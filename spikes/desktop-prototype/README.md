@@ -16,6 +16,8 @@ Use the same menu to switch between Docked and Floating panels. Floating panels 
 
 Appearance choices are recorded in the URL and included in exported HTML. For example, `?panels=floating&accent=coral&corners=24` opens floating panels with Coral and 24-pixel corners. Docked panels with neutral gray chrome and a light blue accent are the chosen default. Selection, focus, and primary actions use the accent; the canvas keeps its authored colors. Floating remains available for comparison, with 18-pixel corners. Workspace accents do not change the artboards’ design tokens.
 
+The app has one header. Project navigation sits above the layers, Design/Prototype/Code controls sit above properties, and a floating zoom control sits at the canvas’s top-right corner.
+
 Select layers on the canvas or in the layer list. Double-click text to edit it. Change geometry, typography, opacity, corner radius, and fill in the inspector. Open Tokens to change colors shared across both artboards. Assets selects example components already on the canvas.
 
 Use the toolbar to add text and rectangles. Drag layers to move them. Arrow keys nudge by one pixel; Shift nudges by ten. Hold the middle mouse button and drag to pan anywhere on the canvas, including over artboards and editable text. This preserves the current selection and tool. You can also hold Space or choose the hand tool. Command-scroll zooms, and Shift 1 fits both artboards. Command-Z undoes; Shift-Command-Z redoes. The play button hides the editing panels.

@@ -7,6 +7,19 @@ try {
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(new URL('./index.html', import.meta.url).href);
   assert.equal(await page.locator('[data-node]').count(), 5);
+  assert.equal(await page.locator('.workspace-bar').count(), 0);
+  assert.equal(await page.locator('header').count(), 1);
+  assert.ok(await page.locator('.left-panel #project-info').isVisible());
+  assert.ok(await page.locator('.inspector #design-mode').isVisible());
+  assert.ok(await page.locator('#canvas #zoom-fit').isVisible());
+  assert.equal((await page.locator('#canvas').boundingBox()).y, 46);
+  await page.locator('#project-info').click();
+  assert.ok(await page.locator('#modal').isVisible());
+  await page.locator('#dismiss-modal').click();
+  await page.locator('.inspector [data-future="prototype"]').click();
+  assert.ok(await page.locator('#modal').isVisible());
+  await page.locator('#dismiss-modal').click();
+
   assert.equal(await page.locator('html').getAttribute('data-layout'), 'docked');
   assert.equal(await page.locator('html').getAttribute('data-accent'), 'blue');
   assert.equal(await page.locator('.left-panel').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(32, 32, 32)');
@@ -189,7 +202,7 @@ try {
   await page.screenshot({ path: new URL('./narrow-preview.png', import.meta.url).pathname });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 560);
   assert.deepEqual(errors, []);
-  console.log('PASS: selection, properties, text editing, undo/redo, linked tokens, insertion, dragging, zoom, preview, standalone export, compact layouts, appearance combinations, URL state, custom colors, appearance export, and middle-mouse panning.');
+  console.log('PASS: selection, properties, text editing, undo/redo, linked tokens, insertion, dragging, zoom, preview, standalone export, compact layouts, appearance combinations, URL state, custom colors, appearance export, middle-mouse panning, and the single-header layout.');
 } finally {
   await browser.close();
 }
