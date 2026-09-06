@@ -9,7 +9,7 @@ try {
   assert.equal(await page.locator('[data-node]').count(), 5);
   assert.equal(await page.locator('html').getAttribute('data-layout'), 'docked');
   assert.equal(await page.locator('html').getAttribute('data-accent'), 'blue');
-  assert.equal(await page.locator('.left-panel').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(38, 39, 42)');
+  assert.equal(await page.locator('.left-panel').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(39, 39, 39)');
   const canvasOffset = () => page.locator('#world').evaluate(el => {
     const matrix = new DOMMatrix(getComputedStyle(el).transform);
     return { x: matrix.e, y: matrix.f };
