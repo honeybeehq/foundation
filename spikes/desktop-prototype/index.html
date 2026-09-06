@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- Design prototype: one desktop direction for Foundation. Edits are in memory; export downloads a prototype snapshot. -->
-<html lang="en">
+<html lang="en" data-layout="floating" data-accent="iris" data-roundness="18">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Foundation · Somewhere</title>
@@ -14,6 +14,38 @@
 @media(max-width:850px){.app{grid-template-columns:170px minmax(0,1fr) 220px}.brand-name,.workspace-path,.breadcrumb .parent,.prototype,.titlebar .divider,.titlebar .local-label{display:none}.workspace-bar{gap:5px}.mode-switch button{padding:4px 6px}.file-tab{min-width:170px}.left-tabs{gap:13px;padding:0 12px}.tool-dock{gap:0;padding:5px}.tool-dock button{width:29px}.footer .detail{display:none}}
 @media(max-width:680px){.app{grid-template-columns:1fr}.left-panel,.inspector{display:none}.canvas{grid-column:1/-1}.titlebar{padding:0 10px}.file-tab{min-width:0;flex:1}.titlebar .avatar,.titlebar .export-label{display:none}.breadcrumb{font-size:10px}.mode-switch{margin-left:auto}.canvas-top{left:18px}.compact-label{display:inline}.inspector.mobile-open{display:block;position:absolute;top:89px;bottom:29px;right:0;width:238px;z-index:10;box-shadow:-10px 0 40px #0006}.left-panel.mobile-open{display:flex;position:absolute;top:89px;bottom:29px;left:0;width:215px;z-index:10;box-shadow:10px 0 40px #0006}.footer .file-location{display:none}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+<style id="appearance-styles">
+/* Workspace appearance changes only the editor chrome, not document tokens. */
+.node:hover{outline-color:color-mix(in srgb,var(--accent),transparent 35%)}
+.layer-row>span:not(.layer-kind){overflow:hidden;text-overflow:ellipsis;min-width:0}
+@media(max-width:1100px){html[data-layout=floating] .layer-kind{display:none}}
+:root{--accent-ink:#20242a;--panel-radius:18px;--accent-hover:color-mix(in srgb,var(--accent),white 13%)}
+.primary,.tool-dock button.active{color:var(--accent-ink)}.primary:hover{background:var(--accent-hover)}
+.tool-dock{background:#2a2c2d;border-color:#45484a}.mode-switch .active{background:#393b3e}.layer-row.selected{color:var(--text)}.status-dot{background:var(--accent)}.type-badge{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent),transparent 75%);color:color-mix(in srgb,var(--accent),white 25%)}.modal{background:#282a2d;border-color:#45494f}.modal p{color:#aeb2ba}.modal .outline-button{border-color:#51565e}.toast{background:var(--accent-soft);color:var(--text);border-color:color-mix(in srgb,var(--accent),transparent 60%)}
+.appearance-trigger{display:flex;align-items:center;gap:7px;height:29px;padding:0 9px;border:1px solid var(--line);font-size:11px;white-space:nowrap}.appearance-trigger .accent-dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent),transparent 88%)}.appearance-trigger[aria-expanded=true]{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent),transparent 55%)}
+.appearance-popover{position:fixed;z-index:40;top:54px;right:16px;width:310px;padding:17px;background:#292b2e;border:1px solid #484b50;border-radius:16px;box-shadow:0 16px 60px #0008;color:#e9eaed}.appearance-popover h2{font-size:12px;margin:0;font-weight:550}.appearance-popover .subcopy{font-size:10px;color:#9fa4ac;line-height:1.5;margin:4px 0 18px}.appearance-label{font-size:10px;color:#b9bdc5;display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}.appearance-options{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px}.layout-choice{border:1px solid #44484e;background:#24262a;padding:9px;border-radius:10px;text-align:left}.layout-choice[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft)}.layout-choice>span:last-child{display:block;font-size:11px;margin-top:9px}.layout-mini{height:64px;display:flex;gap:7px;background:#17191c;position:relative;overflow:hidden;border:1px solid #393d43}.layout-mini i{width:20px;height:100%;background:#444850}.layout-mini i:last-child{margin-left:auto}.layout-mini:after{content:"";position:absolute;left:33px;right:33px;top:20px;height:25px;border:1px solid var(--accent);background:color-mix(in srgb,var(--accent),transparent 85%)}.layout-mini.float{padding:7px;border-radius:6px}.layout-mini.float i{border-radius:4px;width:17px}.layout-mini.float i:first-child{height:36px}.appearance-range{display:flex;align-items:center;gap:14px;margin:0 0 17px}.appearance-range input{width:100%;height:4px;accent-color:var(--accent);cursor:pointer}.appearance-range output{font-size:10px;color:#afb4be;min-width:29px;text-align:right}.appearance-range:has(input:disabled){opacity:.4}.accent-options{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:0 0 13px}.accent-choice{display:flex;flex-direction:column;align-items:center;gap:7px;border:1px solid transparent;padding:6px 2px;border-radius:7px;font-size:9px;color:#a8aeb7}.accent-choice i{display:block;width:23px;height:23px;border-radius:50%;background:var(--swatch);border:1px solid #ffffff20;box-shadow:inset 0 0 0 3px #00000008}.accent-choice[aria-pressed=true]{border-color:color-mix(in srgb,var(--accent),transparent 45%);background:var(--accent-soft);color:#eff0f3}.accent-choice[aria-pressed=true] i:after{content:"";display:block;width:5px;height:9px;border:solid #20242a;border-width:0 1.5px 1.5px 0;transform:rotate(45deg);margin:4px auto}.custom-accent{display:flex;align-items:center;font-size:10px;color:#adb2bb;gap:8px;padding:8px 0 15px;border-bottom:1px solid #41454b}.custom-accent input{height:22px;width:23px;border:0;padding:0;background:none;cursor:pointer}.appearance-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:13px;gap:12px}.appearance-bottom button{font-size:10px;padding:5px 7px;border:1px solid #454a51}.appearance-summary{font-size:10px;color:#9fa6b2}.appearance-popover button:focus-visible,.appearance-popover input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+html[data-layout=floating]{--shell:#202226;--panel:#25272b;--field:#2e3035;--line:#3b3e44;--text:#e5e7ed;--muted:#a3a8b2;--dim:#7d8490;--canvas:#181a1e}
+html[data-layout=floating] .app{background-color:var(--canvas);background-image:radial-gradient(#69717e38 .7px,transparent .7px);background-size:18px 18px;grid-template-rows:46px 55px 1fr 29px}
+html[data-layout=floating] .titlebar{background:#222428;border-color:#383b41}
+html[data-layout=floating] .workspace-bar{margin:9px 14px 0;padding:0 10px;border:1px solid #3d4148;border-radius:calc(var(--panel-radius) * .65);background:#26282d;box-shadow:0 3px 12px #0002}
+html[data-layout=floating] .canvas{background:transparent}
+html[data-layout=floating] .left-panel,html[data-layout=floating] .inspector{grid-row:3;margin:14px 0 17px 14px;border:1px solid #42464d;border-radius:var(--panel-radius);box-shadow:0 10px 28px #0003,inset 0 1px #ffffff04;z-index:6;scrollbar-width:thin;scrollbar-color:#51555e transparent}
+html[data-layout=floating] .left-panel{grid-column:1;height:min(595px,calc(100% - 31px));align-self:start}
+html[data-layout=floating] .canvas{grid-row:3;grid-column:2}
+html[data-layout=floating] .inspector{grid-column:3;margin-left:0;margin-right:14px}
+html[data-layout=floating] .left-tabs{padding:0 12px;gap:13px}html[data-layout=floating] .left-tabs button{font-size:11px}
+html[data-layout=floating] .layer-row{width:calc(100% - 12px);margin-left:6px;border-radius:6px}html[data-layout=floating] .layer-row.selected{box-shadow:none;background:var(--accent-soft)}
+html[data-layout=floating] .page-row.active{background:#34373e}html[data-layout=floating] .library-footer{background:#282b30}
+html[data-layout=floating] .tool-dock{border-radius:calc(var(--panel-radius) * .8);background:#292c32;border-color:#494e58;padding:7px;box-shadow:0 10px 32px #0006}
+html[data-layout=floating] .tool-dock button{border-radius:calc(var(--panel-radius) * .4)}
+html[data-layout=floating] .footer{background:transparent;border:0;color:#9299a6}html[data-layout=floating] .footer .file-location{color:#aeb6c3}
+html[data-layout=floating] .canvas-top{left:21px}html[data-layout=floating] .canvas-top,html[data-layout=floating] .canvas-caption{color:#919baa}html[data-layout=floating] .canvas-note,html[data-layout=floating] .canvas-hint{color:#7b8595}
+html[data-layout=floating] .app.preview .canvas{grid-column:1/-1}
+@media(max-width:1100px){html[data-layout=floating] .left-tabs{gap:9px;padding:0 9px}html[data-layout=floating] .left-tabs .icon-button{width:22px}html[data-layout=floating] .left-tabs button{font-size:10px}html[data-layout=floating] .left-panel{margin-left:10px}html[data-layout=floating] .inspector{margin-right:10px}}
+@media(max-width:850px){.appearance-trigger .appearance-text{display:none}.titlebar .prototype{display:none}html[data-layout=floating] .left-tabs{gap:7px;padding:0 7px}html[data-layout=floating] .left-tabs .icon-button{width:18px}html[data-layout=floating] .left-tabs svg{width:14px}html[data-layout=floating] .layer-row.nested{padding-left:16px}html[data-layout=floating] .layer-kind{display:none}}
+@media(max-width:680px){.appearance-popover{right:10px;width:min(310px,calc(100vw - 20px))}.appearance-trigger{padding:0 8px}html[data-layout=floating] .workspace-bar{margin-left:9px;margin-right:9px}html[data-layout=floating] .canvas{grid-column:1/-1}html[data-layout=floating] .left-panel.mobile-open,html[data-layout=floating] .inspector.mobile-open{top:113px;bottom:44px;margin:0 10px;height:auto;max-height:calc(100dvh - 157px)}html[data-layout=floating] .left-panel.mobile-open{height:min(595px,calc(100dvh - 157px))}}
+
 </style>
 </head>
 <body>
@@ -212,7 +244,7 @@
 <header class="titlebar">
  <div class="brand row"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="brand-name">foundation</span></div>
  <div class="file-tab"><svg class="icon"><use href="#i-file"/></svg><span class="file-name">Somewhere.fdn</span><span class="dot"></span><span class="spacer"></span><svg class="icon muted" style="width:12px"><use href="#i-chevron-down"/></svg></div>
- <span class="prototype">DESIGN STUDY</span><span class="spacer"></span>
+ <span class="prototype">DESIGN STUDY</span><button class="appearance-trigger" id="appearance-toggle" aria-expanded="false" aria-controls="appearance-popover"><i class="accent-dot" aria-hidden="true"></i><span class="appearance-text">Appearance</span><svg class="icon" style="width:12px"><use href="#i-chevron-down"/></svg></button><span class="spacer"></span>
  <span class="row muted local-label small"><svg class="icon"><use href="#i-folder"/></svg>Local project</span>
  <span class="divider"></span><div class="avatar" title="Your workspace">TH</div>
  <button class="icon-button" id="preview" aria-label="Preview artboards" title="Preview artboards"><svg class="icon"><use href="#i-player-play"/></svg></button>
@@ -272,6 +304,26 @@
 </aside>
 <footer class="footer"><span class="status-dot"></span><span id="save-status">Prototype · edits in memory</span><span class="detail dim">/</span><span class="file-location">somewhere / website.fdn.html</span><span class="spacer"></span><span class="detail" id="selection-footer">1 layer selected</span><span class="detail divider" style="height:12px"></span><button id="undo" aria-label="Undo" title="Undo (⌘Z)"><svg class="icon"><use href="#i-arrow-back-up"/></svg></button><button id="redo" aria-label="Redo" title="Redo (⇧⌘Z)"><svg class="icon"><use href="#i-arrow-forward-up"/></svg></button><span class="detail divider" style="height:12px"></span><button id="help" title="Prototype shortcuts"><svg class="icon"><use href="#i-circle"/></svg> <span class="detail">Shortcuts</span></button></footer>
 </div>
+<section class="appearance-popover hidden" id="appearance-popover" aria-label="Workspace appearance">
+ <div class="row between"><h2>Workspace appearance</h2><button class="icon-button" id="appearance-close" aria-label="Close appearance"><svg class="icon"><use href="#i-x"/></svg></button></div>
+ <p class="subcopy">Try a different frame for your work.</p>
+ <div class="appearance-label">Panels</div>
+ <div class="appearance-options"><button class="layout-choice" data-layout-choice="docked" aria-pressed="false"><span class="layout-mini" aria-hidden="true"><i></i><i></i></span><span>Docked</span></button><button class="layout-choice" data-layout-choice="floating" aria-pressed="true"><span class="layout-mini float" aria-hidden="true"><i></i><i></i></span><span>Floating</span></button></div>
+ <label class="appearance-label" for="panel-radius">Corner radius <span class="dim">Floating panels</span></label>
+ <div class="appearance-range"><input id="panel-radius" type="range" min="8" max="28" step="2" value="18"><output for="panel-radius" id="radius-output">18 px</output></div>
+ <div class="appearance-label">Accent <span id="accent-name">Iris</span></div>
+ <div class="accent-options">
+  <button class="accent-choice" data-accent-choice="iris" style="--swatch:#b4afff" aria-label="Iris accent" aria-pressed="true"><i></i>Iris</button>
+  <button class="accent-choice" data-accent-choice="blue" style="--swatch:#92bcff" aria-label="Blue accent" aria-pressed="false"><i></i>Blue</button>
+  <button class="accent-choice" data-accent-choice="coral" style="--swatch:#f4aa97" aria-label="Coral accent" aria-pressed="false"><i></i>Coral</button>
+  <button class="accent-choice" data-accent-choice="mint" style="--swatch:#8edcc5" aria-label="Mint accent" aria-pressed="false"><i></i>Mint</button>
+  <button class="accent-choice" data-accent-choice="gold" style="--swatch:#e9c47b" aria-label="Gold accent" aria-pressed="false"><i></i>Gold</button>
+  <button class="accent-choice" data-accent-choice="lime" style="--swatch:#d0e8a0" aria-label="Lime accent" aria-pressed="false"><i></i>Lime</button>
+ </div>
+ <label class="custom-accent"><input type="color" id="custom-accent" value="#b4afff" aria-label="Custom accent color">Your own color<span class="spacer"></span><span class="mono" id="accent-hex">#B4AFFF</span></label>
+ <div class="appearance-bottom"><span class="appearance-summary" id="appearance-summary" aria-live="polite">Floating · Iris</span><button id="original-appearance">Original draft</button></div>
+</section>
+
 <dialog class="modal" id="modal"><div class="row between"><span class="modal-kicker">FOUNDATION / DESIGN STUDY</span><button class="icon-button" id="close-modal" aria-label="Close dialog"><svg class="icon"><use href="#i-x"/></svg></button></div><h2 id="modal-title"></h2><p id="modal-body"></p><button class="outline-button" id="dismiss-modal">Back to the canvas</button></dialog>
 <script id="document-model">
 const initialDocument = {
@@ -354,9 +406,55 @@ $$('[data-future]').forEach(b=>b.onclick=()=>modal(...future[b.dataset.future]))
 $('#help').onclick=()=>modal('A few ways to get around','V selects the move tool. H or holding Space pans the canvas. T adds text and R adds a rectangle. Double-click text to edit it. Arrow keys nudge a layer; Shift nudges by 10. ⌘Z undoes, ⇧⌘Z redoes, and Shift 1 fits the artboards. Export study downloads your edited prototype.');
 $('#project-info').onclick=()=>modal('Somewhere / local project','An example travel brand to explore Foundation’s desktop workspace. Edits live in this browser tab. Export study downloads an HTML snapshot with your edits; this prototype does not write to a Foundation document or the engine.');
 $('#close-modal').onclick=$('#dismiss-modal').onclick=()=>$('#modal').close();$('#modal').addEventListener('click',e=>{if(e.target===$('#modal'))$('#modal').close()});
-$('#export').onclick=()=>{document.activeElement?.blur();const clone=document.documentElement.cloneNode(true);clone.querySelector('#document-model').textContent=$('#document-model').textContent.replace(/const initialDocument = [\s\S]*?;\nfunction validNumber/,()=>`const initialDocument = ${JSON.stringify(history.value).replace(/</g,'\\u003c')};\nfunction validNumber`);clone.querySelector('#app').classList.remove('preview');clone.querySelector('#modal').removeAttribute('open');clone.querySelector('#toast').classList.add('hidden');clone.querySelectorAll('.mobile-open').forEach(el=>el.classList.remove('mobile-open'));const blob=new Blob(['<!doctype html>\n'+clone.outerHTML],{type:'text/html'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='somewhere.foundation-study.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);notify('Exported an HTML study with your edits.')};
+$('#export').onclick=()=>{document.activeElement?.blur();const clone=document.documentElement.cloneNode(true);clone.querySelector('#document-model').textContent=$('#document-model').textContent.replace(/const initialDocument = [\s\S]*?;\nfunction validNumber/,()=>`const initialDocument = ${JSON.stringify(history.value).replace(/</g,'\\u003c')};\nfunction validNumber`);clone.querySelector('#app').classList.remove('preview');clone.querySelector('#modal').removeAttribute('open');clone.querySelector('#toast').classList.add('hidden');clone.querySelector('#appearance-popover').classList.add('hidden');clone.querySelector('#appearance-toggle').setAttribute('aria-expanded','false');clone.querySelectorAll('.mobile-open').forEach(el=>el.classList.remove('mobile-open'));const blob=new Blob(['<!doctype html>\n'+clone.outerHTML],{type:'text/html'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='somewhere.foundation-study.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);notify('Exported an HTML study with your edits.')};
 window.addEventListener('keydown',e=>{if($('#modal').open)return;const editing=e.target.closest('input,textarea,select,[contenteditable="true"]');if(editing){if(e.key==='Escape')e.target.blur();return}if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?redo():undo();return}if(e.code==='Space'){space=true;e.preventDefault();$('#canvas').classList.add('hand');return}if(e.shiftKey&&e.code==='Digit1'){e.preventDefault();fit();return}if(e.metaKey||e.ctrlKey||e.altKey)return;if(e.key==='v')setTool('select');if(e.key==='h')setTool('hand');if(e.key==='t')insert('text');if(e.key==='r')insert('shape');if(e.key==='Escape'){$('#app').classList.remove('preview');$$('.mobile-open').forEach(el=>el.classList.remove('mobile-open'));setTool('select');fit()}const delta={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(delta&&node()){e.preventDefault();const step=e.shiftKey?10:1;patch({x:node().x+delta[0]*step,y:node().y+delta[1]*step})}});
 window.addEventListener('keyup',e=>{if(e.code==='Space'){space=false;$('#canvas').classList.toggle('hand',tool==='hand')}});window.addEventListener('blur',()=>{space=false;finishDrag();$('#canvas').classList.toggle('hand',tool==='hand')});
 new ResizeObserver(fit).observe($('#canvas'));render();fit();
+</script>
+<script id="appearance-controller">
+/* Independent from the design document: switching chrome preserves canvas edits. */
+(()=>{
+ const root=document.documentElement;
+ const presets={iris:'#b4afff',blue:'#92bcff',coral:'#f4aa97',mint:'#8edcc5',gold:'#e9c47b',lime:'#d0e8a0'};
+ const find=s=>document.querySelector(s),all=s=>[...document.querySelectorAll(s)];
+ const params=new URLSearchParams(location.search);
+ let layout=params.get('panels')||root.dataset.layout||'floating';
+ let accent=params.get('accent')||root.dataset.accent||'iris';
+ let radius=Number(params.get('corners')||root.dataset.roundness||18);
+ if(!['docked','floating'].includes(layout))layout='floating';
+ if(!Object.hasOwn(presets,accent)&&!/^#[0-9a-f]{6}$/i.test(accent))accent='iris';
+ if(!Number.isFinite(radius))radius=18;
+ radius=Math.round(Math.max(8,Math.min(28,radius))/2)*2;
+ const label=s=>s[0].toUpperCase()+s.slice(1);
+ function apply(updateURL=true){
+  const color=presets[accent]||accent;
+  const rgb=color.slice(1).match(/../g).map(v=>parseInt(v,16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);
+  const luminance=rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;
+  root.dataset.layout=layout;root.dataset.accent=accent;root.dataset.roundness=radius;
+  root.style.setProperty('--accent',color);
+  root.style.setProperty('--accent-ink',luminance>.179?'#17191d':'#ffffff');
+  root.style.setProperty('--accent-soft',`color-mix(in srgb, ${color} 16%, #25272b)`);
+  root.style.setProperty('--panel-radius',radius+'px');
+  all('[data-layout-choice]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.layoutChoice===layout));
+  all('[data-accent-choice]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.accentChoice===accent));
+  find('#panel-radius').value=radius;find('#panel-radius').disabled=layout==='docked';
+  find('#radius-output').value=radius+' px';find('#custom-accent').value=color;find('#accent-hex').textContent=color.toUpperCase();
+  const accentLabel=presets[accent]?label(accent):'Custom';
+  find('#accent-name').textContent=accentLabel;find('#appearance-summary').textContent=label(layout)+' · '+accentLabel;
+  if(updateURL){const url=new URL(location.href);url.searchParams.set('panels',layout);url.searchParams.set('accent',accent);url.searchParams.set('corners',radius);try{window.history.replaceState(null,'',url)}catch{/* Exported previews can run in a browser without a writable URL. */}}
+ }
+ function setOpen(open){find('#appearance-popover').classList.toggle('hidden',!open);find('#appearance-toggle').setAttribute('aria-expanded',open)}
+ find('#appearance-toggle').onclick=()=>setOpen(find('#appearance-popover').classList.contains('hidden'));
+ find('#appearance-close').onclick=()=>{setOpen(false);find('#appearance-toggle').focus()};
+ all('[data-layout-choice]').forEach(b=>b.onclick=()=>{layout=b.dataset.layoutChoice;apply()});
+ all('[data-accent-choice]').forEach(b=>b.onclick=()=>{accent=b.dataset.accentChoice;apply()});
+ find('#custom-accent').oninput=e=>{accent=e.target.value;apply()};
+ find('#panel-radius').oninput=e=>{radius=Number(e.target.value);apply()};
+ find('#original-appearance').onclick=()=>{layout='docked';accent='lime';radius=18;apply()};
+ document.addEventListener('pointerdown',e=>{if(!e.target.closest('#appearance-popover,#appearance-toggle'))setOpen(false)});
+ document.addEventListener('keydown',e=>{if(find('#appearance-popover').classList.contains('hidden'))return;if(e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();setOpen(false);find('#appearance-toggle').focus()}else if(e.target.closest('#appearance-popover')){e.stopImmediatePropagation()}},true);
+ apply(false);
+})();
+
 </script>
 </body></html>

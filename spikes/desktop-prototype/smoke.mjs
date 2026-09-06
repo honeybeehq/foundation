@@ -22,6 +22,34 @@ try {
   await page.keyboard.insertText('Stay somewhere wonderful.');
   await page.locator('#selection-name').click();
   assert.equal(await page.locator('#text-content').inputValue(), 'Stay somewhere wonderful.');
+  // Appearance switches preserve the edited document across both layouts and all accents.
+  await page.locator('#appearance-toggle').click();
+  for (const layout of ['docked', 'floating']) {
+    await page.locator(`[data-layout-choice="${layout}"]`).click();
+    for (const accent of ['iris', 'blue', 'coral', 'mint', 'gold', 'lime']) {
+      await page.locator(`[data-accent-choice="${accent}"]`).click();
+      assert.equal(await page.locator('html').getAttribute('data-accent'), accent);
+      assert.equal(await page.locator('[data-node="heading"]').textContent(), 'Stay somewhere wonderful.');
+      assert.equal(await page.locator('[data-node="cta"]').evaluate(el => el.style.background), 'rgb(221, 231, 198)');
+    }
+  }
+  await page.locator('#panel-radius').fill('24');
+  assert.equal(await page.locator('.left-panel').evaluate(el => getComputedStyle(el).borderRadius), '24px');
+  const xBeforeRadiusKey = await page.locator('[data-prop="x"]').inputValue();
+  await page.locator('#panel-radius').press('ArrowRight');
+  assert.equal(await page.locator('[data-prop="x"]').inputValue(), xBeforeRadiusKey);
+  await page.locator('#custom-accent').evaluate(el => { el.value = '#102030'; el.dispatchEvent(new Event('input', { bubbles: true })); });
+  assert.equal(await page.locator('html').evaluate(el => el.style.getPropertyValue('--accent-ink')), '#ffffff');
+  assert.equal(await page.locator('#accent-name').textContent(), 'Custom');
+  await page.locator('#original-appearance').click();
+  assert.equal(await page.locator('html').getAttribute('data-layout'), 'docked');
+  assert.equal(await page.locator('html').getAttribute('data-accent'), 'lime');
+  assert.ok(await page.locator('#panel-radius').isDisabled());
+  await page.locator('[data-layout-choice="floating"]').click();
+  await page.locator('[data-accent-choice="blue"]').click();
+  await page.locator('#appearance-close').click();
+  assert.ok(page.url().includes('panels=floating'));
+  assert.ok(page.url().includes('accent=blue'));
   await page.locator('[data-tab="tokens"]').click();
   await page.locator('[data-token="sage"]').evaluate(el => { el.value = '#e8b5a2'; el.dispatchEvent(new Event('input', { bubbles: true })); });
   assert.equal(await page.locator('[data-node="cta"]').evaluate(el => el.style.background), 'rgb(232, 181, 162)');
@@ -61,8 +89,16 @@ try {
   await reopened.setContent(exported);
   assert.equal(await reopened.locator('[data-node="heading"]').textContent(), literal);
   assert.equal(await reopened.evaluate(() => window.badExport), undefined);
+  assert.equal(await reopened.locator('html').getAttribute('data-layout'), 'floating');
+  assert.equal(await reopened.locator('html').getAttribute('data-accent'), 'blue');
+  assert.ok(await reopened.locator('#appearance-popover').isHidden());
   assert.equal(await reopened.locator('[data-node="mobile-cta"]').evaluate(el => el.style.background), 'rgb(232, 181, 162)');
   await page.reload();
+  assert.equal(await page.locator('html').getAttribute('data-accent'), 'blue');
+  await page.locator('#appearance-toggle').click();
+  await page.locator('[data-accent-choice="iris"]').click();
+  await page.screenshot({ path: new URL('./appearance-preview.png', import.meta.url).pathname });
+  await page.locator('#appearance-close').click();
   await page.setViewportSize({ width: 1024, height: 768 });
   await page.screenshot({ path: new URL('./compact-preview.png', import.meta.url).pathname });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 1024);
@@ -74,7 +110,7 @@ try {
   await page.screenshot({ path: new URL('./narrow-preview.png', import.meta.url).pathname });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 560);
   assert.deepEqual(errors, []);
-  console.log('PASS: selection, properties, text editing, undo/redo, linked tokens, insertion, dragging, zoom, preview, standalone export, and compact layouts.');
+  console.log('PASS: selection, properties, text editing, undo/redo, linked tokens, insertion, dragging, zoom, preview, standalone export, compact layouts, appearance combinations, URL state, custom colors, and appearance export.');
 } finally {
   await browser.close();
 }
