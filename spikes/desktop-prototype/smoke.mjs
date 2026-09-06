@@ -7,6 +7,62 @@ try {
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(new URL('./index.html', import.meta.url).href);
   assert.equal(await page.locator('[data-node]').count(), 5);
+  assert.equal(await page.locator('html').getAttribute('data-layout'), 'docked');
+  assert.equal(await page.locator('html').getAttribute('data-accent'), 'blue');
+  assert.equal(await page.locator('.left-panel').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(38, 39, 42)');
+  const canvasOffset = () => page.locator('#world').evaluate(el => {
+    const matrix = new DOMMatrix(getComputedStyle(el).transform);
+    return { x: matrix.e, y: matrix.f };
+  });
+  const layerState = () => page.locator('[data-node]').evaluateAll(nodes => nodes.map(el => ({
+    id: el.dataset.node, selected: el.classList.contains('selected'), left: el.style.left, top: el.style.top, text: el.innerText,
+  })));
+  const originalLayers = await layerState();
+  for (const target of ['background', 'photo', 'heading']) {
+    const area = await page.locator(target === 'background' ? '#canvas' : `[data-node="${target}"]`).boundingBox();
+    const x = area.x + 65, y = area.y + 55;
+    const offset = await canvasOffset();
+    await page.mouse.move(x, y);
+    await page.mouse.down({ button: 'middle' });
+    assert.ok(await page.locator('#canvas').evaluate(el => el.classList.contains('panning')));
+    await page.mouse.move(x + 80, y + 45, { steps: 5 });
+    await page.mouse.up({ button: 'middle' });
+    const moved = await canvasOffset();
+    assert.ok(Math.abs(moved.x - offset.x - 80) < 0.1);
+    assert.ok(Math.abs(moved.y - offset.y - 45) < 0.1);
+    assert.deepEqual(await layerState(), originalLayers);
+    assert.ok(await page.locator('#undo').isDisabled());
+    assert.ok(await page.locator('[data-tool="select"]').evaluate(el => el.classList.contains('active')));
+    assert.equal(await page.locator('#canvas').evaluate(el => el.classList.contains('panning')), false);
+    await page.mouse.move(x + 100, y + 60);
+    assert.deepEqual(await canvasOffset(), moved);
+    await page.locator('#zoom-fit').click();
+  }
+  // Pointer capture keeps panning alive over the inspector; release ends it there.
+  const canvasBounds = await page.locator('#canvas').boundingBox();
+  await page.mouse.move(canvasBounds.x + canvasBounds.width - 20, canvasBounds.y + 60);
+  await page.mouse.down({ button: 'middle' });
+  const boundaryOffset = await canvasOffset();
+  await page.mouse.move(canvasBounds.x + canvasBounds.width + 40, canvasBounds.y + 80, { steps: 4 });
+  await page.mouse.up({ button: 'middle' });
+  assert.ok(Math.abs((await canvasOffset()).x - boundaryOffset.x - 60) < 0.1);
+  assert.equal(await page.locator('#canvas').evaluate(el => el.classList.contains('panning')), false);
+  await page.locator('#zoom-fit').click();
+  // Text-editing mode remains intact, and losing window focus cancels an active pan.
+  await page.locator('[data-node="heading"]').dblclick();
+  const editingBox = await page.locator('[data-node="heading"]').boundingBox();
+  await page.mouse.move(editingBox.x + 30, editingBox.y + 25);
+  await page.mouse.down({ button: 'middle' });
+  await page.mouse.move(editingBox.x + 55, editingBox.y + 40, { steps: 3 });
+  assert.equal(await page.locator('[data-node="heading"]').getAttribute('contenteditable'), 'true');
+  await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+  const blurredOffset = await canvasOffset();
+  await page.mouse.move(editingBox.x + 85, editingBox.y + 70);
+  await page.mouse.up({ button: 'middle' });
+  assert.deepEqual(await canvasOffset(), blurredOffset);
+  assert.equal(await page.locator('#canvas').evaluate(el => el.classList.contains('panning')), false);
+  await page.locator('#selection-name').click();
+  await page.locator('#zoom-fit').click();
   await page.screenshot({ path: new URL('./desktop-preview.png', import.meta.url).pathname });
   await page.locator('[data-select="cta"]').first().click();
   assert.equal(await page.locator('#selection-type').textContent(), 'Instance');
@@ -110,7 +166,7 @@ try {
   await page.screenshot({ path: new URL('./narrow-preview.png', import.meta.url).pathname });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 560);
   assert.deepEqual(errors, []);
-  console.log('PASS: selection, properties, text editing, undo/redo, linked tokens, insertion, dragging, zoom, preview, standalone export, compact layouts, appearance combinations, URL state, custom colors, and appearance export.');
+  console.log('PASS: selection, properties, text editing, undo/redo, linked tokens, insertion, dragging, zoom, preview, standalone export, compact layouts, appearance combinations, URL state, custom colors, appearance export, and middle-mouse panning.');
 } finally {
   await browser.close();
 }

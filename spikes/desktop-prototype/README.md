@@ -12,11 +12,11 @@ Open http://127.0.0.1:4318. Use a desktop window around 1500 × 980 to see the i
 
 Open **Appearance** in the title bar to switch between Docked and Floating panels. Floating panels have an adjustable corner radius. Choose Iris, Blue, Coral, Mint, Gold, or Lime, or pick a custom accent. **Original draft** restores docked panels with Lime. Changes apply immediately and preserve document edits.
 
-Appearance choices are recorded in the URL and included in exported HTML. For example, `?panels=floating&accent=coral&corners=24` opens floating panels with Coral and 24-pixel corners. The default is Floating with Iris and 18-pixel corners. Workspace accents do not change the artboards’ design tokens.
+Appearance choices are recorded in the URL and included in exported HTML. For example, `?panels=floating&accent=coral&corners=24` opens floating panels with Coral and 24-pixel corners. Docked panels with neutral gray chrome and a light blue accent are the chosen default. Selection, focus, and primary actions use the accent; the canvas keeps its authored colors. Floating remains available for comparison, with 18-pixel corners. Workspace accents do not change the artboards’ design tokens.
 
 Select layers on the canvas or in the layer list. Double-click text to edit it. Change geometry, typography, opacity, corner radius, and fill in the inspector. Open Tokens to change colors shared across both artboards. Assets selects example components already on the canvas.
 
-Use the toolbar to add text and rectangles. Drag layers to move them. Arrow keys nudge by one pixel; Shift nudges by ten. Hold Space to pan, or choose the hand tool. Command-scroll zooms, and Shift 1 fits both artboards. Command-Z undoes; Shift-Command-Z redoes. The play button hides the editing panels.
+Use the toolbar to add text and rectangles. Drag layers to move them. Arrow keys nudge by one pixel; Shift nudges by ten. Hold the middle mouse button and drag to pan anywhere on the canvas, including over artboards and editable text. This preserves the current selection and tool. You can also hold Space or choose the hand tool. Command-scroll zooms, and Shift 1 fits both artboards. Command-Z undoes; Shift-Command-Z redoes. The play button hides the editing panels.
 
 Edits stay in memory. **Export study** downloads a self-contained HTML copy with the current edits. Reopen that file to continue the study.
 
