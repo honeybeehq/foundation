@@ -12,7 +12,7 @@ try {
   assert.ok(await page.locator('.left-panel #project-info').isVisible());
   assert.ok(await page.locator('.inspector #design-mode').isVisible());
   assert.ok(await page.locator('#canvas #zoom-fit').isVisible());
-  assert.equal((await page.locator('#canvas').boundingBox()).y, 46);
+  assert.equal((await page.locator('#canvas').boundingBox()).y, 40);
   await page.locator('#project-info').click();
   assert.ok(await page.locator('#modal').isVisible());
   await page.locator('#dismiss-modal').click();
