@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- Design prototype: one desktop direction for Foundation. Edits are in memory; export downloads a prototype snapshot. -->
-<html lang="en" data-layout="docked" data-accent="blue" data-roundness="18">
+<html lang="en" data-layout="docked" data-accent="blue" data-roundness="18" data-panel-tone="32" data-canvas-tone="26">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Foundation · Somewhere</title>
@@ -60,6 +60,19 @@ html[data-layout=floating] .app.preview .canvas{grid-column:1/-1}
 @media(max-width:850px){.appearance-trigger .appearance-text{display:none}.titlebar .prototype{display:none}html[data-layout=floating] .left-tabs{gap:7px;padding:0 7px}html[data-layout=floating] .left-tabs .icon-button{width:18px}html[data-layout=floating] .left-tabs svg{width:14px}html[data-layout=floating] .layer-row.nested{padding-left:16px}html[data-layout=floating] .layer-kind{display:none}}
 @media(max-width:680px){.appearance-popover{right:10px;width:min(310px,calc(100vw - 20px))}.appearance-trigger{padding:0 8px}html[data-layout=floating] .workspace-bar{margin-left:9px;margin-right:9px}html[data-layout=floating] .canvas{grid-column:1/-1}html[data-layout=floating] .left-panel.mobile-open,html[data-layout=floating] .inspector.mobile-open{top:113px;bottom:44px;margin:0 10px;height:auto;max-height:calc(100dvh - 157px)}html[data-layout=floating] .left-panel.mobile-open{height:min(595px,calc(100dvh - 157px))}}
 
+
+/* Brightness changes editor surfaces only; document colors and text stay intact. */
+.appearance-popover{max-height:calc(100dvh - 72px);overflow-y:auto;scrollbar-width:thin}
+.brightness-controls{padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--line)}
+.brightness-controls .appearance-range{margin-bottom:13px}.brightness-controls output{min-width:53px;font-family:monospace}
+.brightness-presets{display:flex;gap:6px;margin-bottom:16px}.brightness-presets button{flex:1;border:1px solid var(--line);padding:6px;font-size:10px;color:var(--muted)}.brightness-presets button[aria-pressed=true]{color:var(--text);border-color:var(--accent);background:var(--accent-soft)}
+html .app .left-panel,html .app .inspector{background:var(--panel)}
+html .app .titlebar,html .app .workspace-bar,html .app .footer{background:var(--shell)}
+html .app .file-tab,html .app .library-footer,html .app .tool-dock,html .app .system-link,html .app .asset-card,.appearance-popover,.modal{background:var(--chrome-raised,var(--panel))}
+html .app .field,html .app .textarea{background:var(--field);border-color:var(--line)}
+html .app .page-row.active,html .app .mode-switch .active,.token-pill{background:var(--accent-soft)}
+html .app .mode-switch,html .app .search-box{background:var(--chrome-sunken,var(--shell))}
+html .app .system-link,html .app .outline-button,html .app .tool-dock{border-color:var(--line)}
 </style>
 </head>
 <body>
@@ -321,6 +334,13 @@ html[data-layout=floating] .app.preview .canvas{grid-column:1/-1}
 <section class="appearance-popover hidden" id="appearance-popover" aria-label="Workspace appearance">
  <div class="row between"><h2>Workspace appearance</h2><button class="icon-button" id="appearance-close" aria-label="Close appearance"><svg class="icon"><use href="#i-x"/></svg></button></div>
  <p class="subcopy">Try a different frame for your work.</p>
+ <div class="brightness-controls">
+  <label class="appearance-label" for="panel-brightness">Panel brightness <span class="dim">Darker ↔ Lighter</span></label>
+  <div class="appearance-range"><input id="panel-brightness" type="range" min="20" max="48" step="1" value="32"><output for="panel-brightness" id="panel-brightness-output">#202020</output></div>
+  <div class="brightness-presets" aria-label="Brightness presets"><button data-brightness="24" aria-pressed="false">Deep</button><button data-brightness="32" aria-pressed="true">Dark</button><button data-brightness="39" aria-pressed="false">Original</button></div>
+  <label class="appearance-label" for="canvas-brightness">Canvas background <span class="dim">Behind your artboards</span></label>
+  <div class="appearance-range" style="margin-bottom:0"><input id="canvas-brightness" type="range" min="10" max="38" step="1" value="26"><output for="canvas-brightness" id="canvas-brightness-output">#1A1A1A</output></div>
+ </div>
  <div class="appearance-label">Panels</div>
  <div class="appearance-options"><button class="layout-choice" data-layout-choice="docked" aria-pressed="false"><span class="layout-mini" aria-hidden="true"><i></i><i></i></span><span>Docked</span></button><button class="layout-choice" data-layout-choice="floating" aria-pressed="true"><span class="layout-mini float" aria-hidden="true"><i></i><i></i></span><span>Floating</span></button></div>
  <label class="appearance-label" for="panel-radius">Corner radius <span class="dim">Floating panels</span></label>
@@ -463,6 +483,10 @@ new ResizeObserver(fit).observe($('#canvas'));render();fit();
  let layout=params.get('panels')||root.dataset.layout||'docked';
  let accent=params.get('accent')||root.dataset.accent||'blue';
  let radius=Number(params.get('corners')||root.dataset.roundness||18);
+ const boundedTone=(value,fallback,min,max)=>{const n=Number(value);return Number.isFinite(n)?Math.round(Math.min(max,Math.max(min,n))):fallback};
+ let panelTone=boundedTone(params.get('shade')??root.dataset.panelTone??32,32,20,48);
+ let canvasTone=boundedTone(params.get('canvas')??root.dataset.canvasTone??26,26,10,38);
+ const gray=n=>'#'+Math.max(0,Math.min(255,n)).toString(16).padStart(2,'0').repeat(3);
  if(!['docked','floating'].includes(layout))layout='docked';
  if(!Object.hasOwn(presets,accent)&&!/^#[0-9a-f]{6}$/i.test(accent))accent='blue';
  if(!Number.isFinite(radius))radius=18;
@@ -475,7 +499,11 @@ new ResizeObserver(fit).observe($('#canvas'));render();fit();
   root.dataset.layout=layout;root.dataset.accent=accent;root.dataset.roundness=radius;
   root.style.setProperty('--accent',color);
   root.style.setProperty('--accent-ink',luminance>.179?'#191919':'#ffffff');
-  root.style.setProperty('--accent-soft','#363636');
+  root.dataset.panelTone=panelTone;root.dataset.canvasTone=canvasTone;
+  for(const [name,value] of Object.entries({'--panel':panelTone,'--shell':panelTone-4,'--field':panelTone+10,'--line':panelTone+21,'--accent-soft':panelTone+15,'--chrome-raised':panelTone+4,'--chrome-sunken':panelTone-6,'--canvas':canvasTone}))root.style.setProperty(name,gray(value));
+  find('#panel-brightness').value=panelTone;find('#panel-brightness-output').value=gray(panelTone).toUpperCase();
+  find('#canvas-brightness').value=canvasTone;find('#canvas-brightness-output').value=gray(canvasTone).toUpperCase();
+  all('[data-brightness]').forEach(b=>b.setAttribute('aria-pressed',Number(b.dataset.brightness)===panelTone));
   root.style.setProperty('--panel-radius',radius+'px');
   all('[data-layout-choice]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.layoutChoice===layout));
   all('[data-accent-choice]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.accentChoice===accent));
@@ -483,7 +511,7 @@ new ResizeObserver(fit).observe($('#canvas'));render();fit();
   find('#radius-output').value=radius+' px';find('#custom-accent').value=color;find('#accent-hex').textContent=color.toUpperCase();
   const accentLabel=presets[accent]?label(accent):'Custom';
   find('#accent-name').textContent=accentLabel;find('#appearance-summary').textContent=label(layout)+' · '+accentLabel;
-  if(updateURL){const url=new URL(location.href);url.searchParams.set('panels',layout);url.searchParams.set('accent',accent);url.searchParams.set('corners',radius);try{window.history.replaceState(null,'',url)}catch{/* Exported previews can run in a browser without a writable URL. */}}
+  if(updateURL){const url=new URL(location.href);url.searchParams.set('panels',layout);url.searchParams.set('accent',accent);url.searchParams.set('corners',radius);url.searchParams.set('shade',panelTone);url.searchParams.set('canvas',canvasTone);try{window.history.replaceState(null,'',url)}catch{/* Exported previews can run in a browser without a writable URL. */}}
  }
  function setOpen(open){find('#appearance-popover').classList.toggle('hidden',!open);find('#appearance-toggle').setAttribute('aria-expanded',open)}
  find('#appearance-toggle').onclick=()=>setOpen(find('#appearance-popover').classList.contains('hidden'));
@@ -492,7 +520,10 @@ new ResizeObserver(fit).observe($('#canvas'));render();fit();
  all('[data-accent-choice]').forEach(b=>b.onclick=()=>{accent=b.dataset.accentChoice;apply()});
  find('#custom-accent').oninput=e=>{accent=e.target.value;apply()};
  find('#panel-radius').oninput=e=>{radius=Number(e.target.value);apply()};
- find('#original-appearance').onclick=()=>{layout='docked';accent='lime';radius=18;apply()};
+ find('#panel-brightness').oninput=e=>{panelTone=boundedTone(e.target.value,32,20,48);apply()};
+ find('#canvas-brightness').oninput=e=>{canvasTone=boundedTone(e.target.value,26,10,38);apply()};
+ all('[data-brightness]').forEach(b=>b.onclick=()=>{panelTone=Number(b.dataset.brightness);apply()});
+ find('#original-appearance').onclick=()=>{layout='docked';accent='lime';radius=18;panelTone=39;canvasTone=26;apply()};
  document.addEventListener('pointerdown',e=>{if(!e.target.closest('#appearance-popover,#appearance-toggle'))setOpen(false)});
  document.addEventListener('keydown',e=>{if(find('#appearance-popover').classList.contains('hidden'))return;if(e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();setOpen(false);find('#appearance-toggle').focus()}else if(e.target.closest('#appearance-popover')){e.stopImmediatePropagation()}},true);
  apply(false);

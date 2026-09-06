@@ -9,7 +9,7 @@ try {
   assert.equal(await page.locator('[data-node]').count(), 5);
   assert.equal(await page.locator('html').getAttribute('data-layout'), 'docked');
   assert.equal(await page.locator('html').getAttribute('data-accent'), 'blue');
-  assert.equal(await page.locator('.left-panel').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(39, 39, 39)');
+  assert.equal(await page.locator('.left-panel').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(32, 32, 32)');
   const canvasOffset = () => page.locator('#world').evaluate(el => {
     const matrix = new DOMMatrix(getComputedStyle(el).transform);
     return { x: matrix.e, y: matrix.f };
@@ -80,6 +80,22 @@ try {
   assert.equal(await page.locator('#text-content').inputValue(), 'Stay somewhere wonderful.');
   // Appearance switches preserve the edited document across both layouts and all accents.
   await page.locator('#appearance-toggle').click();
+  const brightnessContent = await page.locator('[data-node="heading"]').textContent();
+  for (const value of [24, 32, 39]) {
+    await page.locator(`[data-brightness="${value}"]`).click();
+    assert.equal(await page.locator('.left-panel').evaluate(el => getComputedStyle(el).backgroundColor), `rgb(${value}, ${value}, ${value})`);
+  }
+  await page.locator('#panel-brightness').fill('20');
+  assert.equal(await page.locator('.inspector').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(20, 20, 20)');
+  await page.locator('#panel-brightness').press('ArrowRight');
+  assert.equal(await page.locator('#panel-brightness').inputValue(), '21');
+  await page.locator('#canvas-brightness').fill('14');
+  assert.equal(await page.locator('#canvas').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(14, 14, 14)');
+  assert.equal(await page.locator('[data-node="heading"]').textContent(), brightnessContent);
+  assert.equal(await page.locator('[data-node="cta"]').evaluate(el => el.style.background), 'rgb(221, 231, 198)');
+  assert.equal(await page.locator('#export').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(146, 188, 255)');
+  await page.locator('[data-brightness="32"]').click();
+
   for (const layout of ['docked', 'floating']) {
     await page.locator(`[data-layout-choice="${layout}"]`).click();
     for (const accent of ['iris', 'blue', 'coral', 'mint', 'gold', 'lime']) {
@@ -106,6 +122,10 @@ try {
   await page.locator('#appearance-close').click();
   assert.ok(page.url().includes('panels=floating'));
   assert.ok(page.url().includes('accent=blue'));
+  await page.locator('#appearance-toggle').click();
+  await page.locator('#panel-brightness').fill('28');
+  await page.locator('#canvas-brightness').fill('18');
+  await page.locator('#appearance-close').click();
   await page.locator('[data-tab="tokens"]').click();
   await page.locator('[data-token="sage"]').evaluate(el => { el.value = '#e8b5a2'; el.dispatchEvent(new Event('input', { bubbles: true })); });
   assert.equal(await page.locator('[data-node="cta"]').evaluate(el => el.style.background), 'rgb(232, 181, 162)');
@@ -148,9 +168,12 @@ try {
   assert.equal(await reopened.locator('html').getAttribute('data-layout'), 'floating');
   assert.equal(await reopened.locator('html').getAttribute('data-accent'), 'blue');
   assert.ok(await reopened.locator('#appearance-popover').isHidden());
+  assert.equal(await reopened.locator('html').getAttribute('data-panel-tone'), '28');
+  assert.equal(await reopened.locator('html').getAttribute('data-canvas-tone'), '18');
   assert.equal(await reopened.locator('[data-node="mobile-cta"]').evaluate(el => el.style.background), 'rgb(232, 181, 162)');
   await page.reload();
   assert.equal(await page.locator('html').getAttribute('data-accent'), 'blue');
+  assert.equal(await page.locator('html').getAttribute('data-panel-tone'), '28');
   await page.locator('#appearance-toggle').click();
   await page.locator('[data-accent-choice="iris"]').click();
   await page.screenshot({ path: new URL('./appearance-preview.png', import.meta.url).pathname });

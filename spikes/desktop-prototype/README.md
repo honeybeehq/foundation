@@ -10,7 +10,9 @@ python3 -m http.server 4318 --bind 127.0.0.1 --directory spikes/desktop-prototyp
 
 Open http://127.0.0.1:4318. Use a desktop window around 1500 × 980 to see the intended composition.
 
-Open **Appearance** in the title bar to switch between Docked and Floating panels. Floating panels have an adjustable corner radius. Choose Iris, Blue, Coral, Mint, Gold, or Lime, or pick a custom accent. **Original draft** restores docked panels with Lime. Changes apply immediately and preserve document edits.
+Open **Appearance** in the title bar to adjust **Panel brightness** or **Canvas background** independently. Deep, Dark, and Original give quick panel-brightness presets; Dark is the default. These sliders preserve text contrast, the accent, and artwork colors. Choices persist in exported HTML and URL parameters `shade` and `canvas`.
+
+Use the same menu to switch between Docked and Floating panels. Floating panels have an adjustable corner radius. Choose Iris, Blue, Coral, Mint, Gold, or Lime, or pick a custom accent. **Original draft** restores docked panels with Lime. Changes apply immediately and preserve document edits.
 
 Appearance choices are recorded in the URL and included in exported HTML. For example, `?panels=floating&accent=coral&corners=24` opens floating panels with Coral and 24-pixel corners. Docked panels with neutral gray chrome and a light blue accent are the chosen default. Selection, focus, and primary actions use the accent; the canvas keeps its authored colors. Floating remains available for comparison, with 18-pixel corners. Workspace accents do not change the artboards’ design tokens.
 
