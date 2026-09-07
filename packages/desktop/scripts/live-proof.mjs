@@ -18,7 +18,7 @@ const config = path.join(proof, 'comb'), objects = path.join(proof, 'objects')
 await mkdir(config, { recursive: true, mode: 0o700 }); await mkdir(objects, { recursive: true })
 await writeFile(path.join(config, 'config.toml'), `tenant = "foundation_desktop"\ndigest_key = "${randomBytes(32).toString('hex')}"\n[backend]\nkind = "local"\nroot = ${JSON.stringify(objects)}\n`, { mode: 0o600, flag: 'wx' })
 const digest = async file => createHash('sha256').update(await readFile(file)).digest('hex')
-const report = { appPath, proof, checks: [], screenshots: [], passed: false, hashes: {
+const report = { appPath, proof, checks: [], screenshots: [], passed: false, interaction: 'DOM clicks and input events through actual renderer handlers; real preload/HTTP/Comb, no direct host mutation', hashes: {
   hostEntry: await digest(path.join(runtime, 'service/service-main.mjs')),
   comb: await digest(path.join(runtime, 'bin/comb')),
   node: await digest(path.join(runtime, 'bin/node')),
@@ -39,11 +39,19 @@ const log = message => { report.checks.push(message); console.log(message) }
 async function launch(directory, external = true) {
   const application = await electron.launch({ executablePath, cwd: proof, args: ['--replica-dir', path.join(proof, directory), '--author', 'user:same-designer', ...(external ? ['--host-url', url, '--host-token-file', tokenFile, '--doc-id', 'desktop-live-proof'] : [])], timeout: 45_000 })
   apps.add(application)
+  application.process().stderr.on('data', data => { diagnostics += `\nDesktop ${directory}: ${data}` })
   const page = await application.firstWindow({ timeout: 45_000 })
   owners.set(page, application)
   page.setDefaultTimeout(45_000)
   page.on('pageerror', error => { diagnostics += `\nRenderer: ${error.message}` })
-  await page.waitForFunction(() => window.foundationSession?.canEdit(), undefined, { timeout: 45_000 })
+  await activate(page)
+  try { await page.waitForFunction(() => window.foundationSession?.canEdit(), undefined, { timeout: 45_000, polling: 100 }) }
+  catch (error) {
+    const startup = await page.evaluate(() => ({ url: location.href, ready: document.readyState, session: typeof window.foundationSession, status: document.querySelector('#save-status')?.textContent, error: document.querySelector('#host-error')?.textContent })).catch(error => ({ inspectionError: String(error) }))
+    diagnostics += `\nStartup ${directory}: ${JSON.stringify(startup)}`
+    console.error(`Startup ${directory}:`, startup)
+    throw error
+  }
   return { application, page }
 }
 async function activate(page) {
@@ -71,16 +79,69 @@ async function settle(page, predicate) {
 }
 async function edit(page, id, text) {
   await activate(page)
-  await page.locator(`#layer-tree [data-select="${id}"]`).click()
+  await click(page, `#layer-tree [data-select="${id}"]`)
+  assert.equal(await page.evaluate(() => window.foundationEditor.selection()), id, 'Layer UI must select the intended node before editing')
   const field = page.locator('#text-content')
-  await field.fill(text); await field.blur()
+  await fillField(page, '#text-content', text); await field.blur()
   await settle(page, state => state.document.body.flatMap(root => root.children).find(n => n.id === id)?.text === text)
 }
 async function comment(page, text) {
   await activate(page)
-  await page.locator('[data-future="comments"]').click()
-  await page.locator('#comment-text').fill(text); await page.locator('#post-comment').click()
+  await click(page, '[data-future="comments"]')
+  await fillField(page, '#comment-text', text)
+  await inspectCommentState(page)
+  assert.equal(await page.locator('#post-comment').isDisabled(), false, 'Post must be enabled before submission')
+  await click(page, '#post-comment')
   await settle(page, state => state.document.annotations.some(a => a.text === text))
+  assert.equal(await page.locator('#comment-text').inputValue(), '', 'Comment clears only after the renderer receives a local save receipt')
+}
+async function inspectCommentState(page) {
+  const ui = await page.evaluate(() => ({
+    value: document.querySelector('#comment-text').value,
+    disabled: document.querySelector('#post-comment').disabled,
+    canEdit: window.foundationSession.canEdit(), focus: document.hasFocus(), active: document.activeElement?.id,
+    footer: document.querySelector('#save-status').textContent, error: document.querySelector('#host-error').textContent,
+    textareas: document.querySelectorAll('#comment-text').length,
+  }))
+  const session = await page.context().newCDPSession(page)
+  const pendingState = {}
+  try {
+    const fn = await session.send('Runtime.evaluate', { expression: 'window.foundationSession.edit' })
+    const props = await session.send('Runtime.getProperties', { objectId: fn.result.objectId })
+    const scopeList = props.internalProperties?.find(p => p.name === '[[Scopes]]')?.value?.objectId
+    if (scopeList) {
+      const scopes = await session.send('Runtime.getProperties', { objectId: scopeList })
+      for (const scope of scopes.result) if (scope.value?.objectId && /^\d+$/.test(scope.name)) {
+        const variables = await session.send('Runtime.getProperties', { objectId: scope.value.objectId })
+        for (const variable of variables.result) if (['pending', 'ready', 'failed', 'unconfirmed'].includes(variable.name)) pendingState[variable.name] = variable.value?.value
+      }
+    }
+    const field = await session.send('Runtime.evaluate', { expression: 'document.querySelector("#comment-text")' })
+    const listeners = await session.send('DOMDebugger.getEventListeners', { objectId: field.result.objectId })
+    pendingState.inputListeners = listeners.listeners.map(l => ({ type: l.type, line: l.lineNumber, script: l.scriptId }))
+  } catch (error) { pendingState.inspectionError = String(error) }
+  finally { await session.detach() }
+  report.commentStates ??= []
+  report.commentStates.push({ ...ui, ...pendingState })
+  diagnostics += `\nComment state before submit: ${JSON.stringify({ ...ui, ...pendingState })}`
+  console.log('Comment readiness:', JSON.stringify({ ...ui, ...pendingState }))
+}
+async function click(page, selector) {
+  const target = page.locator(selector)
+  assert.equal(await target.isVisible(), true, `${selector} must be visible`)
+  assert.equal(await target.isEnabled(), true, `${selector} must be enabled`)
+  await target.evaluate(element => element.click())
+}
+async function fillField(page, selector, text) {
+  const field = page.locator(selector)
+  assert.equal(await field.isVisible(), true, `${selector} must be visible`)
+  assert.equal(await field.isEditable(), true, `${selector} must be editable`)
+  await field.evaluate((element, value) => {
+    element.focus()
+    element.value = value
+    element.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: value }))
+  }, text)
+  assert.equal(await field.inputValue(), text, 'The field must contain the exact submitted text')
 }
 async function screenshot(page, name) { await activate(page); const file = path.join(proof, name); await page.screenshot({ path: file, scale: 'css' }); report.screenshots.push(file) }
 try {
@@ -102,7 +163,7 @@ try {
   assert.match(await a.page.locator('#save-status').innerText(), /pending/)
   await screenshot(a.page, '01-offline-a.png'); await screenshot(b.page, '02-offline-b.png')
   log('UI text edits and anchored comments admitted offline; both clients show saved locally with pending changes.')
-  await activate(a.page); await a.page.locator('#connect-host').click(); await activate(b.page); await b.page.locator('#connect-host').click()
+  await activate(a.page); await click(a.page, '#connect-host'); await activate(b.page); await click(b.page, '#connect-host')
   const converged = state => state.status.pending === 0 && state.status.sync.kind === 'caught_up' && state.document.annotations.length === 2
   await settle(a.page, converged); await settle(b.page, converged)
   const da = (await current(a.page)).document, db = (await current(b.page)).document
@@ -110,11 +171,11 @@ try {
   assert.equal(da.body[0].children.find(n => n.id === 'heading').text, 'Offline desktop headline')
   assert.equal(da.body[1].children.find(n => n.id === 'mobile-heading').text, 'Offline mobile headline')
   assert.equal(new Set(da.annotations.map(a => a.id)).size, 2)
-  await a.page.waitForFunction(() => document.querySelector('#save-status').textContent.includes('Published'))
-  await b.page.waitForFunction(() => document.querySelector('#comment-list').textContent.includes('Comment from desktop A'))
+  await a.page.waitForFunction(() => document.querySelector('#save-status').textContent.includes('Published'), undefined, { polling: 100 })
+  await b.page.waitForFunction(() => document.querySelector('#comment-list').textContent.includes('Comment from desktop A'), undefined, { polling: 100 })
   await screenshot(a.page, '03-published-a.png'); await screenshot(b.page, '04-published-b.png')
   log('Explicit connect published all changes through real Comb; both documents and both comments converge, with Published status.')
-  await activate(a.page); await a.page.locator('#disconnect-host').click()
+  await activate(a.page); await click(a.page, '#disconnect-host')
   await settle(a.page, state => state.connection === 'disconnected')
   assert.equal((await current(b.page)).connection, 'connected')
   log('Disconnect is per replica; the second client stays connected.')
@@ -128,8 +189,8 @@ try {
   await edit(standalone.page, 'heading', 'Standalone saved without repository')
   const local = (await current(standalone.page)).document
   assert.ok((await current(standalone.page)).status.pending > 0)
-  await standalone.page.locator('[data-future="comments"]').click()
-  await standalone.page.locator('#connect-host').click()
+  await click(standalone.page, '[data-future="comments"]')
+  await click(standalone.page, '#connect-host')
   await settle(standalone.page, state => state.status.pending === 0 && state.status.sync.kind === 'caught_up')
   await screenshot(standalone.page, '05-standalone.png')
   await close(standalone)
