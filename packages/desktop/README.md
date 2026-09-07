@@ -36,6 +36,14 @@ Choose a new output path for each package. The script verifies the Node version/
 
 Opening the packaged app without a host URL starts its bundled Node/host sidecar. On first launch it creates a private local Comb configuration and random digest key in writable user data. Existing keys are preserved. Local objects, SQLite files and auth tokens stay outside the app. An explicit `--comb-dir` can point to an operator's existing backend configuration. The sidecar lives with the app process, independently of Apiary terminal tabs.
 
+For a manual two-client session, with no automated edits:
+
+```sh
+node packages/desktop/scripts/open-two-clients.mjs /path/to/Foundation.app /path/to/new-session-directory
+```
+
+This leaves two editable windows sharing a document and host, with independent replica directories and the same author. Open Comments & sync to connect each client after making offline edits. Ctrl-C stops the clients and host; their saved replicas remain in the session directory. The launcher refuses an existing session directory and prints no credentials. Keep its process running for the session. Direct-opening the app remains the independent standalone option.
+
 ## Editing and failure behavior
 
 Text, geometry, color and token changes become engine `PatchOp` batches. Undo/redo sends inverse leaf edits; remote edits to unrelated fields survive. New layers use UUIDs. Images are bundled `assets/<hash>.jpeg` references, never image data in genesis.
@@ -55,4 +63,4 @@ node --test spikes/desktop-prototype/model.test.mjs
 node packages/desktop/scripts/live-proof.mjs /path/to/Foundation.app /path/to/fresh-proof-directory
 ```
 
-The live proof drives two actual Electron clients through the UI/preload, with one real host and immutable Comb bridge. It tests same-author offline edits/comments, pending-to-published convergence, per-session disconnect, restart of both replicas, then packaged standalone first launch and save/reopen. It writes screenshots, a result report and diagnostics under the chosen proof directory. Use a fresh directory per run. These are acceptance artifacts, not mock sync results.
+The live proof drives two actual Electron clients through the UI/preload, with one real host and immutable Comb bridge. It tests same-author offline edits/comments, pending-to-published convergence, per-session disconnect, restart of both replicas, then packaged standalone offline save, Connect through its generated local Comb backend, and reopen. It writes screenshots, bundled executable hashes, a result report and diagnostics under a fresh proof directory; existing directories are refused. Success requires observed clean exits from every app and the external host. A failed or timed-out teardown remains a failed report. These are acceptance artifacts, not mock sync results.

@@ -4,29 +4,40 @@ import assert from 'node:assert/strict'
 import { spawn } from 'node:child_process'
 import { once } from 'node:events'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
-import { randomBytes } from 'node:crypto'
+import { randomBytes, createHash } from 'node:crypto'
 import { createInterface } from 'node:readline'
 import path from 'node:path'
 
 const appPath = path.resolve(process.argv[2] ?? 'packages/desktop/release/Foundation-development.app')
 const proof = path.resolve(process.argv[3] ?? `packages/desktop/.runtime-downloads/proof-${Date.now()}`)
-await mkdir(proof, { recursive: true })
+await mkdir(path.dirname(proof), { recursive: true })
+await mkdir(proof) // Refuse reuse, including a directory containing an old report.
 const resources = path.join(appPath, 'Contents/Resources'), executablePath = path.join(appPath, 'Contents/MacOS/Foundation')
 const runtime = path.join(resources, 'host')
 const config = path.join(proof, 'comb'), objects = path.join(proof, 'objects')
 await mkdir(config, { recursive: true, mode: 0o700 }); await mkdir(objects, { recursive: true })
 await writeFile(path.join(config, 'config.toml'), `tenant = "foundation_desktop"\ndigest_key = "${randomBytes(32).toString('hex')}"\n[backend]\nkind = "local"\nroot = ${JSON.stringify(objects)}\n`, { mode: 0o600, flag: 'wx' })
-const host = spawn(path.join(runtime, 'bin/node'), [path.join(runtime, 'service/service-main.mjs'), '--state-dir', path.join(proof, 'host'), '--comb-bin', path.join(runtime, 'bin/comb'), '--comb-dir', config, '--remote', 'desktop-proof', '--port', '0'], { stdio: ['ignore', 'pipe', 'pipe'] })
+const digest = async file => createHash('sha256').update(await readFile(file)).digest('hex')
+const report = { appPath, proof, checks: [], screenshots: [], passed: false, hashes: {
+  hostEntry: await digest(path.join(runtime, 'service/service-main.mjs')),
+  comb: await digest(path.join(runtime, 'bin/comb')),
+  node: await digest(path.join(runtime, 'bin/node')),
+  desktopMain: await digest(path.join(resources, 'app/dist/main.cjs')),
+  desktopRenderer: await digest(path.join(resources, 'app/dist/renderer.js')),
+} }
+const host = spawn(path.join(runtime, 'bin/node'), [path.join(runtime, 'service/service-main.mjs'), '--state-dir', path.join(proof, 'host'), '--comb-bin', path.join(runtime, 'bin/comb'), '--comb-dir', config, '--remote', 'desktop-proof', '--port', '0'], { cwd: proof, stdio: ['ignore', 'pipe', 'pipe'] })
+const hostExit = new Promise(resolve => {
+  host.once('exit', (code, signal) => resolve({ code, signal }))
+  host.once('error', error => resolve({ code: null, signal: null, error: error.message }))
+})
 let diagnostics = ''; host.stderr.on('data', data => { diagnostics += data })
 const lines = createInterface({ input: host.stdout })
-const [line] = await once(lines, 'line', { signal: AbortSignal.timeout(30_000) })
-const { url, tokenFile } = JSON.parse(line); lines.close()
+let url, tokenFile
 const apps = new Set()
 const owners = new WeakMap()
-const report = { appPath, proof, checks: [], screenshots: [] }
 const log = message => { report.checks.push(message); console.log(message) }
 async function launch(directory, external = true) {
-  const application = await electron.launch({ executablePath, args: ['--replica-dir', path.join(proof, directory), '--author', 'user:same-designer', ...(external ? ['--host-url', url, '--host-token-file', tokenFile, '--doc-id', 'desktop-live-proof'] : [])], timeout: 45_000 })
+  const application = await electron.launch({ executablePath, cwd: proof, args: ['--replica-dir', path.join(proof, directory), '--author', 'user:same-designer', ...(external ? ['--host-url', url, '--host-token-file', tokenFile, '--doc-id', 'desktop-live-proof'] : [])], timeout: 45_000 })
   apps.add(application)
   const page = await application.firstWindow({ timeout: 45_000 })
   owners.set(page, application)
@@ -40,8 +51,12 @@ async function activate(page) {
   await page.bringToFront()
 }
 async function close(instance) {
+  await bounded(instance.application.close(), 30_000, 'Desktop shutdown exceeded 30 seconds')
+  apps.delete(instance.application)
+}
+async function bounded(promise, milliseconds, message) {
   let timer
-  try { await Promise.race([instance.application.close(), new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Desktop shutdown exceeded 30 seconds')), 30_000) })]); apps.delete(instance.application) }
+  try { return await Promise.race([promise, new Promise((_, reject) => { timer = setTimeout(() => reject(new Error(message)), milliseconds) })]) }
   finally { clearTimeout(timer) }
 }
 const current = page => page.evaluate(() => window.foundationHost.state())
@@ -69,6 +84,11 @@ async function comment(page, text) {
 }
 async function screenshot(page, name) { await activate(page); const file = path.join(proof, name); await page.screenshot({ path: file, scale: 'css' }); report.screenshots.push(file) }
 try {
+  const startup = await Promise.race([
+    once(lines, 'line', { signal: AbortSignal.timeout(30_000) }).then(([line]) => JSON.parse(line)),
+    hostExit.then(exit => { throw new Error(`Host exited before startup: ${JSON.stringify(exit)}`) }),
+  ])
+  url = startup.url; tokenFile = startup.tokenFile; lines.close()
   let a = await launch('replica-a'), b = await launch('replica-b')
   const sa = await current(a.page), sb = await current(b.page)
   assert.notEqual(sa.status.replicaId, sb.status.replicaId); assert.equal(sa.status.docId, sb.status.docId)
@@ -107,13 +127,17 @@ try {
   let standalone = await launch('standalone', false)
   await edit(standalone.page, 'heading', 'Standalone saved without repository')
   const local = (await current(standalone.page)).document
+  assert.ok((await current(standalone.page)).status.pending > 0)
+  await standalone.page.locator('[data-future="comments"]').click()
+  await standalone.page.locator('#connect-host').click()
+  await settle(standalone.page, state => state.status.pending === 0 && state.status.sync.kind === 'caught_up')
   await screenshot(standalone.page, '05-standalone.png')
   await close(standalone)
   standalone = await launch('standalone', false)
   assert.deepEqual((await current(standalone.page)).document, local)
-  log('Packaged standalone first launch starts bundled Node/host/Comb runtime and reopens saved edits without repository paths.')
+  log('Packaged standalone first launch saves offline, publishes through bundled Comb with its generated local config, and reopens saved edits without repository paths.')
   await close(standalone)
-  report.passed = true
+  report.dataChecksPassed = true
 } catch (error) {
   report.passed = false; report.error = error.stack
   for (const application of apps) {
@@ -121,8 +145,24 @@ try {
   }
   console.error(error); process.exitCode = 1
 } finally {
-  for (const application of apps) { try { await application.evaluate(({ app }) => app.exit()) } catch {} }
-  host.kill()
+  const shutdownErrors = []
+  for (const application of [...apps]) {
+    try { await close({ application }) }
+    catch (error) { shutdownErrors.push(String(error)); application.process().kill('SIGKILL') }
+  }
+  lines.close()
+  if (host.exitCode === null && host.signalCode === null) host.kill('SIGTERM')
+  try {
+    report.hostExit = await bounded(hostExit, 70_000, 'External host shutdown exceeded 70 seconds')
+    if (report.hostExit.code !== 0 || report.hostExit.signal || report.hostExit.error) shutdownErrors.push(`External host did not exit cleanly: ${JSON.stringify(report.hostExit)}`)
+  } catch (error) {
+    shutdownErrors.push(String(error)); host.kill('SIGKILL')
+    report.hostExit = await bounded(hostExit, 5000, 'External host did not exit after forced stop').catch(error => ({ error: String(error) }))
+  }
+  report.shutdownErrors = shutdownErrors
+  report.passed = report.dataChecksPassed === true && !report.error && shutdownErrors.length === 0
+  if (!report.passed) process.exitCode = 1
+  else log('All app processes and the external host shut down cleanly; acceptance passed.')
   await writeFile(path.join(proof, 'report.json'), JSON.stringify(report, null, 2))
   await writeFile(path.join(proof, 'diagnostics.log'), diagnostics)
   console.log(`Evidence: ${proof}`)
