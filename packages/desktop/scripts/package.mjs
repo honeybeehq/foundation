@@ -1,0 +1,42 @@
+import { cp, mkdir, readFile, writeFile, rename, chmod } from 'node:fs/promises'
+import { createHash } from 'node:crypto'
+import { createRequire } from 'node:module'
+import { execFileSync } from 'node:child_process'
+import { fileURLToPath } from 'node:url'
+import path from 'node:path'
+
+const root = fileURLToPath(new URL('..', import.meta.url))
+const args = new Map()
+for (let index = 2; index < process.argv.length; index += 2) args.set(process.argv[index], process.argv[index + 1])
+for (const flag of ['--host-bundle', '--node-bin', '--comb-bin']) if (!args.get(flag)) throw new Error(`Required ${flag}`)
+if (process.platform !== 'darwin' || process.arch !== 'arm64') throw new Error('This packager currently targets macOS arm64')
+const require = createRequire(import.meta.url)
+const electron = require('electron')
+const app = path.resolve(args.get('--output') ?? path.join(root, 'release', `Foundation-${Date.now()}.app`))
+await mkdir(path.dirname(app), { recursive: true })
+await cp(path.resolve(electron, '../../..'), app, { recursive: true, verbatimSymlinks: true, errorOnExist: true, force: false })
+const contents = path.join(app, 'Contents'), resources = path.join(contents, 'Resources')
+await mkdir(path.join(resources, 'app'), { recursive: true })
+await cp(path.join(root, 'dist'), path.join(resources, 'app/dist'), { recursive: true })
+await writeFile(path.join(resources, 'app/package.json'), JSON.stringify({ name: 'foundation-desktop', version: '0.1.0', main: 'dist/main.cjs' }))
+await cp(path.resolve(args.get('--host-bundle')), path.join(resources, 'host/service'), { recursive: true, verbatimSymlinks: true })
+await mkdir(path.join(resources, 'host/bin'), { recursive: true })
+const node = path.resolve(args.get('--node-bin')), comb = path.resolve(args.get('--comb-bin'))
+const nodeHash = createHash('sha256').update(await readFile(node)).digest('hex')
+if (nodeHash !== '9d050fd455b56426e25d4d603c7c501cbb2630348e836cf221dcce748e90588a') throw new Error('Node binary differs from the verified official archive')
+const nodeVersion = execFileSync(node, ['--version'], { encoding: 'utf8' }).trim()
+if (nodeVersion !== 'v24.20.0') throw new Error(`Expected verified Node v24.20.0, got ${nodeVersion}`)
+const linkage = execFileSync('otool', ['-L', node], { encoding: 'utf8' })
+if (linkage.includes('/opt/') || linkage.includes('/usr/local/')) throw new Error('Node binary depends on an external package manager')
+const combHash = createHash('sha256').update(await readFile(comb)).digest('hex')
+if (combHash !== 'a0489c7e4414a1c524c71d0a3ffc4c7b9d968483f8510ad1640c784784c072f1') throw new Error('Comb binary differs from accepted immutable bridge')
+await cp(node, path.join(resources, 'host/bin/node'))
+await cp(comb, path.join(resources, 'host/bin/comb'))
+await chmod(path.join(resources, 'host/bin/node'), 0o755); await chmod(path.join(resources, 'host/bin/comb'), 0o755)
+await writeFile(path.join(resources, 'host/runtime.json'), JSON.stringify({ node: 'bin/node', comb: 'bin/comb', entry: 'service/service-main.mjs', remote: 'foundation-local' }, null, 2))
+await writeFile(path.join(resources, 'runtime-provenance.json'), JSON.stringify({ nodeVersion, nodeArchiveSha256: '40e5607e5ecb3db9192723776da2d75d966260fc74a7a9e731c1bd67dda96bc8', combSha256: combHash }, null, 2))
+await rename(path.join(contents, 'MacOS/Electron'), path.join(contents, 'MacOS/Foundation'))
+const plist = path.join(contents, 'Info.plist')
+for (const [key, value] of [['CFBundleName', 'Foundation'], ['CFBundleDisplayName', 'Foundation'], ['CFBundleExecutable', 'Foundation'], ['CFBundleIdentifier', 'design.foundation.desktop']]) execFileSync('/usr/libexec/PlistBuddy', ['-c', `Set :${key} ${value}`, plist])
+execFileSync('codesign', ['--force', '--deep', '--sign', '-', app], { stdio: 'inherit' })
+console.log(app)
