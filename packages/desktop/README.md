@@ -44,7 +44,7 @@ The footer distinguishes saving, saved locally with pending changes, offline, pa
 
 A failed or timed-out save leaves its draft visible and stops further writes. Reload saved state rereads the host before discarding an unconfirmed draft. Mutations are never retried automatically. Closing with unconfirmed edits prompts the user. Comments receive IDs and local-save receipts from the host; resolve/reopen is another persisted engine operation.
 
-Export uses the host's explicit HTML/chain export and a native directory picker. Static artboard decoration remains part of this design study; the current persisted editable vocabulary is the displayed text, images, buttons, rectangles and color tokens. AI execution, JavaScript components, responsive layout authoring and arbitrary document rendering remain later work; their UI controls explain that scope.
+Export uses the host's explicit HTML/chain export and a native save dialog to choose a new folder name. The host creates that destination and refuses any existing path. Static artboard decoration remains part of this design study; the current persisted editable vocabulary is the displayed text, images, buttons, rectangles and color tokens. AI execution, JavaScript components, responsive layout authoring and arbitrary document rendering remain later work; their UI controls explain that scope.
 
 ## Verification
 

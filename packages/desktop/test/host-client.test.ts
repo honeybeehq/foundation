@@ -53,6 +53,17 @@ describe('main-process HTTP boundary', () => {
     await client.open(); await client.open()
     expect(opens).toBe(2)
   })
+  it('forwards the chosen new export path and preserves host collision refusal', async () => {
+    const destinations: unknown[] = []
+    const client = await server((url, body) => {
+      if (url.endsWith('/open')) return { body: { sessionId: 'a', state } }
+      destinations.push(body)
+      return { status: 409, body: { error: { code: 'destination_exists', message: 'Choose a fresh export directory' } } }
+    })
+    await client.open()
+    await expect(client.export('/chosen/new-export-folder')).rejects.toThrow('destination_exists')
+    expect(destinations).toEqual([{ directory: '/chosen/new-export-folder' }])
+  })
   it('distinguishes offline, paused, causal gaps and published state', () => {
     expect(statusText(state)).toBe('Saved locally · 1 pending · Offline')
     expect(statusText({ ...state, connection: 'connected' })).not.toContain('Published')

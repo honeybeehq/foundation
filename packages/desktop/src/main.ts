@@ -83,8 +83,12 @@ async function launch(): Promise<void> {
     return client!.connection(action)
   })
   handle('foundation:export', async () => {
-    const destination = await dialog.showOpenDialog(window, { title: 'Export Foundation document', properties: ['openDirectory', 'createDirectory'] })
-    const directory = destination.filePaths[0]
+    const destination = await dialog.showSaveDialog(window, {
+      title: 'Export Foundation document', buttonLabel: 'Export', nameFieldLabel: 'Export folder name:',
+      message: 'Choose a new folder name. Foundation creates it for the HTML and chain files; existing destinations are never overwritten.',
+      defaultPath: path.join(app.getPath('documents'), 'Somewhere-export'), properties: ['createDirectory', 'showOverwriteConfirmation'],
+    })
+    const directory = destination.filePath
     return destination.canceled || !directory ? { canceled: true } : { canceled: false, files: await client!.export(directory) }
   })
   window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
