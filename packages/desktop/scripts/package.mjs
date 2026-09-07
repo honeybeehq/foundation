@@ -19,6 +19,7 @@ const contents = path.join(app, 'Contents'), resources = path.join(contents, 'Re
 await mkdir(path.join(resources, 'app'), { recursive: true })
 await cp(path.join(root, 'dist'), path.join(resources, 'app/dist'), { recursive: true })
 await writeFile(path.join(resources, 'app/package.json'), JSON.stringify({ name: 'foundation-desktop', version: '0.1.0', main: 'dist/main.cjs' }))
+await cp(path.join(root, 'scripts/open-two-clients.mjs'), path.join(resources, 'open-two-clients.mjs'))
 await cp(path.resolve(args.get('--host-bundle')), path.join(resources, 'host/service'), { recursive: true, verbatimSymlinks: true })
 await mkdir(path.join(resources, 'host/bin'), { recursive: true })
 const node = path.resolve(args.get('--node-bin')), comb = path.resolve(args.get('--comb-bin'))

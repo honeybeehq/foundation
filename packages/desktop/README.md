@@ -44,6 +44,14 @@ node packages/desktop/scripts/open-two-clients.mjs /path/to/Foundation.app /path
 
 This leaves two editable windows sharing a document and host, with independent replica directories and the same author. Open Comments & sync to connect each client after making offline edits. Ctrl-C stops the clients and host; their saved replicas remain in the session directory. The launcher refuses an existing session directory and prints no credentials. Keep its process running for the session. Direct-opening the app remains the independent standalone option.
 
+The package also includes this launcher. To run it without a repository or system Node installation:
+
+```sh
+"/path/Foundation.app/Contents/Resources/host/bin/node" \
+  "/path/Foundation.app/Contents/Resources/open-two-clients.mjs" \
+  "/path/Foundation.app" "/path/to/new-session-directory"
+```
+
 ## Editing and failure behavior
 
 Text, geometry, color and token changes become engine `PatchOp` batches. Undo/redo sends inverse leaf edits; remote edits to unrelated fields survive. New layers use UUIDs. Images are bundled `assets/<hash>.jpeg` references, never image data in genesis.
