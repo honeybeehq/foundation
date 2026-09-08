@@ -97,3 +97,5 @@ pushed, installed, or deployed.
 ## Main publication scope
 
 This main commit publishes the review report only. The reviewed feature code and verified export repair remain on local `art/nightly-2026-09-07-foundation-host`, ending at `7ef08acb715425c2f7f879b4cce639a63546aefb`. No unfinished feature history is merged into main. Root independently reviewed all three repair commits and the passing check logs. The packaged two-client acceptance is baseline evidence, not a fresh export-repair acceptance run.
+
+Portable [verification excerpts and original-log digests](art-nightly-2026-09-07-evidence.md) accompany this report.
