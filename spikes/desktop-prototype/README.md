@@ -12,7 +12,7 @@ Open http://127.0.0.1:4318. Use a desktop window around 1500 × 980 to see the i
 
 The editor chrome follows the Apiary design system (`packages/ui/src/tokens.stylex.ts` in the Apiary repository): warm charcoal neutrals, Hanken Grotesk for interface text, IBM Plex Mono for data, 4/6/8 px radii, panes separated by distance rather than borders, and a single honey accent reserved for the one primary action and the focus cue. Selection on the canvas uses Apiary's inspector blue; selected rows and active tabs use neutral fills, never the accent. The canvas artwork keeps its own document tokens.
 
-Open **Appearance** in the title bar to switch between **Charcoal** (default, Apiary's dark branch) and **Paper** (Apiary's light branch). In Charcoal, **Panel brightness** and **Canvas background** move along the same warm ramp; Deep, Charcoal, and Lifted are presets. Paper uses Apiary's fixed light tokens and parks the sliders.
+Open **Appearance** in the footer (next to Shortcuts) to switch between **Charcoal** (default, Apiary's dark branch) and **Paper** (Apiary's light branch). In Charcoal, **Panel brightness** and **Canvas background** move along the same warm ramp; Deep, Charcoal, and Lifted are presets. Paper uses Apiary's fixed light tokens and parks the sliders.
 
 The same menu switches **Docked** and **Floating** panels (floating corner radius 8–24 px, default 12) and the accent: Honey (default), Amber, Blue, Sage, Clay, and Lilac are all drawn from Apiary's own palette, each with a light and a dark value; a custom color is also accepted. **Apiary default** restores Charcoal, Docked, and Honey. Changes apply immediately and preserve document edits.
 
@@ -22,7 +22,7 @@ The app has one header. Project navigation sits above the layers, Design/Prototy
 
 Select layers on the canvas or in the layer list. Double-click text to edit it. Change geometry, typography, opacity, corner radius, and fill in the inspector. Open Tokens to change colors shared across both artboards. Assets selects example components already on the canvas.
 
-Use the toolbar to add text and rectangles. Drag layers to move them. Arrow keys nudge by one pixel; Shift nudges by ten. Hold the middle mouse button and drag to pan anywhere on the canvas, including over artboards and editable text. This preserves the current selection and tool. You can also hold Space or choose the hand tool. Command-scroll zooms, and Shift 1 fits both artboards. Command-Z undoes; Shift-Command-Z redoes. The play button hides the editing panels.
+Use the toolbar to add text and rectangles; each dock button shows its hotkey (V move, H pan, R rectangle, T text, F artboards, C comments). Click a frame row in the layer list to focus the camera on that artboard; the chevron alone expands or collapses it. Drag layers to move them. Arrow keys nudge by one pixel; Shift nudges by ten. Hold the middle mouse button and drag to pan anywhere on the canvas, including over artboards and editable text. This preserves the current selection and tool. You can also hold Space or choose the hand tool. Command-scroll zooms, and Shift 1 fits both artboards. Command-Z undoes; Shift-Command-Z redoes. The play button hides the editing panels.
 
 Edits stay in memory. **Export study** downloads a self-contained HTML copy with the current edits. Reopen that file to continue the study.
 

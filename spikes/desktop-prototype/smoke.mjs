@@ -12,7 +12,7 @@ try {
   assert.ok(await page.locator('.left-panel #project-info').isVisible());
   assert.ok(await page.locator('.inspector #design-mode').isVisible());
   assert.ok(await page.locator('#canvas #zoom-fit').isVisible());
-  assert.equal((await page.locator('#canvas').boundingBox()).y, 40);
+  assert.equal((await page.locator('#canvas').boundingBox()).y, 32);
   await page.locator('#project-info').click();
   assert.ok(await page.locator('#modal').isVisible());
   await page.locator('#dismiss-modal').click();
@@ -173,6 +173,23 @@ try {
   const oldZoom = await page.locator('#zoom-fit').textContent();
   await page.locator('#zoom-in').click();
   assert.notEqual(await page.locator('#zoom-fit').textContent(), oldZoom);
+  await page.locator('#zoom-fit').click();
+  // Hotkeys drive the dock; frame rows focus the camera while only the chevron collapses.
+  await page.keyboard.press('h');
+  assert.ok(await page.locator('[data-tool="hand"]').evaluate(el => el.classList.contains('active')));
+  await page.keyboard.press('V');
+  assert.ok(await page.locator('[data-tool="select"]').evaluate(el => el.classList.contains('active')));
+  const beforeFocus = await canvasOffset();
+  await page.locator('[data-collapse="mobile"]').click();
+  assert.notDeepEqual(await canvasOffset(), beforeFocus);
+  assert.equal(await page.locator('[data-collapse="mobile"]').getAttribute('aria-expanded'), 'true');
+  await page.locator('[data-collapse="mobile"] .chevron-hit').click();
+  assert.equal(await page.locator('[data-collapse="mobile"]').getAttribute('aria-expanded'), 'false');
+  await page.locator('[data-collapse="mobile"] .chevron-hit').click();
+  assert.equal(await page.locator('[data-collapse="mobile"]').getAttribute('aria-expanded'), 'true');
+  await page.keyboard.press('f');
+  assert.ok(await page.locator('#modal').isVisible());
+  await page.locator('#dismiss-modal').click();
   await page.locator('#zoom-fit').click();
   await page.locator('#preview').click();
   assert.ok(await page.locator('#app').evaluate(el => el.classList.contains('preview')));
