@@ -109,14 +109,15 @@ try {
   assert.equal(await page.locator('#canvas').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(16, 14, 10)');
   assert.equal(await page.locator('[data-node="heading"]').textContent(), brightnessContent);
   assert.equal(await page.locator('[data-node="cta"]').evaluate(el => el.style.background), 'rgb(221, 231, 198)');
-  assert.equal(await page.locator('#export').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(210, 154, 68)');
+  assert.equal(await page.locator('.footer .accent-dot').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(210, 154, 68)');
+  assert.equal(await page.locator('#export').evaluate(el => getComputedStyle(el).backgroundColor), 'rgba(0, 0, 0, 0)');
   await page.locator('[data-brightness="30"]').click();
   // Paper scheme swaps to Apiary's light tokens and parks the brightness controls.
   await page.locator('[data-scheme-choice="light"]').click();
   assert.equal(await page.locator('html').getAttribute('data-theme'), 'light');
   assert.equal(await page.locator('.left-panel').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(255, 255, 255)');
   assert.equal(await page.locator('#canvas').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(245, 244, 241)');
-  assert.equal(await page.locator('#export').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(184, 132, 46)');
+  assert.equal(await page.locator('.footer .accent-dot').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(184, 132, 46)');
   assert.ok(await page.locator('#panel-brightness').isDisabled());
   assert.equal(await page.locator('[data-node="heading"]').textContent(), brightnessContent);
   await page.locator('[data-scheme-choice="dark"]').click();
