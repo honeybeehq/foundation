@@ -41,7 +41,7 @@ kbd{font:10px var(--sans);color:var(--dim)}
 .avatar{background:var(--badge-bg);color:var(--badge-fg)}
 #post-comment{background:var(--accent);color:var(--accent-ink)}
 .mode-switch,.inspector-tabs .mode-switch{background:var(--chrome-sunken);border-color:var(--line)}.mode-switch .active{background:var(--segment-on);color:var(--text);box-shadow:var(--shadow-control)}
-.left-tabs button.active:after,.inspector-tabs button.active:after{background:var(--text)}
+.left-tabs button.active:after,.inspector-tabs button.active:after{content:none}
 .page-row{border-radius:4px}.page-row.active{background:var(--accent-soft)}
 .layer-row{color:var(--muted);width:calc(100% - 12px);margin-left:6px;border-radius:4px}.layer-row .icon{color:var(--icon)}.layer-row.frame{color:var(--text)}.layer-row .layer-kind{color:var(--dim)}
 .layer-row.selected{background:var(--accent-soft);color:var(--text);box-shadow:none}.layer-row.selected .icon{color:var(--text)}
@@ -114,7 +114,7 @@ html .app .system-link,html .app .tool-dock{border-color:var(--line)}html .app .
 
 /* Compact editor spacing on a 4px grid; artwork dimensions and typography stay in document space. */
 .titlebar{padding:0 10px;gap:8px}.file-tab{padding:0 10px}.primary{padding:4px 9px}.avatar{width:20px;height:20px;font-size:8px}
-html .app .left-tabs,html .app .inspector-tabs{height:36px;padding:0 8px;gap:4px}html .app .left-tabs button,html .app .inspector-tabs button{height:24px;padding:0 7px;border-radius:4px;align-self:center}html .app .left-tabs .icon-button,html .app .inspector-tabs .activity-button{height:26px;width:26px}.left-tabs button.active:after,.inspector-tabs button.active:after{bottom:-6px;left:7px;right:7px}
+html .app .left-tabs,html .app .inspector-tabs{height:36px;padding:0 8px;gap:4px}html .app .left-tabs button,html .app .inspector-tabs button{height:24px;padding:0 7px;border-radius:4px;align-self:center}html .app .left-tabs .icon-button,html .app .inspector-tabs .activity-button{height:26px;width:26px}html .app .left-tabs button.active,html .app .inspector-tabs button.active{background:var(--accent-soft);color:var(--text)}
 .panel-section{padding:8px 12px}.section-title{margin-bottom:8px}.page-row{padding:4px 6px;min-height:26px;margin:1px -3px;gap:7px}
 .layer-section{padding-top:10px}.layer-section .section-title .icon-button{height:24px;width:24px}.layer-row{height:28px;padding:0 8px;gap:7px}.layer-row.nested{padding-left:26px}.layer-row.nested.deep{padding-left:40px}.layer-row.frame{margin-top:4px}
 .library-footer{padding:10px 12px}.library-footer p{margin-top:4px}
