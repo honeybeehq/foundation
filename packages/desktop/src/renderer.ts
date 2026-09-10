@@ -173,7 +173,6 @@ element('#export').onclick = async () => {
     if (!result.canceled) { showComments(); element('#host-error').textContent = `Exported HTML and chain to ${result.files?.html}` }
   } catch (error) { showComments(); element('#host-error').textContent = error instanceof Error ? error.message : String(error) }
 }
-element('#project-info').onclick = () => showComments()
 window.addEventListener('beforeunload', event => { if (pending || unconfirmed) { event.preventDefault(); event.returnValue = '' } })
 async function poll() {
   if (polling || pending || failed || !state) return

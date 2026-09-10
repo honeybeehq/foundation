@@ -9,13 +9,10 @@ try {
   assert.equal(await page.locator('[data-node]').count(), 5);
   assert.equal(await page.locator('.workspace-bar').count(), 0);
   assert.equal(await page.locator('header').count(), 1);
-  assert.ok(await page.locator('.left-panel #project-info').isVisible());
+  assert.equal(await page.locator('#project-info').count(), 0);
   assert.ok(await page.locator('.inspector #design-mode').isVisible());
   assert.ok(await page.locator('#canvas #zoom-fit').isVisible());
   assert.equal((await page.locator('#canvas').boundingBox()).y, 32);
-  await page.locator('#project-info').click();
-  assert.ok(await page.locator('#modal').isVisible());
-  await page.locator('#dismiss-modal').click();
   await page.locator('.inspector [data-future="prototype"]').click();
   assert.ok(await page.locator('#modal').isVisible());
   await page.locator('#dismiss-modal').click();

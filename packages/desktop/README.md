@@ -2,7 +2,7 @@
 
 The accepted canvas study, connected to the Foundation host through a sandboxed Electron preload. The host owns SQLite, Loro history and Comb publication. The desktop sends granular edits and displays host receipts and sync state.
 
-The app keeps the compact docked panels, one header, neutral gray chrome, light blue accent, appearance sliders and middle mouse panning. Comments and connection controls live in the right sidebar, opened through Comments, Activity or the save status.
+The app keeps the compact docked panels, one header, and middle mouse panning, styled in the Apiary look: warm charcoal chrome (with a Paper light scheme), Hanken Grotesk and IBM Plex Mono, and a honey accent reserved for the brand mark, the appearance dot, and focus. Comments open through the dock, Activity, or the footer save status. Comments and connection controls live in the right sidebar.
 
 ## Development
 

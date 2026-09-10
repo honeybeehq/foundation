@@ -18,7 +18,7 @@ The same menu switches **Docked** and **Floating** panels (floating corner radiu
 
 Appearance choices are recorded in the URL parameters `scheme`, `panels`, `accent`, `corners`, `shade`, and `canvas`, and are included in exported HTML. For example, `?scheme=light&panels=floating&accent=blue` opens the Paper scheme with floating panels and a blue accent.
 
-The app has one header. Project navigation sits above the layers, Design/Prototype/Code controls sit above properties, and a floating zoom control sits at the canvas’s top-right corner.
+The app has one header naming the open document. Design/Prototype/Code controls sit above properties, and a floating zoom control sits at the canvas’s top-right corner. Project and file switching belongs to future tabs and the command palette, so the sidebar starts directly with Layers, Assets, and Tokens.
 
 Select layers on the canvas or in the layer list. Double-click text to edit it. Change geometry, typography, opacity, corner radius, and fill in the inspector. Open Tokens to change colors shared across both artboards. Assets selects example components already on the canvas.
 
