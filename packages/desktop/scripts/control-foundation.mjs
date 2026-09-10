@@ -29,6 +29,10 @@ launch --runtime <host-directory> [--clients 1|2] [--app <Foundation.app>]
   Builds current desktop source by default. --app explicitly drives that package instead.
   Refuses an existing run directory. Uses a fresh private local Comb backend and replicas.
   --runtime is required for source mode; packaged mode uses its bundled host.
+  --comb-config <config.toml> copies an existing Comb configuration (for example an S3/MinIO
+  backend) instead of generating a private local one. Its credentials come from the profile it
+  names. --doc-id <id> shares a document across runs; --recover opens replicas without a seed so
+  they adopt the published genesis after Connect. --author <id> sets the client author.
 doctor                  Read-only identity, build freshness, host and renderer checks
 snapshot                ARIA tree, visible text, controls, selection and save status
 state                   Read-only persisted host document/status through the real preload
@@ -55,12 +59,14 @@ One command at a time per run; separate run directories can operate concurrently
 
 export function parseArgs(argv) {
   const positionals = [], flags = {}
-  const allowed = new Set(['run', 'runtime', 'clients', 'app', 'client', 'label', 'input'])
+  const allowed = new Set(['run', 'runtime', 'clients', 'app', 'client', 'label', 'input', 'comb-config', 'doc-id', 'author'])
+  const switches = new Set(['recover'])
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i]
     if (arg === '--') { positionals.push(...argv.slice(i + 1)); break }
     if (!arg.startsWith('--')) { positionals.push(arg); continue }
     const name = arg.slice(2)
+    if (switches.has(name)) { flags[name] = true; continue }
     if (!allowed.has(name)) throw new Error(`Unknown option ${arg}; run help`)
     if (flags[name] !== undefined) throw new Error(`Duplicate ${arg}`)
     const value = argv[++i]
@@ -71,6 +77,8 @@ export function parseArgs(argv) {
   if (flags.client && !['a', 'b'].includes(flags.client)) throw new Error('--client must be a or b')
   if (flags.clients && !['1', '2'].includes(flags.clients)) throw new Error('--clients must be 1 or 2')
   if (flags.input && !['dom', 'pointer'].includes(flags.input)) throw new Error('--input must be dom or pointer')
+  if (flags['doc-id'] && !/^[a-zA-Z0-9._-]{1,120}$/.test(flags['doc-id'])) throw new Error('--doc-id must be 1-120 characters of [a-zA-Z0-9._-]')
+  if (flags.recover && !flags['doc-id']) throw new Error('--recover requires --doc-id of an existing published document')
   return { command, args, flags }
 }
 
@@ -115,6 +123,9 @@ async function owner(run) {
   const config = await readJSON(path.join(run, 'config.json'))
   const evidence = path.join(run, 'evidence'), scratch = path.join(run, 'scratch')
   const metadata = { version: 1, id: randomUUID(), phase: 'starting', run, root, mode: config.app ? 'package' : 'source', ownerPid: process.pid, clients: {}, errors: [], startedAt: new Date().toISOString() }
+  metadata.docId = config.docId ?? metadata.id
+  metadata.recover = Boolean(config.recover)
+  metadata.combConfig = config.combConfig ?? null
   const token = randomBytes(32).toString('hex')
   const save = async () => {
     const file = path.join(run, 'session.json')
@@ -150,7 +161,8 @@ async function owner(run) {
   async function closeClient(name) {
     const client = clients.get(name)
     if (!client) return
-    const child = client.app.process()
+    // Playwright disposes the application once its window is closed externally; keep our own handle.
+    const child = client.child
     try {
       await bounded(client.app.close(), 30_000, `Client ${name} shutdown timed out`)
       const result = await bounded(exits.get(child), 5_000, `Client ${name} exit unconfirmed`)
@@ -191,13 +203,13 @@ async function owner(run) {
   })
   async function launchClient(name) {
     const replica = path.join(scratch, `replica-${name}`)
-    const args = ['--replica-dir', replica, '--doc-id', metadata.id, '--author', 'user:verification', '--host-url', hostInfo.url, '--host-token-file', hostInfo.tokenFile]
+    const args = ['--replica-dir', replica, '--doc-id', metadata.docId, '--author', config.author ?? 'user:verification', '--host-url', hostInfo.url, '--host-token-file', hostInfo.tokenFile, ...(metadata.recover ? ['--recover'] : [])]
     const options = config.app
       ? { executablePath: path.join(config.app, 'Contents/MacOS/Foundation'), args }
       : { executablePath: (await import('electron')).default, args: [desktop, ...args] }
     const app = await electron.launch({ ...options, cwd: run, timeout: 45_000 })
     const child = app.process(); observe(child)
-    const client = { app, page: null }
+    const client = { app, child, page: null }
     clients.set(name, client)
     metadata.clients[name] = { pid: child.pid, replica }
     child.stderr?.on('data', data => void log(`Client ${name}: ${data}`))
@@ -209,7 +221,9 @@ async function owner(run) {
     page.on('pageerror', error => { metadata.errors.push(`Renderer ${name}: ${error.message}`); void log(`Renderer ${name}: ${error.stack}\n`) })
     page.on('console', message => { if (message.type() === 'error') void log(`Console ${name}: ${message.text()}\n`) })
     page.on('dialog', async dialog => { void log(`Dismissed ${dialog.type()}: ${dialog.message()}\n`); await dialog.dismiss() })
-    await page.waitForFunction(() => window.foundationSession?.canEdit(), undefined, { timeout: 45_000, polling: 100 })
+    // A recovering replica has no document until Connect adopts the published genesis.
+    if (metadata.recover) await page.waitForFunction(() => document.querySelector('#connect-host')?.disabled === false, undefined, { timeout: 45_000, polling: 100 })
+    else await page.waitForFunction(() => window.foundationSession?.canEdit(), undefined, { timeout: 45_000, polling: 100 })
     const state = await page.evaluate(() => window.foundationHost.state())
     metadata.clients[name].replicaId = state.status.replicaId
     await save()
@@ -251,7 +265,7 @@ async function owner(run) {
       try {
         const state = await page.evaluate(() => window.foundationHost.state())
         check(`${name}: expected page`, page.url().split('?')[0] === pathToFileURL(path.join(dist, 'index.html')).href, 'Stop: wrong renderer target')
-        check(`${name}: own document/replica`, state.status.docId === metadata.id && state.status.replicaId === metadata.clients[name].replicaId, 'Stop: instance identity mismatch')
+        check(`${name}: own document/replica`, state.status.docId === metadata.docId && state.status.replicaId === metadata.clients[name].replicaId, 'Stop: instance identity mismatch')
         check(`${name}: editor ready`, await page.evaluate(() => window.foundationSession.canEdit()), 'Inspect snapshot and runtime.log; do not retry a mutation blindly')
       } catch (error) { check(`${name}: host/renderer reachable`, false, error.message) }
     }
@@ -330,7 +344,9 @@ async function owner(run) {
       // callers still assert the feature's exact stored result with wait-state.
       await page.waitForFunction(() => !document.querySelector('#save-status')?.textContent?.startsWith('Saving locally'), undefined, { timeout: 45_000, polling: 100 })
       const ui = await capture(page, prefix + '-after', true)
-      if (['click', 'fill', 'select', 'press'].includes(command) && !ui.canEdit) throw new Error(`Editor cannot confirm writes: ${ui.footer}. Inspect state before retrying.`)
+      // Connection controls and pane toggles are how an empty recovering replica becomes editable.
+      const connectionControl = command === 'click' && /#(connect|sync|disconnect)-host|data-future=/.test(args[0] ?? '')
+      if (['click', 'fill', 'select', 'press'].includes(command) && !ui.canEdit && !connectionControl) throw new Error(`Editor cannot confirm writes: ${ui.footer}. Inspect state before retrying.`)
       if (command === 'state') result = await page.evaluate(() => window.foundationHost.state())
       if (command === 'snapshot') result = ui
       if (command === 'screenshot') result = { path: path.join(evidence, `${prefix}-after.png`) }
@@ -359,7 +375,9 @@ async function owner(run) {
     for (const file of ['runtime.json', 'service/service-main.mjs', 'bin/node', 'bin/comb']) runtimeHashes[file] = digest(await readFile(path.join(runtime, file)))
     metadata.build = { dist, distHash: await hashTree(dist), ...(source ? { sourceHash: source } : {}), runtime, runtimeHashes, gitHead: (await exec('git', ['rev-parse', 'HEAD'], { cwd: root })).stdout.trim() }
     await mkdir(path.join(scratch, 'comb'), { mode: 0o700 }); await mkdir(path.join(scratch, 'objects'), { mode: 0o700 })
-    await writeFile(path.join(scratch, 'comb/config.toml'), `tenant = "foundation_desktop"\ndigest_key = "${randomBytes(32).toString('hex')}"\n[backend]\nkind = "local"\nroot = ${JSON.stringify(path.join(scratch, 'objects'))}\n`, { mode: 0o600, flag: 'wx' })
+    // An external configuration is copied, never mirrored into evidence: it may hold a digest key.
+    const combConfig = config.combConfig ? await readFile(config.combConfig, 'utf8') : `tenant = "foundation_desktop"\ndigest_key = "${randomBytes(32).toString('hex')}"\n[backend]\nkind = "local"\nroot = ${JSON.stringify(path.join(scratch, 'objects'))}\n`
+    await writeFile(path.join(scratch, 'comb/config.toml'), combConfig, { mode: 0o600, flag: 'wx' })
     host = spawn(path.join(runtime, 'bin/node'), [path.join(runtime, 'service/service-main.mjs'), '--state-dir', path.join(scratch, 'host'), '--comb-bin', path.join(runtime, 'bin/comb'), '--comb-dir', path.join(scratch, 'comb'), '--remote', 'foundation-verification', '--port', '0'], { cwd: run, detached: true, stdio: ['ignore', 'pipe', 'pipe'] })
     const hostExit = observe(host)
     metadata.hostPid = host.pid
@@ -415,7 +433,9 @@ async function launch(flags) {
   for (const file of ['runtime.json', 'service/service-main.mjs', 'bin/node', 'bin/comb']) await readFile(path.join(runtime, file))
   await mkdir(path.dirname(run), { recursive: true }); await mkdir(run, { mode: 0o700 })
   await mkdir(path.join(run, 'evidence'), { mode: 0o700 })
-  await writeJSON(path.join(run, 'config.json'), { runtime, app, clients: Number(flags.clients ?? 1) })
+  const combConfig = flags['comb-config'] ? await realpath(flags['comb-config']) : undefined
+  if (combConfig) await readFile(combConfig)
+  await writeJSON(path.join(run, 'config.json'), { runtime, app, clients: Number(flags.clients ?? 1), combConfig, docId: flags['doc-id'], recover: Boolean(flags.recover), author: flags.author })
   const log = await open(path.join(run, 'evidence/owner.log'), 'wx', 0o600)
   const child = spawn(process.execPath, [script, '__owner', run], { detached: true, cwd: root, stdio: ['ignore', log.fd, log.fd] })
   let launchError

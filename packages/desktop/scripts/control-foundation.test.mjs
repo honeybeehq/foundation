@@ -11,6 +11,14 @@ test('rejects misspelled target options and invalid clients before touching an i
   })
 })
 
+test('shared-document launches take a Comb configuration, document id and recover switch', () => {
+  assert.deepEqual(parseArgs(['launch', '--run', '/tmp/r', '--comb-config', '/tmp/comb/config.toml', '--doc-id', 'remote-test.1', '--recover', '--author', 'user:b']).flags, {
+    run: '/tmp/r', 'comb-config': '/tmp/comb/config.toml', 'doc-id': 'remote-test.1', recover: true, author: 'user:b',
+  })
+  assert.throws(() => parseArgs(['launch', '--run', '/tmp/r', '--recover']), /requires --doc-id/)
+  assert.throws(() => parseArgs(['launch', '--run', '/tmp/r', '--doc-id', 'has space']), /doc-id/)
+})
+
 test('stored-state assertions distinguish missing values, null, arrays and inherited properties', () => {
   assert.equal(atPath({ document: { body: [{ text: 'saved' }] } }, 'document.body.0.text'), 'saved')
   assert.equal(atPath({ document: null }, 'document'), null)

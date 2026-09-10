@@ -94,6 +94,25 @@ owns a private local Comb backend and independent replicas. The default interact
 DOM events through the existing UI handlers; `--input pointer` on click/fill tests Playwright
 input targeting. Native dialogs and canvas gestures require separate UI verification.
 
+For a remote backend, point two independent runs at one Comb configuration. Each run keeps its
+own host process and replica; only the object store is shared. `combctl init --backend s3` with an
+`--endpoint` produces a MinIO-compatible configuration; its credentials come from the AWS profile
+it names, and the file is copied into the run's scratch state, never into evidence.
+
+```sh
+pnpm control launch --run .artifacts/verification/remote-a --app "$HOME/Applications/Foundation.app" \
+  --comb-config "$HOME/Library/Application Support/Foundation/remote-minio/config.toml" \
+  --doc-id remote-test-1 --author user:a
+pnpm control launch --run .artifacts/verification/remote-b --app "$HOME/Applications/Foundation.app" \
+  --comb-config "$HOME/Library/Application Support/Foundation/remote-minio/config.toml" \
+  --doc-id remote-test-1 --author user:b --recover
+```
+
+The first run seeds the document and publishes it after Connect. The recovering run opens an empty
+replica; its Connect adopts the published genesis and every later change. Publication holds a
+single publisher lease per log, so a second host's appends pause with `deadline_exceeded` while
+another host stays connected; Disconnect the first host, then Reconnect the second.
+
 Actions, snapshots, stored states, screenshots, build fingerprints, and lifecycle exits
 remain under the run's `evidence/` directory. Cleanup closes the processes owned by that
 run and moves scratch state to its `.trash/` directory. It never deletes proof artifacts.
