@@ -21,8 +21,11 @@ try {
   await page.locator('#dismiss-modal').click();
 
   assert.equal(await page.locator('html').getAttribute('data-layout'), 'docked');
-  assert.equal(await page.locator('html').getAttribute('data-accent'), 'blue');
-  assert.equal(await page.locator('.left-panel').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(32, 32, 32)');
+  assert.equal(await page.locator('html').getAttribute('data-accent'), 'honey');
+  assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark');
+  assert.equal(await page.locator('.left-panel').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(32, 30, 26)');
+  assert.equal(await page.locator('body').evaluate(el => getComputedStyle(el).fontFamily.split(',')[0]), '"Hanken Grotesk"');
+  assert.ok(await page.evaluate(() => document.fonts.check('12px "Hanken Grotesk"')));
   const canvasOffset = () => page.locator('#world').evaluate(el => {
     const matrix = new DOMMatrix(getComputedStyle(el).transform);
     return { x: matrix.e, y: matrix.f };
@@ -94,32 +97,42 @@ try {
   // Appearance switches preserve the edited document across both layouts and all accents.
   await page.locator('#appearance-toggle').click();
   const brightnessContent = await page.locator('[data-node="heading"]').textContent();
-  for (const value of [24, 32, 39]) {
+  for (const value of [24, 30, 36]) {
     await page.locator(`[data-brightness="${value}"]`).click();
-    assert.equal(await page.locator('.left-panel').evaluate(el => getComputedStyle(el).backgroundColor), `rgb(${value}, ${value}, ${value})`);
+    assert.equal(await page.locator('.left-panel').evaluate(el => getComputedStyle(el).backgroundColor), `rgb(${value + 2}, ${value}, ${value - 4})`);
   }
   await page.locator('#panel-brightness').fill('20');
-  assert.equal(await page.locator('.inspector').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(20, 20, 20)');
+  assert.equal(await page.locator('.inspector').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(22, 20, 16)');
   await page.locator('#panel-brightness').press('ArrowRight');
   assert.equal(await page.locator('#panel-brightness').inputValue(), '21');
   await page.locator('#canvas-brightness').fill('14');
-  assert.equal(await page.locator('#canvas').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(14, 14, 14)');
+  assert.equal(await page.locator('#canvas').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(16, 14, 10)');
   assert.equal(await page.locator('[data-node="heading"]').textContent(), brightnessContent);
   assert.equal(await page.locator('[data-node="cta"]').evaluate(el => el.style.background), 'rgb(221, 231, 198)');
-  assert.equal(await page.locator('#export').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(146, 188, 255)');
-  await page.locator('[data-brightness="32"]').click();
+  assert.equal(await page.locator('#export').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(210, 154, 68)');
+  await page.locator('[data-brightness="30"]').click();
+  // Paper scheme swaps to Apiary's light tokens and parks the brightness controls.
+  await page.locator('[data-scheme-choice="light"]').click();
+  assert.equal(await page.locator('html').getAttribute('data-theme'), 'light');
+  assert.equal(await page.locator('.left-panel').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(255, 255, 255)');
+  assert.equal(await page.locator('#canvas').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(245, 244, 241)');
+  assert.equal(await page.locator('#export').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(184, 132, 46)');
+  assert.ok(await page.locator('#panel-brightness').isDisabled());
+  assert.equal(await page.locator('[data-node="heading"]').textContent(), brightnessContent);
+  await page.locator('[data-scheme-choice="dark"]').click();
+  assert.ok(await page.locator('#panel-brightness').isEnabled());
 
   for (const layout of ['docked', 'floating']) {
     await page.locator(`[data-layout-choice="${layout}"]`).click();
-    for (const accent of ['iris', 'blue', 'coral', 'mint', 'gold', 'lime']) {
+    for (const accent of ['honey', 'amber', 'blue', 'sage', 'clay', 'lilac']) {
       await page.locator(`[data-accent-choice="${accent}"]`).click();
       assert.equal(await page.locator('html').getAttribute('data-accent'), accent);
       assert.equal(await page.locator('[data-node="heading"]').textContent(), 'Stay somewhere wonderful.');
       assert.equal(await page.locator('[data-node="cta"]').evaluate(el => el.style.background), 'rgb(221, 231, 198)');
     }
   }
-  await page.locator('#panel-radius').fill('24');
-  assert.equal(await page.locator('.left-panel').evaluate(el => getComputedStyle(el).borderRadius), '24px');
+  await page.locator('#panel-radius').fill('20');
+  assert.equal(await page.locator('.left-panel').evaluate(el => getComputedStyle(el).borderRadius), '20px');
   const xBeforeRadiusKey = await page.locator('[data-prop="x"]').inputValue();
   await page.locator('#panel-radius').press('ArrowRight');
   assert.equal(await page.locator('[data-prop="x"]').inputValue(), xBeforeRadiusKey);
@@ -128,7 +141,8 @@ try {
   assert.equal(await page.locator('#accent-name').textContent(), 'Custom');
   await page.locator('#original-appearance').click();
   assert.equal(await page.locator('html').getAttribute('data-layout'), 'docked');
-  assert.equal(await page.locator('html').getAttribute('data-accent'), 'lime');
+  assert.equal(await page.locator('html').getAttribute('data-accent'), 'honey');
+  assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark');
   assert.ok(await page.locator('#panel-radius').isDisabled());
   await page.locator('[data-layout-choice="floating"]').click();
   await page.locator('[data-accent-choice="blue"]').click();
@@ -188,8 +202,9 @@ try {
   assert.equal(await page.locator('html').getAttribute('data-accent'), 'blue');
   assert.equal(await page.locator('html').getAttribute('data-panel-tone'), '28');
   await page.locator('#appearance-toggle').click();
-  await page.locator('[data-accent-choice="iris"]').click();
+  await page.locator('[data-scheme-choice="light"]').click();
   await page.screenshot({ path: new URL('./appearance-preview.png', import.meta.url).pathname });
+  await page.locator('[data-scheme-choice="dark"]').click();
   await page.locator('#appearance-close').click();
   await page.setViewportSize({ width: 1024, height: 768 });
   await page.screenshot({ path: new URL('./compact-preview.png', import.meta.url).pathname });
@@ -202,7 +217,7 @@ try {
   await page.screenshot({ path: new URL('./narrow-preview.png', import.meta.url).pathname });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 560);
   assert.deepEqual(errors, []);
-  console.log('PASS: selection, properties, text editing, undo/redo, linked tokens, insertion, dragging, zoom, preview, standalone export, compact layouts, appearance combinations, URL state, custom colors, appearance export, middle-mouse panning, and the single-header layout.');
+  console.log('PASS: Apiary tokens and fonts, charcoal/paper schemes, selection, properties, text editing, undo/redo, linked tokens, insertion, dragging, zoom, preview, standalone export, compact layouts, appearance combinations, URL state, custom colors, appearance export, middle-mouse panning, and the single-header layout.');
 } finally {
   await browser.close();
 }

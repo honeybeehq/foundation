@@ -30,3 +30,9 @@ Photography comes from Unsplash. The images are embedded so the prototype works 
 - Coast: https://images.unsplash.com/photo-1516483638261-f4dbaf036963
 - Retreat: https://images.unsplash.com/photo-1613490493576-7fde63acd811
 - License: https://unsplash.com/license
+
+Interface type is embedded as latin WOFF2 subsets, copied from the `@fontsource` packages Apiary bundles, so the study and the desktop build render offline.
+
+- Hanken Grotesk (400, 500, 600): Copyright 2021 The Hanken Grotesk Project Authors, https://github.com/marcologous/hanken-grotesk
+- IBM Plex Mono (400, 500): Copyright © 2017 IBM Corp., https://github.com/IBM/plex
+- Both are licensed under the SIL Open Font License, Version 1.1: https://openfontlicense.org

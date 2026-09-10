@@ -52,7 +52,7 @@ async function launch(): Promise<void> {
   const seed: unknown = JSON.parse(await readFile(path.join(__dirname, 'seed.json'), 'utf8'))
   if (!isDocument(seed)) throw new Error('Bundled seed document is invalid')
   client = new HostClient({ url, token, directory: replicaDirectory, docId, author: args.get('author') ?? 'user:local', ...(args.has('recover') ? {} : { seed }) })
-  const window = new BrowserWindow({ width: 1440, height: 940, minWidth: 480, minHeight: 480, title: 'Foundation', backgroundColor: '#1b1b1b', show: false,
+  const window = new BrowserWindow({ width: 1440, height: 940, minWidth: 480, minHeight: 480, title: 'Foundation', backgroundColor: '#171512', show: false,
     webPreferences: { preload: path.join(__dirname, 'preload.cjs'), sandbox: true, contextIsolation: true, nodeIntegration: false, webSecurity: true },
   })
   const rendererURL = pathToFileURL(path.join(__dirname, 'index.html')).href
@@ -98,7 +98,7 @@ async function launch(): Promise<void> {
     if (answer === 1) event.preventDefault()
   })
   window.once('ready-to-show', () => window.show())
-  await window.loadFile(path.join(__dirname, 'index.html'), { query: { panels: 'docked', accent: 'blue', shade: '27', canvas: '30' } })
+  await window.loadFile(path.join(__dirname, 'index.html'), { query: { panels: 'docked', scheme: 'dark', accent: 'honey', shade: '30', canvas: '21' } })
 }
 
 if (!app.requestSingleInstanceLock()) app.quit()

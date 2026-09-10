@@ -14,6 +14,14 @@ if (!modelCode) throw new Error('Prototype model script missing')
 const initial = vm.runInNewContext(`${modelCode};initialDocument`, { structuredClone })
 const assetWrites = []
 const assets = []
+const fontWrites = []
+html = html.replace(/data:font\/woff2;base64,([A-Za-z0-9+/=]+)/g, (_all, base64) => {
+  const bytes = Buffer.from(base64, 'base64')
+  const ref = `assets/${createHash('sha256').update(bytes).digest('hex').slice(0, 20)}.woff2`
+  fontWrites.push(writeFile(path.join(dist, ref), bytes))
+  return ref
+})
+await Promise.all(fontWrites)
 html = html.replace(/data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)/g, (_all, format, base64) => {
   const bytes = Buffer.from(base64, 'base64')
   const ref = `assets/${createHash('sha256').update(bytes).digest('hex').slice(0, 20)}.${format}`

@@ -10,11 +10,13 @@ python3 -m http.server 4318 --bind 127.0.0.1 --directory spikes/desktop-prototyp
 
 Open http://127.0.0.1:4318. Use a desktop window around 1500 × 980 to see the intended composition.
 
-Open **Appearance** in the title bar to adjust **Panel brightness** or **Canvas background** independently. Deep, Dark, and Original give quick panel-brightness presets; Dark is the default. These sliders preserve text contrast, the accent, and artwork colors. Choices persist in exported HTML and URL parameters `shade` and `canvas`.
+The editor chrome follows the Apiary design system (`packages/ui/src/tokens.stylex.ts` in the Apiary repository): warm charcoal neutrals, Hanken Grotesk for interface text, IBM Plex Mono for data, 4/6/8 px radii, panes separated by distance rather than borders, and a single honey accent reserved for the one primary action and the focus cue. Selection on the canvas uses Apiary's inspector blue; selected rows and active tabs use neutral fills, never the accent. The canvas artwork keeps its own document tokens.
 
-Use the same menu to switch between Docked and Floating panels. Floating panels have an adjustable corner radius. Choose Iris, Blue, Coral, Mint, Gold, or Lime, or pick a custom accent. **Original draft** restores docked panels with Lime. Changes apply immediately and preserve document edits.
+Open **Appearance** in the title bar to switch between **Charcoal** (default, Apiary's dark branch) and **Paper** (Apiary's light branch). In Charcoal, **Panel brightness** and **Canvas background** move along the same warm ramp; Deep, Charcoal, and Lifted are presets. Paper uses Apiary's fixed light tokens and parks the sliders.
 
-Appearance choices are recorded in the URL and included in exported HTML. For example, `?panels=floating&accent=coral&corners=24` opens floating panels with Coral and 24-pixel corners. Docked panels with neutral gray chrome and a light blue accent are the chosen default. Selection, focus, and primary actions use the accent; the canvas keeps its authored colors. Floating remains available for comparison, with 18-pixel corners. Workspace accents do not change the artboards’ design tokens.
+The same menu switches **Docked** and **Floating** panels (floating corner radius 8–24 px, default 12) and the accent: Honey (default), Amber, Blue, Sage, Clay, and Lilac are all drawn from Apiary's own palette, each with a light and a dark value; a custom color is also accepted. **Apiary default** restores Charcoal, Docked, and Honey. Changes apply immediately and preserve document edits.
+
+Appearance choices are recorded in the URL parameters `scheme`, `panels`, `accent`, `corners`, `shade`, and `canvas`, and are included in exported HTML. For example, `?scheme=light&panels=floating&accent=blue` opens the Paper scheme with floating panels and a blue accent.
 
 The app has one header. Project navigation sits above the layers, Design/Prototype/Code controls sit above properties, and a floating zoom control sits at the canvas’s top-right corner.
 
@@ -24,7 +26,7 @@ Use the toolbar to add text and rectangles. Drag layers to move them. Arrow keys
 
 Edits stay in memory. **Export study** downloads a self-contained HTML copy with the current edits. Reopen that file to continue the study.
 
-This is a desktop design study with switchable panel and accent treatments, pending review. It is separate from the Foundation engine and does not produce valid `.fdn.html` documents. The component examples share color tokens, but full component definitions, overrides, JavaScript editing, AI work, comments, custom artboards, and interaction prototyping are reserved for later design passes. The narrow layout keeps the prototype usable in a browser sidecar; it is not yet a dedicated Foundation sidecar design.
+This is a desktop design study in the Apiary look, with switchable scheme, panel, and accent treatments, pending review. It is separate from the Foundation engine and does not produce valid `.fdn.html` documents. The component examples share color tokens, but full component definitions, overrides, JavaScript editing, AI work, comments, custom artboards, and interaction prototyping are reserved for later design passes. The narrow layout keeps the prototype usable in a browser sidecar; it is not yet a dedicated Foundation sidecar design.
 
 Run the focused checks from the repository root:
 
