@@ -52,7 +52,9 @@ async function launch(): Promise<void> {
   const seed: unknown = JSON.parse(await readFile(path.join(__dirname, 'seed.json'), 'utf8'))
   if (!isDocument(seed)) throw new Error('Bundled seed document is invalid')
   client = new HostClient({ url, token, directory: replicaDirectory, docId, author: args.get('author') ?? 'user:local', ...(args.has('recover') ? {} : { seed }) })
-  const window = new BrowserWindow({ width: 1440, height: 940, minWidth: 480, minHeight: 480, title: 'Foundation', backgroundColor: '#171512', show: false,
+  // macOS: hide the native title bar and let the traffic lights sit inside the 32px app title bar.
+  const chrome = process.platform === 'darwin' ? { titleBarStyle: 'hiddenInset' as const, trafficLightPosition: { x: 13, y: 10 } } : {}
+  const window = new BrowserWindow({ width: 1440, height: 940, minWidth: 480, minHeight: 480, title: 'Foundation', backgroundColor: '#171512', show: false, ...chrome,
     webPreferences: { preload: path.join(__dirname, 'preload.cjs'), sandbox: true, contextIsolation: true, nodeIntegration: false, webSecurity: true, backgroundThrottling: false },
   })
   const rendererURL = pathToFileURL(path.join(__dirname, 'index.html')).href

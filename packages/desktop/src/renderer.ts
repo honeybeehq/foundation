@@ -133,6 +133,11 @@ window.foundationSession = {
   },
 }
 document.body.classList.add('host-loading')
+if (navigator.platform.startsWith('Mac')) {
+  // The traffic lights own the top-left corner, so the Foundation mark moves to the footer.
+  document.body.classList.add('mac-desktop')
+  element('.footer').prepend(element('.titlebar .brand'))
+}
 element<HTMLButtonElement>('[data-future="comments"]').onclick = () => showComments(!commentsOpen)
 element<HTMLButtonElement>('[data-future="activity"]').onclick = () => showComments(!commentsOpen)
 element('#save-status').onclick = () => showComments(!commentsOpen)

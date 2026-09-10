@@ -16,3 +16,9 @@
 body.host-loading #world{opacity:.35;pointer-events:none}
 body.host-loading .inspector input,body.host-loading .inspector textarea{pointer-events:none}
 .inspector.comments-open>.selection-heading,.inspector.comments-open>.inspector-section{display:none}
+/* Frameless macOS window: the title bar is the drag handle, controls opt out, and the traffic lights get a left inset. */
+.titlebar{-webkit-app-region:drag}
+.titlebar button,.titlebar .file-tab,.titlebar .avatar{-webkit-app-region:no-drag}
+body.mac-desktop .titlebar{padding-left:78px}
+body.mac-desktop .footer .brand{margin-right:2px}
+body.mac-desktop .footer .brand-mark{transform:rotate(-10deg) scale(.8);transform-origin:center}
