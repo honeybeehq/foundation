@@ -143,7 +143,14 @@ async function fillField(page, selector, text) {
   }, text)
   assert.equal(await field.inputValue(), text, 'The field must contain the exact submitted text')
 }
-async function screenshot(page, name) { await activate(page); const file = path.join(proof, name); await page.screenshot({ path: file, scale: 'css' }); report.screenshots.push(file) }
+async function screenshot(page, name) {
+  const file = path.join(proof, name)
+  for (let attempt = 1; ; attempt++) {
+    try { await activate(page); await page.screenshot({ path: file, scale: 'css', timeout: 20_000 }); break }
+    catch (error) { if (attempt === 3) throw error; log(`Screenshot ${name} attempt ${attempt} failed (${error.name}); refocusing and retrying.`) }
+  }
+  report.screenshots.push(file)
+}
 try {
   const startup = await Promise.race([
     once(lines, 'line', { signal: AbortSignal.timeout(30_000) }).then(([line]) => JSON.parse(line)),

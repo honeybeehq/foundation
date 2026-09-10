@@ -53,7 +53,7 @@ async function launch(): Promise<void> {
   if (!isDocument(seed)) throw new Error('Bundled seed document is invalid')
   client = new HostClient({ url, token, directory: replicaDirectory, docId, author: args.get('author') ?? 'user:local', ...(args.has('recover') ? {} : { seed }) })
   const window = new BrowserWindow({ width: 1440, height: 940, minWidth: 480, minHeight: 480, title: 'Foundation', backgroundColor: '#171512', show: false,
-    webPreferences: { preload: path.join(__dirname, 'preload.cjs'), sandbox: true, contextIsolation: true, nodeIntegration: false, webSecurity: true },
+    webPreferences: { preload: path.join(__dirname, 'preload.cjs'), sandbox: true, contextIsolation: true, nodeIntegration: false, webSecurity: true, backgroundThrottling: false },
   })
   const rendererURL = pathToFileURL(path.join(__dirname, 'index.html')).href
   const guard = (event: IpcMainInvokeEvent) => {
