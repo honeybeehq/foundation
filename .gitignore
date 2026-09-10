@@ -3,3 +3,4 @@ dist/
 *.png
 !spikes/render/fixtures/**
 spikes/render/out/
+.artifacts/verification/

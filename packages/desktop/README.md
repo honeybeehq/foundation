@@ -72,3 +72,39 @@ node packages/desktop/scripts/live-proof.mjs /path/to/Foundation.app /path/to/fr
 ```
 
 The live proof drives two actual Electron clients with DOM clicks and input events through their existing UI handlers and preload, with one real host and immutable Comb bridge. It asserts selection, field contents, enabled controls and local-save acknowledgments. It does not call host mutation endpoints directly. Physical pointer targeting is covered separately by the prototype smoke test; this data acceptance avoids shared-desktop focus interference. It tests same-author offline edits/comments, pending-to-published convergence, per-session disconnect, restart of both replicas, then packaged standalone offline save, Connect through its generated local Comb backend, and reopen. It writes screenshots, bundled executable hashes, a result report and diagnostics under a fresh proof directory; existing directories are refused. Success requires observed clean exits from every app and the external host. A failed or timed-out teardown remains a failed report. These are acceptance artifacts, not mock sync results.
+
+## Reusable control surface
+
+Use the repository-local [verify-foundation skill](../../.claude/skills/verify-foundation/SKILL.md)
+and its [feature map](../../.claude/skills/verify-foundation/features/README.md) for targeted
+verification. `pnpm control help` lists the JSON CLI: launch, doctor, UI click/fill/select,
+keyboard input, snapshots, stored-state assertions, screenshots, client restart, and cleanup.
+
+```sh
+pnpm control launch --run .artifacts/verification/my-task \
+  --runtime "$HOME/Applications/Foundation.app/Contents/Resources/host" --clients 2
+pnpm control doctor --run .artifacts/verification/my-task
+pnpm control snapshot --run .artifacts/verification/my-task
+pnpm control cleanup --run .artifacts/verification/my-task
+```
+
+Source mode rebuilds this checkout's desktop and uses the explicitly supplied real host
+runtime. `--app /path/to/Foundation.app` instead verifies that packaged renderer. Every run
+owns a private local Comb backend and independent replicas. The default interaction uses
+DOM events through the existing UI handlers; `--input pointer` on click/fill tests Playwright
+input targeting. Native dialogs and canvas gestures require separate UI verification.
+
+Actions, snapshots, stored states, screenshots, build fingerprints, and lifecycle exits
+remain under the run's `evidence/` directory. Cleanup closes the processes owned by that
+run and moves scratch state to its `.trash/` directory. It never deletes proof artifacts.
+
+```sh
+pnpm test:control
+node packages/desktop/scripts/control-foundation-proof.mjs \
+  "$HOME/Applications/Foundation.app/Contents/Resources/host" \
+  .artifacts/verification/control-acceptance
+```
+
+The latter drives the public control CLI end to end, asserts two-peer offline edits,
+comments, publication, undo/redo, restart persistence, and clean teardown, and retains
+`evidence/control-proof.json`. Existing proof directories are refused.

@@ -4,6 +4,8 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
+    "control": "node packages/desktop/scripts/control-foundation.mjs",
+    "test:control": "node --test packages/desktop/scripts/control-foundation.test.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "spike:chain": "tsx spikes/chain/src/run.ts",

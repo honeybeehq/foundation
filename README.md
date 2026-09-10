@@ -26,3 +26,7 @@ pnpm test          # gauntlet + harness tests
 pnpm spike:chain   # run the full chain gauntlet, writes spikes/chain/RESULTS.md
 pnpm spike:render  # render determinism check, writes spikes/render/RESULTS.md
 ```
+
+For the current desktop application, see [desktop development](packages/desktop/README.md).
+Use the [verification skill](.claude/skills/verify-foundation/SKILL.md) and `pnpm control help`
+to drive a real isolated desktop session and capture evidence.
