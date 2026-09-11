@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "spike:chain": "tsx spikes/chain/src/run.ts",
-    "spike:render": "tsx spikes/render/run.ts"
+    "spike:render": "tsx spikes/render/run.ts",
+    "deploy:desktop": "node packages/desktop/scripts/deploy.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.1.2",

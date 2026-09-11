@@ -18,6 +18,14 @@ The host service prints its loopback URL and token file path on startup. `FOUNDA
 
 Without `--doc-id`, main generates and persists a document ID in the replica's `.desktop/document.json`. Without `--replica-dir`, it uses the default user data replica. `--recover` opens without a seed for recovery from an existing feed. A replica with no document can connect but cannot edit until recovery completes.
 
+## Rebuild and redeploy the installed app
+
+```sh
+pnpm deploy:desktop --open
+```
+
+This rebuilds the desktop from this checkout, packages a fresh `packages/desktop/release/Foundation-<stamp>.app`, quits any running copy, replaces `~/Applications/Foundation.app` and launches it. The previous bundle goes to the Trash. The host bundle, Node executable and accepted Comb bridge are reused from the installed app's `Contents/Resources/host`; pass `--runtime <dir>` (or `--host-bundle`, `--node-bin`, `--comb-bin`) to change them, `--target` for another install path, and `--no-install` to only package. `pnpm deploy:desktop --help` lists the options.
+
 ## Packaging on macOS arm64
 
 The host owner builds a self-contained directory containing `service-main.mjs` and its runtime dependencies. The desktop package copies that directory, the accepted immutable Comb bridge and an official Node 24 executable. It never copies a backend configuration or credentials.
