@@ -1,4 +1,4 @@
-import type { ChangeMeta, FdnAnnotation, FdnDocument, FdnNode, PatchOp } from '../../engine/src/types.js'
+import type { FdnAnnotation, FdnDocument, FdnNode, PatchOp } from '../../engine/src/types.js'
 
 export type SyncState = { kind: 'offline' | 'idle' | 'syncing' | 'caught_up' } | { kind: 'paused'; reason: string; resumeAt?: string }
 export interface HostState {
@@ -22,7 +22,6 @@ export interface DesktopAPI {
   export(): Promise<{ canceled: boolean; files?: { html: string; chain: string } }>
 }
 export interface HostConfiguration { url: string; token: string; directory: string; docId: string; author: string; seed?: FdnDocument }
-export type CommitBody = { meta: ChangeMeta; ops: PatchOp[] }
 
 export function record(value: unknown): value is Record<string, unknown> { return typeof value === 'object' && value !== null && !Array.isArray(value) }
 function strings(value: unknown): value is Record<string, string> { return record(value) && Object.values(value).every(v => typeof v === 'string') }
