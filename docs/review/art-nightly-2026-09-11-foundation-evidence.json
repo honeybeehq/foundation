@@ -1,0 +1,448 @@
+{
+  "date": "2026-09-11",
+  "frozenMain": "1148bbfaeee16c524ab17eeb85434f3c18cec5ec",
+  "sourceHead": "e3d9823bbe7f4f3110473b0bb75cc1bf5e21e504",
+  "sourceScopeComplete": true,
+  "reviewRunComplete": false,
+  "rawDiffCommand": "git diff --binary --full-index --no-ext-diff --no-renames <sha>^ <sha>",
+  "candidates": [
+    {
+      "sha": "1148bbfaeee16c524ab17eeb85434f3c18cec5ec",
+      "rawDiffSha256": "31990322739db32348b951999c6a02f6394bc8891244e2e114157e28930be2ca",
+      "onMain": true
+    },
+    {
+      "sha": "686728361be58215d6a4389d0309e1907e2d8ac4",
+      "rawDiffSha256": "3924f726f1c5988bbeefb33fab3dca570c2a5fc5de4ae2b67bbc919f52b678eb",
+      "onMain": true
+    },
+    {
+      "sha": "580ccc7f6e11f1350166a711a98c197b1ef3ae32",
+      "rawDiffSha256": "bc6c36a61f69c8a6122696f182afff82c116448db3af5c65f4733f6b54682c0e",
+      "onMain": true
+    },
+    {
+      "sha": "05b91b45c2db5aa004b3f5e935c41a3ab41044ee",
+      "rawDiffSha256": "5a6f66e160721634cc2b2a67b39b0caa064a8ebc2c86f47cf9038dabd01a521b",
+      "onMain": true
+    },
+    {
+      "sha": "fb7bbc4acb2af9b0da716a02b4b4881e086b2b0d",
+      "rawDiffSha256": "331b405b0c215499141739c2efd2779ec47d65b3766b5e7b4fc458f38921c885",
+      "onMain": true
+    },
+    {
+      "sha": "b7cd482dce34ee0f6301bfad6078d97a94286116",
+      "rawDiffSha256": "3924f726f1c5988bbeefb33fab3dca570c2a5fc5de4ae2b67bbc919f52b678eb",
+      "onMain": false
+    },
+    {
+      "sha": "539bc4291a166ca591976b6753866c29bd847162",
+      "rawDiffSha256": "1c9c7b9f3e763d2baf21dd92b851f6879412195a2dd909f52de44ae7a7898c1b",
+      "onMain": false
+    },
+    {
+      "sha": "af20a49366c554838287fe15b116a962beae04f7",
+      "rawDiffSha256": "d7f98a9a42531aad309fd954efdbe718aba109a133a07da70d2189716944e17f",
+      "onMain": true
+    },
+    {
+      "sha": "41ab77deeeaf59fe45299363ed3dadf82b87bc85",
+      "rawDiffSha256": "0cf447a436ae6aedb7d26091c0f21845c5f06983c8f02eb45437ddc34116f1cb",
+      "onMain": false
+    },
+    {
+      "sha": "afef18ba92b4ef568435e7d6535002d8abd1b2f0",
+      "rawDiffSha256": "bc6c36a61f69c8a6122696f182afff82c116448db3af5c65f4733f6b54682c0e",
+      "onMain": false
+    },
+    {
+      "sha": "5db1a4aa8bd2faa5aab2c0507c1230033f6747c7",
+      "rawDiffSha256": "5a6f66e160721634cc2b2a67b39b0caa064a8ebc2c86f47cf9038dabd01a521b",
+      "onMain": false
+    },
+    {
+      "sha": "b02b7effc47acf21492c9e5633ae94d7ac5c0eba",
+      "rawDiffSha256": "331b405b0c215499141739c2efd2779ec47d65b3766b5e7b4fc458f38921c885",
+      "onMain": false
+    },
+    {
+      "sha": "0b80e87b9e4f7dc32d151d7a689e936e20a45518",
+      "rawDiffSha256": "9d6a12e467dd857ccb950fd32155d9596e83f004254965cbd7d6e11b72f46134",
+      "onMain": true
+    },
+    {
+      "sha": "8102c5133fa0b7ad84a0fd7ad7a921f79f4662a7",
+      "rawDiffSha256": "652d858a130aa15d61745211a33f08c3a9e97794213a7765e14a6b2fe2c3dc3e",
+      "onMain": true
+    },
+    {
+      "sha": "a489c0a9627b1f51fec13a7e5cb33ac6cdff2061",
+      "rawDiffSha256": "bea26ad89ffb90ea5859e996a60b99acf1c23772ceee3fc8793a126f315ca8f7",
+      "onMain": true
+    },
+    {
+      "sha": "01d745b06d59128f0e299f2e6193476041f44008",
+      "rawDiffSha256": "b68131cc7ec4cb90f72aeb89b1a71d6939263afbee276f4bf99ff59d2d5dce3f",
+      "onMain": true
+    },
+    {
+      "sha": "3943990ef1d86d7d89d293eb680a6b1a49f65810",
+      "rawDiffSha256": "606f2f15a2a25b1f5176310fef09f5adb3a41de427bc9675b662489407e905be",
+      "onMain": true
+    },
+    {
+      "sha": "3163060ffd6903395d6cd51df4b7c9f957a51ac9",
+      "rawDiffSha256": "4545dc17ed1825fce1b65ed6c1b7bc6f26e73a274bdf2fcb9c81a06af11b76e5",
+      "onMain": true
+    },
+    {
+      "sha": "4ca0d2cb1e23b15588f6d417b1659abf4968c2d8",
+      "rawDiffSha256": "38ac47af16a0e7abacabc256e949a85a0fc56fb42bf29192ba22c6d57d4196e3",
+      "onMain": true
+    },
+    {
+      "sha": "b7b85b17d49fc385f1abd7aa894868f51624aa24",
+      "rawDiffSha256": "bd1961fcede1e33dbd213687f6c8cfacade126811f65d4743c8e46801768509c",
+      "onMain": true
+    },
+    {
+      "sha": "7fedb51efb6c55db18f24bf04a8eb83ccef94a1f",
+      "rawDiffSha256": "ad174c91fbed9138ee3f0c2ecfb8abfe43419a1f86f9e09d358b44d94e07cc25",
+      "onMain": true
+    },
+    {
+      "sha": "f718ce5dda5b5680fed7af072b97f78af6c639f9",
+      "rawDiffSha256": "521f6c6483c868011f32a4bcf07bfa44ab5c3f25c75a93a921cc456e6950598a",
+      "onMain": true
+    },
+    {
+      "sha": "257169b0b334e10456bb15cd3b7a862730116b05",
+      "rawDiffSha256": "04b48200ae82d5d7fabd9295277c7c7a9a9842d2e9bdcc2c72589fd4b992cb6c",
+      "onMain": true
+    },
+    {
+      "sha": "3be56aa8a083307f1a89651a270287e4e883e988",
+      "rawDiffSha256": "b160d6868e1d8ca1a461f096b057f91e1a9c2d0d2565af8421796143907f209c",
+      "onMain": true
+    },
+    {
+      "sha": "f79eaefca0085306f2fbd83b86c763389854d310",
+      "rawDiffSha256": "377fdc75f818023262c1f069bdf0ff223a8aeab3c974ce9736c20617b3ee0b92",
+      "onMain": true
+    },
+    {
+      "sha": "0483d992dcb4bbb3d9814ee4c31669279cf0478a",
+      "rawDiffSha256": "e4e0d1175ddc21f45f5502828e5390734eb0442b717a8d1bfa7bc9d434e56ef2",
+      "onMain": true
+    },
+    {
+      "sha": "f8f278ccb014166396c1ac47db46f100af8a501f",
+      "rawDiffSha256": "e8010442d26e2e13aa98c670eb7bd25e778ed8c1fa9022c5d63768dfb5f57603",
+      "onMain": true
+    },
+    {
+      "sha": "c567b0a35fe1616598f4fd70d9069107e8145b8c",
+      "rawDiffSha256": "50fa02965bad59e6d0c56e7f79f3657ebf97bf174ee2107441e8a1f3d5ea6b31",
+      "onMain": true
+    },
+    {
+      "sha": "6e2355ecda7bd5e63c99aaf41ea36c5d97f54353",
+      "rawDiffSha256": "76ab8841c2008db904e99d1344e196a8e36b04d9d7559ddb5f07a664a1654c59",
+      "onMain": true
+    },
+    {
+      "sha": "dc83269372af51b966c31de4869bac3987b999f6",
+      "rawDiffSha256": "6a7e0c857c4f5f8a897d617536358d499005569be49e1444116713318e8ce2bf",
+      "onMain": true
+    },
+    {
+      "sha": "356c6805cc5126c19fd86495c090054c16920ce0",
+      "rawDiffSha256": "f8820cd7c1ac443271d30ea310d7e81c22cd4179a1373a0895e93179573297e1",
+      "onMain": true
+    },
+    {
+      "sha": "ad7f99d97089f2ce346ef49efa6b1d1abd469638",
+      "rawDiffSha256": "9d6a12e467dd857ccb950fd32155d9596e83f004254965cbd7d6e11b72f46134",
+      "onMain": false
+    },
+    {
+      "sha": "b19d0f51d30f83fc5cae708f36b8294acad96f6f",
+      "rawDiffSha256": "652d858a130aa15d61745211a33f08c3a9e97794213a7765e14a6b2fe2c3dc3e",
+      "onMain": false
+    },
+    {
+      "sha": "7d258b8d65dba19c4f0fa0b6be3f13af211d3352",
+      "rawDiffSha256": "bea26ad89ffb90ea5859e996a60b99acf1c23772ceee3fc8793a126f315ca8f7",
+      "onMain": false
+    },
+    {
+      "sha": "ece99795e18ee9a1df55b90ba3a0ca101e7605ea",
+      "rawDiffSha256": "b68131cc7ec4cb90f72aeb89b1a71d6939263afbee276f4bf99ff59d2d5dce3f",
+      "onMain": false
+    },
+    {
+      "sha": "2c1e0f4d1e95748cf93c9c3d6fafaaf7e88fb6e8",
+      "rawDiffSha256": "606f2f15a2a25b1f5176310fef09f5adb3a41de427bc9675b662489407e905be",
+      "onMain": false
+    },
+    {
+      "sha": "982adf44fccf176f8bbb1518344a68512bbff463",
+      "rawDiffSha256": "4545dc17ed1825fce1b65ed6c1b7bc6f26e73a274bdf2fcb9c81a06af11b76e5",
+      "onMain": false
+    },
+    {
+      "sha": "483b87f4f5e0263739523a58b7dd3c4e3cc5a3ed",
+      "rawDiffSha256": "38ac47af16a0e7abacabc256e949a85a0fc56fb42bf29192ba22c6d57d4196e3",
+      "onMain": false
+    },
+    {
+      "sha": "f9cacf4b735bb383656ce0926ac1f38d5d884173",
+      "rawDiffSha256": "bd1961fcede1e33dbd213687f6c8cfacade126811f65d4743c8e46801768509c",
+      "onMain": false
+    },
+    {
+      "sha": "058a54f743c1816784beb89982fb7d8981e35a52",
+      "rawDiffSha256": "ad174c91fbed9138ee3f0c2ecfb8abfe43419a1f86f9e09d358b44d94e07cc25",
+      "onMain": false
+    },
+    {
+      "sha": "0f089e3d733c0cb4147e625817cc6bc2aa0de142",
+      "rawDiffSha256": "521f6c6483c868011f32a4bcf07bfa44ab5c3f25c75a93a921cc456e6950598a",
+      "onMain": false
+    },
+    {
+      "sha": "9ded152bd7e2943aa648f931816d096b809a4974",
+      "rawDiffSha256": "04b48200ae82d5d7fabd9295277c7c7a9a9842d2e9bdcc2c72589fd4b992cb6c",
+      "onMain": false
+    },
+    {
+      "sha": "424d899ec5084a098f09762e103420cd59762f31",
+      "rawDiffSha256": "b160d6868e1d8ca1a461f096b057f91e1a9c2d0d2565af8421796143907f209c",
+      "onMain": false
+    },
+    {
+      "sha": "e570d6c434c9ad3d5cc6932ab68181ba0df5eafc",
+      "rawDiffSha256": "377fdc75f818023262c1f069bdf0ff223a8aeab3c974ce9736c20617b3ee0b92",
+      "onMain": false
+    },
+    {
+      "sha": "ef34d4c5ce12de737a580bad4fd3e4a1f7b1e81a",
+      "rawDiffSha256": "e4e0d1175ddc21f45f5502828e5390734eb0442b717a8d1bfa7bc9d434e56ef2",
+      "onMain": false
+    },
+    {
+      "sha": "b8f08f0a4ad7f09e2da0385335758145607ee877",
+      "rawDiffSha256": "e8010442d26e2e13aa98c670eb7bd25e778ed8c1fa9022c5d63768dfb5f57603",
+      "onMain": false
+    },
+    {
+      "sha": "98e73889e8873f76acb0fb0d90e816b560b7a62c",
+      "rawDiffSha256": "50fa02965bad59e6d0c56e7f79f3657ebf97bf174ee2107441e8a1f3d5ea6b31",
+      "onMain": false
+    },
+    {
+      "sha": "6a0209e1e8ca48c15ff13ae18c74209b3c406a23",
+      "rawDiffSha256": "76ab8841c2008db904e99d1344e196a8e36b04d9d7559ddb5f07a664a1654c59",
+      "onMain": false
+    },
+    {
+      "sha": "e8478875267b8630e93f3953f5edb906506d1252",
+      "rawDiffSha256": "6a7e0c857c4f5f8a897d617536358d499005569be49e1444116713318e8ce2bf",
+      "onMain": false
+    }
+  ],
+  "sourceCommits": [
+    {
+      "sha": "a81ce0e37972b69da3edffeb06803eee77476a9a",
+      "subject": "fix(verification): reject invalid desktop launch combinations",
+      "applicability": "main",
+      "kind": "repair"
+    },
+    {
+      "sha": "d9817e9f0fa0ef9950193a19dd087abbb6726573",
+      "subject": "fix(desktop): reject invalid deploy options before installation",
+      "applicability": "main",
+      "kind": "repair"
+    },
+    {
+      "sha": "e4751b144f49e428856dc0b29951f57c37ae3b64",
+      "subject": "fix(test): run desktop Node suites with their native runner",
+      "applicability": "main",
+      "kind": "repair"
+    },
+    {
+      "sha": "739d89e37129ddad0339f30cfc746ec4973501b3",
+      "subject": "docs(verify): recognize explicit publisher lease contention",
+      "applicability": "main",
+      "kind": "repair"
+    },
+    {
+      "sha": "e3d9823bbe7f4f3110473b0bb75cc1bf5e21e504",
+      "subject": "refactor(desktop): read deploy help without a redundant import chain",
+      "applicability": "main",
+      "kind": "simplification"
+    }
+  ],
+  "checks": [
+    {
+      "command": "node --test packages/desktop/scripts/control-foundation.test.mjs",
+      "exitCode": 1,
+      "result": "RED:3 passed,2 failed; both missing expected guard exceptions"
+    },
+    {
+      "command": "node --test packages/desktop/scripts/control-foundation.test.mjs",
+      "exitCode": 0,
+      "result": "GREEN5/5"
+    },
+    {
+      "command": "node --test packages/desktop/scripts/deploy.test.mjs",
+      "exitCode": 1,
+      "result": "RED:missing target and unknown switch accepted by parser; intentionally missing runtime stops before build/install"
+    },
+    {
+      "command": "node --test packages/desktop/scripts/*.test.mjs spikes/desktop-prototype/model.test.mjs",
+      "exitCode": 0,
+      "result": "12/12, including stable error-code assertion for Node-version-independent missing-argument rejection"
+    },
+    {
+      "command": "CI=true pnpm install --offline --frozen-lockfile",
+      "exitCode": 0,
+      "result": "isolated dependencies installed; pinned Electron subsequently acquired by package tool"
+    },
+    {
+      "command": "pnpm exec vitest run --maxWorkers=1 (before runner separation)",
+      "exitCode": 1,
+      "result": "720/720 tests in69 suites passed;2 Node suites failed Vitest discovery"
+    },
+    {
+      "command": "pnpm test -- --maxWorkers=1",
+      "exitCode": "terminated-owned-tree",
+      "result": "Harness invocation mistake: worker option forwarded to final Node command; default Vitest parallelism timed out under load. Retained and replaced with direct serial invocation. Not a pass."
+    },
+    {
+      "command": "pnpm exec vitest run --maxWorkers=1",
+      "exitCode": 0,
+      "result": "69/69 suites720/720tests passed after config separation"
+    },
+    {
+      "command": "pnpm typecheck",
+      "exitCode": 0,
+      "result": "unchanged final TypeScript production/test files; new config loaded successfully by actual Vitest run, outside tsconfig include"
+    },
+    {
+      "command": "pnpm --filter foundation-desktop build",
+      "exitCode": 0,
+      "result": "Seed2849bytes;2bundled image assets"
+    },
+    {
+      "command": "node packages/desktop/scripts/package.mjs --host-bundle",
+      "exitCode": 0,
+      "result": "fresh isolated signed package; no deploy/install"
+    },
+    {
+      "command": "node packages/desktop/scripts/live-proof.mjs",
+      "exitCode": 0,
+      "result": "two-peer offline/save/comment/publish/convergence/restart; standalone bundled-host local backend publication/reopen; clean teardown PASS"
+    },
+    {
+      "command": "control-foundation launch --app Foundation-main1148.app; cleanup --run native-control",
+      "exitCode": 0,
+      "result": "ready session then clean stopped host/client0 errors[] scratchArchived:true; native driver timed out before interaction"
+    },
+    {
+      "command": "cua.getApp(owned Foundation-main1148.app)",
+      "exitCode": "tool-timeout",
+      "result": "Sky Computer Use timeout128.467s; no native-dialog or induced-occlusion proof"
+    },
+    {
+      "command": "ssh -o BatchMode=yes -o ConnectTimeout=8 trmd-erebor-mini02 readiness checks",
+      "exitCode": 1,
+      "result": "arm64 and Node present; expected Foundation app runtime and checkout absent; no remote writes/bootstrap"
+    },
+    {
+      "command": "node deploy.mjs --help before/after simplification; cmp",
+      "exitCode": 0,
+      "result": "byte-identical help output and successful exit"
+    },
+    {
+      "command": "node --test packages/desktop/scripts/deploy.test.mjs after simplification",
+      "exitCode": 0,
+      "result": "2/2 retained parser regressions pass"
+    },
+    {
+      "command": "corrected stable-code assertions against exact baseline deploy source and final deploy source",
+      "exitCode": 0,
+      "result": "Both guard codes absent on baseline/present after; baseline deliberately stopped at missing runtime before build/install"
+    }
+  ],
+  "retainedLocalLogDigests": {
+    "main-guards-red.log": "29c081c4cb82b4c0cd1bdac7a4ed739ba774bd0beff7546a25da38ad4fa2e1c9",
+    "main-guards-green.log": "2fcb4198233e0bd8178b732b809aaefd42fca7ee3db42a6907aa791b138da654",
+    "deploy-options-red.log": "5d63df92a2900cabae54f4c4caa3b1add94814693a3a2027122400460bd6fd53",
+    "deploy-corrected-red-green.json": "f8b39e02f601ba2be0a3bdb30d2e1194b472ee19836baf504c7c9d28c5cc12cd",
+    "node-suites-green.log": "c4740675442782719c9cb7735627df56d272621b791a2b51606e0b7efd25126d",
+    "node-suites-final.log": "1f38e2fdd1ef4e433f23be934ce738bb8b7346176483b6964216f6dc9f9a6309",
+    "tests.log": "986a4dc46b54d1ed1266fee19f75e02db9958c25eb9c7e6f26ff912c21a34a9d",
+    "all-runners-green.log": "f06a2bd7db3cd02f1051d080a87f0a61147537351e9add02415b7a4ddbd2f7c5",
+    "vitest-serial-green.log": "6b799fda7e628185eb68024d323c785efa543d84d602a652b150bb888d297ffd",
+    "typecheck-separate.log": "582e48c67e1288dbf0aa1de327b5094216bfa087887817a86be04ef076d166fc",
+    "build-separate.log": "50242f7a4a5920af66e099d21449c82e8fc4715b0db99a2bb6f61f7322002e09",
+    "package.log": "d04a60a9f67476e9fb71fb4d1026d83b443ebca0060a83b8dfb1d34422513d9c",
+    "package-live-proof/report.json": "f792c69a0261bf0ea304a869d6218ff0f30793763ddc6288e81b161a7e3e44ca",
+    "native-control/evidence/lifecycle.json": "0cb818baf091ede8da8675095b6b790cbdb858a70704da3e486a14ea45208acf",
+    "deploy-help-equivalence.json": "77c713f7fb25b248cc4d0d3a210389d71678803810a7b3eba7640e9d3212c685",
+    "deploy-simplification-green.log": "837c711f81b177a802285578e3ff9f23b4088ec04bd853717e1cd90aad39ed50"
+  },
+  "package": {
+    "passed": true,
+    "dataChecksPassed": true,
+    "hashes": {
+      "hostEntry": "e95665ef932c3e84b2220262aae8f8f3194c7af984812db1146faa3794032e89",
+      "comb": "a0489c7e4414a1c524c71d0a3ffc4c7b9d968483f8510ad1640c784784c072f1",
+      "node": "9d050fd455b56426e25d4d603c7c501cbb2630348e836cf221dcce748e90588a",
+      "desktopMain": "d3de252c6c20fc54f467b10c5e1f0ad3edae6556649cd2eeb76f8f4d600e5c8f",
+      "desktopRenderer": "c0370d370b2e2255f8cf0beadc868133393479dba6becf3521daf3130964ed15"
+    },
+    "checks": [
+      "Two real Electron clients opened: same author/document, distinct persisted replica identities, disconnected.",
+      "Screenshot 01-offline-a.png attempt 1 failed (TimeoutError); refocusing and retrying.",
+      "UI text edits and anchored comments admitted offline; both clients show saved locally with pending changes.",
+      "Explicit connect published all changes through real Comb; both documents and both comments converge, with Published status.",
+      "Disconnect is per replica; the second client stays connected.",
+      "Both app processes restart with identical saved documents/comments and their original replica identities.",
+      "Packaged standalone first launch saves offline, publishes through bundled Comb with its generated local config, and reopens saved edits without repository paths.",
+      "All app processes and the external host shut down cleanly; acceptance passed."
+    ],
+    "teardown": {
+      "hostExit": {
+        "code": 0,
+        "signal": null
+      },
+      "shutdownErrors": []
+    }
+  },
+  "priorSameMachineMinio": {
+    "passed": true,
+    "sourceSha": "41ab77deeeaf59fe45299363ed3dadf82b87bc85",
+    "rawReportSha256": "d1f6144bab02c53663828a2f3a9c7256bbdb18d9a60cf9d1e943622ae8312139",
+    "scope": "same-machine loopback MinIO; two independent hosts/replicas recovery+lease handoff"
+  },
+  "simplification": {
+    "skillSha256": "67e2e706af704089b682ce1197152e384762f1d22968ad06928ac62c5e29eb45",
+    "sourceModulesInspected": 45,
+    "secondSourcePassComplete": true,
+    "acceptedCommit": "e3d9823bbe7f4f3110473b0bb75cc1bf5e21e504",
+    "helpOutputSha256": "8516e481ea0fec4bdfeb31a6ac01de66e55a542466eb25140d7ca3e1e23e2ef2",
+    "helpBeforeAfterIdentical": true
+  },
+  "remainingWork": [
+    "Native macOS export dialog: choose/cancel/fresh destination/collision and inspect HTML+chain. CUA getApp timed out before any interaction; unit host forwarding/collision and package data proof are not this test.",
+    "Forced occlusion and native titlebar controls: deliberately cover/minimize owned window and prove rendering/capture/restore plus drag/traffic-light targeting. One real package screenshot timeout retried successfully, but no deliberate occlusion was injected.",
+    "Manual bundled open-two-clients launcher execution still not rerun; package contains exact launcher bytes and live-proof independently passes2clients/standalone, but these are distinct entry points.",
+    "External two-machine recovery/convergence/lease handoff: erebor-mini02 reachable arm64+Node; no expected runtime or checkout. Needs only an isolated runtime copy and a scheduled broad slot; verification is already authorized, with no installation or shared mutation.",
+    "Controlled backend outage: own isolated backend only; record local persistence/pending/error during outage then restart/reconnect/convergence. Prior same-machine MinIO recovery/lease pass does not cover outage.",
+    "Investigate custom --target deploy shutdown: pgrep uses an unescaped target regex and osascript tells application Foundation by name. With multiple copies, correct target selection is unconfirmed; do not execute install or quit operator apps to reproduce. Needs a bounded native fixture/owner followup."
+  ],
+  "artifactPolicy": "Raw runtime directories, configs, logs, screenshots and local review ledgers remain uncommitted. This compact receipt accompanies verified main source changes; it does not claim native/external completion."
+}
