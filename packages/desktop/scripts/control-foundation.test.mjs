@@ -16,6 +16,7 @@ test('shared-document launches take a Comb configuration, document id and recove
     run: '/tmp/r', 'comb-config': '/tmp/comb/config.toml', 'doc-id': 'remote-test.1', recover: true, author: 'user:b',
   })
   assert.throws(() => parseArgs(['launch', '--run', '/tmp/r', '--recover']), /requires --doc-id/)
+  assert.throws(() => parseArgs(['launch', '--run', '/tmp/r', '--doc-id', 'remote-test.1', '--recover']), /requires --comb-config/)
   assert.throws(() => parseArgs(['launch', '--run', '/tmp/r', '--doc-id', 'has space']), /doc-id/)
 })
 
@@ -34,5 +35,11 @@ test('bounded lifecycle fails on missing exit acknowledgement', async () => {
 
 test('launch requires explicit source runtime; help is machine readable', async () => {
   await assert.rejects(main(['launch', '--run', '/unused']), /requires --runtime/)
-  assert.match((await main(['help'])).help, /wait-state/)
+  assert.throws(
+    () => parseArgs(['launch', '--run', '/unused', '--app', '/tmp/Foundation.app', '--runtime', '/tmp/other-host']),
+    /cannot be combined/,
+  )
+  const help = (await main(['help'])).help
+  assert.match(help, /launch --runtime <host-directory> \[--clients 1\|2\]\nlaunch --app <Foundation\.app>/)
+  assert.match(help, /wait-state/)
 })

@@ -25,14 +25,15 @@ export const HELP = `control-foundation — real Foundation UI, isolated local h
 
 node packages/desktop/scripts/control-foundation.mjs <command> --run <directory> [options]
 
-launch --runtime <host-directory> [--clients 1|2] [--app <Foundation.app>]
-  Builds current desktop source by default. --app explicitly drives that package instead.
+launch --runtime <host-directory> [--clients 1|2]
+launch --app <Foundation.app> [--clients 1|2]
+  The first form builds current desktop source. The second explicitly drives that package.
   Refuses an existing run directory. Uses a fresh private local Comb backend and replicas.
   --runtime is required for source mode; packaged mode uses its bundled host.
   --comb-config <config.toml> copies an existing Comb configuration (for example an S3/MinIO
   backend) instead of generating a private local one. Its credentials come from the profile it
-  names. --doc-id <id> shares a document across runs; --recover opens replicas without a seed so
-  they adopt the published genesis after Connect. --author <id> sets the client author.
+  names. --doc-id <id> shares a document across runs; --recover requires that ID and a shared
+  --comb-config, then opens without a seed to adopt the published genesis. --author sets the client author.
 doctor                  Read-only identity, build freshness, host and renderer checks
 snapshot                ARIA tree, visible text, controls, selection and save status
 state                   Read-only persisted host document/status through the real preload
@@ -79,6 +80,8 @@ export function parseArgs(argv) {
   if (flags.input && !['dom', 'pointer'].includes(flags.input)) throw new Error('--input must be dom or pointer')
   if (flags['doc-id'] && !/^[a-zA-Z0-9._-]{1,120}$/.test(flags['doc-id'])) throw new Error('--doc-id must be 1-120 characters of [a-zA-Z0-9._-]')
   if (flags.recover && !flags['doc-id']) throw new Error('--recover requires --doc-id of an existing published document')
+  if (flags.recover && !flags['comb-config']) throw new Error('--recover requires --comb-config for the existing published document')
+  if (flags.app && flags.runtime) throw new Error('--runtime cannot be combined with --app; package verification uses the app bundled runtime')
   return { command, args, flags }
 }
 
