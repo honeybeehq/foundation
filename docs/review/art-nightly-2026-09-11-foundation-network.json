@@ -1,0 +1,138 @@
+{
+  "scope": "Two actual host services on different Macs over SSH loopback tunnels and one owned MinIO; public API only, not desktop UI.",
+  "passed": true,
+  "checks": [
+    {
+      "name": "exact remote runtime loader and 44 file hashes passed",
+      "passed": true
+    },
+    {
+      "name": "owned S3 reverse tunnel active",
+      "passed": true
+    },
+    {
+      "name": "owned remote host tunnel active",
+      "passed": true
+    },
+    {
+      "name": "A published to owned backend",
+      "passed": true
+    },
+    {
+      "name": "B recovered on second machine",
+      "passed": true
+    },
+    {
+      "name": "cross-machine recovered document equality",
+      "passed": true
+    },
+    {
+      "name": "distinct durable replica identities",
+      "passed": true
+    },
+    {
+      "name": "second-machine publisher lease contention",
+      "passed": true
+    },
+    {
+      "name": "second-machine lease handoff published",
+      "passed": true
+    },
+    {
+      "name": "cross-machine complete document convergence",
+      "passed": true
+    },
+    {
+      "name": "backend unavailable local edit durably saved with pending work",
+      "passed": true
+    },
+    {
+      "name": "unavailable backend reports paused state",
+      "passed": true
+    },
+    {
+      "name": "outage does not falsely clear pending publication",
+      "passed": true
+    },
+    {
+      "name": "publication recovers after backend resumes",
+      "passed": true
+    },
+    {
+      "name": "peer converges after backend outage",
+      "passed": true
+    },
+    {
+      "name": "a explicit session close acknowledged",
+      "passed": true
+    },
+    {
+      "name": "b explicit session close acknowledged",
+      "passed": true
+    }
+  ],
+  "hosts": {
+    "a": {
+      "machine": "Tormods-Mac-Studio.local",
+      "pid": 5349
+    },
+    "b": {
+      "machine": "trmd-erebor-mini02",
+      "pid": 23177
+    }
+  },
+  "cleanup": {
+    "remoteHost": {
+      "ownerExit": 0,
+      "hostExit": {
+        "ownedHostExit": 0
+      }
+    },
+    "process-0": {
+      "forced": false,
+      "exitCode": 0
+    },
+    "process-1": {
+      "forced": false,
+      "exitCode": 0
+    },
+    "process-3": {
+      "forced": false,
+      "exitCode": 0
+    }
+  },
+  "finalProcessAndBackendCheck": {
+    "passed": true,
+    "proofSha256": "23d5d004b4d9bafd8b14e27a3dad66a4470b27a87cfb31ceefe14e64018f6f69",
+    "driverSha256": "3a8b5787b4c1173542bff626d3a13e667e6471e254329e0a7191c8e6d00f98ad",
+    "remoteHostExit": {
+      "ownerExit": 0,
+      "hostExit": {
+        "ownedHostExit": 0
+      }
+    },
+    "localHostPid": 5349,
+    "remoteHostPid": 23177,
+    "aPidAbsent": {
+      "exitCode": 1,
+      "stdout": ""
+    },
+    "bPidAbsent": {
+      "exitCode": 1,
+      "stdout": ""
+    },
+    "backendState": "exited false"
+  },
+  "sourceProofSha256": "23d5d004b4d9bafd8b14e27a3dad66a4470b27a87cfb31ceefe14e64018f6f69",
+  "driverSha256": "3a8b5787b4c1173542bff626d3a13e667e6471e254329e0a7191c8e6d00f98ad",
+  "runtimePayloadSha256": "c299be49900ed390bbc2a5f67152814c038e8f76b81b6252e3e8b910554f4118",
+  "priorFailedAttempt": {
+    "scope": "noncanonical temporary CLI path meant entrypoint did not execute; corrected canonical path, no source edit",
+    "sha256": "59c9d3c01bebab2e5c69e3e41b23322144a1057a94c3a690adb36e351f2e3752"
+  },
+  "limits": [
+    "Public host/API calls, not second-machine desktop UI or native dialogs.",
+    "Backend outage is pause/unpause; not process crash or ambiguous acknowledgement."
+  ],
+  "decisiveDriverExcerpt": " sa=state('a');sb=state('b');check(sa['document']==sb['document'],'cross-machine recovered document equality');check(sa['status']['replicaId']!=sb['status']['replicaId'],'distinct durable replica identities')\n commit('b','Network B '+SUFFIX)\n wait('b',lambda s:s['status']['sync']['kind']=='paused' and s['status']['sync'].get('reason') in ['lease_held','deadline_exceeded'],'second-machine publisher lease contention')\n call('a','disconnect',{});call('b','connect',{})\n wait('b',lambda s:s['status']['pending']==0 and s['status']['sync']['kind']=='caught_up','second-machine lease handoff published')\n call('a','connect',{});wait('a',lambda s:s['document']==state('b')['document'],'cross-machine complete document convergence')\n REC['networkPassed']=True\n # Backend outage proof through the same ordinary service endpoints.\n call('a','disconnect',{});call('b','disconnect',{})\n run(['docker','pause',CONTAINER]);paused=True\n mutation=commit('b','Outage saved '+SUFFIX);check(mutation['receipt']['status']=='locally_saved' and mutation['state']['status']['pending']>0,'backend unavailable local edit durably saved with pending work')\n call('b','connect',{});failed=wait('b',lambda s:s['status']['sync']['kind']=='paused','unavailable backend reports paused state')\n check(failed['status']['pending']>0,'outage does not falsely clear pending publication')\n run(['docker','unpause',CONTAINER]);paused=False;call('b','connect',{})\n wait('b',lambda s:s['status']['pending']==0 and s['status']['sync']['kind']=='caught_up','publication recovers after backend resumes')\n call('a','connect',{});wait('a',lambda s:s['document']==state('b')['document'],'peer converges after backend outage')\n REC['outagePassed']=True"
+}
