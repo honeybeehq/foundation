@@ -12,23 +12,22 @@ import { execFileSync, spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import os from 'node:os'
 import path from 'node:path'
+import { parseArgs } from 'node:util'
 
 const desktop = fileURLToPath(new URL('..', import.meta.url))
 const repo = path.resolve(desktop, '../..')
-const flags = new Map(), switches = new Set()
-for (let index = 2; index < process.argv.length; index += 1) {
-  const argument = process.argv[index]
-  if (!argument.startsWith('--')) throw new Error(`Unexpected argument ${argument}`)
-  if (['--open', '--no-install', '--help'].includes(argument)) switches.add(argument)
-  else flags.set(argument, process.argv[++index])
-}
-if (switches.has('--help')) { console.log(await import('node:fs/promises').then(fs => fs.readFile(fileURLToPath(import.meta.url), 'utf8')).then(text => text.split('\n').filter(line => line.startsWith('//')).map(line => line.slice(3)).join('\n'))); process.exit(0) }
+const { values } = parseArgs({ options: {
+  open: { type: 'boolean' }, 'no-install': { type: 'boolean' }, help: { type: 'boolean' },
+  target: { type: 'string' }, runtime: { type: 'string' },
+  'host-bundle': { type: 'string' }, 'node-bin': { type: 'string' }, 'comb-bin': { type: 'string' },
+} })
+if (values['help']) { console.log(await import('node:fs/promises').then(fs => fs.readFile(fileURLToPath(import.meta.url), 'utf8')).then(text => text.split('\n').filter(line => line.startsWith('//')).map(line => line.slice(3)).join('\n'))); process.exit(0) }
 
-const target = path.resolve(flags.get('--target') ?? path.join(os.homedir(), 'Applications/Foundation.app'))
-const runtime = path.resolve(flags.get('--runtime') ?? path.join(target, 'Contents/Resources/host'))
-const hostBundle = path.resolve(flags.get('--host-bundle') ?? path.join(runtime, 'service'))
-const nodeBin = path.resolve(flags.get('--node-bin') ?? path.join(runtime, 'bin/node'))
-const combBin = path.resolve(flags.get('--comb-bin') ?? path.join(runtime, 'bin/comb'))
+const target = path.resolve(values['target'] ?? path.join(os.homedir(), 'Applications/Foundation.app'))
+const runtime = path.resolve(values['runtime'] ?? path.join(target, 'Contents/Resources/host'))
+const hostBundle = path.resolve(values['host-bundle'] ?? path.join(runtime, 'service'))
+const nodeBin = path.resolve(values['node-bin'] ?? path.join(runtime, 'bin/node'))
+const combBin = path.resolve(values['comb-bin'] ?? path.join(runtime, 'bin/comb'))
 for (const [label, file] of [['host bundle entry', path.join(hostBundle, 'service-main.mjs')], ['Node executable', nodeBin], ['Comb bridge', combBin]]) {
   try { await access(file) } catch { throw new Error(`Missing ${label}: ${file}\nPass --runtime/--host-bundle/--node-bin/--comb-bin explicitly.`) }
 }
@@ -44,11 +43,11 @@ function run(command, args, cwd = repo) {
   if (result.status !== 0) throw new Error(`${command} exited with ${result.status ?? result.signal}`)
 }
 
-console.log(`Foundation desktop deploy\n  source   ${repo} @ ${commit}${dirty ? ' (uncommitted desktop changes)' : ''}\n  runtime  ${runtime}\n  release  ${release}\n  install  ${switches.has('--no-install') ? '(skipped)' : target}`)
+console.log(`Foundation desktop deploy\n  source   ${repo} @ ${commit}${dirty ? ' (uncommitted desktop changes)' : ''}\n  runtime  ${runtime}\n  release  ${release}\n  install  ${values['no-install'] ? '(skipped)' : target}`)
 run('pnpm', ['--filter', 'foundation-desktop', 'build'])
 await mkdir(path.dirname(release), { recursive: true })
 run('node', [path.join(desktop, 'scripts/package.mjs'), '--host-bundle', hostBundle, '--node-bin', nodeBin, '--comb-bin', combBin, '--output', release])
-if (switches.has('--no-install')) { console.log(`\nPackaged ${release}`); process.exit(0) }
+if (values['no-install']) { console.log(`\nPackaged ${release}`); process.exit(0) }
 
 /* Quit any running copy of the installed app, then swap the bundle atomically. */
 const running = spawnSync('pgrep', ['-f', path.join(target, 'Contents/MacOS/Foundation')], { encoding: 'utf8' }).stdout.trim()
@@ -70,4 +69,4 @@ if (previous) {
   if (!trashed) { await mkdir(path.join(os.homedir(), '.Trash'), { recursive: true }); await rename(previous, path.join(os.homedir(), '.Trash', path.basename(previous))) }
 }
 console.log(`\nInstalled ${target}\n  from ${release}`)
-if (switches.has('--open')) run('open', [target])
+if (values['open']) run('open', [target])
