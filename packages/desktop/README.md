@@ -118,8 +118,8 @@ pnpm control launch --run .artifacts/verification/remote-b --app "$HOME/Applicat
 
 The first run seeds the document and publishes it after Connect. The recovering run opens an empty
 replica; its Connect adopts the published genesis and every later change. Publication holds a
-single publisher lease per log, so a second host's appends pause with `deadline_exceeded` while
-another host stays connected; Disconnect the first host, then Reconnect the second.
+single publisher lease per log, so a second host's appends pause with `lease_held` (or
+`deadline_exceeded` when acquisition times out) while another host stays connected; Disconnect the first host, then Reconnect the second.
 
 Actions, snapshots, stored states, screenshots, build fingerprints, and lifecycle exits
 remain under the run's `evidence/` directory. Cleanup closes the processes owned by that
