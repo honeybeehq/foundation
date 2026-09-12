@@ -7,7 +7,7 @@
 // The host bundle, Node executable and accepted Comb bridge are taken from the currently
 // installed app's Contents/Resources/host by default. Override with --runtime <dir>, or
 // individually with --host-bundle, --node-bin, --comb-bin. --target changes the install path.
-import { access, mkdir, rename } from 'node:fs/promises'
+import { access, mkdir, rename, readFile } from 'node:fs/promises'
 import { execFileSync, spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import os from 'node:os'
@@ -21,7 +21,11 @@ const { values } = parseArgs({ options: {
   target: { type: 'string' }, runtime: { type: 'string' },
   'host-bundle': { type: 'string' }, 'node-bin': { type: 'string' }, 'comb-bin': { type: 'string' },
 } })
-if (values['help']) { console.log(await import('node:fs/promises').then(fs => fs.readFile(fileURLToPath(import.meta.url), 'utf8')).then(text => text.split('\n').filter(line => line.startsWith('//')).map(line => line.slice(3)).join('\n'))); process.exit(0) }
+if (values['help']) {
+  const source = await readFile(fileURLToPath(import.meta.url), 'utf8')
+  console.log(source.split('\n').filter(line => line.startsWith('//')).map(line => line.slice(3)).join('\n'))
+  process.exit(0)
+}
 
 const target = path.resolve(values['target'] ?? path.join(os.homedir(), 'Applications/Foundation.app'))
 const runtime = path.resolve(values['runtime'] ?? path.join(target, 'Contents/Resources/host'))
