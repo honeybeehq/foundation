@@ -7,7 +7,7 @@
     "control": "node packages/desktop/scripts/control-foundation.mjs",
     "test:control": "node --test packages/desktop/scripts/control-foundation.test.mjs",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run && node --test packages/desktop/scripts/*.test.mjs spikes/desktop-prototype/model.test.mjs",
     "spike:chain": "tsx spikes/chain/src/run.ts",
     "spike:render": "tsx spikes/render/run.ts",
     "deploy:desktop": "node packages/desktop/scripts/deploy.mjs"
