@@ -54,13 +54,15 @@ run('node', [path.join(desktop, 'scripts/package.mjs'), '--host-bundle', hostBun
 if (values['no-install']) { console.log(`\nPackaged ${release}`); process.exit(0) }
 
 /* Quit any running copy of the installed app, then swap the bundle atomically. */
-const running = spawnSync('pgrep', ['-f', path.join(target, 'Contents/MacOS/Foundation')], { encoding: 'utf8' }).stdout.trim()
+const executable = path.join(target, 'Contents/MacOS/Foundation')
+const processPattern = `^${executable.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}( |$)`
+const running = spawnSync('pgrep', ['-f', processPattern], { encoding: 'utf8' }).stdout.trim()
 if (running) {
   console.log('\nQuitting running Foundation…')
-  spawnSync('osascript', ['-e', 'tell application "Foundation" to quit'], { stdio: 'ignore' })
+  spawnSync('osascript', ['-e', 'on run argv', '-e', 'tell application (item 1 of argv) to quit', '-e', 'end run', target], { stdio: 'ignore' })
   const deadline = Date.now() + 10_000
-  while (Date.now() < deadline && spawnSync('pgrep', ['-f', path.join(target, 'Contents/MacOS/Foundation')]).status === 0) await new Promise(resolve => setTimeout(resolve, 250))
-  if (spawnSync('pgrep', ['-f', path.join(target, 'Contents/MacOS/Foundation')]).status === 0) throw new Error('Foundation is still running; close it and rerun')
+  while (Date.now() < deadline && spawnSync('pgrep', ['-f', processPattern]).status === 0) await new Promise(resolve => setTimeout(resolve, 250))
+  if (spawnSync('pgrep', ['-f', processPattern]).status === 0) throw new Error('Foundation is still running; close it and rerun')
 }
 await mkdir(path.dirname(target), { recursive: true })
 const staged = `${target}.new-${stamp}`
