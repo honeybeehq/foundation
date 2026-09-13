@@ -487,7 +487,7 @@ export async function main(argv) {
     return await response.json()
   } catch (error) { throw new Error(`Owner unavailable or command timed out: ${error.message}. Inspect ${run}/evidence/owner.log and session.json; do not retry mutations or kill stale PIDs blindly.`) }
 }
-if (process.argv[1] && path.resolve(process.argv[1]) === script) {
+if (process.argv[1] && await realpath(process.argv[1]).catch(() => undefined) === script) {
   main(process.argv.slice(2)).then(result => {
     if (result !== undefined) { process.stdout.write(json(result)); if (!result.ok) process.exitCode = 1 }
   }).catch(error => { process.stdout.write(json({ ok: false, error: error.message })); process.exitCode = 1 })
