@@ -1,0 +1,140 @@
+{
+  "baseline": "98f0befb6b6cf1a65bcd048bbea00ab3b5c009b9",
+  "repair": "af5f9a3079f155353a2920c2ec367f841a824410",
+  "files": [
+    {
+      "path": "deploy-target-red.log",
+      "sha256": "3828736d38df0025193702249ba8fcb773c5d06e6ae6b80e81f9b7a2def48c0c"
+    },
+    {
+      "path": "deploy-target-red-corrected.log",
+      "sha256": "49b5bfc5f206108cc3014099786d8b43796403142bb6707e6be92aac72bf10c3"
+    },
+    {
+      "path": "deploy-target-green.log",
+      "sha256": "52aaba076842e5ca18953c8ac1b70abe3b6b62b76fc5bbb947a64f09a4483470"
+    }
+  ],
+  "baselineResult": "Corrected fixture0/3, three target-selection assertions fail",
+  "repairResult": "15/15 Node tests pass",
+  "excludedClaim": "No actual deployment or installation performed. Native target-only Quit independently passed on two owned COW copies.",
+  "nativeTargetQuit": {
+    "resultSha256": "1a79213939e8aa3c20103ca944920ade8ca9f183c1280f98f8d5bbe2eb05aeac",
+    "driverSha256": "1ce59a54b894fcb78137f76d5ba0d47d69f286830a60228a9155af1d5004fd69",
+    "sameBundleId": "design.foundation.desktop",
+    "checks": {
+      "twoOwnedProcessesAlive": true,
+      "targetExited": true,
+      "otherSurvived": true
+    },
+    "quitExitCode": 0,
+    "targetExitCode": 0,
+    "otherCleanupExitCode": 0,
+    "forcedCleanup": false,
+    "passed": true
+  },
+  "reviewedShas": [
+    "e3d9823bbe7f4f3110473b0bb75cc1bf5e21e504",
+    "739d89e37129ddad0339f30cfc746ec4973501b3",
+    "e4751b144f49e428856dc0b29951f57c37ae3b64",
+    "d9817e9f0fa0ef9950193a19dd087abbb6726573",
+    "a81ce0e37972b69da3edffeb06803eee77476a9a",
+    "1148bbfaeee16c524ab17eeb85434f3c18cec5ec",
+    "686728361be58215d6a4389d0309e1907e2d8ac4",
+    "580ccc7f6e11f1350166a711a98c197b1ef3ae32",
+    "05b91b45c2db5aa004b3f5e935c41a3ab41044ee",
+    "fb7bbc4acb2af9b0da716a02b4b4881e086b2b0d",
+    "b7cd482dce34ee0f6301bfad6078d97a94286116",
+    "539bc4291a166ca591976b6753866c29bd847162",
+    "af20a49366c554838287fe15b116a962beae04f7",
+    "41ab77deeeaf59fe45299363ed3dadf82b87bc85",
+    "afef18ba92b4ef568435e7d6535002d8abd1b2f0",
+    "5db1a4aa8bd2faa5aab2c0507c1230033f6747c7",
+    "b02b7effc47acf21492c9e5633ae94d7ac5c0eba",
+    "0b80e87b9e4f7dc32d151d7a689e936e20a45518",
+    "8102c5133fa0b7ad84a0fd7ad7a921f79f4662a7",
+    "a489c0a9627b1f51fec13a7e5cb33ac6cdff2061",
+    "01d745b06d59128f0e299f2e6193476041f44008",
+    "3943990ef1d86d7d89d293eb680a6b1a49f65810",
+    "3163060ffd6903395d6cd51df4b7c9f957a51ac9",
+    "4ca0d2cb1e23b15588f6d417b1659abf4968c2d8",
+    "b7b85b17d49fc385f1abd7aa894868f51624aa24",
+    "7fedb51efb6c55db18f24bf04a8eb83ccef94a1f",
+    "f718ce5dda5b5680fed7af072b97f78af6c639f9",
+    "257169b0b334e10456bb15cd3b7a862730116b05",
+    "3be56aa8a083307f1a89651a270287e4e883e988",
+    "f79eaefca0085306f2fbd83b86c763389854d310",
+    "0483d992dcb4bbb3d9814ee4c31669279cf0478a",
+    "f8f278ccb014166396c1ac47db46f100af8a501f",
+    "c567b0a35fe1616598f4fd70d9069107e8145b8c",
+    "6e2355ecda7bd5e63c99aaf41ea36c5d97f54353",
+    "dc83269372af51b966c31de4869bac3987b999f6",
+    "356c6805cc5126c19fd86495c090054c16920ce0",
+    "ad7f99d97089f2ce346ef49efa6b1d1abd469638",
+    "b19d0f51d30f83fc5cae708f36b8294acad96f6f",
+    "7d258b8d65dba19c4f0fa0b6be3f13af211d3352",
+    "ece99795e18ee9a1df55b90ba3a0ca101e7605ea",
+    "2c1e0f4d1e95748cf93c9c3d6fafaaf7e88fb6e8",
+    "982adf44fccf176f8bbb1518344a68512bbff463",
+    "483b87f4f5e0263739523a58b7dd3c4e3cc5a3ed",
+    "f9cacf4b735bb383656ce0926ac1f38d5d884173",
+    "058a54f743c1816784beb89982fb7d8981e35a52",
+    "0f089e3d733c0cb4147e625817cc6bc2aa0de142",
+    "9ded152bd7e2943aa648f931816d096b809a4974",
+    "424d899ec5084a098f09762e103420cd59762f31",
+    "e570d6c434c9ad3d5cc6932ab68181ba0df5eafc",
+    "ef34d4c5ce12de737a580bad4fd3e4a1f7b1e81a",
+    "b8f08f0a4ad7f09e2da0385335758145607ee877",
+    "98e73889e8873f76acb0fb0d90e816b560b7a62c",
+    "6a0209e1e8ca48c15ff13ae18c74209b3c406a23",
+    "e8478875267b8630e93f3953f5edb906506d1252"
+  ],
+  "symlinkEntry": {
+    "repairSha": "430dac5ae2e5336a14ca84f32ac078488920b1ab",
+    "baseline": "af5f9a3079f155353a2920c2ec367f841a824410; control blob identical frozen main",
+    "red": "1/2: symlink help empty stdout; direct help JSON; import-only assertion passed",
+    "green": "17/17 Node tests passed",
+    "logs": [
+      {
+        "path": "control-entry-red.log",
+        "sha256": "d793bfe935d6ea0702b7905d76debe28320f2533e42171d1b5c1efb56ce37de1"
+      },
+      {
+        "path": "control-entry-red-corrected.log",
+        "sha256": "838a19ea78ba326b5f9449e340cf11cae8cee6a7e576cba32aab0783e2a44d1b"
+      },
+      {
+        "path": "control-entry-green.log",
+        "sha256": "afabed263cf9b640796f3e088e34a97ecb9d3398750673835217fd3d4c8bcd2f"
+      }
+    ],
+    "initialFixtureLimitation": "Initial --help spelling unsupported by baseline; corrected fixture uses documented help command. Initial failure not counted as symlink reproduction."
+  },
+  "remoteGui": {
+    "passed": true,
+    "sourceScriptBlob": "e6ce5cdba6b9b6517fb0cab95a4c91b55ddc2879",
+    "fixtureGitHead": "f07604a89fac5c430ff598fdb9781137eeb1e3d9",
+    "fixtureHeadIsProductionSource": false,
+    "resultSha256": "7f316ae348429a79b8d38c9a60f4f34e8df0c44e255eb2ba96b6e5bd3ca965b7",
+    "lifecycleSha256": "b6df1c8e6916aedcd4771ca8006bcc30f27510102fe87c6e669f93f058c092b9",
+    "checks": [
+      "real renderer headline edit",
+      "read-only saved document assertion",
+      "restart same replica",
+      "saved edit retained",
+      "footer Saved locally \u00b7 2 pending \u00b7 Offline",
+      "app and host clean exit0; owner/host/app PIDs absent"
+    ],
+    "limits": [
+      "single second-machine renderer with local backend; not cross-machine GUI sync/outage",
+      "native export/occlusion still CUA timeout"
+    ],
+    "transfer": {
+      "host": "trmd-erebor-mini02",
+      "remoteRoot": "/tmp/art-foundation-20260912.i1HHH0",
+      "archiveBytes": 193051916,
+      "archiveSha256": "ba337b40f22ef96d3843c0b6b3cace7b68c8cf2c116fdebefda53c541bce3999",
+      "payloadManifest": "remote-payload-manifest.json"
+    }
+  }
+}
