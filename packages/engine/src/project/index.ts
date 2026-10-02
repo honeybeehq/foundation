@@ -321,6 +321,7 @@ function emitComponent(w: Writer, depth: number, component: FdnComponent): void 
     w.push(depth + 1, '<fdn-props>')
     for (const p of component.props) {
       const a: [string, string][] = [['name', p.name], ['type', p.type]]
+      if (p.values) a.push(['values', p.values.join(',')])
       if (p.required !== undefined) a.push(['required', p.required ? 'true' : 'false'])
       if (p.default !== undefined) a.push(['default', fmtDefault(p.default)])
       emitElement(w, depth + 2, 'fdn-prop', a, null)

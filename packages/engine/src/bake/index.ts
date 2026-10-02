@@ -77,7 +77,7 @@ export function bakeEditorDocument(doc: FdnDocument, opts?: { state?: string }):
 
 export function bakeEditorComponent(doc: FdnDocument, name: string): { html: string; tree: FdnNode[]; report: ConformanceReport } {
   const component = doc.components.find((c) => c.name === name)
-  const samples = component && !component.sealed ? sampleProps(component.props) : {}
+  const samples = component && !component.sealed ? sampleProps(component) : {}
   const sampled = Object.keys(samples)
   const attrs: Record<string, string> = { component: name }
   for (const [prop, value] of Object.entries(samples)) attrs[`data-fdn-prop-${prop}`] = value
@@ -96,22 +96,44 @@ export function bakeEditorComponent(doc: FdnDocument, name: string): { html: str
   return { html: emitEditorHtml(doc, tree, capsuleCss), tree, report: { lines } }
 }
 
-function sampleProps(props: FdnProp[]): Record<string, string> {
+function sampleProps(component: FdnComponent): Record<string, string> {
   const samples: Record<string, string> = {}
-  for (const prop of props) {
+  for (const prop of component.props) {
     if (prop.default !== undefined) continue
-    const sample = sampleValue(prop)
+    const sample = sampleValue(prop, component.body)
     if (sample !== undefined) samples[prop.name] = sample
   }
   return samples
 }
 
-function sampleValue(prop: FdnProp): string | undefined {
+function comparedLiteral(propName: string, body: FdnNode[]): string | undefined {
+  const name = propName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const literal = `'([^']*)'|"([^"]*)"`
+  const patterns = [new RegExp(`prop\\.${name}\\s*[!=]=\\s*(?:${literal})`), new RegExp(`(?:${literal})\\s*[!=]=\\s*prop\\.${name}\\b`)]
+  const find = (expression: string | undefined): string | undefined => {
+    if (!expression) return undefined
+    const hits = patterns.map((pattern) => pattern.exec(expression)).filter((match): match is RegExpExecArray => match !== null)
+    const first = hits.sort((a, b) => a.index - b.index)[0]
+    return first ? (first[1] ?? first[2]) : undefined
+  }
+  for (const node of body) {
+    const found =
+      find(node.when) ??
+      Object.values(node.attrs).map(find).find((value) => value !== undefined) ??
+      Object.values(node.style).map(find).find((value) => value !== undefined) ??
+      find(node.text) ??
+      comparedLiteral(propName, node.children)
+    if (found !== undefined) return found
+  }
+  return undefined
+}
+
+function sampleValue(prop: FdnProp, body: FdnNode[]): string | undefined {
   switch (prop.type) {
     case 'string':
-      return prop.name
+      return comparedLiteral(prop.name, body) ?? prop.name
     case 'enum':
-      return prop.values?.[0]
+      return prop.values?.[0] ?? comparedLiteral(prop.name, body)
     case 'boolean':
       return 'false'
     case 'number':

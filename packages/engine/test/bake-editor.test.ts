@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { bakeDocument, bakeEditorComponent, bakeEditorDocument, parseDocument } from '../src/index.js'
-import type { FdnDocument, FdnNode } from '../src/index.js'
+import { bakeDocument, bakeEditorComponent, bakeEditorDocument, parseDocument, projectDocument, validateDocument } from '../src/index.js'
+import type { FdnDocument, FdnNode, FdnProp } from '../src/index.js'
 
 const el = (id: string, tag: string, extra: Partial<FdnNode> = {}): FdnNode => ({ id, tag, attrs: {}, style: {}, styleStates: {}, children: [], ...extra })
 
@@ -128,5 +128,60 @@ describe('bakeEditorComponent sample props', () => {
     expect(html).toContain('<li data-fdn-id="Kinds::k2" data-fdn-index="0">name 1</li>')
     expect(html).toContain('<li data-fdn-id="Kinds::k2" data-fdn-index="1">name 2</li>')
     expect(bakeEditorComponent(doc, 'Badge').html).not.toContain('data-fdn-sample')
+  })
+})
+
+describe('sample values from compared literals', () => {
+  const board = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'boards', 'tracks-pane.fdn.html')
+  const tracksPane = parseDocument(readFileSync(board, 'utf8')).doc
+  const visibleText = (html: string): string =>
+    html
+      .slice(html.indexOf('<body>'))
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+
+  it('bakes TracksPane with the first mode its body compares against, so the master shows its first variant', () => {
+    const { html, report } = bakeEditorComponent(tracksPane, 'TracksPane')
+    expect(html).toContain('data-fdn-prop-mode="rest"')
+    expect(html).toContain('data-fdn-sample="mode"')
+    expect(html).toContain('data-fdn-id="TracksPane::n71"')
+    expect(visibleText(html)).toContain('Tracks')
+    expect(report.lines).toContainEqual(expect.objectContaining({ code: 'sample-props', detail: { props: { mode: 'rest' } } }))
+  })
+
+  it('finds literals on either side, in either quote style, in text ternaries, and prefers declared values', () => {
+    const component = (props: FdnProp[], body: FdnNode[]): FdnDocument => ({ ...doc, components: [{ name: 'Probe', props, slots: [], body }] })
+    const sampled = (d: FdnDocument): string | undefined => /data-fdn-sample="[^"]*"/.test(bakeEditorComponent(d, 'Probe').html) ? (bakeEditorComponent(d, 'Probe').report.lines.find((l) => l.code === 'sample-props')?.detail as { props: Record<string, string> }).props.tone : undefined
+    expect(sampled(component([{ name: 'tone', type: 'enum' }], [el('p1', 'p', { when: '"loud" == prop.tone', text: 'x' })]))).toBe('loud')
+    expect(sampled(component([{ name: 'tone', type: 'enum' }], [el('p1', 'p', { text: "{{ prop.tone == 'calm' ? 'a' : 'b' }}" })]))).toBe('calm')
+    expect(sampled(component([{ name: 'tone', type: 'string' }], [el('p1', 'p', { children: [el('p2', 'i', { when: "prop.tone != 'muted'", text: 'x' })] })]))).toBe('muted')
+    expect(sampled(component([{ name: 'tone', type: 'string' }], [el('p1', 'p', { text: '{{ prop.tone }}' })]))).toBe('tone')
+    expect(sampled(component([{ name: 'tone', type: 'enum', values: ['first', 'second'] }], [el('p1', 'p', { when: "prop.tone == 'second'", text: 'x' })]))).toBe('first')
+    expect(sampled(component([{ name: 'tone', type: 'enum' }], [el('p1', 'p', { when: "prop.tones == 'other'", text: 'x' })]))).toBeUndefined()
+  })
+})
+
+describe('enum values', () => {
+  it('round-trips component prop values through the text', () => {
+    const withValues: FdnDocument = { ...doc, components: [{ name: 'Probe', props: [{ name: 'tone', type: 'enum', values: ['calm', 'loud'] }], slots: [], body: [el('p1', 'p', { text: 'x' })] }] }
+    const text = projectDocument(withValues)
+    expect(text).toContain('<fdn-prop name="tone" type="enum" values="calm,loud"></fdn-prop>')
+    expect(parseDocument(text).doc.components[0]?.props[0]?.values).toEqual(['calm', 'loud'])
+  })
+
+  it('reports enum props and params without values as info', () => {
+    const missing: FdnDocument = {
+      ...doc,
+      params: [{ name: 'mode', type: 'enum', default: 'a' }],
+      components: [{ name: 'Probe', props: [{ name: 'tone', type: 'enum' }], slots: [], body: [el('p1', 'p', { text: 'x' })] }],
+      body: [],
+    }
+    const result = validateDocument(missing)
+    expect(result.valid).toBe(true)
+    expect(result.issues.filter((i) => i.code === 'enum-without-values')).toEqual([
+      expect.objectContaining({ severity: 'info', detail: { kind: 'param', name: 'mode', component: undefined } }),
+      expect.objectContaining({ severity: 'info', detail: { kind: 'prop', name: 'tone', component: 'Probe' } }),
+    ])
   })
 })

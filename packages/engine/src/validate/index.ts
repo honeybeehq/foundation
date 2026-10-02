@@ -410,8 +410,21 @@ function walkNode(ctx: ValidateCtx, node: FdnNode, scope: Scope, inOverlay: bool
   for (const child of node.children) walkNode(ctx, child, ownScope, overlayHere)
 }
 
+function checkEnumValues(ctx: ValidateCtx, kind: 'param' | 'prop', declaration: { name: string; type: string; values?: string[] }, componentName: string | undefined): void {
+  if (declaration.type !== 'enum' || (declaration.values && declaration.values.length > 0)) return
+  push(ctx, {
+    code: 'enum-without-values',
+    severity: 'info',
+    message: `enum ${kind} "${declaration.name}"${componentName ? ` on component "${componentName}"` : ''} declares no values — add values="a,b,…" so editors can offer them and bindings can be checked`,
+    detail: { kind, name: declaration.name, component: componentName },
+  })
+}
+
 function walkComponent(ctx: ValidateCtx, component: FdnComponent): void {
-  for (const prop of component.props) checkLowercaseName(ctx, 'prop', prop.name, component.name)
+  for (const prop of component.props) {
+    checkLowercaseName(ctx, 'prop', prop.name, component.name)
+    checkEnumValues(ctx, 'prop', prop, component.name)
+  }
   const scope: Scope = { props: new Set(component.props.map((p) => p.name)), aliases: new Set() }
   for (const node of component.body) walkNode(ctx, node, scope, false)
 }
@@ -440,7 +453,10 @@ export function validateDocument(doc: FdnDocument): ValidationResult {
     viewportNames: new Set(doc.viewports.map((v) => v.name)),
   }
 
-  for (const param of doc.params) checkLowercaseName(ctx, 'param', param.name, undefined)
+  for (const param of doc.params) {
+    checkLowercaseName(ctx, 'param', param.name, undefined)
+    checkEnumValues(ctx, 'param', param, undefined)
+  }
 
   const paramByName = new Map(doc.params.map((p) => [p.name, p]))
 

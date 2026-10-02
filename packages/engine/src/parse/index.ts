@@ -911,6 +911,7 @@ function parseComponents(body: ElementNode, ctx: ConvertCtx): FdnComponent[] {
           const pa = attrsOf(propEl)
           const type = (pa.type as FdnParamType) ?? 'string'
           const prop: FdnProp = { name: pa.name ?? '', type }
+          if (pa.values) prop.values = pa.values.split(',').map((s) => s.trim())
           if (pa.required !== undefined) prop.required = pa.required === 'true'
           if (pa.default !== undefined) prop.default = coerce(type, pa.default)
           return prop
