@@ -608,22 +608,67 @@ function instantiateSealedComponent(
   ctx: BakeCtx,
 ): FdnNode[] {
   const capsuleClass = capsuleClassName(componentName)
+  const instance: InstanceStyle | null = hasInstanceStyle(node) ? resolveNodeStyle(node, ctx) : null
   const parsed = parseSealedFragment(sealed.html, `${node.id}~cap`)
   const roots = ctx.editor ? withEditorIds(parsed, ctx.editor.idPrefix) : parsed
   if (sealed.css.trim() !== '' && !ctx.capsuleCss.has(capsuleClass)) {
     ctx.capsuleCss.set(capsuleClass, scopeCss(sealed.css, capsuleClass))
   }
-  return [
-    {
-      id: node.id,
-      tag: 'div',
-      attrs: { class: capsuleClass, ...editorIdentity(node, componentName, ctx) },
-      style: {},
-      styleStates: {},
-      text: undefined,
-      children: roots,
-    },
-  ]
+  const capsule: FdnNode = {
+    id: node.id,
+    tag: 'div',
+    attrs: { class: capsuleClass, ...editorIdentity(node, componentName, ctx) },
+    style: {},
+    styleStates: {},
+    text: undefined,
+    children: roots,
+  }
+  return [instance ? withInstanceStyle(capsule, instance) : capsule]
+}
+
+interface InstanceStyle {
+  style: Record<string, string>
+  styleStates: Partial<Record<StateStyleKey, Record<string, string>>>
+}
+
+function hasInstanceStyle(node: FdnNode): boolean {
+  return Boolean(node.styleRef) || Object.keys(node.style).length > 0 || Object.values(node.styleStates).some((plane) => plane && Object.keys(plane).length > 0)
+}
+
+function withInstanceStyle(root: FdnNode, instance: InstanceStyle): FdnNode {
+  if (root.tag === 'fdn-use') {
+    return { ...root, style: { display: 'contents' }, children: root.children.map((child) => withInstanceStyle(child, instance)) }
+  }
+  const attrs = { ...root.attrs }
+  const styleStates: Partial<Record<StateStyleKey, Record<string, string>>> = { ...root.styleStates }
+  for (const key of STATE_STYLE_KEYS) {
+    const merged = { ...(root.styleStates[key] ?? {}), ...(instance.styleStates[key] ?? {}) }
+    const props = Object.keys(merged).sort()
+    if (props.length === 0) continue
+    styleStates[key] = merged
+    attrs[`style-${key}`] = props.map((prop) => `${prop}:${merged[prop]}`).join(';')
+  }
+  return { ...root, attrs, style: { ...root.style, ...instance.style }, styleStates }
+}
+
+function applyInstanceStyle(node: FdnNode, componentName: string, roots: FdnNode[], instance: InstanceStyle, ctx: BakeCtx): FdnNode[] {
+  if (roots.length === 0) {
+    pushReport(ctx, {
+      code: 'instance-style-unapplied',
+      severity: 'warning',
+      message: `instance "${node.id}" of "${componentName}" has style, but the component rendered no element to carry it`,
+      nodeId: node.id,
+    })
+  } else if (roots.length > 1) {
+    pushReport(ctx, {
+      code: 'instance-style-multi-root',
+      severity: 'warning',
+      message: `instance "${node.id}" style was applied to each of the ${roots.length} root elements of "${componentName}"`,
+      nodeId: node.id,
+      detail: { roots: roots.length },
+    })
+  }
+  return roots.map((root) => withInstanceStyle(root, instance))
 }
 
 function instantiateComponent(node: FdnNode, ctx: BakeCtx): FdnNode[] {
@@ -649,7 +694,9 @@ function instantiateComponent(node: FdnNode, ctx: BakeCtx): FdnNode[] {
 
   if (component.sealed) return instantiateSealedComponent(node, componentName, component.sealed, ctx)
 
-  const { attrs: bakedAttrs } = resolveNodeStyle(node, ctx)
+  const resolved = resolveNodeStyle(node, ctx)
+  const instance: InstanceStyle | null = hasInstanceStyle(node) ? resolved : null
+  const bakedAttrs = Object.fromEntries(Object.entries(resolved.attrs).filter(([key]) => key !== 'data-fdn-style' && !key.startsWith('style-')))
 
   const propsRaw: Record<string, string> = {}
   for (const [k, v] of Object.entries(bakedAttrs)) {
@@ -703,14 +750,15 @@ function instantiateComponent(node: FdnNode, ctx: BakeCtx): FdnNode[] {
   }
 
   const bakedBody = component.body.flatMap((n) => bakeNode(n, innerCtx))
-  const namespacedBody = prefixIds(bakedBody, node.id)
+  const styledBody = instance ? applyInstanceStyle(node, componentName, bakedBody, instance, ctx) : bakedBody
+  const namespacedBody = prefixIds(styledBody, node.id)
 
   return [
     {
       id: node.id,
       tag: node.tag,
       attrs: finalAttrs,
-      style: {},
+      style: instance ? { display: 'contents' } : {},
       styleStates: {},
       text: undefined,
       children: namespacedBody,
