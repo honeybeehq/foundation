@@ -29,6 +29,7 @@ import type {
   FdnNamedStyle,
   FdnNode,
   FdnParamType,
+  FdnProp,
   FdnState,
   NodeId,
   ReportLine,
@@ -75,10 +76,56 @@ export function bakeEditorDocument(doc: FdnDocument, opts?: { state?: string }):
 }
 
 export function bakeEditorComponent(doc: FdnDocument, name: string): { html: string; tree: FdnNode[]; report: ConformanceReport } {
-  const instance: FdnNode = { id: name, tag: 'fdn-use', attrs: { component: name }, style: {}, styleStates: {}, children: [] }
+  const component = doc.components.find((c) => c.name === name)
+  const samples = component && !component.sealed ? sampleProps(component.props) : {}
+  const sampled = Object.keys(samples)
+  const attrs: Record<string, string> = { component: name }
+  for (const [prop, value] of Object.entries(samples)) attrs[`data-fdn-prop-${prop}`] = value
+  if (sampled.length > 0) attrs['data-fdn-sample'] = sampled.join(',')
+  const instance: FdnNode = { id: name, tag: 'fdn-use', attrs, style: {}, styleStates: {}, children: [] }
   const { tree, capsuleCss, report } = bakeTree({ ...doc, body: [instance] }, null, true)
   const lines = report.lines.filter((line) => line.code !== 'unused-token')
+  if (sampled.length > 0) {
+    lines.push({
+      code: 'sample-props',
+      severity: 'info',
+      message: `display-only sample values for props without defaults: ${sampled.join(', ')}`,
+      detail: { props: samples },
+    })
+  }
   return { html: emitEditorHtml(doc, tree, capsuleCss), tree, report: { lines } }
+}
+
+function sampleProps(props: FdnProp[]): Record<string, string> {
+  const samples: Record<string, string> = {}
+  for (const prop of props) {
+    if (prop.default !== undefined) continue
+    const sample = sampleValue(prop)
+    if (sample !== undefined) samples[prop.name] = sample
+  }
+  return samples
+}
+
+function sampleValue(prop: FdnProp): string | undefined {
+  switch (prop.type) {
+    case 'string':
+      return prop.name
+    case 'enum':
+      return prop.values?.[0]
+    case 'boolean':
+      return 'false'
+    case 'number':
+      return '0'
+    case 'list': {
+      const fields = prop.values ?? []
+      if (fields.length === 0) return '[]'
+      return JSON.stringify([1, 2].map((n) => Object.fromEntries(fields.map((field) => [field, `${field} ${n}`]))))
+    }
+    case 'record':
+      return '{}'
+    default:
+      return undefined
+  }
 }
 
 function bakeTree(doc: FdnDocument, stateName: string | null, editor: boolean): { tree: FdnNode[]; capsuleCss: Map<string, string>; report: ConformanceReport } {
