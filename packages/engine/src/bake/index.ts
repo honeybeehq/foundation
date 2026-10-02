@@ -758,7 +758,7 @@ function instantiateComponent(node: FdnNode, ctx: BakeCtx): FdnNode[] {
       id: node.id,
       tag: node.tag,
       attrs: finalAttrs,
-      style: instance ? { display: 'contents' } : {},
+      style: { display: 'contents' },
       styleStates: {},
       text: undefined,
       children: namespacedBody,

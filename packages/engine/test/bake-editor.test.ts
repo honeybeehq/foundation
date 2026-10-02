@@ -49,7 +49,7 @@ describe('bakeEditorDocument', () => {
   })
 
   it('tags component instances and their inner nodes', () => {
-    expect(html).toContain('<fdn-use component="Badge" data-fdn-component="Badge" data-fdn-id="n2" data-fdn-prop-label="Hi">')
+    expect(html).toContain('<fdn-use component="Badge" data-fdn-component="Badge" data-fdn-id="n2" data-fdn-prop-label="Hi" style="display:contents">')
     expect(html).toContain('<span data-fdn-id="n2::b1">Hi</span>')
     expect(html).toContain('<ul data-fdn-id="n2::b2">')
     expect(html).toContain('<li data-fdn-id="n2::b3" data-fdn-index="0">a</li>')
@@ -73,7 +73,7 @@ describe('bakeEditorDocument', () => {
 describe('bakeEditorComponent', () => {
   it('bakes one component alone with default props, using the component name as the instance id', () => {
     const { html, report } = bakeEditorComponent(doc, 'Badge')
-    expect(html).toContain('<fdn-use component="Badge" data-fdn-component="Badge" data-fdn-id="Badge" data-fdn-prop-label="Hi">')
+    expect(html).toContain('<fdn-use component="Badge" data-fdn-component="Badge" data-fdn-id="Badge" data-fdn-prop-label="Hi" style="display:contents">')
     expect(html).toContain('<span data-fdn-id="Badge::b1">Hi</span>')
     expect(html).not.toContain('data-fdn-id="n1"')
     expect(report.lines.some((line) => line.code === 'unused-token')).toBe(false)

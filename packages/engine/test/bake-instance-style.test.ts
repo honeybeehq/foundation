@@ -3,7 +3,11 @@ import { chromium } from 'playwright'
 import { afterAll, describe, expect, it } from 'vitest'
 import { bakeDocument, bakeEditorDocument } from '../src/index.js'
 import { closeBrowser } from '../src/render/browser.js'
-import { renderHtml } from '../src/render/index.js'
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { renderDocument, renderHtml } from '../src/render/index.js'
+import { parseDocument } from '../src/index.js'
 import type { FdnDocument, FdnNode } from '../src/index.js'
 
 const el = (id: string, tag: string, extra: Partial<FdnNode> = {}): FdnNode => ({ id, tag, attrs: {}, style: {}, styleStates: {}, children: [], ...extra })
@@ -46,8 +50,8 @@ describe('instance styles', () => {
     )
   })
 
-  it('leaves unstyled instances exactly as before', () => {
-    expect(normal.html).toContain('<fdn-use component="Chip">\n    <span style-hover="color:green" style="color:red;width:10px">chip</span>\n  </fdn-use>')
+  it('gives every instance wrapper display:contents, styled or not, and leaves an unstyled root as authored', () => {
+    expect(normal.html).toContain('<fdn-use component="Chip" style="display:contents">\n    <span style-hover="color:green" style="color:red;width:10px">chip</span>\n  </fdn-use>')
   })
 
   it('applies to every root of a multi-root component and reports it', () => {
@@ -104,5 +108,25 @@ describe.skipIf(!chromiumAvailable())('instance styles in a browser', () => {
     const fixed = layout.find((entry) => entry.id === 'fixed')
     expect(chip?.width).toBe(500)
     expect((chip?.y ?? 0) - (fixed?.y ?? 0)).toBe(90)
+  })
+
+  const board = (name: string): FdnDocument =>
+    parseDocument(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'boards', `${name}.fdn.html`), 'utf8')).doc
+
+  it('renders tracks-pane StatusDots as 7x7 dots in their flex rows', async () => {
+    const [cell] = await renderDocument(board('tracks-pane'))
+    const dots = (cell?.layout ?? []).filter((entry) => entry.id.endsWith('::n25'))
+    expect(dots.length).toBeGreaterThan(0)
+    for (const dot of dots) expect([dot.width, dot.height]).toEqual([7, 7])
+  })
+
+  it('lets the GuideNav spacer push the help-center footer links to the bottom of the sidebar', async () => {
+    const [cell] = await renderDocument(board('system-help-center'))
+    const box = (id: string) => (cell?.layout ?? []).find((entry) => entry.id === id)
+    const sidebar = box('n217::n16')
+    const spacer = box('n217::n25')
+    const lastLink = (cell?.layout ?? []).filter((entry) => entry.id.startsWith('n217::') && entry.y > (spacer?.y ?? 0)).at(-1)
+    expect(spacer?.height).toBeGreaterThan(100)
+    expect((sidebar?.y ?? 0) + (sidebar?.height ?? 0) - ((lastLink?.y ?? 0) + (lastLink?.height ?? 0))).toBeLessThan(24)
   })
 })
