@@ -114,7 +114,7 @@ function toFilePath(name: string): string {
   return name.endsWith('.fdn.html') ? name : `${name}.fdn.html`
 }
 
-function titleFromName(name: string): string {
+export function titleFromName(name: string): string {
   const base = basename(name).replace(/\.fdn\.html$/, '')
   return base
     .split(/[-_\s]+/)

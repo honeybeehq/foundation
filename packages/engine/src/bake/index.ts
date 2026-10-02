@@ -35,7 +35,7 @@ import type {
   StateStyleKey,
 } from '../types.js'
 import { evaluateWhen, interpolateString, resolveRef, stringifyValue, type ExprContext } from './expr.js'
-import { emitHtml } from './emit.js'
+import { emitEditorHtml, emitHtml } from './emit.js'
 import { capsuleClassName, parseSealedFragment, scopeCss } from './capsule.js'
 
 export { emitHtml } from './emit.js'
@@ -55,6 +55,7 @@ interface BakeCtx extends ExprContext {
    *  reference across every ctx spread — same accumulation pattern as
    *  `reports`/`referencedTokens` below. */
   capsuleCss: Map<string, string>
+  editor?: { idPrefix: string }
 }
 
 function pushReport(ctx: BakeCtx, line: ReportLine): void {
@@ -62,8 +63,26 @@ function pushReport(ctx: BakeCtx, line: ReportLine): void {
 }
 
 export function bakeDocument(doc: FdnDocument, opts?: { state?: string }): { html: string; tree: FdnNode[]; state: string | null; report: ConformanceReport } {
-  const reports: ReportLine[] = []
   const stateName = opts?.state ?? null
+  const { tree, capsuleCss, report } = bakeTree(doc, stateName, false)
+  return { html: emitHtml(doc, tree, capsuleCss), tree, state: stateName, report }
+}
+
+export function bakeEditorDocument(doc: FdnDocument, opts?: { state?: string }): { html: string; tree: FdnNode[]; state: string | null; report: ConformanceReport } {
+  const stateName = opts?.state ?? null
+  const { tree, capsuleCss, report } = bakeTree(doc, stateName, true)
+  return { html: emitEditorHtml(doc, tree, capsuleCss), tree, state: stateName, report }
+}
+
+export function bakeEditorComponent(doc: FdnDocument, name: string): { html: string; tree: FdnNode[]; report: ConformanceReport } {
+  const instance: FdnNode = { id: name, tag: 'fdn-use', attrs: { component: name }, style: {}, styleStates: {}, children: [] }
+  const { tree, capsuleCss, report } = bakeTree({ ...doc, body: [instance] }, null, true)
+  const lines = report.lines.filter((line) => line.code !== 'unused-token')
+  return { html: emitEditorHtml(doc, tree, capsuleCss), tree, report: { lines } }
+}
+
+function bakeTree(doc: FdnDocument, stateName: string | null, editor: boolean): { tree: FdnNode[]; capsuleCss: Map<string, string>; report: ConformanceReport } {
+  const reports: ReportLine[] = []
 
   let state: FdnState | undefined
   if (stateName !== null) {
@@ -109,6 +128,7 @@ export function bakeDocument(doc: FdnDocument, opts?: { state?: string }): { htm
     tokenValueIndex,
     referencedTokens: new Set(),
     capsuleCss: new Map(),
+    ...(editor ? { editor: { idPrefix: '' } } : {}),
   }
 
   const tree = doc.body.flatMap((n) => bakeNode(n, ctx))
@@ -123,9 +143,7 @@ export function bakeDocument(doc: FdnDocument, opts?: { state?: string }): { htm
     }
   }
 
-  const html = emitHtml(doc, tree, ctx.capsuleCss)
-
-  return { html, tree, state: stateName, report: { lines: dedupeReports(reports) } }
+  return { tree, capsuleCss: ctx.capsuleCss, report: { lines: dedupeReports(reports) } }
 }
 
 /**
@@ -260,7 +278,8 @@ function bakeEach(node: FdnNode, ctx: BakeCtx): FdnNode[] {
     const childBindings = { ...ctx.bindings, [spec.binding]: toBindable(item) }
     const childCtx: BakeCtx = { ...ctx, bindings: childBindings }
     const baked = bakeSingle(stripped, childCtx)
-    out.push(...prefixIds(baked, `${node.id}#${i}`))
+    const indexed = ctx.editor ? baked.map((n) => ({ ...n, attrs: { ...n.attrs, 'data-fdn-index': String(i) } })) : baked
+    out.push(...prefixIds(indexed, `${node.id}#${i}`))
   })
   return out
 }
@@ -464,12 +483,20 @@ function buildRegularNode(node: FdnNode, ctx: BakeCtx): FdnNode {
   return {
     id: node.id,
     tag: node.tag,
-    attrs,
+    attrs: ctx.editor ? { ...attrs, 'data-fdn-id': ctx.editor.idPrefix + node.id } : attrs,
     style,
     styleStates,
     text,
     children,
   }
+}
+
+function editorIdentity(node: FdnNode, componentName: string, ctx: BakeCtx): Record<string, string> {
+  return ctx.editor ? { 'data-fdn-id': ctx.editor.idPrefix + node.id, 'data-fdn-component': componentName } : {}
+}
+
+function withEditorIds(nodes: FdnNode[], prefix: string): FdnNode[] {
+  return nodes.map((n) => ({ ...n, attrs: { ...n.attrs, 'data-fdn-id': prefix + n.id }, children: withEditorIds(n.children, prefix) }))
 }
 
 // ——— component instantiation ———
@@ -534,7 +561,8 @@ function instantiateSealedComponent(
   ctx: BakeCtx,
 ): FdnNode[] {
   const capsuleClass = capsuleClassName(componentName)
-  const roots = parseSealedFragment(sealed.html, `${node.id}~cap`)
+  const parsed = parseSealedFragment(sealed.html, `${node.id}~cap`)
+  const roots = ctx.editor ? withEditorIds(parsed, ctx.editor.idPrefix) : parsed
   if (sealed.css.trim() !== '' && !ctx.capsuleCss.has(capsuleClass)) {
     ctx.capsuleCss.set(capsuleClass, scopeCss(sealed.css, capsuleClass))
   }
@@ -542,7 +570,7 @@ function instantiateSealedComponent(
     {
       id: node.id,
       tag: 'div',
-      attrs: { class: capsuleClass },
+      attrs: { class: capsuleClass, ...editorIdentity(node, componentName, ctx) },
       style: {},
       styleStates: {},
       text: undefined,
@@ -584,7 +612,7 @@ function instantiateComponent(node: FdnNode, ctx: BakeCtx): FdnNode[] {
   }
 
   const propsTyped: Record<string, unknown> = {}
-  const finalAttrs: Record<string, string> = { ...bakedAttrs, component: componentName }
+  const finalAttrs: Record<string, string> = { ...bakedAttrs, component: componentName, ...editorIdentity(node, componentName, ctx) }
   for (const propDef of component.props) {
     const raw = propsRaw[propDef.name]
     if (raw === undefined) {
@@ -624,6 +652,7 @@ function instantiateComponent(node: FdnNode, ctx: BakeCtx): FdnNode[] {
     bindings: { prop: propsTyped, param: ctx.bindings['param'] ?? {} },
     componentStack: [...ctx.componentStack, componentName],
     slotFills,
+    ...(ctx.editor ? { editor: { idPrefix: `${ctx.editor.idPrefix}${node.id}::` } } : {}),
   }
 
   const bakedBody = component.body.flatMap((n) => bakeNode(n, innerCtx))

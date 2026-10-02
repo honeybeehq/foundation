@@ -367,6 +367,7 @@ class LoroChain implements FdnChain {
     if (!(other instanceof LoroChain)) throw new Error('merge: other chain is not a LoroChain instance')
     this.loro.import(other.loro.export({ mode: 'update' }))
     this.rebuildIndex()
+    for (const [name, frontier] of other.anchors) if (!this.anchors.has(name)) this.anchors.set(name, frontier)
   }
 
   save(): Uint8Array {
@@ -686,7 +687,7 @@ class LoroChain implements FdnChain {
 
   private rebuildIndex(): void {
     this.idToTree.clear()
-    for (const node of this.tree.nodes()) {
+    for (const node of this.tree.getNodes()) {
       const id = node.data.get('id') as NodeId | undefined
       if (id === undefined) continue
       this.idToTree.set(id, node.id)

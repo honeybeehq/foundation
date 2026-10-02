@@ -74,23 +74,7 @@ function renderNode(node: FdnNode, depth: number): string {
 export function emitHtml(doc: FdnDocument, tree: FdnNode[], capsuleCss?: Map<string, string>): string {
   const lines: string[] = []
   lines.push('<!-- baked by foundation-engine — derived artifact, do not edit -->')
-
-  const tokenNames = Object.keys(doc.tokens).sort()
-  const capsuleNames = capsuleCss ? [...capsuleCss.keys()].sort() : []
-  if (tokenNames.length > 0 || capsuleNames.length > 0) {
-    lines.push('<style>')
-    if (tokenNames.length > 0) {
-      lines.push(':root {')
-      for (const name of tokenNames) {
-        lines.push(`  --${name}: ${doc.tokens[name]};`)
-      }
-      lines.push('}')
-    }
-    for (const name of capsuleNames) {
-      lines.push(capsuleCss?.get(name) as string)
-    }
-    lines.push('</style>')
-  }
+  lines.push(...styleBlock(doc, capsuleCss))
 
   if (doc.title) {
     lines.push(`<title>${escapeText(doc.title)}</title>`)
@@ -101,4 +85,33 @@ export function emitHtml(doc: FdnDocument, tree: FdnNode[], capsuleCss?: Map<str
   }
 
   return lines.join('\n') + '\n'
+}
+
+export function emitEditorHtml(doc: FdnDocument, tree: FdnNode[], capsuleCss?: Map<string, string>): string {
+  const lines: string[] = ['<!doctype html>', '<html>', '<head>', '<meta charset="utf-8">']
+  if (doc.title) lines.push(`<title>${escapeText(doc.title)}</title>`)
+  lines.push(...styleBlock(doc, capsuleCss), '</head>', '<body>')
+  for (const node of tree) lines.push(renderNode(node, 0))
+  lines.push('</body>', '</html>')
+  return lines.join('\n') + '\n'
+}
+
+function styleBlock(doc: FdnDocument, capsuleCss?: Map<string, string>): string[] {
+  const lines: string[] = []
+  const tokenNames = Object.keys(doc.tokens).sort()
+  const capsuleNames = capsuleCss ? [...capsuleCss.keys()].sort() : []
+  if (tokenNames.length === 0 && capsuleNames.length === 0) return lines
+  lines.push('<style>')
+  if (tokenNames.length > 0) {
+    lines.push(':root {')
+    for (const name of tokenNames) {
+      lines.push(`  --${name}: ${doc.tokens[name]};`)
+    }
+    lines.push('}')
+  }
+  for (const name of capsuleNames) {
+    lines.push(capsuleCss?.get(name) as string)
+  }
+  lines.push('</style>')
+  return lines
 }

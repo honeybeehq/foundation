@@ -54,6 +54,9 @@ importers:
       foundation-importer:
         specifier: workspace:*
         version: link:../importer
+      foundation-protocol:
+        specifier: workspace:*
+        version: link:../protocol
       pngjs:
         specifier: ^7.0.0
         version: 7.0.0
@@ -113,6 +116,8 @@ importers:
       tailwindcss:
         specifier: ^4.1.0
         version: 4.3.3
+
+  packages/protocol: {}
 
 packages:
 

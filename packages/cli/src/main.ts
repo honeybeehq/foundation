@@ -26,6 +26,7 @@ import { runMcp } from './commands/mcp.js'
 import { runGateway } from './commands/gateway.js'
 import { runGitMergeDriver } from './commands/git-merge-driver.js'
 import { runProject } from './commands/project.js'
+import { runSession } from './commands/session.js'
 import type { CliIO } from './io.js'
 
 const COMMANDS: Record<string, (args: string[], io: CliIO) => Promise<number>> = {
@@ -46,6 +47,7 @@ const COMMANDS: Record<string, (args: string[], io: CliIO) => Promise<number>> =
   gateway: runGateway,
   'git-merge-driver': runGitMergeDriver,
   project: runProject,
+  session: runSession,
 }
 
 const USAGE = `foundation — a design-document engine CLI
@@ -89,6 +91,9 @@ commands:
   project list [dir]                         list a manifest's documents + validate/chain status
   project scan [dir]                         discover *.fdn.html under dir not yet registered, add them
   mcp                                        run a stdio MCP server exposing Foundation's verbs
+  session <file> [--create] [--title T] [--author A]
+                                              long-lived editing session speaking the JSON-lines
+                                              session protocol on stdin/stdout (packages/protocol)
   gateway install|uninstall|status           publish/withdraw the operator-gateway registry entry
   git-merge-driver <ancestor> <ours> <theirs>   git merge driver (see docs/GIT-INTEGRATION.md)
 `
