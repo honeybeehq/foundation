@@ -121,6 +121,8 @@ import { createHash } from 'node:crypto'
 
 const STATE_KEYS: StateStyleKey[] = ['hover', 'focus', 'active', 'disabled']
 
+type KeyedSection = 'params' | 'data' | 'lookups' | 'states' | 'viewports' | 'namedStyles' | 'components'
+
 type Frontier = { peer: PeerID; counter: number }[]
 
 /** Fixed public interface (API.md) — no Loro types appear anywhere here.
@@ -193,6 +195,7 @@ class LoroChain implements FdnChain {
    *  all either whole-item or single-scalar-field writes, so a flat keyed
    *  map (not a nested per-field container) is the right grain here too. */
   private annotations: LoroMap
+  private order: LoroMap
 
   private clock = new DeterministicClock()
   private idToTree = new Map<NodeId, TreeID>()
@@ -224,6 +227,7 @@ class LoroChain implements FdnChain {
     this.namedStyles = this.loro.getMap('namedStyles')
     this.components = this.loro.getMap('components')
     this.annotations = this.loro.getMap('annotations')
+    this.order = this.loro.getMap('order')
   }
 
   static create(doc: FdnDocument, meta: ChangeMeta, actor: string, docId?: string): LoroChain {
@@ -474,31 +478,31 @@ class LoroChain implements FdnChain {
         break
       }
       case 'set-named-style': {
-        this.namedStyles.set(op.style.name, stableStringify(op.style))
+        this.setKeyed('namedStyles', this.namedStyles, op.style.name, op.style)
         break
       }
       case 'remove-named-style': {
-        this.namedStyles.delete(op.name)
+        this.removeKeyed('namedStyles', this.namedStyles, op.name)
         break
       }
       case 'set-component': {
-        this.components.set(op.component.name, stableStringify(op.component))
+        this.setKeyed('components', this.components, op.component.name, op.component)
         break
       }
       case 'remove-component': {
-        this.components.delete(op.name)
+        this.removeKeyed('components', this.components, op.name)
         break
       }
       case 'set-param': {
-        this.params.set(op.param.name, stableStringify(op.param))
+        this.setKeyed('params', this.params, op.param.name, op.param)
         break
       }
       case 'set-lookup': {
-        this.lookups.set(op.lookup.name, stableStringify(op.lookup))
+        this.setKeyed('lookups', this.lookups, op.lookup.name, op.lookup)
         break
       }
       case 'set-state': {
-        this.states.set(op.state.name, stableStringify(op.state))
+        this.setKeyed('states', this.states, op.state.name, op.state)
         break
       }
       case 'annotate': {
@@ -578,14 +582,16 @@ class LoroChain implements FdnChain {
     this.meta.set('title', doc.title ?? null)
 
     this.replaceScalarMap(this.tokens, doc.tokens)
-    this.replaceKeyedMap(this.params, doc.params, (p) => p.name)
-    this.replaceKeyedMap(this.data, doc.data, (d) => d.name)
-    this.replaceKeyedMap(this.lookups, doc.lookups, (l) => l.name)
-    this.replaceKeyedMap(this.states, doc.states, (s) => s.name)
-    this.replaceKeyedMap(this.viewports, doc.viewports, (v) => v.name)
-    this.replaceKeyedMap(this.namedStyles, doc.namedStyles, (s) => s.name)
-    this.replaceKeyedMap(this.components, doc.components, (c) => c.name)
-    this.replaceKeyedMap(this.annotations, doc.annotations, (a) => a.id)
+    this.replaceKeyedMap('params', this.params, doc.params, (p) => p.name)
+    this.replaceKeyedMap('data', this.data, doc.data, (d) => d.name)
+    this.replaceKeyedMap('lookups', this.lookups, doc.lookups, (l) => l.name)
+    this.replaceKeyedMap('states', this.states, doc.states, (s) => s.name)
+    this.replaceKeyedMap('viewports', this.viewports, doc.viewports, (v) => v.name)
+    this.replaceKeyedMap('namedStyles', this.namedStyles, doc.namedStyles, (s) => s.name)
+    this.replaceKeyedMap('components', this.components, doc.components, (c) => c.name)
+    const annotationIds = new Set(doc.annotations.map((a) => a.id))
+    for (const key of this.annotations.keys() as string[]) if (!annotationIds.has(key)) this.annotations.delete(key)
+    for (const annotation of doc.annotations) this.annotations.set(annotation.id, stableStringify(annotation))
 
     if (this.matrix.length > 0) this.matrix.delete(0, this.matrix.length)
     for (const m of doc.matrix) this.matrix.push(stableStringify(m))
@@ -596,10 +602,29 @@ class LoroChain implements FdnChain {
     for (const [key, value] of Object.entries(record)) map.set(key, value)
   }
 
-  private replaceKeyedMap<T>(map: LoroMap, items: T[], nameOf: (item: T) => string): void {
-    const names = new Set(items.map(nameOf))
-    for (const key of map.keys() as string[]) if (!names.has(key)) map.delete(key)
+  private replaceKeyedMap<T>(section: KeyedSection, map: LoroMap, items: T[], nameOf: (item: T) => string): void {
+    const names = items.map(nameOf)
+    const kept = new Set(names)
+    for (const key of map.keys() as string[]) if (!kept.has(key)) map.delete(key)
     for (const item of items) map.set(nameOf(item), stableStringify(item))
+    this.order.set(section, JSON.stringify(names))
+  }
+
+  private declaredOrder(section: KeyedSection): string[] | null {
+    const stored = this.order.get(section) as string | undefined
+    return stored === undefined ? null : (JSON.parse(stored) as string[])
+  }
+
+  private setKeyed(section: KeyedSection, map: LoroMap, key: string, item: unknown): void {
+    map.set(key, stableStringify(item))
+    const order = this.declaredOrder(section)
+    if (order && !order.includes(key)) this.order.set(section, JSON.stringify([...order, key]))
+  }
+
+  private removeKeyed(section: KeyedSection, map: LoroMap, key: string): void {
+    map.delete(key)
+    const order = this.declaredOrder(section)
+    if (order?.includes(key)) this.order.set(section, JSON.stringify(order.filter((name) => name !== key)))
   }
 
   // ——— materialization ———
@@ -612,15 +637,15 @@ class LoroChain implements FdnChain {
       specVersion: (this.meta.get('specVersion') as string | undefined) ?? '',
       ...(title != null ? { title } : {}),
       tokens: this.mapToRecord(this.tokens),
-      params: this.mapValuesSorted<FdnParam>(this.params),
-      data: this.mapValuesSorted<FdnDataSet>(this.data),
-      lookups: this.mapValuesSorted<FdnLookup>(this.lookups),
-      states: this.mapValuesSorted<FdnState>(this.states),
-      viewports: this.mapValuesSorted<FdnViewport>(this.viewports),
-      matrix: this.listValuesSorted(),
-      namedStyles: this.mapValuesSorted<FdnNamedStyle>(this.namedStyles),
-      components: this.mapValuesSorted<FdnComponent>(this.components),
-      annotations: this.mapValuesSortedById<FdnAnnotation>(this.annotations),
+      params: this.keyedValues<FdnParam>('params', this.params),
+      data: this.keyedValues<FdnDataSet>('data', this.data),
+      lookups: this.keyedValues<FdnLookup>('lookups', this.lookups),
+      states: this.keyedValues<FdnState>('states', this.states),
+      viewports: this.keyedValues<FdnViewport>('viewports', this.viewports),
+      matrix: (this.matrix.toArray() as string[]).map((s) => JSON.parse(s) as { state: string; viewport: string }),
+      namedStyles: this.keyedValues<FdnNamedStyle>('namedStyles', this.namedStyles),
+      components: this.keyedValues<FdnComponent>('components', this.components),
+      annotations: this.annotationsById(),
       body,
     }
   }
@@ -666,23 +691,16 @@ class LoroChain implements FdnChain {
     return out
   }
 
-  private mapValuesSorted<T extends { name: string }>(map: LoroMap): T[] {
-    const items: T[] = []
-    for (const [, v] of map.entries()) items.push(JSON.parse(v as string) as T)
-    return items.sort((a, b) => a.name.localeCompare(b.name))
-  }
-
-  /** Same as mapValuesSorted, keyed/sorted by `.id` instead of `.name` —
-   *  annotations have no `.name` field (see FdnAnnotation, types.ts). */
-  private mapValuesSortedById<T extends { id: string }>(map: LoroMap): T[] {
-    const items: T[] = []
-    for (const [, v] of map.entries()) items.push(JSON.parse(v as string) as T)
+  private annotationsById(): FdnAnnotation[] {
+    const items = (this.annotations.values() as string[]).map((value) => JSON.parse(value) as FdnAnnotation)
     return items.sort((a, b) => a.id.localeCompare(b.id))
   }
 
-  private listValuesSorted(): { state: string; viewport: string }[] {
-    const items = (this.matrix.toArray() as string[]).map((s) => JSON.parse(s) as { state: string; viewport: string })
-    return items.sort((a, b) => a.state.localeCompare(b.state) || a.viewport.localeCompare(b.viewport))
+  private keyedValues<T>(section: KeyedSection, map: LoroMap): T[] {
+    const position = new Map((this.declaredOrder(section) ?? []).map((key, index) => [key, index]))
+    const entries = (map.entries() as [string, unknown][]).map(([key, value]) => ({ key, item: JSON.parse(value as string) as T }))
+    entries.sort((a, b) => (position.get(a.key) ?? Infinity) - (position.get(b.key) ?? Infinity) || a.key.localeCompare(b.key))
+    return entries.map((entry) => entry.item)
   }
 
   private rebuildIndex(): void {

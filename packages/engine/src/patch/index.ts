@@ -129,8 +129,8 @@ function checkOp(op: PatchOp, doc: FdnDocument, index: Map<NodeId, NodeLocation>
 }
 
 function upsertByName<T extends { name: string }>(items: T[], item: T): T[] {
-  const rest = items.filter((existing) => existing.name !== item.name)
-  return [...rest, structuredClone(item)].sort((a, b) => a.name.localeCompare(b.name))
+  const copy = structuredClone(item)
+  return items.some((existing) => existing.name === item.name) ? items.map((existing) => (existing.name === item.name ? copy : existing)) : [...items, copy]
 }
 
 function applyOp(doc: FdnDocument, op: PatchOp, index: Map<NodeId, NodeLocation>): FdnDocument {
@@ -218,22 +218,7 @@ function applyOp(doc: FdnDocument, op: PatchOp, index: Map<NodeId, NodeLocation>
 }
 
 export function normalizeDocument(doc: FdnDocument): FdnDocument {
-  return {
-    ...doc,
-    params: byName(doc.params),
-    data: byName(doc.data),
-    lookups: byName(doc.lookups),
-    states: byName(doc.states),
-    viewports: byName(doc.viewports),
-    matrix: [...doc.matrix].sort((a, b) => a.state.localeCompare(b.state) || a.viewport.localeCompare(b.viewport)),
-    namedStyles: byName(doc.namedStyles),
-    components: byName(doc.components),
-    annotations: [...doc.annotations].sort((a, b) => a.id.localeCompare(b.id)),
-  }
-}
-
-function byName<T extends { name: string }>(items: T[]): T[] {
-  return [...items].sort((a, b) => a.name.localeCompare(b.name))
+  return { ...doc, annotations: [...doc.annotations].sort((a, b) => a.id.localeCompare(b.id)) }
 }
 
 export function diffPatch(original: FdnDocument, target: FdnDocument): PatchOp[] | null {
@@ -245,8 +230,8 @@ export function diffPatch(original: FdnDocument, target: FdnDocument): PatchOp[]
   if (!diffNamed(from.params, to.params, (param) => ({ op: 'set-param', param }), null, ops)) return null
   if (!diffNamed(from.lookups, to.lookups, (lookup) => ({ op: 'set-lookup', lookup }), null, ops)) return null
   if (!diffNamed(from.states, to.states, (state) => ({ op: 'set-state', state }), null, ops)) return null
-  diffNamed(from.namedStyles, to.namedStyles, (style) => ({ op: 'set-named-style', style }), (name) => ({ op: 'remove-named-style', name }), ops)
-  diffNamed(from.components, to.components, (component) => ({ op: 'set-component', component }), (name) => ({ op: 'remove-component', name }), ops)
+  if (!diffNamed(from.namedStyles, to.namedStyles, (style) => ({ op: 'set-named-style', style }), (name) => ({ op: 'remove-named-style', name }), ops)) return null
+  if (!diffNamed(from.components, to.components, (component) => ({ op: 'set-component', component }), (name) => ({ op: 'remove-component', name }), ops)) return null
   diffRecord(from.tokens, to.tokens, (name, value) => ops.push({ op: 'set-token', name, value }))
   ops.push(...diffNodes(from.body, to.body))
   const beforeAnnotations = new Map(from.annotations.map((a) => [a.id, a]))
@@ -271,6 +256,9 @@ function diffNamed<T extends { name: string }>(
 ): boolean {
   const before = new Map(from.map((item) => [item.name, item]))
   const afterNames = new Set(to.map((item) => item.name))
+  const keptOrder = from.map((item) => item.name).filter((name) => afterNames.has(name))
+  const resultingOrder = [...keptOrder, ...to.map((item) => item.name).filter((name) => !before.has(name))]
+  if (resultingOrder.join('\u0000') !== to.map((item) => item.name).join('\u0000')) return false
   for (const name of before.keys()) {
     if (afterNames.has(name)) continue
     if (!remove) return false
