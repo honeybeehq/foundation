@@ -38,3 +38,19 @@ describe('chain reload and merge', () => {
     expect(() => loadChain(ours.save()).checkout('review')).not.toThrow()
   })
 })
+
+describe('replace-document', () => {
+  it('reconciles the tree in place so concurrent whole-document writes merge without duplicating nodes', () => {
+    const base = createChain(doc(['n1', 'n2']), { author: 'a', message: 'init' })
+    const left = loadChain(base.save(), { actor: 'left' })
+    const right = loadChain(base.save(), { actor: 'right' })
+    const leftDoc = doc(['n1', 'n2', 'n3'])
+    const rightDoc = doc(['n1', 'n2'])
+    rightDoc.body[1]!.style = { color: 'red' }
+    left.apply({ author: 'left', message: 'add' }, [{ op: 'replace-document', doc: leftDoc }])
+    right.apply({ author: 'right', message: 'style' }, [{ op: 'replace-document', doc: rightDoc }])
+    left.merge(right)
+    expect(left.doc().body.map((n) => n.id)).toEqual(['n1', 'n2', 'n3'])
+    expect(left.doc().body[1]?.style).toEqual({ color: 'red' })
+  })
+})

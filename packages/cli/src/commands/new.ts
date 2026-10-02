@@ -11,7 +11,7 @@
  * failure — the document itself was written successfully either way.
  */
 import { randomUUID } from 'node:crypto'
-import { existsSync, writeFileSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { basename } from 'node:path'
 import { projectDocument, validateDocument } from 'foundation-engine'
 import type { FdnDocument, FdnNode } from 'foundation-engine'
@@ -20,6 +20,7 @@ import { flagString, parseArgs } from '../argv.js'
 import { injectDocIdAttr } from '../docid.js'
 import { defaultAuthor } from '../identity.js'
 import { writeChainInit } from './chain.js'
+import { writeAtomic } from '../disk.js'
 
 function leafNode(partial: Partial<FdnNode> & Pick<FdnNode, 'id' | 'tag'>): FdnNode {
   return { attrs: {}, style: {}, styleStates: {}, children: [], ...partial }
@@ -152,15 +153,12 @@ export async function runNew(args: string[], io: CliIO): Promise<number> {
   // (see packages/cli/src/docid.ts for why: FdnDocument has no field for it).
   const docId = randomUUID()
   const text = injectDocIdAttr(projectDocument(doc), docId)
-  writeFileSync(filePath, text, 'utf8')
+  const author = flagString(flags, 'author') ?? defaultAuthor()
+  const message = flagString(flags, 'm', 'message') ?? 'init'
+  const chain = flags['no-chain'] ? null : writeChainInit(filePath, doc, { author, message }, io, { docId })
+  writeAtomic(filePath, text)
   io.stdout(`wrote ${filePath}`)
-
-  if (!flags['no-chain']) {
-    const author = flagString(flags, 'author') ?? defaultAuthor()
-    const message = flagString(flags, 'm', 'message') ?? 'init'
-    const result = writeChainInit(filePath, doc, { author, message }, io, { docId })
-    if (result) io.stdout(`wrote ${result.chainPath} (head ${result.head.hash.slice(0, 12)})`)
-  }
+  if (chain) io.stdout(`wrote ${chain.chainPath} (head ${chain.head.hash.slice(0, 12)})`)
 
   return 0
 }

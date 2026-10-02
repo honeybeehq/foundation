@@ -66,6 +66,7 @@ import {
 import { skeletonDocument, skeletonDocumentEmpty } from '../commands/new.js'
 import { defaultAuthor } from '../identity.js'
 import { chainLabel, documentStatus, manifestPathFor, readManifest, statusLabel } from '../project.js'
+import { commitDocument, writeAtomic } from '../disk.js'
 
 const require = createRequire(import.meta.url)
 
@@ -321,60 +322,56 @@ async function toolIngest(args: Record<string, unknown>): Promise<ToolResult> {
   const commit = optionalBoolean(args, 'commit')
   const message = optionalString(args, 'message')
 
+  let source: string
   if (content !== undefined) {
-    try {
-      writeFileSync(path, content, 'utf8')
-    } catch (err) {
-      return fail(`could not write ${path}: ${err instanceof Error ? err.message : String(err)}`)
-    }
+    source = content
+  } else {
+    const read = readSource(path)
+    if (!read.ok) return read.result
+    source = read.source
   }
 
-  const read = readSource(path)
-  if (!read.ok) return read.result
-
-  const { doc, report } = parseDocument(read.source)
+  const { doc, report } = parseDocument(source)
   const canonical = projectDocument(doc)
   // Bug fix (friction §6): re-stamp data-fdn-doc-id off the ORIGINAL source
   // onto the freshly-projected text, exactly as commands/ingest.ts's CLI
   // path does — parse(project(doc)) is a fixpoint for FdnDocument, but
   // data-fdn-doc-id isn't part of FdnDocument, so without this every MCP
   // ingest silently deleted the document's identity.
-  const docId = readDocIdAttr(read.source)
+  const docId = readDocIdAttr(source)
   const canonicalWithDocId = docId ? injectDocIdAttr(canonical, docId) : canonical
-  const rewritten = canonicalWithDocId !== read.source
-  try {
-    writeFileSync(path, canonicalWithDocId, 'utf8')
-  } catch (err) {
-    return fail(`could not write ${path}: ${err instanceof Error ? err.message : String(err)}`)
-  }
+  const rewritten = canonicalWithDocId !== source
   const validation = validateDocument(doc)
 
   let commitInfo: Record<string, unknown> | null = null
+  let commitFailure: string | null = null
   if (commit) {
     const chainPath = chainPathFor(path)
     if (!existsSync(chainPath)) {
       commitInfo = { status: 'skipped', reason: `no chain yet — call foundation_new or chain init to start tracking ${path}` }
     } else {
+      // friction §6: same identity rules the CLI uses (agent:<HIVE_BEE> when
+      // set, else user:<name>@<host>) — a hardcoded 'agent:mcp' loses which
+      // bee actually made the change in the chain log.
+      const commitMessage = message ?? (report.lines.length === 0 ? 'ingest' : `ingest — ${report.lines.length} normalization line(s)`)
       try {
-        // friction §6: same identity rules the CLI uses (agent:<HIVE_BEE> when
-        // set, else user:<name>@<host>) — a hardcoded 'agent:mcp' loses which
-        // bee actually made the change in the chain log.
-        const author = defaultAuthor()
-        const chain = loadChain(readFileSync(chainPath), { actor: author })
-        const currentCanonical = projectDocument(chain.doc())
-        if (currentCanonical === canonical) {
-          commitInfo = { status: 'no-op', reason: 'parsed document matches chain head; nothing to commit' }
-        } else {
-          const commitMessage = message ?? (report.lines.length === 0 ? 'ingest' : `ingest — ${report.lines.length} normalization line(s)`)
-          const envelope = chain.apply({ author, message: commitMessage }, [{ op: 'replace-document', doc }])
-          writeFileSync(chainPath, chain.save())
-          commitInfo = { status: 'committed', hash: envelope.hash, message: commitMessage, chainPath }
-        }
+        const result = commitDocument(chainPath, { author: defaultAuthor(), message: commitMessage }, doc)
+        commitInfo =
+          result.status === 'committed'
+            ? { status: 'committed', hash: result.envelope.hash, message: commitMessage, chainPath }
+            : { status: 'no-op', reason: 'parsed document matches chain head; nothing to commit' }
       } catch (err) {
-        return fail(`chain commit failed: ${err instanceof Error ? err.message : String(err)}`)
+        commitFailure = `chain commit failed: ${err instanceof Error ? err.message : String(err)}`
       }
     }
   }
+
+  try {
+    writeAtomic(path, canonicalWithDocId)
+  } catch (err) {
+    return fail(`could not write ${path}: ${err instanceof Error ? err.message : String(err)}`)
+  }
+  if (commitFailure) return fail(commitFailure)
 
   return ok({
     path,
@@ -588,7 +585,7 @@ function commitAnnotationChange(
 ): { hash: string; textRegenerated: boolean } {
   const wasDirty = existsSync(path) && hasUncommittedEdits(path, chain)
   const envelope = chain.apply(meta, ops)
-  writeFileSync(chainPath, chain.save())
+  writeAtomic(chainPath, chain.save())
   if (!wasDirty) regenerateTextFromChain(path, chain, NO_OP_IO)
   return { hash: envelope.hash, textRegenerated: !wasDirty }
 }
@@ -693,7 +690,7 @@ async function toolChainAnchor(args: Record<string, unknown>): Promise<ToolResul
   try {
     const chain = loadChain(readFileSync(chainPath))
     chain.anchor(name)
-    writeFileSync(chainPath, chain.save())
+    writeAtomic(chainPath, chain.save())
     return ok({ path, chainPath, anchor: name, head: chain.head() })
   } catch (err) {
     return fail(`chain anchor failed: ${err instanceof Error ? err.message : String(err)}`)
@@ -769,21 +766,22 @@ async function toolNew(args: Record<string, unknown>): Promise<ToolResult> {
   // own init commit, matching `foundation new` exactly.
   const docId = randomUUID()
   const text = injectDocIdAttr(projectDocument(doc), docId)
-  try {
-    writeFileSync(filePath, text, 'utf8')
-  } catch (err) {
-    return fail(`could not write ${filePath}: ${err instanceof Error ? err.message : String(err)}`)
-  }
 
   // friction §6: same identity rules the CLI uses, not a hardcoded 'agent:mcp'.
   let chain: { chainPath: string; head: { hash: string } } | null = null
-  const result = writeChainInit(
-    filePath,
-    doc,
-    { author: defaultAuthor(), message: 'init' },
-    { stdout: () => {}, stderr: () => {} },
-    { docId },
-  )
+  let result: ReturnType<typeof writeChainInit>
+  try {
+    result = writeChainInit(
+      filePath,
+      doc,
+      { author: defaultAuthor(), message: 'init' },
+      { stdout: () => {}, stderr: () => {} },
+      { docId },
+    )
+    writeAtomic(filePath, text)
+  } catch (err) {
+    return fail(`could not write ${filePath}: ${err instanceof Error ? err.message : String(err)}`)
+  }
   if (result) chain = { chainPath: result.chainPath, head: { hash: result.head.hash } }
 
   return ok({ path: filePath, title, empty, chain, docId })
@@ -869,31 +867,28 @@ async function toolImport(args: Record<string, unknown>): Promise<ToolResult> {
   const canonical = projectDocument(nextDoc)
   const targetDocId = readDocIdAttr(read.source)
   const canonicalWithDocId = targetDocId ? injectDocIdAttr(canonical, targetDocId) : canonical
+
+  let commitInfo: Record<string, unknown> | null = null
+  let commitFailure: string | null = null
+  const chainPath = chainPathFor(into)
+  if (existsSync(chainPath)) {
+    const message = `import ${component.name} from ${source} (${projected.mode})`
+    try {
+      const result = commitDocument(chainPath, { author: defaultAuthor(), message }, nextDoc)
+      commitInfo =
+        result.status === 'committed'
+          ? { status: 'committed', hash: result.envelope.hash, message, chainPath }
+          : { status: 'no-op', reason: 'parsed document matches chain head; nothing to commit' }
+    } catch (err) {
+      commitFailure = `chain commit failed: ${err instanceof Error ? err.message : String(err)}`
+    }
+  }
   try {
-    writeFileSync(into, canonicalWithDocId, 'utf8')
+    writeAtomic(into, canonicalWithDocId)
   } catch (err) {
     return fail(`could not write ${into}: ${err instanceof Error ? err.message : String(err)}`)
   }
-
-  let commitInfo: Record<string, unknown> | null = null
-  const chainPath = chainPathFor(into)
-  if (existsSync(chainPath)) {
-    const author = defaultAuthor()
-    try {
-      const chain = loadChain(readFileSync(chainPath), { actor: author })
-      const currentCanonical = projectDocument(chain.doc())
-      if (currentCanonical === canonical) {
-        commitInfo = { status: 'no-op', reason: 'parsed document matches chain head; nothing to commit' }
-      } else {
-        const message = `import ${component.name} from ${source} (${projected.mode})`
-        const envelope = chain.apply({ author, message }, [{ op: 'replace-document', doc: nextDoc }])
-        writeFileSync(chainPath, chain.save())
-        commitInfo = { status: 'committed', hash: envelope.hash, message, chainPath }
-      }
-    } catch (err) {
-      return fail(`chain commit failed: ${err instanceof Error ? err.message : String(err)}`)
-    }
-  }
+  if (commitFailure) return fail(commitFailure)
 
   return ok({
     source,

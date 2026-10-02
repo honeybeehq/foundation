@@ -248,7 +248,7 @@ export function diffPatch(original: FdnDocument, target: FdnDocument): PatchOp[]
   diffNamed(from.namedStyles, to.namedStyles, (style) => ({ op: 'set-named-style', style }), (name) => ({ op: 'remove-named-style', name }), ops)
   diffNamed(from.components, to.components, (component) => ({ op: 'set-component', component }), (name) => ({ op: 'remove-component', name }), ops)
   diffRecord(from.tokens, to.tokens, (name, value) => ops.push({ op: 'set-token', name, value }))
-  diffBody(from, to, ops)
+  ops.push(...diffNodes(from.body, to.body))
   const beforeAnnotations = new Map(from.annotations.map((a) => [a.id, a]))
   const afterIds = new Set(to.annotations.map((a) => a.id))
   for (const annotation of to.annotations) {
@@ -289,9 +289,10 @@ function needsReplacement(a: FdnNode, b: FdnNode): boolean {
   return a.tag !== b.tag || a.each !== b.each || (a.text !== undefined && b.text === undefined)
 }
 
-function diffBody(from: FdnDocument, to: FdnDocument, ops: PatchOp[]): void {
-  const before = indexNodes(from.body)
-  const after = indexNodes(to.body)
+export function diffNodes(from: FdnNode[], to: FdnNode[]): PatchOp[] {
+  const ops: PatchOp[] = []
+  const before = indexNodes(from)
+  const after = indexNodes(to)
   const kept = new Set<NodeId>()
   const order = new Map<NodeId | null, NodeId[]>([[null, []]])
   const parentOf = new Map<NodeId, NodeId | null>()
@@ -310,7 +311,7 @@ function diffBody(from: FdnDocument, to: FdnDocument, ops: PatchOp[]): void {
       sweep(node.children, node.id)
     }
   }
-  sweep(from.body, null)
+  sweep(from, null)
 
   const hasKeptDescendant = (node: FdnNode): boolean => node.children.some((child) => kept.has(child.id) || hasKeptDescendant(child))
   const place = (nodes: FdnNode[], parent: NodeId | null): void => {
@@ -340,7 +341,8 @@ function diffBody(from: FdnDocument, to: FdnDocument, ops: PatchOp[]): void {
       place(node.children, node.id)
     })
   }
-  place(to.body, null)
+  place(to, null)
+  return ops
 }
 
 function diffNode(a: FdnNode, b: FdnNode, ops: PatchOp[]): void {

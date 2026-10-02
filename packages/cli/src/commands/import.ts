@@ -34,14 +34,15 @@
  * document's current max id BEFORE merging — the same invariant a real
  * hand-edit would get for free from parseDocument's single shared counter.
  */
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
-import { loadChain, parseDocument, projectDocument } from 'foundation-engine'
+import { existsSync, readFileSync } from 'node:fs'
+import { parseDocument, projectDocument } from 'foundation-engine'
 import type { FdnComponent, FdnDocument, FdnLookup, FdnNode, FdnProp } from 'foundation-engine'
 import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
 import { defaultAuthor } from '../identity.js'
 import { injectDocIdAttr, readDocIdAttr } from '../docid.js'
 import { chainPathFor } from './chain.js'
+import { commitDocument, writeAtomic } from '../disk.js'
 
 // ——— lazy foundation-importer loader (computed specifier — see module doc) ———
 
@@ -313,7 +314,24 @@ export async function runImport(args: string[], io: CliIO): Promise<number> {
   const canonical = projectDocument(nextDoc)
   const docId = readDocIdAttr(targetSource)
   const canonicalWithDocId = docId ? injectDocIdAttr(canonical, docId) : canonical
-  writeFileSync(into, canonicalWithDocId, 'utf8')
+
+  const chainPath = chainPathFor(into)
+  let commitLine: string | null = null
+  let commitFailure: string | null = null
+  if (existsSync(chainPath)) {
+    const author = flagString(flags, 'author') ?? defaultAuthor()
+    const message = `import ${component.name} from ${source} (${projected.mode})`
+    try {
+      const commit = commitDocument(chainPath, { author, message }, nextDoc)
+      commitLine =
+        commit.status === 'committed'
+          ? `${chainPath}: committed ${commit.envelope.hash.slice(0, 12)} (${message})`
+          : `${chainPath}: no changes to commit (parsed document matches chain head)`
+    } catch (err) {
+      commitFailure = `chain commit failed: ${err instanceof Error ? err.message : String(err)}`
+    }
+  }
+  writeAtomic(into, canonicalWithDocId)
 
   for (const line of [...projected.report, ...tokenResult.conflicts]) {
     io.stdout(`${line.severity} ${line.code}: ${line.message}`)
@@ -321,25 +339,10 @@ export async function runImport(args: string[], io: CliIO): Promise<number> {
   io.stdout(`mode: ${projected.mode}`)
   io.stdout(`provenance: source=${artifact.provenance.source} sha256=${artifact.provenance.contentSha256}`)
   io.stdout(`${into}: ${existingIndex === -1 ? 'added' : 'replaced'} component "${component.name}" (${projected.mode})`)
-
-  const chainPath = chainPathFor(into)
-  if (existsSync(chainPath)) {
-    const author = flagString(flags, 'author') ?? defaultAuthor()
-    try {
-      const chain = loadChain(readFileSync(chainPath), { actor: author })
-      const currentCanonical = projectDocument(chain.doc())
-      if (currentCanonical === canonical) {
-        io.stdout(`${chainPath}: no changes to commit (parsed document matches chain head)`)
-      } else {
-        const message = `import ${component.name} from ${source} (${projected.mode})`
-        const envelope = chain.apply({ author, message }, [{ op: 'replace-document', doc: nextDoc }])
-        writeFileSync(chainPath, chain.save())
-        io.stdout(`${chainPath}: committed ${envelope.hash.slice(0, 12)} (${message})`)
-      }
-    } catch (err) {
-      io.stderr(`chain commit failed: ${err instanceof Error ? err.message : String(err)}`)
-      return 2
-    }
+  if (commitLine) io.stdout(commitLine)
+  if (commitFailure) {
+    io.stderr(commitFailure)
+    return 2
   }
 
   return 0

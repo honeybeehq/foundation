@@ -115,6 +115,7 @@ import type {
 } from '../types.js'
 import { computeEnvelopeHash, decodeEnvelope, encodeEnvelope, type PackedEnvelope } from './envelope.js'
 import { indexNodes, invertOp, structuralDiff } from './model.js'
+import { diffNodes } from '../patch/index.js'
 import { comparePeerIds, derivePeerId, DeterministicClock, stableStringify } from './util.js'
 import { createHash } from 'node:crypto'
 
@@ -570,9 +571,8 @@ class LoroChain implements FdnChain {
   }
 
   private replaceDocumentContent(doc: FdnDocument): void {
-    for (const root of this.tree.roots() ?? []) this.tree.delete(root.id)
-    this.idToTree.clear()
-    doc.body.forEach((n, i) => this.createSubtree(undefined, i, n))
+    const currentBody = (this.tree.roots() ?? []).map((r) => this.materializeNode(r))
+    for (const op of diffNodes(currentBody, doc.body)) this.applyOp(op)
 
     this.meta.set('specVersion', doc.specVersion)
     this.meta.set('title', doc.title ?? null)

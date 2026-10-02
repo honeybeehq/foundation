@@ -22,12 +22,13 @@
  * `foundation chain init` first — same class of guard as `foundation_annotate`
  * (MCP) uses (see mcp/tools.ts).
  */
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { loadChain, mintAnnotationId, parseDocument } from 'foundation-engine'
 import type { FdnAnnotation, FdnChain } from 'foundation-engine'
 import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
 import { defaultAuthor } from '../identity.js'
+import { writeAtomic } from '../disk.js'
 import { chainPathFor, hasUncommittedEdits, regenerateTextFromChain } from './chain.js'
 
 function loadChainFor(chainPath: string): FdnChain {
@@ -62,7 +63,7 @@ function commitAndSync(
   const chainPath = chainPathFor(file)
   const wasDirty = existsSync(file) && hasUncommittedEdits(file, chain)
   const envelope = chain.apply(meta, ops)
-  writeFileSync(chainPath, chain.save())
+  writeAtomic(chainPath, chain.save())
   if (wasDirty) {
     io.stdout(
       `${file}: has uncommitted edits — not regenerated from the chain (annotation still committed). ` +

@@ -12,7 +12,7 @@
  * for a freshly-skeletoned document without re-deriving the `<file>.chain`
  * naming convention or the create+save dance.
  */
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { randomUUID } from 'node:crypto'
 import { createChain, exportBlobs, importBlobs, loadChain, mergeChains, parseDocument, projectDocument } from 'foundation-engine'
 import type { ChangeMeta, EnvelopeRecord, FdnChain, FdnDocument, OverlapReport, SemanticOp } from 'foundation-engine'
@@ -20,6 +20,7 @@ import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
 import { injectDocIdAttr, readDocIdAttr } from '../docid.js'
 import { defaultAuthor } from '../identity.js'
+import { writeAtomic } from '../disk.js'
 
 export function chainPathFor(file: string): string {
   return `${file}.chain`
@@ -44,7 +45,7 @@ export function writeChainInit(
     return null
   }
   const chain = createChain(doc, meta, opts?.docId ? { docId: opts.docId } : undefined)
-  writeFileSync(chainPath, chain.save())
+  writeAtomic(chainPath, chain.save())
   return { chainPath, head: chain.head() }
 }
 
@@ -102,12 +103,8 @@ async function runChainInitCommand(positionals: string[], flags: Record<string, 
   // `foundation new`) if present, else mint one now and stamp it in —
   // `chain init` is the OTHER place (besides `new`) that guarantees every
   // chain-tracked document has one from here on.
-  let docId = readDocIdAttr(source)
-  if (docId === null) {
-    docId = randomUUID()
-    writeFileSync(file, injectDocIdAttr(source, docId), 'utf8')
-    source = readFileSync(file, 'utf8')
-  }
+  const stampedDocId = readDocIdAttr(source)
+  const docId = stampedDocId ?? randomUUID()
 
   const { doc } = parseDocument(source)
   const author = flagString(flags, 'author') ?? defaultAuthor()
@@ -115,6 +112,7 @@ async function runChainInitCommand(positionals: string[], flags: Record<string, 
 
   const result = writeChainInit(file, doc, { author, message }, io, { docId })
   if (!result) return 2
+  if (stampedDocId === null) writeAtomic(file, injectDocIdAttr(source, docId))
 
   io.stdout(`wrote ${result.chainPath} (head ${result.head.hash.slice(0, 12)})`)
   return 0
@@ -142,7 +140,7 @@ async function runChainAnchor(positionals: string[], io: CliIO): Promise<number>
   }
 
   chain.anchor(name)
-  writeFileSync(chainPath, chain.save())
+  writeAtomic(chainPath, chain.save())
   io.stdout(`${chainPath}: anchored '${name}' at ${chain.head().hash.slice(0, 12)}`)
   return 0
 }
@@ -260,7 +258,7 @@ export function regenerateTextFromChain(file: string, chain: FdnChain, io: CliIO
   let text = projectDocument(chain.doc())
   const docId = chain.docId()
   if (docId) text = injectDocIdAttr(text, docId)
-  writeFileSync(file, text, 'utf8')
+  writeAtomic(file, text)
   io.stdout(`updated ${file} from merged chain`)
 }
 
@@ -310,7 +308,7 @@ async function runChainPull(positionals: string[], io: CliIO): Promise<number> {
   const wasDirty = existsSync(file) && hasUncommittedEdits(file, chain)
   try {
     const { imported, overlaps } = await importBlobs(chain, dir)
-    if (imported > 0) writeFileSync(chainPathFor(file), chain.save())
+    if (imported > 0) writeAtomic(chainPathFor(file), chain.save())
     io.stdout(`${chainPathFor(file)}: pulled ${imported} blob(s) from ${dir}/${chain.docId()}`)
     printOverlaps(overlaps, io)
     reconcileTextAfterPull(file, chain, imported, wasDirty, io)
@@ -332,7 +330,7 @@ async function runChainSync(positionals: string[], io: CliIO): Promise<number> {
   const wasDirty = existsSync(file) && hasUncommittedEdits(file, chain)
   try {
     const { imported, overlaps } = await importBlobs(chain, dir)
-    if (imported > 0) writeFileSync(chainPathFor(file), chain.save())
+    if (imported > 0) writeAtomic(chainPathFor(file), chain.save())
     const { written } = await exportBlobs(chain, dir)
     io.stdout(`${chainPathFor(file)}: synced with ${dir}/${chain.docId()} — pulled ${imported}, pushed ${written}`)
     printOverlaps(overlaps, io)
@@ -375,13 +373,13 @@ async function runChainMerge(positionals: string[], io: CliIO): Promise<number> 
   }
 
   const { merged, overlaps } = mergeChains(ours, theirs)
-  writeFileSync(chainPath, merged)
+  writeAtomic(chainPath, merged)
 
   const mergedChain = loadChain(merged)
   let text = projectDocument(mergedChain.doc())
   const docId = mergedChain.docId()
   if (docId) text = injectDocIdAttr(text, docId)
-  writeFileSync(file, text, 'utf8')
+  writeAtomic(file, text)
 
   io.stdout(`${chainPath}: merged with ${theirsPath} (head ${mergedChain.head().hash.slice(0, 12)}) — rewrote ${file}`)
   printOverlaps(overlaps, io)

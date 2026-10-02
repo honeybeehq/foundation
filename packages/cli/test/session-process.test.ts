@@ -13,6 +13,11 @@ import type { ClientMessage, ServiceMessage } from 'foundation-protocol'
 const HERE = dirname(fileURLToPath(import.meta.url))
 const CLI_ROOT = join(HERE, '..')
 const MAIN_TS = join(CLI_ROOT, 'src', 'main.ts')
+const LAUNCHER = join(CLI_ROOT, 'bin', 'session.mjs')
+const ENTRY_POINTS: [string, string[]][] = [
+  ['source through tsx', ['--import', 'tsx', MAIN_TS]],
+  ['bundled launcher', [LAUNCHER]],
+]
 const BOARD = join(HERE, '..', '..', '..', 'boards', 'tracks-pane.fdn.html')
 
 type Of<T extends ServiceMessage['t']> = Extract<ServiceMessage, { t: T }>
@@ -58,7 +63,7 @@ function firstElement(nodes: FdnNode[]): FdnNode | undefined {
   return undefined
 }
 
-describe('foundation session (real stdio child process)', () => {
+describe.each(ENTRY_POINTS)('foundation session (real stdio child process, %s)', (_name, entry) => {
   let dir: string
   let file: string
   let client: Client
@@ -68,7 +73,7 @@ describe('foundation session (real stdio child process)', () => {
     file = join(dir, 'tracks-pane.fdn.html')
     copyFileSync(BOARD, file)
     copyFileSync(`${BOARD}.chain`, `${file}.chain`)
-    client = new Client(spawn(process.execPath, ['--import', 'tsx', MAIN_TS, 'session', file, '--author', 'user:e2e'], { cwd: CLI_ROOT }))
+    client = new Client(spawn(process.execPath, [...entry, 'session', file, '--author', 'user:e2e'], { cwd: CLI_ROOT }))
   })
 
   afterEach(() => {

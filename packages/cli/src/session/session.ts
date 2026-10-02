@@ -12,16 +12,15 @@ import {
   loadChain,
   normalizeDocument,
   parseDocument,
-  projectDocument,
   stableStringify,
   validateDocument,
 } from 'foundation-engine'
 import type { EnvelopeRecord, FdnChain, FdnDocument, PatchOp, ReportLine } from 'foundation-engine'
 import { parseClientMessage, SESSION_PROTOCOL } from 'foundation-protocol'
 import type { Cause, ClientMessage, DocumentView, FaultCode, ResultCode, ServiceMessage } from 'foundation-protocol'
-import { injectDocIdAttr, readDocIdAttr } from '../docid.js'
+import { readDocIdAttr } from '../docid.js'
 import { skeletonDocumentEmpty, titleFromName } from '../commands/new.js'
-import { readBytesIfPresent, readTextIfPresent, sameBytes, writeAtomic } from './disk.js'
+import { canonicalText, documentText, readBytesIfPresent, readTextIfPresent, sameBytes, writeAtomic } from '../disk.js'
 
 export interface SessionOptions {
   path: string
@@ -57,10 +56,6 @@ const FILE_AUTHOR = 'file'
 
 export function createSession(options: SessionOptions): Session {
   return new DesignSession(options)
-}
-
-export function canonicalText(doc: FdnDocument): string {
-  return projectDocument(normalizeDocument(doc))
 }
 
 class DesignSession implements Session {
@@ -260,11 +255,6 @@ class DesignSession implements Session {
     this.issues = validateDocument(doc).issues
   }
 
-  private renderText(): string {
-    const text = projectDocument(this.doc)
-    return this.docId ? injectDocIdAttr(text, this.docId) : text
-  }
-
   private persist(): void {
     this.persistChain()
     this.persistText()
@@ -280,7 +270,7 @@ class DesignSession implements Session {
 
   private persistText(): void {
     if (this.diskTextCanonical === this.docText && this.diskText !== null) return
-    const text = this.renderText()
+    const text = documentText(this.doc, this.docId)
     writeAtomic(this.path, text)
     this.diskText = text
     this.diskTextCanonical = this.docText

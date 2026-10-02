@@ -6,21 +6,24 @@
  * ingested back to canonical form.
  *
  * `--commit` extends that into the chain (D2): when `<file>.chain` exists,
- * the freshly-parsed document is appended as ONE change — v0's commit grain
- * is whole-document (`replace-document`), not a fine-grained text-diff-to-
- * PatchOp derivation; that finer grain is a recorded follow-up, not this
- * command's job. A no-op ingest (parsed doc canonically identical to the
- * chain's current doc) is detected and the commit is skipped — an empty
- * envelope would be a lie about authorship having happened.
+ * the freshly-parsed document is appended as ONE change, made of the
+ * PatchOps that turn the chain's document into the parsed one (falling back
+ * to `replace-document` when the op vocabulary cannot express the edit). A
+ * no-op ingest (parsed doc canonically identical to the chain's current doc)
+ * is detected and the commit is skipped — an empty envelope would be a lie
+ * about authorship having happened. The chain is written before the text,
+ * both atomically, so a live `foundation session` never sees the new text
+ * without its chain.
  */
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
-import { loadChain, parseDocument, projectDocument, validateDocument } from 'foundation-engine'
+import { existsSync, readFileSync } from 'node:fs'
+import { parseDocument, projectDocument, validateDocument } from 'foundation-engine'
 import type { NormalizationReport } from 'foundation-engine'
 import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
 import { defaultAuthor } from '../identity.js'
 import { injectDocIdAttr, readDocIdAttr } from '../docid.js'
 import { chainPathFor } from './chain.js'
+import { commitDocument, writeAtomic } from '../disk.js'
 
 function summarizeReport(report: NormalizationReport): string {
   if (report.lines.length === 0) return 'no normalization changes'
@@ -66,36 +69,38 @@ export async function runIngest(args: string[], io: CliIO): Promise<number> {
     }
   }
 
-  const changed = canonicalWithDocId !== source
-  writeFileSync(file, canonicalWithDocId, 'utf8')
-  io.stdout(`${file}: ${changed ? 'rewritten to canonical form' : 'already canonical, unchanged'}`)
-
   const result = validateDocument(doc)
   const exitCode = result.valid ? 0 : 1
+  const commitLines: string[] = []
+  let commitFailure: string | null = null
 
   if (flags.commit) {
     const chainPath = chainPathFor(file)
     if (!existsSync(chainPath)) {
-      io.stdout(`${file}: --commit requested but no chain yet — run \`foundation chain init ${file}\` to start tracking changes`)
-      return exitCode
-    }
-
-    const author = flagString(flags, 'author') ?? defaultAuthor()
-    try {
-      const chain = loadChain(readFileSync(chainPath), { actor: author })
-      const currentCanonical = projectDocument(chain.doc())
-      if (currentCanonical === canonical) {
-        io.stdout(`${chainPath}: no changes to commit (parsed document matches chain head)`)
-      } else {
-        const message = flagString(flags, 'm', 'message') ?? (report.lines.length === 0 ? 'ingest' : `ingest — ${summarizeReport(report)}`)
-        const envelope = chain.apply({ author, message }, [{ op: 'replace-document', doc }])
-        writeFileSync(chainPath, chain.save())
-        io.stdout(`${chainPath}: committed ${envelope.hash.slice(0, 12)} (${message})`)
+      commitLines.push(`${file}: --commit requested but no chain yet — run \`foundation chain init ${file}\` to start tracking changes`)
+    } else {
+      const author = flagString(flags, 'author') ?? defaultAuthor()
+      const message = flagString(flags, 'm', 'message') ?? (report.lines.length === 0 ? 'ingest' : `ingest — ${summarizeReport(report)}`)
+      try {
+        const commit = commitDocument(chainPath, { author, message }, doc)
+        commitLines.push(
+          commit.status === 'committed'
+            ? `${chainPath}: committed ${commit.envelope.hash.slice(0, 12)} (${message})`
+            : `${chainPath}: no changes to commit (parsed document matches chain head)`,
+        )
+      } catch (err) {
+        commitFailure = `chain commit failed: ${err instanceof Error ? err.message : String(err)}`
       }
-    } catch (err) {
-      io.stderr(`chain commit failed: ${err instanceof Error ? err.message : String(err)}`)
-      return 2
     }
+  }
+
+  const changed = canonicalWithDocId !== source
+  writeAtomic(file, canonicalWithDocId)
+  io.stdout(`${file}: ${changed ? 'rewritten to canonical form' : 'already canonical, unchanged'}`)
+  for (const line of commitLines) io.stdout(line)
+  if (commitFailure) {
+    io.stderr(commitFailure)
+    return 2
   }
 
   return exitCode

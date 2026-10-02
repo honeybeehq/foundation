@@ -9,6 +9,8 @@
     "foundation-protocol": "workspace:*",
     "foundation-importer": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.30.0",
+    "esbuild": "^0.28.1",
+    "loro-crdt": "^1.13.8",
     "pngjs": "^7.0.0"
   },
   "devDependencies": {
