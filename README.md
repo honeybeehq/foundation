@@ -4,6 +4,17 @@ A methodology and technology for agent-first HTML design iteration: a closed-by-
 HTML subset, a chain-of-changes truth model, first-class components, deterministic
 rendering, and a canonical text projection that freezes into repos.
 
+Foundation is three things:
+
+- **A format:** `.fdn.html` documents and their `.chain` files.
+- **A sync strategy:** the Loro change chain.
+- **A service:** `foundation session`, which speaks the session protocol in
+  [packages/protocol](packages/protocol).
+
+Foundation has no app of its own. The editor is Apiary Next's Design panels
+(`apps/next-desktop-beta/src/plugins/foundation` in `honeybeehq/apiary`), which talk to
+`foundation session` over that protocol. The standalone desktop app is retired.
+
 - **Spec:** [docs/SPEC.md](docs/SPEC.md) — the four one-way doors and the grammar skeleton
 - **PRD:** [docs/PRD.md](docs/PRD.md) — the bet, the layers, the delivery plan
 
@@ -26,7 +37,3 @@ pnpm test          # gauntlet + harness tests
 pnpm spike:chain   # run the full chain gauntlet, writes spikes/chain/RESULTS.md
 pnpm spike:render  # render determinism check, writes spikes/render/RESULTS.md
 ```
-
-For the current desktop application, see [desktop development](packages/desktop/README.md).
-Use the [verification skill](.claude/skills/verify-foundation/SKILL.md) and `pnpm control help`
-to drive a real isolated desktop session and capture evidence.

@@ -7,7 +7,7 @@ scaffolding with intent notes, to be filled as the engine (L1) forces precision.
 Foundation is a methodology and a technology for agent-first HTML design iteration.
 This document is the methodology made checkable: a closed grammar, a truth model, a
 component contract, and a projection rule. Everything else — the engine, the protocol,
-the surfaces, the App — consumes this spec and has no authority over it.
+the surfaces — consumes this spec and has no authority over it.
 
 The name is the thesis. In a hive, *foundation* is the pre-embossed wax sheet placed in a
 frame: it does not build the comb, it constrains where and how comb can be built. An

@@ -22,6 +22,13 @@ What survived the review, expanded, is this: Foundation is not an app. It is a
 **methodology and technology** — a format, an engine, and a protocol for agent-first
 HTML design iteration — on which apps are then built, ours and others'.
 
+**Update 2026-10-03.** Foundation is the format (`.fdn.html` + `.chain`), the
+chain-based sync (the Loro chain) and the `foundation session` service. The editor is
+Apiary Next's Design panels (`apps/next-desktop-beta/src/plugins/foundation` in
+`honeybeehq/apiary`), which speak the session protocol in `packages/protocol`. The
+standalone desktop app is retired, and no Foundation App is planned; the Foundation App
+and Phase D passages below are kept as the original plan.
+
 ## 1. Vision
 
 Bring web and app design into the age of agents: design as a live, addressable,
@@ -74,7 +81,7 @@ editor — everyone else's moat — becomes a replaceable surface on top.
 | **L0** | The spec: subset grammar, chain semantics, embed contract, projection/freeze, render + diff contracts, verbs, conformance suite | `SPEC.md` + fixtures, versioned, public |
 | **L1** | The engine: one TypeScript library — parse, validate, materialize, project, render (pinned), diff, chain ops, component importer (sidecar toolchain) | `@foundation/engine` + `foundation` CLI (thin wrapper) |
 | **L2** | The protocol: chain sync + the agent verb set | MCP server via gateway registration (`~/.hive/gateways/foundation.json`) — every bee on every node gets the verbs with no Apiary in the loop; CLI parity for non-MCP use |
-| **L3** | Surfaces | **Foundation-in-Apiary** first (below); **Foundation App** — our answer to Figma — later, and deliberately so |
+| **L3** | Surfaces | **Foundation-in-Apiary** (below): Apiary Next's Design panels. The standalone **Foundation App** is retired |
 
 **Foundation-in-Apiary** (first real surface): a specialized pane/rail surface — not a
 browser pane — for working on Foundation documents. Agent-first with minimal
@@ -87,9 +94,8 @@ transport and the library index, syn-style), grouped per
 named styles) that member documents inherit, so agents working inside a Product change
 and create styles against a governed system, trivially.
 
-**Foundation App**: the standalone collaborative design application. Explicitly later;
-it has no authority over L0 until the first two consumers (CLI, Apiary surface) have
-shipped and shaped the spec.
+**Foundation App**: the standalone collaborative design application. Retired
+(2026-10-03): the editor is Apiary Next's Design panels, on top of `foundation session`.
 
 **Freeze / crystallization** (strategic centerpiece): `foundation freeze` emits the
 canonical projection + lock header into a repo — frozen design files living next to the
@@ -118,8 +124,8 @@ Product/Bee document grouping over peer sync, Product design-system documents,
 component importer v1 (React first, transparent-first with sealed-capsule fallback;
 ShadCN as the acceptance suite; icons via the same contract).
 
-**Phase D — Foundation App (L3b).** Not scheduled. Earns a PRD of its own once A–C
-have proven the format.
+**Phase D — Foundation App (L3b).** Retired 2026-10-03. The editing surface is Apiary
+Next's Design panels; Foundation ships no app.
 
 **Deferred, explicitly valued — the export engine.** One canonical projection compiled
 one-way into framework idioms: Tailwind, StyleX, JSX/React, Svelte, vanilla CSS. One
