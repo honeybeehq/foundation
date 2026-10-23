@@ -435,10 +435,11 @@ existing protocol shapes. Undo history remains session-local.
 ## 4. Tokens, params, conditionals, data — *skeleton*
 
 Intent: tokens are the preferred, audited value channel (D1 — raw values legal);
-params are the only variability channel. Declarative conditionals (`when` on nodes) and iteration over declared sample
+params drive value variation, declarative conditionals (`when` on nodes), and iteration over declared sample
 data — no expressions beyond comparison and boolean composition; if a design needs more
 logic, that logic belongs in an imported component. Sample data is declared in-document or inherited
 from the design system document, so states are self-contained and renderable headless.
+Named-state subtree scopes additionally select authored state copies as described in §4b.
 To fill: token taxonomy and theming (light/dark as token planes), param types —
 including `enum`, `token`, and structured `list`/`record` shapes (finding b.4: real
 component props are lists, e.g. keyboard chord groups) — state declaration syntax, the
@@ -534,6 +535,44 @@ before persistence; type/name/mode/alias errors leave revision, document and cha
 bytes unchanged. Undo/redo restores prior declarations/attributes and appends
 history as usual. Cross-document libraries, moving/renaming collections and
 broader color syntaxes are outside this slice.
+
+### 4b. Named-state subtree scopes (2026-10-23)
+
+`data-fdn-state="name"` on a template element scopes that element and its
+descendants to one named document state. When baking a named state, an unmarked
+element is included normally; a marked element is included only when its marker
+exactly equals the requested state name. The marker is a literal, case-sensitive
+single name: it is not trimmed, interpolated, or split into a list. Existing
+validation warns about undeclared names, including the empty name.
+
+With no state selected, all scopes remain visible as the existing stacked
+overview. An unknown requested state still reports `unknown-state` and uses
+parameter defaults; subtree scopes match that requested name exactly. A marker
+for an undeclared or empty name is therefore excluded from every valid named
+state, but remains visible in the overview.
+
+Scoping happens before evaluating `each`, `when`, component expansion or child
+content. Matching scopes still obey `when` and iteration normally. Nested scopes
+must all match: a different inner state cannot escape an excluded outer scope.
+Unmarked wrappers remain even when all their children are excluded, so their CSS
+can retain space. `data-fdn-viewport` does not filter content.
+
+The same selected state follows native component definitions, `fdn-fill`
+containers and caller slot content. Slot filling keeps its existing fallback:
+when no baked fill content remains, the slot's default children are baked in the
+selected state. A marker on `fdn-use` also gates a sealed component; sealed HTML remains
+opaque and markers inside that HTML are not interpreted. Component master bakes
+use the unscoped overview. Normal, editor, session and render bakes share this
+selection rule. Markers on regular emitted elements are retained in baked HTML;
+component wrappers keep their existing attribute emission rules.
+
+Excluded nodes remain in the document and can still be edited by id. They do not
+appear in the selected state's editor HTML or render layout report; callers must
+measure the chosen rendered state. Excluded subtrees are not evaluated, so their
+interpolation, style and other conformance reports are absent. Token-use audits
+also reflect only included content; a token used only in another scope can be
+reported unused. Document validation and canonical projection remain unfiltered;
+changing the previewed state does not mutate the document or chain.
 
 ## 5. Render contract — *skeleton*
 

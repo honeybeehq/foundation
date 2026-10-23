@@ -49,6 +49,7 @@ const STATE_STYLE_KEYS: StateStyleKey[] = ['hover', 'focus', 'active', 'disabled
 
 interface BakeCtx extends ExprContext {
   doc: FdnDocument
+  selectedState: string | null
   componentStack: string[]
   slotFills?: Record<string, FdnNode[]>
   reports: ReportLine[]
@@ -198,6 +199,7 @@ function bakeTree(doc: FdnDocument, stateName: string | null, editor: boolean): 
 
   const ctx: BakeCtx = {
     doc,
+    selectedState: stateName,
     bindings: { prop: {}, param: params },
     lookups: doc.lookups,
     componentStack: [],
@@ -265,7 +267,13 @@ function dedupeReports(lines: ReportLine[]): ReportLine[] {
 
 // ——— each / when / dispatch ———
 
+function matchesStateScope(node: FdnNode, state: string | null): boolean {
+  const scope = node.attrs['data-fdn-state']
+  return state === null || scope === undefined || scope === state
+}
+
 function bakeNode(node: FdnNode, ctx: BakeCtx): FdnNode[] {
+  if (!matchesStateScope(node, ctx.selectedState)) return []
   if (node.each) {
     return bakeEach(node, ctx)
   }
@@ -761,7 +769,7 @@ function instantiateComponent(node: FdnNode, ctx: BakeCtx): FdnNode[] {
 
   const slotFills: Record<string, FdnNode[]> = {}
   for (const child of node.children) {
-    if (child.tag === 'fdn-fill') {
+    if (child.tag === 'fdn-fill' && matchesStateScope(child, ctx.selectedState)) {
       const slotName = child.attrs['slot'] ?? 'default'
       const baked = child.children.flatMap((c) => bakeNode(c, ctx))
       slotFills[slotName] = (slotFills[slotName] ?? []).concat(baked)
