@@ -102,6 +102,7 @@ import type {
   FdnComponent,
   FdnDataSet,
   FdnDocument,
+  FdnTokenCollection,
   FdnLookup,
   FdnNamedStyle,
   FdnNode,
@@ -121,7 +122,7 @@ import { createHash } from 'node:crypto'
 
 const STATE_KEYS: StateStyleKey[] = ['hover', 'focus', 'active', 'disabled']
 
-type KeyedSection = 'params' | 'data' | 'lookups' | 'states' | 'viewports' | 'namedStyles' | 'components'
+type KeyedSection = 'tokenCollections' | 'params' | 'data' | 'lookups' | 'states' | 'viewports' | 'namedStyles' | 'components'
 
 type Frontier = { peer: PeerID; counter: number }[]
 
@@ -179,6 +180,7 @@ class LoroChain implements FdnChain {
   private tree: LoroTree
   private meta: LoroMap
   private tokens: LoroMap
+  private tokenCollections: LoroMap
   private params: LoroMap
   private data: LoroMap
   private lookups: LoroMap
@@ -218,6 +220,7 @@ class LoroChain implements FdnChain {
     this.tree = this.loro.getTree('tree')
     this.meta = this.loro.getMap('meta')
     this.tokens = this.loro.getMap('tokens')
+    this.tokenCollections = this.loro.getMap('tokenCollections')
     this.params = this.loro.getMap('params')
     this.data = this.loro.getMap('data')
     this.lookups = this.loro.getMap('lookups')
@@ -466,6 +469,14 @@ class LoroChain implements FdnChain {
         this.treeNodeOf(op.id).data.set('when', op.when)
         break
       }
+      case 'set-token-collection': {
+        this.setKeyed('tokenCollections', this.tokenCollections, op.collection.name, op.collection, op.index)
+        break
+      }
+      case 'remove-token-collection': {
+        this.removeKeyed('tokenCollections', this.tokenCollections, op.name)
+        break
+      }
       case 'set-token': {
         if (op.value === null) this.tokens.delete(op.name)
         else this.tokens.set(op.name, op.value)
@@ -580,6 +591,7 @@ class LoroChain implements FdnChain {
     this.meta.set('title', doc.title ?? null)
 
     this.replaceScalarMap(this.tokens, doc.tokens)
+    if (doc.tokenCollections?.length || this.tokenCollections.size > 0) this.replaceKeyedMap('tokenCollections', this.tokenCollections, doc.tokenCollections ?? [], (item) => item.name)
     this.replaceKeyedMap('params', this.params, doc.params, (p) => p.name)
     this.replaceKeyedMap('data', this.data, doc.data, (d) => d.name)
     this.replaceKeyedMap('lookups', this.lookups, doc.lookups, (l) => l.name)
@@ -641,6 +653,7 @@ class LoroChain implements FdnChain {
       specVersion: (this.meta.get('specVersion') as string | undefined) ?? '',
       ...(title != null ? { title } : {}),
       tokens: this.mapToRecord(this.tokens),
+      ...(this.tokenCollections.size > 0 ? { tokenCollections: this.keyedValues<FdnTokenCollection>('tokenCollections', this.tokenCollections) } : {}),
       params: this.keyedValues<FdnParam>('params', this.params),
       data: this.keyedValues<FdnDataSet>('data', this.data),
       lookups: this.keyedValues<FdnLookup>('lookups', this.lookups),

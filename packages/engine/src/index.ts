@@ -19,3 +19,5 @@ export { applyPatch, diffPatch, normalizeDocument } from './patch/index.js'
 export type { PatchError, PatchErrorCode, PatchResult } from './patch/index.js'
 export { invertOp, indexNodes } from './chain/model.js'
 export { stableStringify } from './chain/util.js'
+
+export { validateTokenCollections } from './tokens/index.js'

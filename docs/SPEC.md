@@ -359,6 +359,93 @@ are inert without a way into text and attribute values), and a bounded value-map
 primitive (open question 9; finding b.2: enum→style mapping via N `when` branches
 scales linearly and badly).
 
+### 4a. Typed token collections and modes (2026-10-23)
+
+Flat `doc.tokens` remain unchanged. A document may additionally declare
+`tokenCollections: {name, modes, tokens}[]`. A collection's ordered, nonempty mode
+list defines its default as the first mode. Each token is `{name,type,values}`,
+where type is `color`, `number`, `string`, or `boolean`, and values has exactly one
+entry per mode. Values are typed literals or `{alias:tokenName}`. Names of tokens
+are global CSS custom-property names without the leading `--`, unique across flat
+tokens and all collections; grouping a token does not change its CSS identity.
+Collection names match `[a-z][a-z0-9-]*`; mode names match
+`[A-Za-z][A-Za-z0-9_-]*` and are case-sensitive. Token names use CSS-safe identifiers
+`[A-Za-z_][A-Za-z0-9_-]*`.
+
+Color literals in this slice use CSS hex (#rgb, #rgba, #rrggbb, #rrggbbaa) or
+`transparent`. Numbers are finite, unitless JSON numbers; a dimensional use can
+spell `calc(var(--gap) * 1px)`. Strings are literal strings without NUL, emitted as escaped CSS
+quoted strings; booleans emit `true` or `false`. An alias must refer to a declared
+same-type token. Canonical compatible flat values (hex color, finite numeric
+literal, boolean, quoted string, or an alias to one) may also be alias targets.
+Unclassified legacy CSS values are not silently assigned a type. Flat-only
+legacy documents keep their existing grammar and bake bytes.
+
+The canonical metadata lives in the hidden `fdn-doc` header, for example:
+
+```html
+<fdn-token-collection name="theme" modes="Light,Dark">
+  <fdn-token name="surface" type="color">
+    <fdn-token-value mode="Light" value="#ffffff"></fdn-token-value>
+    <fdn-token-value mode="Dark" alias="ink"></fdn-token-value>
+  </fdn-token>
+</fdn-token-collection>
+```
+
+Literal number/boolean/string value attributes use JSON primitive spelling (strings are JSON-quoted). The metadata
+is document truth. Projection adds a derived `style[data-fdn-token-modes]` block
+for direct browser rendering; parsing discards that generated block and
+regenerates it from metadata. It is not an authored stylesheet escape hatch.
+Documents without collections emit no new block and bake byte-identically.
+
+A frame/section selects each collection independently with an ordinary attribute,
+for example `data-fdn-mode-theme="Dark"`. Selection is inherited by descendants;
+a nested explicit selection wins for that collection. With no selection, the
+first mode applies. Clearing selection resumes inheritance. Mode selection is
+document truth; choosing an editor preview mode without authoring an attribute
+is workspace state and does not alter export.
+
+Bake/export emit plain CSS custom properties with native `@scope` rules, with
+identical selectors at each mode boundary and defaults scoped to `:root`. Values
+are declared at each element in the scope so aliases resolve in that element's
+current mode context, including aliases between collections and flat aliases to
+collection tokens. This avoids inherited aliases freezing at an ancestor's mode.
+Per-element mode rules may reset an inherited inline custom-property override on descendants; author a mode selection to scope collection values through a subtree. The output targets a full document/iframe, as the existing flat :root tokens do; shadow-root embedding requires an adapter.
+Generated scoped rules are a sanctioned derived form; arbitrary authored
+selectors/at-rules remain outside D1. Rendering requires native CSS scope support
+(as provided by Foundation's pinned Chromium); there is no injected mode runtime.
+Aliases that cycle in any simultaneously selectable combination of modes are
+refused by validation, patch/session commits and bake. Invalid metadata emits no active mode CSS in projection. Invalid external token edits are preserved on disk and reported as faults; session commits are blocked until the file is repaired. Repair is interpreted as a new file edit against the current model; a stale repaired file can supersede chain changes merged while the file was invalid. Edges in mutually exclusive
+modes of one collection do not constitute a cycle.
+
+Session operations use the normal commit batch and standard results:
+
+- `create-token-collection {name,modes}` creates an empty collection.
+- `add-token-mode {collection,name,from?}` appends a mode with values copied from
+  the named source mode, defaulting to the first mode.
+- `rename-token-mode {collection,name,newName}` preserves position/values and
+  updates explicit body and component-template selections in the same batch.
+- `remove-token-mode {collection,name}` removes its values, refusing the last mode
+  or a mode still explicitly selected. Clear/switch selections first, optionally
+  in that same commit. Removing the first mode makes the next mode the default.
+- `set-mode-token {collection,name,type?,mode,value}` changes one value. A new
+  token requires a type and initializes every mode with that value; subsequent
+  edits customize modes. This verb cannot change an existing type; a full,
+  validated collection update may do so.
+- `set-collection-mode {id,collection,mode}` sets a body frame/section's mode;
+  `mode:null` clears it.
+
+These expand to keyed `set-token-collection {collection,index?}` and
+`remove-token-collection {name}`, plus ordinary attribute/component patches.
+Collection primitives have typed inverses; they never replace the document.
+One commit is one undo step. The guarded inverse owns the affected collection
+object, so a competing edit in that same collection may conflict; unrelated
+collections and flat tokens are independent. Candidate batches are validated
+before persistence; type/name/mode/alias errors leave revision, document and chain
+bytes unchanged. Undo/redo restores prior declarations/attributes and appends
+history as usual. Cross-document libraries, moving/renaming collections and
+broader color syntaxes are outside this slice.
+
 ## 5. Render contract — *skeleton*
 
 Intent: pixel output is a pure function of (projection hash × render-config hash).

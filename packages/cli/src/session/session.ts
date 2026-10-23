@@ -1,4 +1,5 @@
-import { expandPlacement, PlacementError } from './placement.js'
+import { PlacementError } from './placement.js'
+import { expandSessionOps } from './token-modes.js'
 import { randomUUID } from 'node:crypto'
 import { existsSync, mkdirSync, statSync, watch, type FSWatcher } from 'node:fs'
 import { basename, dirname, resolve } from 'node:path'
@@ -15,6 +16,7 @@ import {
   parseDocument,
   stableStringify,
   validateDocument,
+  validateTokenCollections,
 } from 'foundation-engine'
 import type { EnvelopeRecord, FdnChain, FdnDocument, PatchOp, ReportLine } from 'foundation-engine'
 import { parseClientMessage, SESSION_PROTOCOL } from 'foundation-protocol'
@@ -76,6 +78,7 @@ class DesignSession implements Session {
   private rev = 0
   private undoStack: Step[] = []
   private redoStack: Step[] = []
+  private invalidExternalTokens: string | null = null
   private diskText: string | null = null
   private diskTextCanonical: string | null = null
   private diskChain: Uint8Array | null = null
@@ -188,6 +191,7 @@ class DesignSession implements Session {
       created,
       ...this.documentView(),
     })
+    if (this.invalidExternalTokens) this.fault('unreadable', this.invalidExternalTokens, null)
     if (this.options.watch !== false) this.startWatching()
     this.sendBakes()
   }
@@ -215,6 +219,12 @@ class DesignSession implements Session {
     this.diskTextCanonical = canonicalText(incoming)
     this.diskChain = chainBytes
     this.docId = this.chain?.docId() ?? readDocIdAttr(text)
+    const issue = validateTokenCollections(incoming)[0]
+    if (issue) {
+      this.invalidExternalTokens = `external token metadata is invalid; source preserved and commits blocked until repaired: ${issue.message}`
+      this.setDoc(this.chain ? this.chain.doc() : normalizeDocument(incoming))
+      return false
+    }
     if (!this.chain) {
       this.setDoc(normalizeDocument(incoming))
       return false
@@ -270,6 +280,7 @@ class DesignSession implements Session {
   }
 
   private persistText(): void {
+    if (this.invalidExternalTokens) return
     if (this.diskTextCanonical === this.docText && this.diskText !== null) return
     const text = documentText(this.doc, this.docId)
     writeAtomic(this.path, text)
@@ -310,16 +321,24 @@ class DesignSession implements Session {
       this.log(`ignoring unreadable ${this.path}: ${err instanceof Error ? err.message : String(err)}`)
     }
     if (text !== null && text !== this.diskText) {
-      const base = this.diskText === null ? this.doc : parseDocument(this.diskText).doc
+      const base = this.invalidExternalTokens || this.diskText === null ? this.doc : parseDocument(this.diskText).doc
       const incoming = parseDocument(text).doc
       const incomingCanonical = canonicalText(incoming)
       const baseCanonical = this.diskTextCanonical
       this.diskText = text
       this.diskTextCanonical = incomingCanonical
-      if (incomingCanonical !== baseCanonical && incomingCanonical !== this.docText) {
-        if (this.ingest(base, incoming)) {
-          chainAhead = true
-          author = FILE_AUTHOR
+      const issue = validateTokenCollections(incoming)[0]
+      if (issue) {
+        const message = `external token metadata is invalid; source preserved and commits blocked until repaired: ${issue.message}`
+        if (this.invalidExternalTokens !== message) this.fault('unreadable', message, null)
+        this.invalidExternalTokens = message
+      } else {
+        this.invalidExternalTokens = null
+        if (incomingCanonical !== baseCanonical && incomingCanonical !== this.docText) {
+          if (this.ingest(base, incoming)) {
+            chainAhead = true
+            author = FILE_AUTHOR
+          }
         }
       }
     }
@@ -332,7 +351,12 @@ class DesignSession implements Session {
   private ingest(base: FdnDocument, incoming: FdnDocument): boolean {
     const ops = diffPatch(base, incoming)
     const patch = ops === null ? applyPatch(this.doc, [{ op: 'replace-document', doc: incoming }]) : applyPatch(this.doc, ops, { lenient: true })
-    if (!patch.ok || patch.applied.length === 0) return false
+    if (!patch.ok) {
+      this.invalidExternalTokens = `external changes cannot be applied; source preserved and commits blocked until repaired: ${patch.error.message}`
+      if (this.phase === 'open') this.fault('unreadable', this.invalidExternalTokens, null)
+      return false
+    }
+    if (patch.applied.length === 0) return false
     if (this.chain) {
       this.chain.apply({ author: FILE_AUTHOR, message: 'ingest' }, patch.applied)
       this.setDoc(this.chain.doc())
@@ -348,7 +372,7 @@ class DesignSession implements Session {
     if (message.base > this.rev) return this.reject(message.id, { code: 'invalid-op', message: `base ${message.base} is ahead of rev ${this.rev}` })
     let ops: PatchOp[]
     try {
-      ops = expandPlacement(this.doc, message.ops)
+      ops = expandSessionOps(this.doc, message.ops)
     } catch (err) {
       return this.reject(message.id, { code: err instanceof PlacementError ? err.code : 'invalid-op', message: err instanceof Error ? err.message : String(err) })
     }
@@ -382,6 +406,7 @@ class DesignSession implements Session {
   }
 
   private record(ops: PatchOp[], message: string): Failure | null {
+    if (this.invalidExternalTokens) return { code: 'invalid-op', message: this.invalidExternalTokens }
     const snapshot = this.chain?.save() ?? null
     const previous = { doc: this.doc, docId: this.docId }
     try {

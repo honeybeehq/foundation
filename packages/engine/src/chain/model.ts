@@ -109,6 +109,14 @@ export function invertOp(
       if (!loc) return 'fallback'
       return { op: 'set-when', id: op.id, when: loc.node.when ?? null }
     }
+    case 'set-token-collection': {
+      const prev = beforeDoc.tokenCollections?.find((item) => item.name === op.collection.name)
+      return prev ? { op: 'set-token-collection', collection: prev, ...(op.index === undefined ? {} : { index: beforeDoc.tokenCollections!.indexOf(prev) }) } : { op: 'remove-token-collection', name: op.collection.name }
+    }
+    case 'remove-token-collection': {
+      const prev = beforeDoc.tokenCollections?.find((item) => item.name === op.name)
+      return prev ? { op: 'set-token-collection', collection: prev, index: beforeDoc.tokenCollections!.indexOf(prev) } : null
+    }
     case 'set-token': {
       const prev = beforeDoc.tokens[op.name] ?? null
       return { op: 'set-token', name: op.name, value: prev }
@@ -238,6 +246,7 @@ function diffSections(a: FdnDocument, b: FdnDocument, out: SemanticOp[]): void {
   for (const name of tokenNames) {
     if (a.tokens[name] !== b.tokens[name]) out.push({ op: 'section-changed', section: 'tokens', name })
   }
+  diffKeyedSection('tokenCollections', a.tokenCollections ?? [], b.tokenCollections ?? [], (item) => item.name, out)
   diffKeyedSection<FdnParam>('params', a.params, b.params, (p) => p.name, out)
   diffKeyedSection<FdnDataSet>('data', a.data, b.data, (d) => d.name, out)
   diffKeyedSection<FdnLookup>('lookups', a.lookups, b.lookups, (l) => l.name, out)

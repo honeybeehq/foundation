@@ -20,6 +20,9 @@ import type {
   FdnComponent,
   FdnDataSet,
   FdnDocument,
+  FdnTokenCollection,
+  FdnTokenValue,
+  FdnTokenType,
   FdnLookup,
   FdnNamedStyle,
   FdnNode,
@@ -665,6 +668,7 @@ function parseStylesheet(
   }
   if (!headEl) return { tokens, classStyles }
   for (const styleEl of directChildrenByTag(headEl, 'style')) {
+    if ('data-fdn-token-modes' in attrsOf(styleEl)) continue
     const css = directTextOf(styleEl)
     for (const rule of splitTopLevelRules(css)) {
       if (rule.selector === ':root') {
@@ -946,6 +950,30 @@ function parseComponents(body: ElementNode, ctx: ConvertCtx): FdnComponent[] {
 // main entry
 // ——————————————————————————————————————————————————————————————————————————
 
+function parseTokenCollections(header: ElementNode): FdnTokenCollection[] {
+  return directChildrenByTag(header, 'fdn-token-collection').map((element) => {
+    const attrs = attrsOf(element)
+    return {
+      name: attrs.name ?? '', modes: (attrs.modes ?? '').split(',').map((mode) => mode.trim()).filter(Boolean),
+      tokens: directChildrenByTag(element, 'fdn-token').map((element) => {
+        const attrs = attrsOf(element)
+        const type = (attrs.type ?? '') as FdnTokenType
+        const values: Record<string, FdnTokenValue> = {}
+        for (const entry of directChildrenByTag(element, 'fdn-token-value')) {
+          const value = attrsOf(entry)
+          let literal: FdnTokenValue = value.value ?? ''
+          if (value.alias !== undefined) literal = { alias: value.alias }
+          else if (type === 'number' || type === 'boolean' || (type === 'string' && value.value?.startsWith('"'))) {
+            try { literal = JSON.parse(value.value ?? '') as FdnTokenValue } catch {}
+          }
+          values[value.mode ?? ''] = literal
+        }
+        return { name: attrs.name ?? '', type, values }
+      }),
+    }
+  })
+}
+
 export function parseDocument(html: string): { doc: FdnDocument; report: NormalizationReport } {
   const lines: ReportLine[] = []
   const normalizedHtml = normalizeSelfClosingFdnTags(html, lines)
@@ -964,6 +992,7 @@ export function parseDocument(html: string): { doc: FdnDocument; report: Normali
   let params: FdnParam[] = []
   let data: FdnDataSet[] = []
   let lookups: FdnLookup[] = []
+  let tokenCollections: FdnTokenCollection[] = []
   let states: FdnState[] = []
   let viewports: FdnViewport[] = []
   let matrix: { state: string; viewport: string }[] = []
@@ -982,6 +1011,7 @@ export function parseDocument(html: string): { doc: FdnDocument; report: Normali
     params = parseParams(fdnDoc)
     data = parseDataSets(fdnDoc)
     lookups = parseLookups(fdnDoc)
+    tokenCollections = parseTokenCollections(fdnDoc)
     states = parseStates(fdnDoc, params)
     const m = parseMatrix(fdnDoc)
     viewports = m.viewports
@@ -1044,6 +1074,7 @@ export function parseDocument(html: string): { doc: FdnDocument; report: Normali
   const doc: FdnDocument = {
     specVersion,
     tokens,
+    ...(tokenCollections.length ? { tokenCollections } : {}),
     params,
     data,
     lookups,

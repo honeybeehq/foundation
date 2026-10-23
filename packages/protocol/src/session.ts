@@ -31,10 +31,20 @@ export type PlacementOp =
   | { op: 'set-placement'; id: string; mode: 'free'; bounds: { x: number; y: number; width: number; height: number } }
   | { op: 'set-placement'; id: string; mode: 'flow' }
 
+export type TokenModeOp =
+  | { op: 'create-token-collection'; name: string; modes: string[] }
+  | { op: 'add-token-mode'; collection: string; name: string; from?: string }
+  | { op: 'rename-token-mode'; collection: string; name: string; newName: string }
+  | { op: 'remove-token-mode'; collection: string; name: string }
+  | { op: 'set-mode-token'; collection: string; name: string; type?: import('./document.ts').FdnTokenType; mode: string; value: import('./document.ts').FdnTokenValue }
+  | { op: 'set-collection-mode'; id: string; collection: string; mode: string | null }
+
+export type SessionOp = PatchOp | PlacementOp | TokenModeOp
+
 export type ClientMessage =
   | { t: 'hello'; protocol: string; client: string; author: string }
   | { t: 'view'; states: Array<string | null>; components: boolean }
-  | { t: 'commit'; id: string; base: number; ops: Array<PatchOp | PlacementOp>; label: string }
+  | { t: 'commit'; id: string; base: number; ops: SessionOp[]; label: string }
   | { t: 'undo'; id: string }
   | { t: 'redo'; id: string }
   | { t: 'log'; id: string; limit: number }
@@ -118,10 +128,14 @@ const isAnnotation = shape({
   text: isString,
   status: isAnnotationStatus,
 })
+const isTokenType = oneOf(['color', 'number', 'string', 'boolean'])
+const isTokenValue: Check = (value) => isString(value) || isNumber(value) || isBoolean(value) || shape({ alias: isString })(value)
+const isTokenCollection = shape({ name: isString, modes: arrayOf(isString), tokens: arrayOf(shape({ name: isString, type: isTokenType, values: recordOf(isTokenValue) })) })
 const isDocument = shape({
   specVersion: isString,
   title: optional(isString),
   tokens: isStringMap,
+  tokenCollections: optional(arrayOf(isTokenCollection)),
   params: arrayOf(isParam),
   data: arrayOf(isDataSet),
   lookups: arrayOf(isLookup),
@@ -143,6 +157,8 @@ const PATCH_OPS: Record<PatchOp['op'], Check> = {
   'set-style-ref': shape({ id: isString, styleRef: nullable(isString) }),
   'set-text': shape({ id: isString, text: isString }),
   'set-when': shape({ id: isString, when: nullable(isString) }),
+  'set-token-collection': shape({ collection: isTokenCollection, index: optional(isCount) }),
+  'remove-token-collection': shape({ name: isString }),
   'set-token': shape({ name: isString, value: nullable(isString) }),
   'set-named-style': shape({ style: isNamedStyle }),
   'remove-named-style': shape({ name: isString }),
@@ -168,10 +184,20 @@ const isPlacementOp: Check = (value) => isRecord(value) && typeof value.op === '
 
 const isPatchOp: Check = (value) => isRecord(value) && typeof value.op === 'string' && Object.hasOwn(PATCH_OPS, value.op) && PATCH_OPS[value.op as PatchOp['op']](value)
 
+const TOKEN_MODE_OPS: Record<TokenModeOp['op'], Check> = {
+  'create-token-collection': shape({ name: isString, modes: arrayOf(isString) }),
+  'add-token-mode': shape({ collection: isString, name: isString, from: optional(isString) }),
+  'rename-token-mode': shape({ collection: isString, name: isString, newName: isString }),
+  'remove-token-mode': shape({ collection: isString, name: isString }),
+  'set-mode-token': shape({ collection: isString, name: isString, type: optional(isTokenType), mode: isString, value: isTokenValue }),
+  'set-collection-mode': shape({ id: isString, collection: isString, mode: nullable(isString) }),
+}
+const isTokenModeOp: Check = (value) => isRecord(value) && typeof value.op === 'string' && Object.hasOwn(TOKEN_MODE_OPS, value.op) && TOKEN_MODE_OPS[value.op as TokenModeOp['op']](value)
+
 const CLIENT_MESSAGES: Record<ClientMessage['t'], Check> = {
   hello: shape({ protocol: isString, client: isString, author: isString }),
   view: shape({ states: arrayOf(nullable(isString)), components: isBoolean }),
-  commit: shape({ id: isString, base: isCount, ops: arrayOf((value) => isPatchOp(value) || isPlacementOp(value)), label: isString }),
+  commit: shape({ id: isString, base: isCount, ops: arrayOf((value) => isPatchOp(value) || isPlacementOp(value) || isTokenModeOp(value)), label: isString }),
   undo: shape({ id: isString }),
   redo: shape({ id: isString }),
   log: shape({ id: isString, limit: isCount }),

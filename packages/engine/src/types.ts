@@ -44,6 +44,11 @@ export interface FdnNode {
 export type FdnParamType =
   | 'string' | 'number' | 'boolean' | 'enum' | 'token' | 'list' | 'record'
 
+export type FdnTokenType = 'color' | 'number' | 'string' | 'boolean'
+export type FdnTokenValue = string | number | boolean | { alias: string }
+export interface FdnToken { name: string; type: FdnTokenType; values: Record<string, FdnTokenValue> }
+export interface FdnTokenCollection { name: string; modes: string[]; tokens: FdnToken[] }
+
 export interface FdnParam {
   name: string
   type: FdnParamType
@@ -125,6 +130,7 @@ export interface FdnDocument {
   title?: string
   /** :root custom properties — the token layer. */
   tokens: Record<string, string>
+  tokenCollections?: FdnTokenCollection[]
   params: FdnParam[]
   data: FdnDataSet[]
   lookups: FdnLookup[]
@@ -219,6 +225,8 @@ export type PatchOp =
   | { op: 'set-style-ref'; id: NodeId; styleRef: string | null }
   | { op: 'set-text'; id: NodeId; text: string }
   | { op: 'set-when'; id: NodeId; when: string | null }
+  | { op: 'set-token-collection'; collection: FdnTokenCollection; index?: number }
+  | { op: 'remove-token-collection'; name: string }
   | { op: 'set-token'; name: string; value: string | null }
   | { op: 'set-named-style'; style: FdnNamedStyle }
   | { op: 'remove-named-style'; name: string }
@@ -243,7 +251,7 @@ export type SemanticOp =
   | { op: 'set-text'; id: NodeId; text: string }
   | { op: 'set-style-ref'; id: NodeId; styleRef: string | null }
   | { op: 'set-when'; id: NodeId; when: string | null }
-  | { op: 'section-changed'; section: 'tokens' | 'params' | 'data' | 'lookups' | 'states' | 'viewports' | 'matrix' | 'namedStyles' | 'components' | 'meta' | 'annotations'; name: string }
+  | { op: 'section-changed'; section: 'tokens' | 'tokenCollections' | 'params' | 'data' | 'lookups' | 'states' | 'viewports' | 'matrix' | 'namedStyles' | 'components' | 'meta' | 'annotations'; name: string }
 
 export type AnchorRef = string
 

@@ -12,6 +12,7 @@
  * always gets an explicit `<tag>…</tag>`, even when empty.
  */
 import type { FdnAnnotation, FdnComponent, FdnDocument, FdnNamedStyle, FdnNode, StateStyleKey } from '../types.js'
+import { collectionCss, isTokenAlias } from '../tokens/index.js'
 import { serializeDeclarations } from '../parse/style.js'
 import { STATE_STYLE_ATTRS } from '../grammar/schema.js'
 
@@ -143,6 +144,23 @@ function emitFdnDoc(w: Writer, depth: number, doc: FdnDocument): void {
   const boolAttrs = attrs.map(([k, v]) => (v === '' ? k : `${k}="${escapeAttr(v)}"`)).join(' ')
   w.push(depth, `<fdn-doc ${boolAttrs}>`)
   let wroteAny = false
+
+  for (const collection of doc.tokenCollections ?? []) {
+    emitElement(w, depth + 1, 'fdn-token-collection', [['name', collection.name], ['modes', collection.modes.join(',')]], (childDepth) => {
+      for (const token of collection.tokens) {
+        emitElement(w, childDepth, 'fdn-token', [['name', token.name], ['type', token.type]], (valueDepth) => {
+          for (const mode of collection.modes) {
+            const value = token.values[mode]
+            if (value === undefined) continue
+            emitElement(w, valueDepth, 'fdn-token-value', [['mode', mode], isTokenAlias(value) ? ['alias', value.alias] : ['value', token.type === 'string' && typeof value === 'string' ? JSON.stringify(value) : String(value)]], null)
+          }
+          return collection.modes.length > 0
+        })
+      }
+      return collection.tokens.length > 0
+    })
+    wroteAny = true
+  }
 
   if (doc.params.length > 0) {
     w.push(depth + 1, '<fdn-params>')
@@ -349,6 +367,12 @@ function emitTokens(w: Writer, doc: FdnDocument): void {
   }
   w.push(1, '}')
   w.push(0, '</style>')
+  const modes = collectionCss(doc)
+  if (modes.length) {
+    w.push(0, '<style data-fdn-token-modes>')
+    for (const line of modes) w.push(1, line)
+    w.push(0, '</style>')
+  }
 }
 
 // ——————————————————————————————————————————————————————————————————————————

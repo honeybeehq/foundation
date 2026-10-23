@@ -22,6 +22,7 @@
  *       the walk itself depends on report contents.
  */
 
+import { validateTokenCollections } from '../tokens/index.js'
 import type {
   ConformanceReport,
   FdnComponent,
@@ -64,18 +65,24 @@ function pushReport(ctx: BakeCtx, line: ReportLine): void {
 }
 
 export function bakeDocument(doc: FdnDocument, opts?: { state?: string }): { html: string; tree: FdnNode[]; state: string | null; report: ConformanceReport } {
+  const issue = validateTokenCollections(doc)[0]
+  if (issue) throw new Error(issue.message)
   const stateName = opts?.state ?? null
   const { tree, capsuleCss, report } = bakeTree(doc, stateName, false)
   return { html: emitHtml(doc, tree, capsuleCss), tree, state: stateName, report }
 }
 
 export function bakeEditorDocument(doc: FdnDocument, opts?: { state?: string }): { html: string; tree: FdnNode[]; state: string | null; report: ConformanceReport } {
+  const issue = validateTokenCollections(doc)[0]
+  if (issue) throw new Error(issue.message)
   const stateName = opts?.state ?? null
   const { tree, capsuleCss, report } = bakeTree(doc, stateName, true)
   return { html: emitEditorHtml(doc, tree, capsuleCss), tree, state: stateName, report }
 }
 
 export function bakeEditorComponent(doc: FdnDocument, name: string): { html: string; tree: FdnNode[]; report: ConformanceReport } {
+  const issue = validateTokenCollections(doc)[0]
+  if (issue) throw new Error(issue.message)
   const component = doc.components.find((c) => c.name === name)
   const samples = component && !component.sealed ? sampleProps(component) : {}
   const sampled = Object.keys(samples)
@@ -639,7 +646,7 @@ function instantiateSealedComponent(
   const capsule: FdnNode = {
     id: node.id,
     tag: 'div',
-    attrs: { class: capsuleClass, ...editorIdentity(node, componentName, ctx) },
+    attrs: { class: capsuleClass, ...Object.fromEntries(Object.entries(node.attrs).filter(([key]) => key.startsWith('data-fdn-mode-'))), ...editorIdentity(node, componentName, ctx) },
     style: {},
     styleStates: {},
     text: undefined,

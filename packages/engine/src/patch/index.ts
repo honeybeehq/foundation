@@ -1,3 +1,4 @@
+import { validateTokenCollections } from '../tokens/index.js'
 import type { FdnDocument, FdnNode, NodeId, PatchOp, StateStyleKey } from '../types.js'
 import { indexNodes, invertOp, type NodeLocation } from '../chain/model.js'
 import { stableStringify } from '../chain/util.js'
@@ -21,7 +22,7 @@ class PatchFailure extends Error {
   }
 }
 
-export function applyPatch(doc: FdnDocument, ops: PatchOp[], opts?: { lenient?: boolean }): PatchResult {
+export function applyPatch(doc: FdnDocument, ops: PatchOp[], opts?: { lenient?: boolean; validateTokens?: boolean }): PatchResult {
   const lenient = opts?.lenient ?? false
   let working = structuredClone(doc)
   const applied: PatchOp[] = []
@@ -42,6 +43,10 @@ export function applyPatch(doc: FdnDocument, ops: PatchOp[], opts?: { lenient?: 
     else if (inverse !== null) inverses.push(inverse)
     working = applyOp(working, effective, index)
     applied.push(effective)
+  }
+  if (opts?.validateTokens !== false) {
+    const issue = validateTokenCollections(working)[0]
+    if (issue) return { ok: false, error: { code: 'invalid-op', message: issue.message } }
   }
   const inverse: PatchOp[] = fallback ? [{ op: 'replace-document', doc: structuredClone(doc) }] : inverses.reverse()
   return { ok: true, doc: working, applied, inverse }
@@ -120,6 +125,12 @@ function checkOp(op: PatchOp, doc: FdnDocument, index: Map<NodeId, NodeLocation>
     case 'set-token':
       if (op.name === '') throw new PatchFailure('invalid-op', 'set-token needs a non-empty name')
       return op
+    case 'set-token-collection': {
+      const items = doc.tokenCollections ?? []
+      if (!op.collection.name) throw new PatchFailure('invalid-op', 'set-token-collection needs a name')
+      if (op.index === undefined) return op
+      return { ...op, index: checkIndex(op.index, items.filter((item) => item.name !== op.collection.name).length, lenient, op.op) }
+    }
     case 'set-lookup':
     case 'set-component': {
       const items = op.op === 'set-lookup' ? doc.lookups : doc.components
@@ -194,6 +205,15 @@ function applyOp(doc: FdnDocument, op: PatchOp, index: Map<NodeId, NodeLocation>
       else target.when = op.when
       return doc
     }
+    case 'set-token-collection':
+      doc.tokenCollections = upsertByName(doc.tokenCollections ?? [], op.collection, op.index)
+      return doc
+    case 'remove-token-collection': {
+      const next = (doc.tokenCollections ?? []).filter((item) => item.name !== op.name)
+      if (next.length) doc.tokenCollections = next
+      else delete doc.tokenCollections
+      return doc
+    }
     case 'set-token':
       if (op.value === null) delete doc.tokens[op.name]
       else doc.tokens[op.name] = op.value
@@ -251,6 +271,7 @@ export function diffPatch(original: FdnDocument, target: FdnDocument): PatchOp[]
   if (!diffNamed(from.states, to.states, (state) => ({ op: 'set-state', state }), null, ops)) return null
   if (!diffNamed(from.namedStyles, to.namedStyles, (style) => ({ op: 'set-named-style', style }), (name) => ({ op: 'remove-named-style', name }), ops)) return null
   if (!diffNamed(from.components, to.components, (component) => ({ op: 'set-component', component }), (name) => ({ op: 'remove-component', name }), ops)) return null
+  if (!diffNamed(from.tokenCollections ?? [], to.tokenCollections ?? [], (collection) => ({ op: 'set-token-collection', collection }), (name) => ({ op: 'remove-token-collection', name }), ops)) return null
   diffRecord(from.tokens, to.tokens, (name, value) => ops.push({ op: 'set-token', name, value }))
   ops.push(...diffNodes(from.body, to.body))
   const beforeAnnotations = new Map(from.annotations.map((a) => [a.id, a]))

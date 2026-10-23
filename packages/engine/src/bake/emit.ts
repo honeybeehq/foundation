@@ -8,6 +8,7 @@
  * concerns, not bake output.
  */
 
+import { collectionCss } from '../tokens/index.js'
 import type { FdnDocument, FdnNode } from '../types.js'
 
 const VOID_ELEMENTS = new Set([
@@ -100,7 +101,7 @@ function styleBlock(doc: FdnDocument, capsuleCss?: Map<string, string>): string[
   const lines: string[] = []
   const tokenNames = Object.keys(doc.tokens).sort()
   const capsuleNames = capsuleCss ? [...capsuleCss.keys()].sort() : []
-  if (tokenNames.length === 0 && capsuleNames.length === 0) return lines
+  if (tokenNames.length === 0 && capsuleNames.length === 0 && !doc.tokenCollections?.length) return lines
   lines.push('<style>')
   if (tokenNames.length > 0) {
     lines.push(':root {')
@@ -109,6 +110,7 @@ function styleBlock(doc: FdnDocument, capsuleCss?: Map<string, string>): string[
     }
     lines.push('}')
   }
+  lines.push(...collectionCss(doc))
   for (const name of capsuleNames) {
     lines.push(capsuleCss?.get(name) as string)
   }

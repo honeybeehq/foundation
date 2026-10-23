@@ -5,6 +5,7 @@
  * what's wrong AND the sanctioned alternative, e.g. "float is not in the subset;
  * use flex on the parent" rather than a bare "invalid property".
  */
+import { validateTokenCollections } from '../tokens/index.js'
 import {
   excludedStylePropertyMessage,
   FDN_ELEMENTS,
@@ -521,6 +522,7 @@ export function validateDocument(doc: FdnDocument): ValidationResult {
   const topScope: Scope = { props: null, aliases: new Set() }
   for (const node of doc.body) walkNode(ctx, node, topScope, false)
 
+  ctx.issues.push(...validateTokenCollections(doc))
   const valid = !ctx.issues.some((i) => i.severity === 'error')
   return { valid, issues: ctx.issues }
 }
