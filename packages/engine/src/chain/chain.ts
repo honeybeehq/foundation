@@ -172,6 +172,10 @@ export function createChain(doc: FdnDocument, meta: ChangeMeta, opts?: { actor?:
   return LoroChain.create(doc, meta, opts?.actor ?? meta.author, opts?.docId)
 }
 
+export function prepareChain(doc: FdnDocument, opts: { actor: string; docId: string }): (meta: ChangeMeta) => FdnChain {
+  return LoroChain.prepare(doc, opts.actor, opts.docId)
+}
+
 export function loadChain(bytes: Uint8Array, opts?: { actor?: string }): FdnChain {
   return LoroChain.load(bytes, opts?.actor)
 }
@@ -204,6 +208,7 @@ class LoroChain implements FdnChain {
   private activity: ChainActivity | undefined
   private clock = new DeterministicClock()
   private idToTree = new Map<NodeId, TreeID>()
+  private materializedNodes = new Map<TreeID, FdnNode>()
   private peerId: number
   private peerIdStr: PeerID
   private anchors = new Map<string, Frontier>()
@@ -247,6 +252,22 @@ class LoroChain implements FdnChain {
     return chain
   }
 
+  static prepare(doc: FdnDocument, actor: string, docId: string): (meta: ChangeMeta) => LoroChain {
+    const chain = new LoroChain(actor)
+    chain.meta.set('docId', docId)
+    const record = chain.prepareApply([{ op: 'replace-document', doc }])
+    chain.materialize()
+    let pending = true
+    return meta => {
+      if (!pending) throw new Error('prepared chain was already started')
+      const wallTime = parseWallTime(meta.wallTime)
+      if (meta.wallTime !== undefined && wallTime === undefined) throw new Error('wallTime must be an ISO UTC timestamp')
+      pending = false
+      record({ ...meta, wallTime })
+      return chain
+    }
+  }
+
   static load(bytes: Uint8Array, actor?: string): LoroChain {
     const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
     const anchorsLen = view.getUint32(0, true)
@@ -270,7 +291,7 @@ class LoroChain implements FdnChain {
   // ——— public interface ———
 
   doc(): FdnDocument {
-    return this.materialize()
+    return structuredClone(this.materialize())
   }
 
   versionRef(): string {
@@ -289,9 +310,11 @@ class LoroChain implements FdnChain {
     if (frontier.some(id => (known.get(id.peer) ?? 0) <= id.counter)) throw new Error('document version is missing from this chain')
     try {
       this.loro.checkout(frontier)
-      return this.materialize()
+      this.materializedNodes.clear()
+      return this.doc()
     } finally {
       this.loro.checkoutToLatest()
+      this.materializedNodes.clear()
     }
   }
 
@@ -304,6 +327,10 @@ class LoroChain implements FdnChain {
     if (ops.length === 0) throw new Error('apply: ops must not be empty')
     const wallTime = parseWallTime(meta.wallTime)
     if (meta.wallTime !== undefined && wallTime === undefined) throw new Error('wallTime must be an ISO UTC timestamp')
+    return this.prepareApply(ops)({ ...meta, wallTime })
+  }
+
+  private prepareApply(ops: PatchOp[]): (meta: ChangeMeta) => EnvelopeRecord {
     const beforeDoc = this.materialize()
     const patch = applyPatch(beforeDoc, ops)
     if (!patch.ok) throw new Error(patch.error.message)
@@ -316,7 +343,7 @@ class LoroChain implements FdnChain {
     const prevHash = this.tryHead()?.hash ?? null
     for (const op of patch.applied) this.applyOp(op)
     this.lastLocalChange = patch.inverse
-    return this.commitEnvelope({ ...meta, wallTime }, startCounter, prevHash)
+    return meta => this.commitEnvelope(meta, startCounter, prevHash)
   }
 
   undo(meta: ChangeMeta): EnvelopeRecord {
@@ -349,10 +376,12 @@ class LoroChain implements FdnChain {
     // editable doc, which is the invariant every other public method here
     // relies on (the doc is always attached before/after any call).
     this.loro.checkout(frontier)
+    this.materializedNodes.clear()
     try {
-      return this.materialize()
+      return this.doc()
     } finally {
       this.loro.checkoutToLatest()
+      this.materializedNodes.clear()
     }
   }
 
@@ -514,6 +543,25 @@ class LoroChain implements FdnChain {
   // ——— mutation ———
 
   private applyOp(op: PatchOp): void {
+    switch (op.op) {
+      case 'set-attr':
+      case 'set-style':
+      case 'set-style-ref':
+      case 'set-text':
+      case 'set-when': {
+        let node: LoroTreeNode | undefined = this.treeNodeOf(op.id)
+        while (node) {
+          this.materializedNodes.delete(node.id)
+          node = node.parent()
+        }
+        break
+      }
+      case 'insert-node':
+      case 'remove-node':
+      case 'move-node':
+      case 'replace-document':
+        this.materializedNodes.clear()
+    }
     switch (op.op) {
       case 'set-declaration-order':
         this.order.set(op.section, JSON.stringify(op.names))
@@ -799,6 +847,8 @@ class LoroChain implements FdnChain {
   }
 
   private materializeNode(node: LoroTreeNode): FdnNode {
+    const cached = this.materializedNodes.get(node.id)
+    if (cached) return cached
     const data = node.data
     const id = data.get('id') as NodeId
     const tag = data.get('tag') as string
@@ -810,7 +860,7 @@ class LoroChain implements FdnChain {
     const each = data.get('each') as string | null
     const text = data.get('text') as string | null
     const children = (node.children() ?? []).map((c) => this.materializeNode(c))
-    return {
+    const materialized: FdnNode = {
       id,
       tag,
       attrs,
@@ -822,6 +872,8 @@ class LoroChain implements FdnChain {
       ...(text != null ? { text } : {}),
       children,
     }
+    this.materializedNodes.set(node.id, materialized)
+    return materialized
   }
 
   private materializeStyleStates(map: LoroMap): Partial<Record<StateStyleKey, Record<string, string>>> {
@@ -852,6 +904,7 @@ class LoroChain implements FdnChain {
   }
 
   private rebuildIndex(): void {
+    this.materializedNodes.clear()
     this.idToTree.clear()
     for (const node of this.tree.getNodes()) {
       const id = node.data.get('id') as NodeId | undefined

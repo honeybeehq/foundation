@@ -31,8 +31,8 @@ export function applyPatch(doc: FdnDocument, ops: PatchOp[], opts?: { lenient?: 
   const applied: PatchOp[] = []
   const inverses: PatchOp[] = []
   let fallback = false
+  let index = indexNodes(working.body)
   for (const op of ops) {
-    const index = indexNodes(working.body)
     let effective: PatchOp
     try {
       effective = checkOp(op, working, index, lenient)
@@ -45,6 +45,7 @@ export function applyPatch(doc: FdnDocument, ops: PatchOp[], opts?: { lenient?: 
     if (inverse === 'fallback') fallback = true
     else if (inverse !== null) inverses.push(inverse)
     working = applyOp(working, effective, index)
+    if (['insert-node', 'remove-node', 'move-node', 'replace-document'].includes(effective.op)) index = indexNodes(working.body)
     applied.push(effective)
   }
   if (opts?.validateTokens !== false) {

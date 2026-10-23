@@ -12,11 +12,15 @@ export function expandSessionOps(doc: FdnDocument, ops: SessionOp[], reports: In
   if (ops.every((op): op is PatchOp | PlacementOp => !MODE_OPS.has(op.op) && !COMPONENT_OPS.has(op.op))) return expandPlacement(doc, ops)
   let working = doc
   const expanded: PatchOp[] = []
-  for (const op of ops) {
+  for (const [position, op] of ops.entries()) {
     let batch: PatchOp[]
     if (COMPONENT_OPS.has(op.op)) batch = expandComponentOp(working, op as ComponentOp, reports)
     else if (!MODE_OPS.has(op.op)) batch = expandPlacement(working, [op as PatchOp | PlacementOp])
     else batch = modeOps(working, op as TokenModeOp)
+    if (position === ops.length - 1) {
+      expanded.push(...batch)
+      break
+    }
     const patch = applyPatch(working, batch, { validateTokens: false, validateComponents: false })
     if (!patch.ok) throw new PlacementError(patch.error.code, patch.error.message)
     working = patch.doc

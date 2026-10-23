@@ -63,8 +63,9 @@ export function projectionVersion(source: string): string | null {
   return /\sdata-fdn-version="([A-Za-z0-9_-]+)"/.exec(tag)?.[1] ?? null
 }
 
-export function projectedText(chain: FdnChain, docId: string | null = chain.docId() ?? null): string {
-  return documentText(chain.doc(), docId).replace('<fdn-doc', `<fdn-doc data-fdn-version="${chain.versionRef()}"`)
+export function projectedText(chain: FdnChain, docId: string | null = chain.docId() ?? null, canonical?: string): string {
+  const text = canonical ?? projectDocument(chain.doc())
+  return (docId ? injectDocIdAttr(text, docId) : text).replace('<fdn-doc', `<fdn-doc data-fdn-version="${chain.versionRef()}"`)
 }
 
 export function sourceBase(chain: FdnChain, source: string, file?: string): FdnDocument {

@@ -58,8 +58,8 @@ export type ComponentOp =
 export type SessionOp = PatchOp | PlacementOp | TokenModeOp | ComponentOp
 
 export type ClientMessage =
-  | { t: 'hello'; protocol: string; client: string; author: string }
-  | { t: 'view'; states: Array<string | null>; components: boolean }
+  | { t: 'hello'; protocol: string; client: string; author: string; earlyResult?: boolean }
+  | { t: 'view'; states: Array<string | null>; components: boolean; bakeDiffs?: boolean }
   | { t: 'commit'; id: string; base: number; ops: SessionOp[]; label: string }
   | { t: 'preview-instance-swap'; id: string; op: Extract<ComponentOp, { op: 'swap-instance' | 'set-instance-variant' }> }
   | { t: 'anchor'; id: string; name: string }
@@ -71,6 +71,7 @@ export type ServiceMessage =
   | ({ t: 'welcome'; protocol: string; path: string; docId: string | null; chain: boolean; created: boolean } & DocumentView)
   | ({ t: 'doc'; cause: Cause } & DocumentView)
   | { t: 'baked'; rev: number; state: string | null; html: string; report: ReportLine[] }
+  | { t: 'baked-diff'; rev: number; state: string | null; baseRev: number; start: number; deleteCount: number; insert: string; report: ReportLine[] }
   | { t: 'component'; rev: number; name: string; html: string; report: ReportLine[] }
   | { t: 'instance-swap-preview'; id: string; rev: number; report: InstanceSwapReport }
   | { t: 'result'; id: string; ok: true; rev: number; componentSwaps?: InstanceSwapReport[] }
@@ -242,8 +243,8 @@ const isComponentOp: Check = (value) => isRecord(value) && typeof value.op === '
 const isTokenModeOp: Check = (value) => isRecord(value) && typeof value.op === 'string' && Object.hasOwn(TOKEN_MODE_OPS, value.op) && TOKEN_MODE_OPS[value.op as TokenModeOp['op']](value)
 
 const CLIENT_MESSAGES: Record<ClientMessage['t'], Check> = {
-  hello: shape({ protocol: isString, client: isString, author: isString }),
-  view: shape({ states: arrayOf(nullable(isString)), components: isBoolean }),
+  hello: shape({ protocol: isString, client: isString, author: isString, earlyResult: optional(isBoolean) }),
+  view: shape({ states: arrayOf(nullable(isString)), components: isBoolean, bakeDiffs: optional(isBoolean) }),
   'preview-instance-swap': shape({ id: isString, op: (value) => isRecord(value) && ['swap-instance', 'set-instance-variant'].includes(String(value.op)) && isComponentOp(value) }),
   commit: shape({ id: isString, base: isCount, ops: arrayOf((value) => isPatchOp(value) || isPlacementOp(value) || isTokenModeOp(value) || isComponentOp(value)), label: isString }),
   anchor: shape({ id: isString, name: isString }),
@@ -278,6 +279,7 @@ const SERVICE_MESSAGES: Record<ServiceMessage['t'], Check> = {
   welcome: (value) => isView(value) && shape({ protocol: isString, path: isString, docId: nullable(isString), chain: isBoolean, created: isBoolean })(value),
   doc: (value) => isView(value) && shape({ cause: isCause })(value),
   baked: shape({ rev: isCount, state: nullable(isString), html: isString, report: isReport }),
+  'baked-diff': shape({ rev: isCount, state: nullable(isString), baseRev: isCount, start: isCount, deleteCount: isCount, insert: isString, report: isReport }),
   component: shape({ rev: isCount, name: isString, html: isString, report: isReport }),
   'instance-swap-preview': shape({ id: isString, rev: isCount, report: shape({ signature: isString, instanceId: isString, scope: arrayOf(isString), component: isString, overrides: arrayOf(isRecord), props: arrayOf(isRecord), fills: arrayOf(isRecord) }) }),
   result: (value) =>

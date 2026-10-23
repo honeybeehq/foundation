@@ -111,6 +111,7 @@ function rebaseValue(op: PatchOp, expected: PatchOp | null | undefined, current:
 }
 
 export function undoOps(step: UndoStep, doc: FdnDocument): PatchOp[] {
+  if (step.retargetedOverrides.size === 0 && step.revert.every(op => ['set-attr', 'set-style', 'set-style-ref', 'set-text', 'set-when'].includes(op.op))) return step.revert
   const created = new Set(step.created)
   let current = doc
   const out: PatchOp[] = []

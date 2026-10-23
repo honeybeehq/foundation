@@ -533,7 +533,7 @@ function resolveNodeStyle(node: FdnNode, ctx: BakeCtx): ResolvedStyle {
     pushReport(ctx, { code: 'unknown-style-ref', severity: 'warning', message: `named style "${node.styleRef}" is not declared`, nodeId: node.id })
   }
 
-  const mergedRaw = mergeStyles(namedStyle?.style ?? {}, node.style)
+  const mergedRaw = namedStyle ? mergeStyles(namedStyle.style, node.style) : node.style
   const style = mapStyleValues(mergedRaw, (prop, raw) => {
     const { value, reports } = interpolateString(raw, ctx, node.id)
     ctx.reports.push(...reports)
@@ -544,9 +544,10 @@ function resolveNodeStyle(node: FdnNode, ctx: BakeCtx): ResolvedStyle {
 
   const styleStates: Partial<Record<StateStyleKey, Record<string, string>>> = {}
   for (const key of STATE_STYLE_KEYS) {
-    const base = namedStyle?.styleStates?.[key] ?? {}
-    const own = node.styleStates?.[key] ?? {}
-    const merged = mergeStyles(base, own)
+    const base = namedStyle?.styleStates?.[key]
+    const own = node.styleStates?.[key]
+    if (!base && !own) continue
+    const merged = mergeStyles(base ?? {}, own ?? {})
     const propNames = styleEntries(merged).map(([prop]) => prop)
     if (propNames.length === 0) continue
     const parts: string[] = []

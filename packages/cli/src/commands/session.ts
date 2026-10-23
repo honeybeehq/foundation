@@ -24,6 +24,9 @@ export async function runSession(args: string[], io: CliIO): Promise<number> {
     title: flagString(flags, 'title'),
     author: flagString(flags, 'author'),
     send: (message) => process.stdout.write(`${JSON.stringify(message)}\n`),
+    flush: () => new Promise<void>((resolveSent) => {
+      process.stdout.write('', () => resolveSent())
+    }),
     log: io.stderr,
   })
 

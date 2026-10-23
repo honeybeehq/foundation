@@ -1,3 +1,4 @@
+import { bakeImpact, mergeBakeImpact, type BakeImpact } from './bake-impact.js'
 import { PlacementError } from './placement.js'
 import { expandComponentOp } from './components.js'
 import { expandSessionOps } from './token-modes.js'
@@ -14,6 +15,7 @@ import {
   loadChain,
   normalizeDocument,
   parseDocument,
+  prepareChain,
   stableStringify,
   validateDocument,
   validateTokenCollections,
@@ -34,6 +36,7 @@ export interface SessionOptions {
   title?: string
   author?: string
   send: (message: ServiceMessage) => void
+  flush?: () => Promise<void>
   log?: (line: string) => void
   watch?: boolean
   settleMs?: number
@@ -67,8 +70,10 @@ class DesignSession implements Session {
   private readonly log: (line: string) => void
   private phase: 'waiting' | 'open' | 'closed' = 'waiting'
   private author = ''
+  private earlyResult = false
   private actor = `session:${randomUUID()}`
   private chain: FdnChain | null = null
+  private preparedChain: { text: string; actor: string; docId: string; finish: ReturnType<typeof prepareChain> } | null = null
   private doc!: FdnDocument
   private docText = ''
   private docId: string | null = null
@@ -80,8 +85,10 @@ class DesignSession implements Session {
   private diskText: string | null = null
   private diskTextCanonical: string | null = null
   private diskChain: Uint8Array | null = null
-  private view: { states: Array<string | null>; components: boolean } = { states: [], components: false }
+  private view: { states: Array<string | null>; components: boolean; bakeDiffs: boolean } = { states: [], components: false, bakeDiffs: false }
   private sentBakes = new Map<string, string>()
+  private pendingBakeImpact: BakeImpact | null = null
+  private stateBakes = new Map<string | null, { rev: number; html: string }>()
   private watcher: FSWatcher | null = null
   private poller: NodeJS.Timeout | null = null
   private seenSignature = ''
@@ -206,8 +213,9 @@ class DesignSession implements Session {
       case 'hello':
         return this.fault('protocol', 'hello was already received', null)
       case 'view':
-        this.view = { states: [...new Set(message.states)], components: message.components }
+        this.view = { states: [...new Set(message.states)], components: message.components, bakeDiffs: message.bakeDiffs === true }
         this.sentBakes.clear()
+        this.stateBakes.clear()
         return this.sendBakes()
       case 'preview-instance-swap': {
         this.syncAndAnnounce()
@@ -243,8 +251,12 @@ class DesignSession implements Session {
       return this.fault('protocol', `protocol ${message.protocol} is not supported; this service speaks ${SESSION_PROTOCOL}`, 2)
     }
     this.author = message.author || this.options.author || `user:${process.env.USER ?? 'unknown'}`
+    this.earlyResult = message.earlyResult === true
     const created = this.open()
     if (created === null) return
+    if (this.earlyResult && !this.chain && !this.invalidExternalTokens && this.docId) {
+      this.preparedChain = { text: this.docText, actor: this.actor, docId: this.docId, finish: prepareChain(this.doc, { actor: this.actor, docId: this.docId }) }
+    }
     this.phase = 'open'
     this.rev = 1
     this.emit({
@@ -337,7 +349,7 @@ class DesignSession implements Session {
 
   private persist(protect = true): void {
     if (!this.chain || this.invalidExternalTokens) return
-    const text = this.diskTextCanonical === this.docText && this.diskText !== null ? this.diskText : this.chain ? projectedText(this.chain, this.docId) : documentText(this.doc, this.docId)
+    const text = this.diskTextCanonical === this.docText && this.diskText !== null ? this.diskText : this.chain ? projectedText(this.chain, this.docId, this.docText) : documentText(this.doc, this.docId)
     this.diskChain = persistDocument(this.path, this.chain, text, protect)
     this.diskText = text
     this.diskTextCanonical = this.docText
@@ -347,7 +359,7 @@ class DesignSession implements Session {
   private persistText(): void {
     if (this.invalidExternalTokens) return
     if (this.diskTextCanonical === this.docText && this.diskText !== null) return
-    const text = this.chain ? projectedText(this.chain, this.docId) : documentText(this.doc, this.docId)
+    const text = this.chain ? projectedText(this.chain, this.docId, this.docText) : documentText(this.doc, this.docId)
     writeAtomic(this.path, text)
     this.diskText = text
     this.diskTextCanonical = this.docText
@@ -456,22 +468,24 @@ class DesignSession implements Session {
     const componentSwaps: InstanceSwapReport[] = []
     for (const op of message.ops) if ('previewRev' in op && op.previewRev !== undefined && (op.previewRev > this.rev || op.previewRev < this.rev && !op.previewSignature)) return this.reject(message.id, { code: 'conflict', message: 'swap preview is stale; preview the swap again' })
     let ops: PatchOp[]
+    let singlePatch: ReturnType<typeof applyPatch> | undefined
     try {
       const primitive: PatchOp[] = []
       let target = this.doc
       for (const op of message.ops) {
         const expanded = op.op === 'replace-document' ? diffPatch(target, op.doc) : [op]
         if (expanded === null) throw new Error('edit cannot be expressed as granular changes')
-        const checked = applyPatch(target, expandSessionOps(target, expanded, componentSwaps), { validateComponents: false })
+        const checked = applyPatch(target, expandSessionOps(target, expanded, componentSwaps), { validateComponents: message.ops.length === 1 })
         if (!checked.ok) throw new PlacementError(checked.error.code, checked.error.message)
         primitive.push(...checked.applied)
+        singlePatch = checked
         target = checked.doc
       }
       ops = primitive
     } catch (err) {
       return this.reject(message.id, { code: err instanceof PlacementError ? err.code : err instanceof Error && err.message.startsWith('swap preview changed') ? 'conflict' : 'invalid-op', message: err instanceof Error ? err.message : String(err) })
     }
-    const patch = applyPatch(this.doc, ops)
+    const patch = message.ops.length === 1 && singlePatch ? singlePatch : applyPatch(this.doc, ops)
     if (!patch.ok) return this.reject(message.id, patch.error)
     if (patch.inverse.length === 0 && canonicalText(patch.doc) === this.docText) {
       this.emit({ t: 'result', id: message.id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}) })
@@ -483,7 +497,7 @@ class DesignSession implements Session {
     if (failure) return this.reject(message.id, failure)
     this.undoStack.push(undoStep(label, patch.inverse, before, this.doc, patch.applied))
     this.redoStack = []
-    this.accept(message.id, { kind: 'commit', id: message.id, author: this.author }, componentSwaps)
+    this.accept(message.id, { kind: 'commit', id: message.id, author: this.author }, bakeImpact(this.doc, patch.applied), componentSwaps)
   }
 
   private step(id: string, direction: 'undo' | 'redo'): void {
@@ -511,7 +525,7 @@ class DesignSession implements Session {
     }
     from.pop()
     to.push(oppositeStep(step, before, this.doc))
-    this.accept(id, { kind: direction, id, author: this.author })
+    this.accept(id, { kind: direction, id, author: this.author }, bakeImpact(this.doc, patch.applied))
   }
 
   private anchor(message: Extract<ClientMessage, { t: 'anchor' }>): void {
@@ -520,7 +534,7 @@ class DesignSession implements Session {
     const label = `Anchor ${message.name}`
     const failure = this.transact(chain => { chain.anchor(message.name, withWallTime({ author: this.author, message: label })) })
     if (failure) return this.reject(message.id, failure)
-    this.accept(message.id, { kind: 'commit', id: message.id, author: this.author })
+    this.accept(message.id, { kind: 'commit', id: message.id, author: this.author }, bakeImpact(this.doc, []))
   }
 
   private record(ops: PatchOp[], message: string): Failure | null {
@@ -534,7 +548,12 @@ class DesignSession implements Session {
     try {
       if (!this.chain) {
         this.docId ??= readDocIdAttr(this.diskText ?? '') ?? randomUUID()
-        this.chain = createChain(this.doc, withWallTime({ author: this.author, message: 'init' }), { actor: this.actor, docId: this.docId })
+        const prepared = this.preparedChain
+        this.preparedChain = null
+        const meta = withWallTime({ author: this.author, message: 'init' })
+        this.chain = prepared?.text === this.docText && prepared.actor === this.actor && prepared.docId === this.docId
+          ? prepared.finish(meta)
+          : createChain(this.doc, meta, { actor: this.actor, docId: this.docId })
       }
       mutate(this.chain)
       this.setDoc(this.chain.doc())
@@ -564,8 +583,15 @@ class DesignSession implements Session {
     if (this.docText !== before) this.announce({ kind: 'external', author: author ?? null })
   }
 
-  private accept(id: string, cause: Cause, componentSwaps: InstanceSwapReport[] = []): void {
-    this.announce(cause)
+  private accept(id: string, cause: Cause, impact: BakeImpact, componentSwaps: InstanceSwapReport[] = []): void {
+    if (this.earlyResult) {
+      this.rev++
+      this.emit({ t: 'doc', cause, ...this.documentView() })
+      this.emit({ t: 'result', id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}) })
+      this.sendBakes(impact)
+      return
+    }
+    this.announce(cause, impact)
     this.emit({ t: 'result', id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}) })
   }
 
@@ -573,10 +599,10 @@ class DesignSession implements Session {
     this.emit({ t: 'result', id, ok: false, code: failure.code, message: failure.message })
   }
 
-  private announce(cause: Cause): void {
+  private announce(cause: Cause, impact?: BakeImpact): void {
     this.rev++
     this.emit({ t: 'doc', cause, ...this.documentView() })
-    this.sendBakes()
+    this.sendBakes(impact)
   }
 
   private documentView(): DocumentView {
@@ -599,19 +625,43 @@ class DesignSession implements Session {
     }
   }
 
-  private sendBakes(): void {
+  private sendBakes(impact: BakeImpact = { states: null, components: true }): void {
     const doc = this.doc
     const rev = this.rev
-    if (this.locked) this.outbox.push(() => this.sendBakesFor(doc, rev))
-    else this.sendBakesFor(doc, rev)
+    if (this.earlyResult) this.pendingBakeImpact = this.pendingBakeImpact ? mergeBakeImpact(this.pendingBakeImpact, impact) : impact
+    const send = (): void => {
+      if (!this.earlyResult) return this.sendBakesFor(doc, rev, impact)
+      void Promise.resolve(this.options.flush?.()).then(() => {
+        if (this.phase !== 'open' || this.rev !== rev) return
+        const pending = this.pendingBakeImpact ?? impact
+        this.pendingBakeImpact = null
+        this.sendBakesFor(doc, rev, pending)
+      }).catch(err => {
+        this.log(`bake delivery failed: ${err instanceof Error ? err.message : String(err)}`)
+      })
+    }
+    if (this.locked) this.outbox.push(send)
+    else send()
   }
 
-  private sendBakesFor(doc: FdnDocument, rev: number): void {
+  private sendBakesFor(doc: FdnDocument, rev: number, impact: BakeImpact): void {
     for (const state of this.view.states) {
+      if (impact.states && !impact.states.has(state)) continue
       const baked = this.bake(() => bakeEditorDocument(doc, state === null ? undefined : { state }))
-      if (this.changed(`state:${JSON.stringify(state)}`, baked)) this.emit({ t: 'baked', rev: rev, state, ...baked })
+      if (!this.changed(`state:${JSON.stringify(state)}`, baked)) continue
+      const previous = this.stateBakes.get(state)
+      this.stateBakes.set(state, { rev, html: baked.html })
+      if (this.view.bakeDiffs && previous) {
+        const diff = htmlDiff(previous.html, baked.html)
+        const delta: ServiceMessage = { t: 'baked-diff', rev, state, baseRev: previous.rev, ...diff, report: baked.report }
+        if (JSON.stringify(delta).length < baked.html.length) {
+          this.emit(delta)
+          continue
+        }
+      }
+      this.emit({ t: 'baked', rev, state, ...baked })
     }
-    if (!this.view.components) return
+    if (!this.view.components || !impact.components) return
     for (const component of [...doc.components, ...(doc.componentSets ?? [])]) {
       const baked = this.bake(() => bakeEditorComponent(doc, component.name))
       if (this.changed(`component:${component.name}`, baked)) this.emit({ t: 'component', rev: rev, name: component.name, ...baked })
@@ -672,4 +722,17 @@ class DesignSession implements Session {
       this.fault('internal', `sync failed: ${err instanceof Error ? err.message : String(err)}`, null)
     }
   }
+}
+
+function htmlDiff(before: string, after: string): { start: number; deleteCount: number; insert: string } {
+  let start = 0
+  const limit = Math.min(before.length, after.length)
+  while (start < limit && before.charCodeAt(start) === after.charCodeAt(start)) start++
+  let endBefore = before.length
+  let endAfter = after.length
+  while (endBefore > start && endAfter > start && before.charCodeAt(endBefore - 1) === after.charCodeAt(endAfter - 1)) {
+    endBefore--
+    endAfter--
+  }
+  return { start, deleteCount: endBefore - start, insert: after.slice(start, endAfter) }
 }

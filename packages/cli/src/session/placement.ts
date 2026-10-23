@@ -13,7 +13,7 @@ export function expandPlacement(doc: FdnDocument, ops: Array<PatchOp | Placement
   if (ops.every((op): op is PatchOp => !['set-frame-mode', 'set-placement', 'set-free-position', 'resize-free', 'set-free-rotation', 'set-free-flip', 'set-free-constraints'].includes(op.op))) return ops
   let working = doc
   const expanded: PatchOp[] = []
-  for (const op of ops) {
+  for (const [position, op] of ops.entries()) {
     const index = indexNodes(working.body)
     const style = (id: string, values: Record<string, string | null>): PatchOp[] => Object.entries(values).map(([prop, value]) => ({ op: 'set-style', id, prop, value }))
     const node = 'id' in op ? index.get(op.id)?.node : undefined
@@ -90,6 +90,10 @@ export function expandPlacement(doc: FdnDocument, ops: Array<PatchOp | Placement
       }
       default:
         batch = [op]
+    }
+    if (position === ops.length - 1) {
+      expanded.push(...batch)
+      break
     }
     const patch = applyPatch(working, batch, { validateTokens: false, validateComponents: false })
     if (!patch.ok) throw new PlacementError(patch.error.code, patch.error.message)

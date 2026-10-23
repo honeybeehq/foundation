@@ -478,6 +478,13 @@ attribute/style declarations through writer-local granular inverses; no
 replace-document is used. Results and document/bake notifications retain the
 existing protocol shapes. Undo history remains session-local.
 
+Session clients may opt in with `hello.earlyResult: true` to receive the durable
+document and result before preview bakes. Without it, the existing delivery order
+is retained. `view.bakeDiffs: true` permits a `baked-diff` message for a state with
+a previously sent preview. Apply its replacement to that state's `baseRev` HTML:
+`start` and `deleteCount` count UTF-16 code units, and `insert` replaces that span.
+Keep a separate preview revision per state; a full `baked` message resets its base.
+
 ### Native component sets and variants
 
 A document may declare `componentSets`, each with `name`, `properties` (axis name
