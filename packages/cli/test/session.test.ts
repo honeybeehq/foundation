@@ -20,7 +20,7 @@ function start(path: string, options: Partial<SessionOptions> = {}) {
     session.receive(JSON.stringify(message))
     return sent.splice(0)
   }
-  const open = (author = 'user:test'): ServiceMessage[] => say({ t: 'hello', protocol: '0.1', client: 'test', author })
+  const open = (author = 'user:test'): ServiceMessage[] => say({ t: 'hello', protocol: '0.2', client: 'test', author })
   return { session, sent, say, open }
 }
 
@@ -76,7 +76,7 @@ describe('foundation session', () => {
       writeDocument(file, skeletonDocument('Board'), true)
       const { open } = start(file)
       const [welcome] = open()
-      expect(welcome).toMatchObject({ t: 'welcome', protocol: '0.1', path: file, chain: true, created: false, rev: 1, head: { author: 'user:seed' } })
+      expect(welcome).toMatchObject({ t: 'welcome', protocol: '0.2', path: file, chain: true, created: false, rev: 1, head: { author: 'user:seed' } })
       expect((welcome as Of<'welcome'>).doc.body.map((n) => n.id)).toEqual(['n1', 'n2'])
     })
 
@@ -143,7 +143,7 @@ describe('foundation session', () => {
     it('applies one commit as one chain change, writes both files, then sends doc, bakes and result', () => {
       const { open, say } = start(file)
       open()
-      expect(only(say({ t: 'view', states: [null], components: false }), 'baked')).toHaveLength(1)
+      expect(only(say({ t: 'view', boards: [{ artboardId: null, state: null, viewport: null }], components: false }), 'baked')).toHaveLength(1)
       const messages = say({ t: 'commit', id: 'c1', base: 1, ops: [{ op: 'set-style', id: 'n1', prop: 'color', value: 'red' }], label: 'Color' })
       expect(messages.map((m) => m.t)).toEqual(['doc', 'baked', 'result'])
       expect(messages[0]).toMatchObject({ rev: 2, cause: { kind: 'commit', id: 'c1', author: 'user:test' }, history: { canUndo: true, undoLabel: 'Color' }, head: { message: 'Color' } })
@@ -207,7 +207,7 @@ describe('foundation session', () => {
     it('skips bakes whose output did not change and bakes components on request', () => {
       const { open, say } = start(file)
       open()
-      const first = say({ t: 'view', states: [null, 'default'], components: true })
+      const first = say({ t: 'view', boards: [null, 'default'].map(state => ({ artboardId: null, state, viewport: null })), components: true })
       expect(only(first, 'baked').map((m) => m.state)).toEqual([null, 'default'])
       expect(only(first, 'component').map((m) => m.name)).toEqual(['Card'])
       expect(only(first, 'component')[0]?.html).toContain('data-fdn-id="Card::card-root"')

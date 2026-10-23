@@ -18,14 +18,15 @@ const doc: FdnDocument = {
   body: [{ ...node, children: [{ ...node, id: 'n2', text: 'hi', children: [] }] }],
   annotations: [{ id: 'a1', nodeId: 'n1', text: 'look', status: 'open' }],
 }
-const view = { rev: 3, doc, head: { hash: 'h', prevHash: null, author: 'user:a', message: 'm', specVersion: '0.0.1-draft' }, history: { canUndo: true, canRedo: false, undoLabel: 'Move', redoLabel: null }, issues: [{ code: 'x', severity: 'warning', message: 'm', nodeId: 'n1' }] }
+const geometry = { artboardId: null, state: null, viewport: null, pageId: null, name: 'T', x: 0, y: 0, width: 1440, height: 900, visible: true, overflow: 'visible', sizeOverride: false }
+const view = { pages: [], boards: [geometry], rev: 3, doc, head: { hash: 'h', prevHash: null, author: 'user:a', message: 'm', specVersion: '0.0.1-draft' }, history: { canUndo: true, canRedo: false, undoLabel: 'Move', redoLabel: null }, issues: [{ code: 'x', severity: 'warning', message: 'm', nodeId: 'n1' }] }
 const line = (value: unknown): string => JSON.stringify(value)
 
 describe('parseClientMessage', () => {
   it('accepts every client message shape', () => {
     const messages = [
       { t: 'hello', protocol: SESSION_PROTOCOL, client: 'apiary', author: '' },
-      { t: 'view', states: [null, 'b'], components: true },
+      { t: 'view', boards: [null, 'b'].map(state => ({ artboardId: null, state, viewport: null })), components: true },
       {
         t: 'commit',
         id: 'c1',
@@ -95,7 +96,7 @@ describe('parseServiceMessage', () => {
       { t: 'doc', cause: { kind: 'open' }, ...view },
       { t: 'doc', cause: { kind: 'commit', id: 'c1', author: 'user:a' }, ...view },
       { t: 'doc', cause: { kind: 'external', author: null }, ...view },
-      { t: 'baked', rev: 3, state: null, html: '<!doctype html>', report: [] },
+      { t: 'baked', rev: 3, ...geometry, html: '<!doctype html>', report: [] },
       { t: 'component', rev: 3, name: 'Card', html: '<!doctype html>', report: [{ code: 'x', severity: 'info', message: 'm' }] },
       { t: 'result', id: 'c1', ok: true, rev: 4 },
       { t: 'result', id: 'c1', ok: false, code: 'conflict', message: 'm' },

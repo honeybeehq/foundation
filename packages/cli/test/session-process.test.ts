@@ -82,11 +82,11 @@ describe.each(ENTRY_POINTS)('foundation session (real stdio child process, %s)',
   })
 
   it('edits, undoes, and picks up a second writer over stdio', async () => {
-    client.send({ t: 'hello', protocol: '0.1', client: 'e2e', author: '' })
+    client.send({ t: 'hello', protocol: '0.2', client: 'e2e', author: '' })
     const welcome = await client.next('welcome')
     expect(welcome).toMatchObject({ rev: 1, chain: true, created: false, path: file })
 
-    client.send({ t: 'view', states: [null], components: false })
+    client.send({ t: 'view', boards: [{ artboardId: null, state: null, viewport: null }], components: false })
     expect((await client.next('baked')).html).toContain('<!doctype html>')
 
     const target = firstElement(welcome.doc.body) as FdnNode

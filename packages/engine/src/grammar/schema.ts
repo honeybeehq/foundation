@@ -132,6 +132,9 @@ export interface FdnElementRule {
 }
 
 export const FDN_ELEMENTS: Record<string, FdnElementRule> = {
+  'fdn-page': { metadata: false, allowsChildren: true },
+  'fdn-artboard': { metadata: false, allowsChildren: true },
+  'fdn-artboard-view': { metadata: false, allowsChildren: false },
   // header block
   'fdn-doc': { metadata: true, knownAttrs: ['data-fdn-spec-version', 'data-fdn-title'], allowsChildren: true },
   'fdn-params': { metadata: true, allowsChildren: true },

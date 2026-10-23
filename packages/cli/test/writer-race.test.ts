@@ -66,7 +66,7 @@ describe('text and chain writers racing a live session', () => {
     writeFileSync(chainPath, createChain(doc, { author: 'user:seed', message: 'init' }).save())
     sent = []
     session = createSession({ path: file, send: (message) => sent.push(message), watch: false })
-    session.receive(JSON.stringify({ t: 'hello', protocol: '0.1', client: 'test', author: 'user:session' }))
+    session.receive(JSON.stringify({ t: 'hello', protocol: '0.2', client: 'test', author: 'user:session' }))
     hooks.chainPath = chainPath
   })
 

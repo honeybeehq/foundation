@@ -27,3 +27,5 @@ export { stateStyleLookup, validateStateStyles } from './state-styles.js'
 export { planInstanceSwap, assertInstanceAcyclic } from './components/swap.js'
 
 export { detachInstance } from './components/detach.js'
+
+export * from './artboards/index.js'

@@ -200,7 +200,7 @@ export interface FdnDocument {
 // ——— EXPRESSION GRAMMAR (resolved SPEC Q9; reconciled with bake v0) ———
 // {{ <expr> }} where <expr> is exactly one of:
 //   ref        := prefix '.' ident ('.' ident)*
-//   prefix     := 'prop' | 'item' | 'param' | <active-each-binding-name>
+//   prefix     := 'prop' | 'item' | 'param' | 'state' | <active-each-binding-name>
 //                 // "row in items" makes `row` a dynamically-scoped prefix
 //                 // inside that each subtree; `item` is the default binding.
 //   ternary    := <cond> '?' <value> ':' <value>
@@ -304,7 +304,7 @@ export type PatchOp =
   | { op: 'remove-node'; id: NodeId }
   | { op: 'move-node'; id: NodeId; parent: NodeId | null; index: number }
   | { op: 'set-attr'; id: NodeId; key: string; value: string | null }
-  | { op: 'set-style'; id: NodeId; prop: string; value: string | null; state?: StateStyleKey }
+  | { op: 'set-style'; id: NodeId; prop: string; value: string | null; state?: StateStyleKey; replaceBinding?: boolean }
   | { op: 'set-style-ref'; id: NodeId; styleRef: string | null }
   | { op: 'set-text'; id: NodeId; text: string }
   | { op: 'set-when'; id: NodeId; when: string | null }
@@ -319,7 +319,8 @@ export type PatchOp =
   | { op: 'remove-component'; name: string }
   | { op: 'set-param'; param: FdnParam; index?: number }
   | { op: 'remove-param'; name: string }
-  | { op: 'set-lookup'; lookup: FdnLookup; index?: number }
+  | { op: 'set-lookup'; lookup: FdnLookup; index?: number; createOnly?: boolean }
+  | { op: 'set-lookup-entry'; name: string; key: string; value: string | null }
   | { op: 'remove-lookup'; name: string }
   | { op: 'set-state'; state: FdnState; index?: number }
   | { op: 'remove-state'; name: string }

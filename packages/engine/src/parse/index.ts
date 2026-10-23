@@ -1,3 +1,4 @@
+import { assertFormatVersion } from '../artboards/index.js'
 import { isComponentSet } from '../components/variants.js'
 import { isJsonValue } from '../data.js'
 /**
@@ -859,6 +860,8 @@ function parseAnnotations(fdnDoc: ElementNode): FdnAnnotation[] {
     if (a.x !== undefined) annotation.x = Number(a.x)
     if (a.y !== undefined) annotation.y = Number(a.y)
     if (a.state !== undefined) annotation.state = a.state
+    if (a['artboard-id'] !== undefined) annotation.artboardId = a['artboard-id']
+    if (a.viewport !== undefined) annotation.viewport = a.viewport
     return annotation
   })
 }
@@ -1026,7 +1029,10 @@ export function parseDocument(html: string): { doc: FdnDocument; report: Normali
 
   if (fdnDoc) {
     const a = attrsOf(fdnDoc)
-    if (a['data-fdn-spec-version']) specVersion = a['data-fdn-spec-version']
+    if (a['data-fdn-spec-version']) {
+      specVersion = a['data-fdn-spec-version']
+      assertFormatVersion({ specVersion })
+    }
     else
       lines.push({
         code: 'spec-version-defaulted',

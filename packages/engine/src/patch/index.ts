@@ -1,3 +1,4 @@
+import { validateArtboards, assertFormatVersion } from '../artboards/index.js'
 import { validateInstanceOverrides } from '../components/overrides.js'
 import { isJsonValue } from '../data.js'
 import { componentIssueKey, validateComponentSets } from '../components/variants.js'
@@ -26,7 +27,7 @@ class PatchFailure extends Error {
   }
 }
 
-export function applyPatch(doc: FdnDocument, ops: PatchOp[], opts?: { lenient?: boolean; validateTokens?: boolean; validateComponents?: boolean; validateStateStyles?: boolean }): PatchResult {
+export function applyPatch(doc: FdnDocument, ops: PatchOp[], opts?: { lenient?: boolean; validateTokens?: boolean; validateComponents?: boolean; validateStateStyles?: boolean; validateArtboards?: boolean }): PatchResult {
   const lenient = opts?.lenient ?? false
   let working = structuredClone(doc)
   const applied: PatchOp[] = []
@@ -65,6 +66,13 @@ export function applyPatch(doc: FdnDocument, ops: PatchOp[], opts?: { lenient?: 
       const issue = issues.find(issue => !prior.has(stableStringify(issue)))
       if (issue) return { ok: false, error: { code: 'invalid-op', message: issue.message } }
     }
+  }
+  if (opts?.validateArtboards !== false) {
+    try { assertFormatVersion(working) } catch (err) { return { ok: false, error: { code: 'invalid-op', message: String(err) } } }
+    const key = (issue: { code: string; nodeId?: string }) => `${issue.code}:${issue.nodeId ?? ''}`
+    const prior = new Set(validateArtboards(doc).map(key))
+    const issue = validateArtboards(working).find(issue => !prior.has(key(issue)))
+    if (issue) return { ok: false, error: { code: 'invalid-op', message: issue.message } }
   }
   const inverse: PatchOp[] = fallback ? [{ op: 'replace-document', doc: structuredClone(doc) }] : inverses.reverse()
   return { ok: true, doc: working, applied, inverse }
@@ -240,6 +248,9 @@ function applyOp(doc: FdnDocument, op: PatchOp, index: Map<NodeId, NodeLocation>
       doc[op.section]?.sort((a, b) => rank.get(a.name)! - rank.get(b.name)!)
       return doc
     }
+    case 'set-spec-version':
+      doc.specVersion = op.specVersion
+      return doc
     case 'set-title':
       if (op.title === null) delete doc.title
       else doc.title = op.title
@@ -378,8 +389,9 @@ export function normalizeDocument(doc: FdnDocument): FdnDocument {
 export function diffPatch(original: FdnDocument, target: FdnDocument): PatchOp[] | null {
   const from = normalizeDocument(original)
   const to = normalizeDocument(target)
-  if (from.specVersion !== to.specVersion) return null
+  try { assertFormatVersion(to) } catch { return null }
   const ops: PatchOp[] = []
+  if (from.specVersion !== to.specVersion) ops.push({ op: 'set-spec-version', specVersion: to.specVersion })
   if (from.title !== to.title) ops.push({ op: 'set-title', title: to.title ?? null })
   if (!diffNamed('params', from.params, to.params, (param) => ({ op: 'set-param', param }), (name) => ({ op: 'remove-param', name }), ops)) return null
   if (!diffNamed('lookups', from.lookups, to.lookups, (lookup) => ({ op: 'set-lookup', lookup }), (name) => ({ op: 'remove-lookup', name }), ops)) return null

@@ -563,6 +563,9 @@ class LoroChain implements FdnChain {
       case 'set-declaration-order':
         this.order.set(op.section, JSON.stringify(op.names))
         break
+      case 'set-spec-version':
+        this.meta.set('specVersion', op.specVersion)
+        break
       case 'set-title':
         if (op.title === null) this.meta.delete('title')
         else this.meta.set('title', op.title)

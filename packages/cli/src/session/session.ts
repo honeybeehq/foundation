@@ -1,3 +1,5 @@
+import { ArtboardError, artboardPages, boardViews, boardView, boardKey, validateArtboards } from 'foundation-engine'
+import type { BoardRef } from 'foundation-engine'
 import { bakeImpact, mergeBakeImpact, type BakeImpact } from './bake-impact.js'
 import { PlacementError } from './placement.js'
 import { expandComponentOp } from './components.js'
@@ -87,11 +89,11 @@ class DesignSession implements Session {
   private diskText: string | null = null
   private diskTextCanonical: string | null = null
   private diskChain: Uint8Array | null = null
-  private view: { states: Array<string | null>; components: boolean; bakeDiffs: boolean } = { states: [], components: false, bakeDiffs: false }
+  private view: { boards: BoardRef[]; components: boolean; bakeDiffs: boolean } = { boards: [], components: false, bakeDiffs: false }
   private sentBakes = new Map<string, string>()
   private bakeGeneration = 0
   private pendingBakeImpact: BakeImpact | null = null
-  private stateBakes = new Map<string | null, { rev: number; html: string }>()
+  private stateBakes = new Map<string, { rev: number; html: string }>()
   private watcher: FSWatcher | null = null
   private poller: NodeJS.Timeout | null = null
   private seenSignature = ''
@@ -217,7 +219,7 @@ class DesignSession implements Session {
       case 'hello':
         return this.fault('protocol', 'hello was already received', null)
       case 'view':
-        this.view = { states: [...new Set(message.states)], components: message.components, bakeDiffs: message.bakeDiffs === true }
+        this.view = { boards: [...new Map(message.boards.map(ref => [boardKey(ref), ref])).values()], components: message.components, bakeDiffs: message.bakeDiffs === true }
         this.sentBakes.clear()
         this.stateBakes.clear()
         return this.sendBakes()
@@ -349,7 +351,7 @@ class DesignSession implements Session {
     this.doc = doc
     this.docText = canonicalText(doc)
     if (this.preparedChain && (this.chain || this.preparedChain.text !== this.docText)) this.preparedChain = null
-    this.issues = validateDocument(doc).issues
+    this.issues = [...validateDocument(doc).issues, ...validateArtboards(doc)]
   }
 
   private persist(protect = true): void {
@@ -481,7 +483,7 @@ class DesignSession implements Session {
       for (const op of message.ops) {
         const expanded = op.op === 'replace-document' ? diffPatch(target, op.doc) : [op]
         if (expanded === null) throw new Error('edit cannot be expressed as granular changes')
-        const checked = applyPatch(target, expandSessionOps(target, expanded, componentSwaps, componentDetaches), { validateComponents: message.ops.length === 1, validateStateStyles: message.ops.length === 1 })
+        const checked = applyPatch(target, expandSessionOps(target, expanded, componentSwaps, componentDetaches), { validateComponents: message.ops.length === 1, validateStateStyles: message.ops.length === 1, validateArtboards: message.ops.length === 1 })
         if (!checked.ok) throw new PlacementError(checked.error.code, checked.error.message)
         primitive.push(...checked.applied)
         singlePatch = checked
@@ -489,7 +491,7 @@ class DesignSession implements Session {
       }
       ops = primitive
     } catch (err) {
-      return this.reject(message.id, { code: err instanceof PlacementError ? err.code : err instanceof Error && err.message.startsWith('swap preview changed') ? 'conflict' : 'invalid-op', message: err instanceof Error ? err.message : String(err) })
+      return this.reject(message.id, { code: err instanceof PlacementError || err instanceof ArtboardError ? err.code : err instanceof Error && err.message.startsWith('swap preview changed') ? 'conflict' : 'invalid-op', message: err instanceof Error ? err.message : String(err) })
     }
     const patch = message.ops.length === 1 && singlePatch ? singlePatch : applyPatch(this.doc, ops)
     if (!patch.ok) return this.reject(message.id, patch.error)
@@ -507,7 +509,7 @@ class DesignSession implements Session {
     if (failure) return this.reject(message.id, failure)
     this.undoStack.push(undoStep(label, patch.inverse, before, this.doc, patch.applied, history))
     this.redoStack = []
-    this.accept(message.id, { kind: 'commit', id: message.id, author: this.author }, bakeImpact(this.doc, patch.applied), componentSwaps, componentDetaches)
+    this.accept(message.id, { kind: 'commit', id: message.id, author: this.author }, bakeImpact(this.doc, patch.applied, before), componentSwaps, componentDetaches)
   }
 
   private step(id: string, direction: 'undo' | 'redo'): void {
@@ -535,7 +537,7 @@ class DesignSession implements Session {
     }
     from.pop()
     to.push(oppositeStep(step, before, this.doc))
-    this.accept(id, { kind: direction, id, author: this.author }, bakeImpact(this.doc, patch.applied))
+    this.accept(id, { kind: direction, id, author: this.author }, bakeImpact(this.doc, patch.applied, before))
   }
 
   private anchor(message: Extract<ClientMessage, { t: 'anchor' }>): void {
@@ -623,6 +625,8 @@ class DesignSession implements Session {
       head: this.head(),
       history: { canUndo: this.undoStack.length > 0, canRedo: this.redoStack.length > 0, undoLabel: top(this.undoStack), redoLabel: top(this.redoStack) },
       issues: this.issues,
+      pages: artboardPages(this.doc),
+      boards: boardViews(this.doc),
     }
   }
 
@@ -656,21 +660,30 @@ class DesignSession implements Session {
   }
 
   private sendBakesFor(doc: FdnDocument, rev: number, impact: BakeImpact): void {
-    for (const state of this.view.states) {
-      if (impact.states && !impact.states.has(state)) continue
-      const baked = this.bake(() => bakeEditorDocument(doc, state === null ? undefined : { state }))
-      if (!this.changed(`state:${JSON.stringify(state)}`, baked)) continue
-      const previous = this.stateBakes.get(state)
-      this.stateBakes.set(state, { rev, html: baked.html })
+    for (const ref of this.view.boards) {
+      const key = boardKey(ref)
+      let geometry: ReturnType<typeof boardView>
+      try { geometry = boardView(doc, ref) } catch (err) {
+        this.stateBakes.delete(key)
+        this.sentBakes.delete(key)
+        this.emit({ t: 'fault', code: 'not-found', message: `preview unavailable ${key}: ${String(err)}` })
+        continue
+      }
+      if (impact.states && !impact.states.has(ref.state)) continue
+      if (impact.artboards && !impact.artboards.has(ref.artboardId)) continue
+      const baked = this.bake(() => bakeEditorDocument(doc, { ...(ref.state === null ? {} : { state: ref.state }), artboardId: ref.artboardId }))
+      if (!this.changed(key, baked)) continue
+      const previous = this.stateBakes.get(key)
+      this.stateBakes.set(key, { rev, html: baked.html })
       if (this.view.bakeDiffs && previous) {
         const diff = htmlDiff(previous.html, baked.html)
-        const delta: ServiceMessage = { t: 'baked-diff', rev, state, baseRev: previous.rev, ...diff, report: baked.report }
+        const delta: ServiceMessage = { t: 'baked-diff', rev, ...geometry, baseRev: previous.rev, ...diff, report: baked.report }
         if (JSON.stringify(delta).length < baked.html.length) {
           this.emit(delta)
           continue
         }
       }
-      this.emit({ t: 'baked', rev, state, ...baked })
+      this.emit({ t: 'baked', rev, ...geometry, ...baked })
     }
     if (!this.view.components || !impact.components) return
     for (const component of [...doc.components, ...(doc.componentSets ?? [])]) {

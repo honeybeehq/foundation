@@ -70,6 +70,8 @@ export function invertOp(
   switch (op.op) {
     case 'set-declaration-order':
       return { op: 'set-declaration-order', section: op.section, names: (beforeDoc[op.section] ?? []).map(item => item.name) }
+    case 'set-spec-version':
+      return { op: 'set-spec-version', specVersion: beforeDoc.specVersion }
     case 'set-title':
       return { op: 'set-title', title: beforeDoc.title ?? null }
     case 'insert-node':

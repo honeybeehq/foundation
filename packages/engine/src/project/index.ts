@@ -1,3 +1,4 @@
+import { assertFormatVersion } from '../artboards/index.js'
 import { needsJsonItem } from '../data.js'
 import { stableStringify } from '../chain/util.js'
 /**
@@ -279,6 +280,8 @@ function emitAnnotation(w: Writer, depth: number, annotation: FdnAnnotation): vo
   if (annotation.x !== undefined) a.push(['x', String(annotation.x)])
   if (annotation.y !== undefined) a.push(['y', String(annotation.y)])
   if (annotation.state !== undefined) a.push(['state', annotation.state])
+  if (annotation.artboardId !== undefined) a.push(['artboard-id', annotation.artboardId])
+  if (annotation.viewport !== undefined) a.push(['viewport', annotation.viewport])
   a.push(['status', annotation.status])
   w.push(depth, `<fdn-annotation ${attrPairs(a)}>${escapeText(annotation.text)}</fdn-annotation>`)
 }
@@ -397,6 +400,7 @@ function emitTokens(w: Writer, doc: FdnDocument): void {
 // ——————————————————————————————————————————————————————————————————————————
 
 export function projectDocument(doc: FdnDocument): string {
+  assertFormatVersion(doc)
   const w = new Writer()
   w.push(0, '<!DOCTYPE html>')
   w.push(0, '<html lang="en">')

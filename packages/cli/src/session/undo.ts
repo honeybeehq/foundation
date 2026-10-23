@@ -184,7 +184,7 @@ export function undoOps(step: UndoStep, doc: FdnDocument): PatchOp[] {
   const out: PatchOp[] = []
   let skippedRetarget = false
   const apply = (op: PatchOp): void => {
-    const patch = applyPatch(current, [op], { validateTokens: false, validateComponents: false, validateStateStyles: false })
+    const patch = applyPatch(current, [op], { validateTokens: false, validateComponents: false, validateStateStyles: false, validateArtboards: false })
     if (!patch.ok) throw new Error(patch.error.message)
     current = patch.doc
     out.push(...patch.applied)
@@ -216,6 +216,7 @@ export function undoOps(step: UndoStep, doc: FdnDocument): PatchOp[] {
         }
       }
       visit(loc.node)
+      if (foreign.length && ['fdn-page', 'fdn-artboard'].includes(loc.node.tag)) throw new Error('created artboard/page now contains foreign descendants; retaining all content')
       for (const [offset, id] of foreign.entries()) apply({ op: 'move-node', id, parent: loc.parent, index: loc.index + offset })
     }
     if (op.op === 'insert-node' || op.op === 'move-node') {

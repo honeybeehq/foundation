@@ -50,7 +50,7 @@ describe('session commit + undo on every board', () => {
     const sent: ServiceMessage[] = []
     const session = createSession({ path: file, send: (message) => sent.push(message), watch: false })
     const say = (message: object): void => session.receive(JSON.stringify(message))
-    say({ t: 'hello', protocol: '0.1', client: 'test', author: 'user:test' })
+    say({ t: 'hello', protocol: '0.2', client: 'test', author: 'user:test' })
     const welcome = sent.find((m): m is Extract<ServiceMessage, { t: 'welcome' }> => m.t === 'welcome')
     expect(welcome).toBeDefined()
     expect(readFileSync(file, 'utf8').replace(/ data-fdn-version="[^"]*"/, '')).toBe(original)

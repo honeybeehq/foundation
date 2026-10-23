@@ -1,27 +1,32 @@
+import { expandArtboardOp } from 'foundation-engine'
+import type { ArtboardOp } from 'foundation-engine'
 import { applyPatch, indexNodes } from 'foundation-engine'
 import type { FdnDocument, FdnNode, InstanceDetachReport, InstanceSwapReport, PatchOp } from 'foundation-engine'
 import { expandComponentOp } from './components.js'
 import type { ComponentOp, PlacementOp, SessionOp, TokenModeOp } from 'foundation-protocol'
 import { expandPlacement, PlacementError } from './placement.js'
 
+const ARTBOARD_OPS = new Set(['create-page', 'rename-page', 'reorder-page', 'duplicate-page', 'delete-page', 'create-artboard', 'rename-artboard', 'move-artboard', 'resize-artboard', 'move-artboard-view', 'set-artboard-view-visible', 'set-artboard-view-size', 'separate-artboard-view', 'rename-viewport', 'rename-state', 'resize-viewport', 'duplicate-artboard', 'reorder-artboard', 'delete-artboard', 'upgrade-artboards'])
+
 const COMPONENT_OPS = new Set(['detach-instance', 'swap-instance', 'set-instance-variant', 'set-instance-override', 'reset-instance-override', 'reset-instance-overrides'])
 
 const MODE_OPS = new Set(['create-token-collection', 'add-token-mode', 'rename-token-mode', 'remove-token-mode', 'set-mode-token', 'set-collection-mode'])
 
 export function expandSessionOps(doc: FdnDocument, ops: SessionOp[], reports: InstanceSwapReport[] = [], detaches: InstanceDetachReport[] = []): PatchOp[] {
-  if (ops.every((op): op is PatchOp | PlacementOp => !MODE_OPS.has(op.op) && !COMPONENT_OPS.has(op.op))) return expandPlacement(doc, ops)
+  if (ops.every((op): op is PatchOp | PlacementOp => !MODE_OPS.has(op.op) && !COMPONENT_OPS.has(op.op) && !ARTBOARD_OPS.has(op.op))) return expandPlacement(doc, ops)
   let working = doc
   const expanded: PatchOp[] = []
   for (const [position, op] of ops.entries()) {
     let batch: PatchOp[]
-    if (COMPONENT_OPS.has(op.op)) batch = expandComponentOp(working, op as ComponentOp, reports, detaches)
+    if (ARTBOARD_OPS.has(op.op)) batch = expandArtboardOp(working, op as ArtboardOp)
+    else if (COMPONENT_OPS.has(op.op)) batch = expandComponentOp(working, op as ComponentOp, reports, detaches)
     else if (!MODE_OPS.has(op.op)) batch = expandPlacement(working, [op as PatchOp | PlacementOp])
     else batch = modeOps(working, op as TokenModeOp)
     if (position === ops.length - 1) {
       expanded.push(...batch)
       break
     }
-    const patch = applyPatch(working, batch, { validateTokens: false, validateComponents: false, validateStateStyles: false })
+    const patch = applyPatch(working, batch, { validateTokens: false, validateComponents: false, validateStateStyles: false, validateArtboards: false })
     if (!patch.ok) throw new PlacementError(patch.error.code, patch.error.message)
     working = patch.doc
     expanded.push(...patch.applied)
