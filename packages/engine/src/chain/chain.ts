@@ -48,8 +48,8 @@
  *     replace-document does. They still get real Loro containers per the
  *     task brief, so a future finer-grained op could reach them without a
  *     storage migration.
- *   - No remove-param/remove-lookup/remove-state exists — undoing a
- *     first-time set-param/set-lookup/set-state has no typed inverse and
+ *   - No remove-param/remove-state exists — undoing a
+ *     first-time set-param/set-state has no typed inverse and
  *     falls back to a whole-document replace-document undo (model.ts).
  *   - (RESOLVED 2026-07-31, contract amendment) SemanticOp gained
  *     set-style-ref/set-when variants and a 'meta' section-changed section
@@ -114,8 +114,8 @@ import type {
   StateStyleKey,
 } from '../types.js'
 import { computeEnvelopeHash, decodeEnvelope, encodeEnvelope, type PackedEnvelope } from './envelope.js'
-import { indexNodes, invertOp, structuralDiff } from './model.js'
-import { diffNodes } from '../patch/index.js'
+import { structuralDiff } from './model.js'
+import { applyPatch, diffNodes } from '../patch/index.js'
 import { comparePeerIds, derivePeerId, DeterministicClock, stableStringify } from './util.js'
 import { createHash } from 'node:crypto'
 
@@ -269,7 +269,8 @@ class LoroChain implements FdnChain {
   apply(meta: ChangeMeta, ops: PatchOp[]): EnvelopeRecord {
     if (ops.length === 0) throw new Error('apply: ops must not be empty')
     const beforeDoc = this.materialize()
-    const nodeIndex = indexNodes(beforeDoc.body)
+    const patch = applyPatch(beforeDoc, ops)
+    if (!patch.ok) throw new Error(patch.error.message)
     const beforeVV = this.loro.version()
     const startCounter = beforeVV.get(this.peerIdStr) ?? 0
     // Must read `head`/prevHash BEFORE mutating: log()/head() walk
@@ -277,15 +278,8 @@ class LoroChain implements FdnChain {
     // (see chain.ts module doc) — calling it after mutating but before our
     // own explicit commit() would silently steal our message.
     const prevHash = this.tryHead()?.hash ?? null
-    const inverses: PatchOp[] = []
-    let fallback = false
-    for (const op of ops) {
-      const inv = invertOp(op, beforeDoc, nodeIndex)
-      if (inv === 'fallback') fallback = true
-      else if (inv !== null) inverses.push(inv)
-      this.applyOp(op)
-    }
-    this.lastLocalChange = fallback ? [{ op: 'replace-document', doc: beforeDoc }] : inverses.reverse()
+    for (const op of patch.applied) this.applyOp(op)
+    this.lastLocalChange = patch.inverse
     return this.commitEnvelope(meta, startCounter, prevHash)
   }
 
@@ -486,7 +480,7 @@ class LoroChain implements FdnChain {
         break
       }
       case 'set-component': {
-        this.setKeyed('components', this.components, op.component.name, op.component)
+        this.setKeyed('components', this.components, op.component.name, op.component, op.index)
         break
       }
       case 'remove-component': {
@@ -498,7 +492,11 @@ class LoroChain implements FdnChain {
         break
       }
       case 'set-lookup': {
-        this.setKeyed('lookups', this.lookups, op.lookup.name, op.lookup)
+        this.setKeyed('lookups', this.lookups, op.lookup.name, op.lookup, op.index)
+        break
+      }
+      case 'remove-lookup': {
+        this.removeKeyed('lookups', this.lookups, op.name)
         break
       }
       case 'set-state': {
@@ -615,9 +613,15 @@ class LoroChain implements FdnChain {
     return stored === undefined ? null : (JSON.parse(stored) as string[])
   }
 
-  private setKeyed(section: KeyedSection, map: LoroMap, key: string, item: unknown): void {
+  private setKeyed(section: KeyedSection, map: LoroMap, key: string, item: unknown, index?: number): void {
     map.set(key, stableStringify(item))
     const order = this.declaredOrder(section)
+    if (index !== undefined) {
+      const next = this.keyedValues<{ name: string }>(section, map).map((entry) => entry.name).filter((name) => name !== key)
+      next.splice(index, 0, key)
+      this.order.set(section, JSON.stringify(next))
+      return
+    }
     if (order && !order.includes(key)) this.order.set(section, JSON.stringify([...order, key]))
   }
 

@@ -222,10 +222,11 @@ export type PatchOp =
   | { op: 'set-token'; name: string; value: string | null }
   | { op: 'set-named-style'; style: FdnNamedStyle }
   | { op: 'remove-named-style'; name: string }
-  | { op: 'set-component'; component: FdnComponent }
+  | { op: 'set-component'; component: FdnComponent; index?: number }
   | { op: 'remove-component'; name: string }
   | { op: 'set-param'; param: FdnParam }
-  | { op: 'set-lookup'; lookup: FdnLookup }
+  | { op: 'set-lookup'; lookup: FdnLookup; index?: number }
+  | { op: 'remove-lookup'; name: string }
   | { op: 'set-state'; state: FdnState }
   | { op: 'annotate'; annotation: FdnAnnotation }
   | { op: 'set-annotation-status'; id: string; status: FdnAnnotation['status'] }

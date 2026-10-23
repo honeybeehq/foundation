@@ -425,6 +425,16 @@ component, bind instance props), `render`, `diff`, `anchor`, `freeze`,
 speak pixels or bytes. To fill: operation schemas, batch/transaction rules, error
 vocabulary (validation failures must be legible to an agent mid-loop).
 
+Lookup edits have granular inverses: `set-lookup {lookup,index?}` inserts or
+updates one declaration; `remove-lookup {name}` removes it. Undo of a new lookup
+removes only that lookup; undo of an update restores its prior value; undo of
+removal restores its value and declaration position. `set-component` also accepts
+an optional declaration `index` for exact restoration after removal. An index
+addresses the list with any previous declaration of that name excluded; omitting
+it preserves the current position or appends a new declaration. These verbs use
+the ordinary one-batch/one-undo protocol, never a whole-document inverse. Component
+prop declarations use `set-component`; instance prop bindings use `set-attr`.
+
 ## 9. Sync & multiplayer — *skeleton*
 
 Intent: chains sync as append-only logs; local-first; any transport (filesystem, peer

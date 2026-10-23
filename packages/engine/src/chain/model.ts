@@ -57,8 +57,7 @@ export function indexNodes(body: FdnNode[]): Map<NodeId, NodeLocation> {
  *     a single `replace-document` restoring the pre-batch snapshot instead.
  *
  * Findings (contract gaps discovered while writing this):
- *   - set-param/set-lookup/set-state have no remove-param/remove-lookup/
- *     remove-state counterpart. Undoing a *first-time* set-param (etc.) has
+ *   - set-param/set-state have no remove-param/remove-state counterpart. Undoing a *first-time* set-param (etc.) has
  *     no typed inverse — 'fallback'.
  *   - set-text's `text` field is a non-nullable string, so a node that had
  *     no text before this batch has no way to be inverted back to
@@ -124,11 +123,11 @@ export function invertOp(
     }
     case 'set-component': {
       const prev = beforeDoc.components.find((c) => c.name === op.component.name)
-      return prev ? { op: 'set-component', component: prev } : { op: 'remove-component', name: op.component.name }
+      return prev ? { op: 'set-component', component: prev, ...(op.index === undefined ? {} : { index: beforeDoc.components.indexOf(prev) }) } : { op: 'remove-component', name: op.component.name }
     }
     case 'remove-component': {
       const prev = beforeDoc.components.find((c) => c.name === op.name)
-      return prev ? { op: 'set-component', component: prev } : null
+      return prev ? { op: 'set-component', component: prev, index: beforeDoc.components.indexOf(prev) } : null
     }
     case 'set-param': {
       const prev = beforeDoc.params.find((p) => p.name === op.param.name)
@@ -136,7 +135,11 @@ export function invertOp(
     }
     case 'set-lookup': {
       const prev = beforeDoc.lookups.find((l) => l.name === op.lookup.name)
-      return prev ? { op: 'set-lookup', lookup: prev } : 'fallback'
+      return prev ? { op: 'set-lookup', lookup: prev, ...(op.index === undefined ? {} : { index: beforeDoc.lookups.indexOf(prev) }) } : { op: 'remove-lookup', name: op.lookup.name }
+    }
+    case 'remove-lookup': {
+      const prev = beforeDoc.lookups.find((l) => l.name === op.name)
+      return prev ? { op: 'set-lookup', lookup: prev, index: beforeDoc.lookups.indexOf(prev) } : null
     }
     case 'set-state': {
       const prev = beforeDoc.states.find((s) => s.name === op.state.name)

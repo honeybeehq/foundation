@@ -120,6 +120,17 @@ function checkOp(op: PatchOp, doc: FdnDocument, index: Map<NodeId, NodeLocation>
     case 'set-token':
       if (op.name === '') throw new PatchFailure('invalid-op', 'set-token needs a non-empty name')
       return op
+    case 'set-lookup':
+    case 'set-component': {
+      const items = op.op === 'set-lookup' ? doc.lookups : doc.components
+      const name = op.op === 'set-lookup' ? op.lookup.name : op.component.name
+      if (name === '') throw new PatchFailure('invalid-op', `${op.op} needs a non-empty name`)
+      if (op.index === undefined) return op
+      return { ...op, index: checkIndex(op.index, items.filter((item) => item.name !== name).length, lenient, op.op) }
+    }
+    case 'remove-lookup':
+      if (op.name === '') throw new PatchFailure('invalid-op', 'remove-lookup needs a non-empty name')
+      return op
     case 'set-annotation-status':
       if (!doc.annotations.some((a) => a.id === op.id)) throw new PatchFailure('invalid-op', `unknown annotation "${op.id}"`)
       return op
@@ -128,8 +139,13 @@ function checkOp(op: PatchOp, doc: FdnDocument, index: Map<NodeId, NodeLocation>
   }
 }
 
-function upsertByName<T extends { name: string }>(items: T[], item: T): T[] {
+function upsertByName<T extends { name: string }>(items: T[], item: T, index?: number): T[] {
   const copy = structuredClone(item)
+  if (index !== undefined) {
+    const next = items.filter((existing) => existing.name !== item.name)
+    next.splice(index, 0, copy)
+    return next
+  }
   return items.some((existing) => existing.name === item.name) ? items.map((existing) => (existing.name === item.name ? copy : existing)) : [...items, copy]
 }
 
@@ -189,7 +205,7 @@ function applyOp(doc: FdnDocument, op: PatchOp, index: Map<NodeId, NodeLocation>
       doc.namedStyles = doc.namedStyles.filter((s) => s.name !== op.name)
       return doc
     case 'set-component':
-      doc.components = upsertByName(doc.components, op.component)
+      doc.components = upsertByName(doc.components, op.component, op.index)
       return doc
     case 'remove-component':
       doc.components = doc.components.filter((c) => c.name !== op.name)
@@ -198,7 +214,10 @@ function applyOp(doc: FdnDocument, op: PatchOp, index: Map<NodeId, NodeLocation>
       doc.params = upsertByName(doc.params, op.param)
       return doc
     case 'set-lookup':
-      doc.lookups = upsertByName(doc.lookups, op.lookup)
+      doc.lookups = upsertByName(doc.lookups, op.lookup, op.index)
+      return doc
+    case 'remove-lookup':
+      doc.lookups = doc.lookups.filter((lookup) => lookup.name !== op.name)
       return doc
     case 'set-state':
       doc.states = upsertByName(doc.states, op.state)
@@ -228,7 +247,7 @@ export function diffPatch(original: FdnDocument, target: FdnDocument): PatchOp[]
   if (!sameJson(from.data, to.data) || !sameJson(from.viewports, to.viewports) || !sameJson(from.matrix, to.matrix)) return null
   const ops: PatchOp[] = []
   if (!diffNamed(from.params, to.params, (param) => ({ op: 'set-param', param }), null, ops)) return null
-  if (!diffNamed(from.lookups, to.lookups, (lookup) => ({ op: 'set-lookup', lookup }), null, ops)) return null
+  if (!diffNamed(from.lookups, to.lookups, (lookup) => ({ op: 'set-lookup', lookup }), (name) => ({ op: 'remove-lookup', name }), ops)) return null
   if (!diffNamed(from.states, to.states, (state) => ({ op: 'set-state', state }), null, ops)) return null
   if (!diffNamed(from.namedStyles, to.namedStyles, (style) => ({ op: 'set-named-style', style }), (name) => ({ op: 'remove-named-style', name }), ops)) return null
   if (!diffNamed(from.components, to.components, (component) => ({ op: 'set-component', component }), (name) => ({ op: 'remove-component', name }), ops)) return null
