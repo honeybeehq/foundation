@@ -1193,3 +1193,66 @@ To fill: the fixtures.
     the overlay (`data-fdn-trigger="hover:<ref>"` + `dismiss="none"`), with all
     other overlay shapes continuing to imply visibility from their containing baked
     state. Decide in L1 alongside the bake semantics.
+
+## 15. Artboards and pages (T97)
+
+Explicit multi-artboard documents use `0.1.0-artboards`. Legacy single-body
+files retain their original format and open without writes. Updated writers
+refuse unsupported format versions before normalization or persistence. This
+cannot make older executables safe: the old parser drops an unknown wrapper
+and its entire subtree. All installed writers must be updated or retired
+before enabling production upgrades; the Foundation release owner records that
+rollout inventory. Development fixtures are disposable copies.
+
+The existing source-node tree stores `fdn-page` at body root, `fdn-artboard`
+inside pages, and ordinary design children inside artboards. Both structural
+nodes use stable `data-fdn-id` and literal `data-fdn-name`; names may repeat.
+Artboards store literal finite pixel numbers in `data-fdn-x`, `data-fdn-y`,
+`data-fdn-width`, `data-fdn-height`, with positive dimensions, plus
+`data-fdn-overflow="clip|visible"`. Page/artboard DOM order is saved ordering,
+independent of canvas coordinates. Structural nodes cannot carry styles,
+conditions, iterations, named-style bindings or token-mode selections.
+
+A preview is addressed by `(artboardId,state,viewport)`, with null state for
+defaults/overview and null viewport for native dimensions. Only `(id,null,null)`
+is the canonical occurrence: its position and size belong to the artboard.
+`fdn-artboard-view` children store optional preview-specific X/Y, visibility and
+paired W/H overrides. `data-fdn-view-state` and `data-fdn-view-viewport` select
+the tuple; omitted selectors mean null. Records have their own IDs, no content
+or styles, and at most one record exists per tuple. Saved positions never
+reflow. Unsaved initial placements are derived and may change when declarations
+or sizes change. The default browser size is Foundation-owned 1440×900 for
+both canvas descriptors and exports. Fractional dimensions stay exact in the
+file; the browser viewport rounds to integer CSS pixels as an iframe does,
+while PNG capture reports its actual raster dimensions.
+
+States, viewports, matrix, parameters, lookups, tokens, styles, components and
+component sets remain document-wide. Existing state scopes and per-state lookup
+bindings retain their semantics. Matrix state `""` maps to null. The Components
+catalog is synthetic, not a writable user page. Baking selects one artboard,
+removes all structural wrappers/view metadata and emits its children through the
+existing body emitter. Artboard placement never becomes content CSS.
+
+Each semantic edit is one granular transaction and one writer-local Undo step.
+Legacy upgrade wraps the unchanged body using insert/move operations, preserves
+source IDs, declarations, annotations and chain ancestry, and records viewport
+preview placements. The first placement gesture combines upgrade plus edit in
+one Undo. Undo refuses to delete a created structural container containing
+foreign descendants that cannot be retained legally. Shared viewport resizing
+commits immediately. A later “Make this board separate” action installs a local
+size override and restores the old shared size, guarded against intervening
+viewport edits, as a second Undo step.
+
+### Duplicate reference inventory
+
+Duplication requires a complete descendant source-ID map; the new root ID is
+separate. It creates fresh IDs for design nodes and metadata, preserves native
+component links and definition-local override target paths, and leaves lookup
+bindings shared. HTML `id` values receive a root-derived suffix. Local `href`
+and `xlink:href` fragments, `for`, `aria-labelledby`, `aria-describedby`,
+`aria-controls`, `aria-owns`, `headers`, and `data-fdn-anchor-ref` are rewritten
+when their targets are internal. External references remain external. Duplicate
+HTML IDs and CSS/attribute `url(#fragment)` references refuse duplication until
+an unambiguous rewrite is supported; no heuristic string substitution runs.
+Annotations/comments are not duplicated. Redo reuses the original copied IDs
+and content, even after the original artboard changes.

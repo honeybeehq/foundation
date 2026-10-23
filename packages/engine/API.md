@@ -216,3 +216,47 @@ expected and live in the module's test directory.
 also bake non-trivially** — a validator acceptance test whose document bakes to
 empty/hollow output is a contract split between validate and bake (the each-over-data
 bug shipped exactly this way: valid and hollow simultaneously).
+
+## Artboard API and session 0.2
+
+`artboardPages(doc)` and `boardViews(doc)` provide ordered page descriptors and
+all native/generated occurrences, including hidden previews. `boardView(doc,
+{artboardId,state,viewport})` resolves one effective position, size and overflow
+policy. `boardKey(ref)` is the stable tuple cache key. `selectArtboard(doc,id)`
+selects one design body; `validateArtboards(doc)` reports structural issues.
+Legacy bodies use `artboardId:null`. Explicit IDs always identify source nodes.
+
+`bakeDocument` and `bakeEditorDocument` accept `{artboardId?,state?}` and return
+`artboardId` alongside existing output. With several artboards an omitted ID
+reports `ambiguous-artboard` and emits no content. `renderDocument` additionally
+accepts `{artboardId?,pageId?,matrix?}`. Explicit designs default to each selected
+artboard's native dimensions; `viewport` chooses a named preview including a
+saved local size override; `matrix:true` enumerates declared matrix cells.
+Clipped artboards capture exactly the artboard bounds. Visible and legacy
+artboards preserve their existing overflow capture policy.
+
+Session protocol is `0.2`; no `0.1` adapter is provided. The `view` request uses
+`boards:[{artboardId,state,viewport}]`, `components`, and optional `bakeDiffs`.
+Welcome/doc messages carry `pages` and `boards`; all baked/baked-diff messages
+carry the complete `BoardView` descriptor. Diff offsets remain UTF-16 and bases
+are tracked independently per tuple. Geometry-only edits update doc descriptors
+without content bakes. Missing subscriptions produce a not-found fault and are
+removed from bake caches; clients discard deleted previews from doc messages.
+
+`ArtboardOp` in the vendored document types defines page/artboard CRUD,
+identity-anchored reorder, duplicate ID maps, preview placement/visibility/size,
+shared viewport resize and guarded separation, declaration rename and explicit
+legacy upgrade. They expand under the same transaction lock into ordinary
+PatchOps. `set-spec-version` is the granular format-version primitive. One
+semantic batch is one change; malformed or conflicting operations make no
+writes. All new operations work through `foundation edit FILE --ops JSON` or
+`--ops-file FILE` and the MCP tool `foundation_edit {path,ops,label?,author?}`.
+These one-shot writers have no persistent Undo stack; live sessions retain
+writer-local Undo/Redo.
+
+CLI bake accepts `--artboard ID`. Render accepts `--artboard ID`, `--page ID`,
+`--matrix`, existing state/viewport/scale selectors and output forms. Single-PNG
+JSON adds `artboardId` for explicit boards. Directory exports use encoded stable
+IDs and write a manifest. MCP bake/render use `artboardId`/`pageId`/`matrix`.
+Vendoring must copy document.ts/session.ts/PIN from the same runtime commit;
+ship Foundation service and Apiary client as one supported protocol pair.

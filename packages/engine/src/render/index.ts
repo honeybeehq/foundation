@@ -1,3 +1,4 @@
+import { artboardPages, boardView, explicitArtboards, DEFAULT_BOARD_SIZE } from '../artboards/index.js'
 /**
  * render/index.ts — renderHtml + renderDocument (API.md "Wave 2 signatures").
  *
@@ -31,6 +32,7 @@ export interface RenderConfig {
   viewport: FdnViewport
   deviceScaleFactor?: number
   clipToViewport?: boolean
+  clipToBounds?: boolean
 }
 
 export interface LayoutEntry {
@@ -91,7 +93,7 @@ async function captureHtml(browser: Browser, html: string, config: RenderConfig)
   const context = await browser.newContext({
     ...CONTEXT_OPTIONS,
     deviceScaleFactor: config.deviceScaleFactor ?? 1,
-    viewport: { width: config.viewport.width, height: config.viewport.height },
+    viewport: { width: Math.max(1, Math.round(config.viewport.width)), height: Math.max(1, Math.round(config.viewport.height)) },
   })
   try {
     await context.addInitScript(freezeClock, FROZEN_EPOCH_MS)
@@ -102,12 +104,12 @@ async function captureHtml(browser: Browser, html: string, config: RenderConfig)
     // theoretically be composited first (ported from the spike).
     await page.evaluate(() => document.fonts.ready)
 
-    const clip = config.clipToViewport
+    const clip = config.clipToViewport || config.clipToBounds
       ? {
           x: 0,
           y: 0,
           width: config.viewport.width,
-          height: await page.evaluate(() => Math.max(window.innerHeight, document.documentElement.scrollHeight, document.body.scrollHeight)),
+          height: config.clipToBounds ? config.viewport.height : await page.evaluate(() => Math.max(window.innerHeight, document.documentElement.scrollHeight, document.body.scrollHeight)),
         }
       : undefined
     const png = await page.screenshot({ type: 'png', fullPage: true, ...(clip ? { clip } : {}) })
@@ -143,7 +145,7 @@ export async function renderHtml(html: string, config: RenderConfig): Promise<{ 
 
 // ——— renderDocument ———
 
-const DEFAULT_VIEWPORT: FdnViewport = { name: 'default', width: 1440, height: 900 }
+const DEFAULT_VIEWPORT: FdnViewport = { name: 'default', ...DEFAULT_BOARD_SIZE }
 
 interface Cell {
   state: string | null
@@ -151,6 +153,8 @@ interface Cell {
   /** Cell-specific issues discovered while resolving the matrix (e.g. an
    *  undeclared viewport name) — merged into the cell's report alongside
    *  the bake's own ConformanceReport. */
+  artboardId?: string
+  clipToBounds?: boolean
   preReport?: ReportLine[]
 }
 
@@ -303,17 +307,32 @@ function detectSystemFontStackLines(doc: FdnDocument, tree: FdnNode[], html: str
 
 export async function renderDocument(
   doc: FdnDocument,
-  opts?: { state?: string; viewport?: string; deviceScaleFactor?: number; clipToViewport?: boolean },
+  opts?: { state?: string; viewport?: string; artboardId?: string; pageId?: string; matrix?: boolean; deviceScaleFactor?: number; clipToViewport?: boolean },
 ): Promise<
-  Array<{ state: string | null; viewport: FdnViewport; png: Uint8Array; layout: LayoutEntry[]; report: ConformanceReport }>
+  Array<{ artboardId?: string; state: string | null; viewport: FdnViewport; png: Uint8Array; layout: LayoutEntry[]; report: ConformanceReport }>
 > {
   const scale = opts?.deviceScaleFactor ?? 1
   if (!Number.isFinite(scale) || scale < 1 || scale > 4) {
     throw new Error('scale must be a finite number between 1 and 4')
   }
-  const cells = resolveCells(doc, opts)
+  let cells: Cell[]
+  if (explicitArtboards(doc)) {
+    const pages = artboardPages(doc)
+    if (opts?.pageId !== undefined && !pages.some(page => page.id === opts.pageId)) throw new Error(`unknown-page: ${opts.pageId}`)
+    const ids = pages.filter(page => opts?.pageId === undefined || page.id === opts.pageId).flatMap(page => page.artboardIds).filter(id => opts?.artboardId === undefined || id === opts.artboardId)
+    if (opts?.artboardId !== undefined && ids.length === 0) throw new Error(`unknown-artboard: ${opts.artboardId}`)
+    const refs = opts?.matrix ? resolveCells(doc, opts).map(cell => ({ state: cell.state || null, viewport: cell.viewport.name })) : [{ state: opts?.state ?? null, viewport: opts?.viewport ?? null }]
+    cells = ids.flatMap(artboardId => refs.map(ref => {
+      const view = boardView(doc, { artboardId, ...ref })
+      return { artboardId, state: ref.state, viewport: { name: ref.viewport ?? 'native', width: view.width, height: view.height }, clipToBounds: view.overflow === 'clip' }
+    }))
+  } else {
+    if (opts?.artboardId !== undefined || opts?.pageId !== undefined) throw new Error('legacy document has no explicit artboard/page selector')
+    cells = resolveCells(doc, opts)
+  }
   const browser = await getBrowser()
   const results: Array<{
+    artboardId?: string
     state: string | null
     viewport: FdnViewport
     png: Uint8Array
@@ -326,17 +345,20 @@ export async function renderDocument(
   // process itself (browser.ts) is launched once, not per cell.
   for (const cell of cells) {
     // eslint-disable-next-line no-await-in-loop -- intentional: one shared browser, sequential contexts
-    const bake = opts?.clipToViewport ? bakeEditorDocument : bakeDocument
-    const baked = bake(doc, cell.state !== null ? { state: cell.state } : undefined)
-    const html = opts?.clipToViewport ? baked.html : emitHtml(doc, injectFdnIds(baked.tree))
+    const editor = opts?.clipToViewport || cell.clipToBounds
+    const bake = editor ? bakeEditorDocument : bakeDocument
+    const baked = bake(doc, { ...(cell.state !== null ? { state: cell.state } : {}), ...(cell.artboardId === undefined ? {} : { artboardId: cell.artboardId }) })
+    const html = editor ? baked.html : emitHtml(doc, injectFdnIds(baked.tree))
     const fontLines = detectSystemFontStackLines(doc, baked.tree, html)
     // eslint-disable-next-line no-await-in-loop -- see above
     const capture = await captureHtml(browser, html, {
       viewport: cell.viewport,
       deviceScaleFactor: scale,
       clipToViewport: opts?.clipToViewport,
+      clipToBounds: cell.clipToBounds,
     })
     results.push({
+      ...(cell.artboardId === undefined ? {} : { artboardId: cell.artboardId }),
       state: cell.state,
       viewport: cell.viewport,
       png: capture.png,

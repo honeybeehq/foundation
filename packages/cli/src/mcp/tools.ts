@@ -1,3 +1,5 @@
+import { editDocument } from '../edit.js'
+import type { SessionOp } from 'foundation-protocol'
 /**
  * foundation MCP tools — the fixed tool list `foundation mcp` exposes over
  * stdio (packages/cli/src/mcp/server.ts wires these into the wire protocol).
@@ -250,9 +252,9 @@ function diffLines(a: string[], b: string[]): LineDiffSummary {
 //      commands/diff.ts) ———
 
 interface LayoutEntry { id: string; x: number; y: number; width: number; height: number }
-interface RenderCell { state: string | null; viewport: FdnViewport; png: Uint8Array; layout: LayoutEntry[]; report: ConformanceReport }
+interface RenderCell { artboardId?: string; state: string | null; viewport: FdnViewport; png: Uint8Array; layout: LayoutEntry[]; report: ConformanceReport }
 interface RenderModule {
-  renderDocument: (doc: FdnDocument, opts?: { state?: string; viewport?: string }) => Promise<RenderCell[]>
+  renderDocument: (doc: FdnDocument, opts?: { state?: string; viewport?: string; artboardId?: string; pageId?: string; matrix?: boolean }) => Promise<RenderCell[]>
 }
 interface VisualDiffResult { identical: boolean; diffPixels: number; width: number; height: number; diffPng: Uint8Array | null }
 interface DiffModule { visualDiff: (a: Uint8Array, b: Uint8Array) => VisualDiffResult }
@@ -397,13 +399,15 @@ async function toolIngest(args: Record<string, unknown>): Promise<ToolResult> {
 async function toolBake(args: Record<string, unknown>): Promise<ToolResult> {
   const path = requireString(args, 'path')
   const state = optionalString(args, 'state')
+  const artboardId = optionalString(args, 'artboardId')
   const read = readSource(path)
   if (!read.ok) return read.result
   const { doc } = parseDocument(read.source)
-  const baked = bakeDocument(doc, state !== undefined ? { state } : undefined)
+  const baked = bakeDocument(doc, { ...(state !== undefined ? { state } : {}), ...(artboardId !== undefined ? { artboardId } : {}) })
   return ok({
     path,
     state: baked.state,
+    artboardId: baked.artboardId,
     html: baked.html,
     conformance: reportPayload(baked.report.lines),
   })
@@ -412,6 +416,7 @@ async function toolBake(args: Record<string, unknown>): Promise<ToolResult> {
 async function toolRender(args: Record<string, unknown>): Promise<ToolResult> {
   const path = requireString(args, 'path')
   const state = optionalString(args, 'state')
+  const artboardId = optionalString(args, 'artboardId')
   const viewport = optionalString(args, 'viewport')
   const outDirArg = optionalString(args, 'outDir')
   const includeLayout = optionalBoolean(args, 'includeLayout')
@@ -432,6 +437,9 @@ async function toolRender(args: Record<string, unknown>): Promise<ToolResult> {
     cells = await renderModule.renderDocument(doc, {
       ...(state !== undefined ? { state } : {}),
       ...(viewport !== undefined ? { viewport } : {}),
+      ...(artboardId !== undefined ? { artboardId } : {}),
+      ...(optionalString(args, 'pageId') !== undefined ? { pageId: optionalString(args, 'pageId') } : {}),
+      matrix: optionalBoolean(args, 'matrix') === true,
     })
   } catch (err) {
     return fail(`render failed: ${err instanceof Error ? err.message : String(err)}`)
@@ -444,7 +452,7 @@ async function toolRender(args: Record<string, unknown>): Promise<ToolResult> {
   // (`includeLayout: true`); it's written to disk either way (like the CLI
   // render command already does with an outDir), so it's always reachable.
   const renders = cells.map((cell) => {
-    const label = `${cell.state ?? 'default'}--${cell.viewport.name}`
+    const label = [cell.artboardId, cell.state ?? 'default', cell.viewport.name].filter(value => value !== undefined).map(value => encodeURIComponent(value!)).join('--')
     const fullPngPath = join(outDir, `${label}.png`)
     writeFileSync(fullPngPath, cell.png)
     const layoutPath = join(outDir, `${label}.layout.json`)
@@ -456,6 +464,7 @@ async function toolRender(args: Record<string, unknown>): Promise<ToolResult> {
 
     const entry: Record<string, unknown> = {
       state: cell.state,
+      artboardId: cell.artboardId,
       viewport: cell.viewport,
       pngPath: fullPngPath,
       bytes: cell.png.byteLength,
@@ -646,6 +655,7 @@ async function toolAnnotate(args: Record<string, unknown>): Promise<ToolResult> 
   const x = optionalNumber(args, 'x')
   const y = optionalNumber(args, 'y')
   const state = optionalString(args, 'state')
+  const artboardId = optionalString(args, 'artboardId')
   if (nodeId !== undefined && (x !== undefined || y !== undefined)) {
     return fail('foundation_annotate: pass "nodeId" OR "x"/"y", not both')
   }
@@ -952,6 +962,16 @@ async function toolProject(args: Record<string, unknown>): Promise<ToolResult> {
 
 export const TOOLS: ToolDefinition[] = [
   {
+    name: 'foundation_edit',
+    description: 'Apply one atomic semantic session-operation batch to a document, including artboard/page CRUD and upgrade. Uses the same file lock, validation and authored chain transaction as the editor.',
+    inputSchema: { type: 'object', properties: { path: { type: 'string' }, ops: { type: 'array', items: { type: 'object' } }, label: { type: 'string' }, author: { type: 'string' } }, required: ['path', 'ops'] },
+    handler: async args => {
+      if (!Array.isArray(args.ops)) return fail('ops must be an array')
+      const result = editDocument(requireString(args, 'path'), args.ops as SessionOp[], optionalString(args, 'label') ?? 'Edit', optionalString(args, 'author') ?? defaultAuthor())
+      return ok({ path: args.path, rev: result.rev })
+    },
+  },
+  {
     name: 'foundation_inspect',
     description: `Summarize a .fdn.html document: title, param/state/component/node counts, and validation status. ${SUBSET_NOTE} Use this first when exploring an unfamiliar document.`,
     inputSchema: { type: 'object', properties: { path: { type: 'string', description: 'Path to a .fdn.html file' } }, required: ['path'] },
@@ -995,6 +1015,7 @@ export const TOOLS: ToolDefinition[] = [
       type: 'object',
       properties: {
         path: { type: 'string', description: 'Path to a .fdn.html file' },
+        artboardId: { type: 'string', description: 'Stable artboard ID; required when several artboards exist' },
         state: { type: 'string', description: 'Named state to bake (see the document\'s states list via foundation_inspect); omitted = default/empty state' },
       },
       required: ['path'],
@@ -1015,6 +1036,9 @@ export const TOOLS: ToolDefinition[] = [
       type: 'object',
       properties: {
         path: { type: 'string', description: 'Path to a .fdn.html file' },
+        artboardId: { type: 'string', description: 'Stable artboard ID to render' },
+        pageId: { type: 'string', description: 'Stable page ID to render' },
+        matrix: { type: 'boolean', description: 'Render declared state/viewport matrix for each explicit artboard' },
         state: { type: 'string', description: 'Named state to render' },
         viewport: { type: 'string', description: 'Named viewport to render' },
         outDir: { type: 'string', description: 'Directory to write PNGs and layout JSON into; a tmp dir is used if omitted' },

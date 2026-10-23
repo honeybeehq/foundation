@@ -4,6 +4,7 @@ import { indexNodes } from '../chain/model.js'
 export const ARTBOARD_VERSION = '0.1.0-artboards'
 export const ARTBOARD_TAGS = new Set(['fdn-page', 'fdn-artboard', 'fdn-artboard-view'])
 export const boardKey = (ref: BoardRef): string => JSON.stringify([ref.artboardId, ref.state, ref.viewport])
+export const DEFAULT_BOARD_SIZE = { width: 1440, height: 900 } as const
 const attr = (node: FdnNode, key: string) => node.attrs[`data-fdn-${key}`]
 const number = (node: FdnNode, key: string) => Number(attr(node, key))
 export const explicitArtboards = (doc: FdnDocument): boolean => doc.specVersion === ARTBOARD_VERSION || doc.body.some(node => ARTBOARD_TAGS.has(node.tag))
@@ -43,10 +44,11 @@ export function validateArtboards(doc: FdnDocument): ReportLine[] {
         if (node.children.length) issue(node, 'artboard-view-children', 'view metadata cannot contain design content')
         if (canonical(ref) && (attr(node, 'x') !== undefined || attr(node, 'y') !== undefined)) issue(node, 'artboard-native-position', 'canonical position belongs to artboard X/Y')
         if ((attr(node, 'x') === undefined) !== (attr(node, 'y') === undefined)) issue(node, 'artboard-view-position', 'view positions require both X and Y')
+        if (canonical(ref) && attr(node, 'width') !== undefined) issue(node, 'artboard-native-size', 'canonical size belongs to artboard W/H')
         if ((attr(node, 'width') === undefined) !== (attr(node, 'height') === undefined)) issue(node, 'artboard-view-size', 'view size override requires both dimensions')
         if (attr(node, 'visible') !== undefined && !['true', 'false'].includes(attr(node, 'visible')!)) issue(node, 'artboard-view-visible', 'view visibility must be true or false')
-        if (ref.state !== null && !doc.states.some(state => state.name === ref.state)) issue(node, 'artboard-view-state', 'view references an unknown state')
-        if (ref.viewport !== null && !doc.viewports.some(viewport => viewport.name === ref.viewport)) issue(node, 'artboard-view-viewport', 'view references an unknown viewport')
+        if (ref.state !== null && (!ref.state || !doc.states.some(state => state.name === ref.state))) issue(node, 'artboard-view-state', 'view references an unknown state')
+        if (ref.viewport !== null && (!ref.viewport || !doc.viewports.some(viewport => viewport.name === ref.viewport))) issue(node, 'artboard-view-viewport', 'view references an unknown viewport')
       }
       if (node.tag === 'fdn-artboard') {
         const tuples = new Set<string>()
@@ -56,7 +58,7 @@ export function validateArtboards(doc: FdnDocument): ReportLine[] {
           tuples.add(key)
         }
       }
-    } else if (explicit && (parent === null || parent.tag === 'fdn-page')) issue(node, 'artboard-loose-content', 'explicit documents contain pages and artboards before design content')
+    } else if (!definition && explicit && (parent === null || parent.tag === 'fdn-page')) issue(node, 'artboard-loose-content', 'explicit documents contain pages and artboards before design content')
     node.children.forEach(child => visit(child, node, definition))
   }
   doc.body.forEach(node => visit(node, null))
@@ -83,8 +85,8 @@ export function boardView(doc: FdnDocument, ref: BoardRef): BoardView {
     if (ref.artboardId !== null) throw new Error(`unknown-artboard: ${ref.artboardId}`)
     const refs = generatedRefs(doc)
     const position = Math.max(0, refs.findIndex(item => item.state === ref.state && item.viewport === ref.viewport))
-    const x = refs.slice(0, position).reduce((sum, item) => sum + (doc.viewports.find(v => v.name === item.viewport)?.width ?? 1280) + 120, 0)
-    return { ...ref, pageId: null, name: doc.title ?? 'Design', x, y: 0, width: viewport?.width ?? 1280, height: viewport?.height ?? 800, visible: true, overflow: 'visible', sizeOverride: false }
+    const x = refs.slice(0, position).reduce((sum, item) => sum + (doc.viewports.find(v => v.name === item.viewport)?.width ?? DEFAULT_BOARD_SIZE.width) + 120, 0)
+    return { ...ref, pageId: null, name: doc.title ?? 'Design', x, y: 0, width: viewport?.width ?? DEFAULT_BOARD_SIZE.width, height: viewport?.height ?? DEFAULT_BOARD_SIZE.height, visible: true, overflow: 'visible', sizeOverride: false }
   }
   const page = doc.body.find(page => page.tag === 'fdn-page' && page.children.some(board => board.tag === 'fdn-artboard' && board.id === ref.artboardId))
   const board = page?.children.find(board => board.id === ref.artboardId)
@@ -219,14 +221,17 @@ export function expandArtboardOp(doc: FdnDocument, op: ArtboardOp): PatchOp[] {
     if (op.op === 'duplicate-page' || op.op === 'duplicate-artboard') {
       name(op.name)
       const descendants = [...indexNodes(source.children).keys()]
-      if (descendants.length !== Object.keys(op.idMap).length || descendants.some(id => !op.idMap[id])) throw new ArtboardError('conflict', 'duplicate source changed; refresh the complete descendant id map')
+      if (descendants.length !== Object.keys(op.idMap).length || descendants.some(id => !Object.hasOwn(op.idMap, id) || !op.idMap[id])) throw new ArtboardError('conflict', 'duplicate source changed; refresh the complete descendant id map')
       const copy = structuredClone(source)
       const replacements = new Map<string, string>()
       const mapping = { ...op.idMap, [source.id]: op.newId }
       const all = indexNodes([copy])
       for (const loc of all.values()) {
         const htmlId = loc.node.attrs.id
-        if (htmlId) replacements.set(htmlId, `${htmlId}--${op.newId}`)
+        if (htmlId) {
+          if (replacements.has(htmlId)) fail('duplicate HTML ids make reference rewriting ambiguous')
+          replacements.set(htmlId, `${htmlId}--${op.newId}`)
+        }
       }
       const refs = new Set(['href', 'xlink:href', 'for', 'aria-labelledby', 'aria-describedby', 'aria-controls', 'aria-owns', 'headers', 'data-fdn-anchor-ref'])
       for (const loc of all.values()) {
@@ -235,9 +240,9 @@ export function expandArtboardOp(doc: FdnDocument, op: ArtboardOp): PatchOp[] {
         for (const [key, value] of Object.entries(child.attrs)) {
           if (key === 'id') child.attrs[key] = replacements.get(value)!
           else if (refs.has(key)) child.attrs[key] = key.includes('href') ? value.startsWith('#') && replacements.has(value.slice(1)) ? `#${replacements.get(value.slice(1))}` : value : value.split(' ').map(part => mapping[part] ?? replacements.get(part) ?? part).join(' ')
-          else if (value.includes('url(#') || Object.values(mapping).some(id => value === `#${id}`)) fail(`cannot safely duplicate reference in ${key}`)
+          else if (value.includes('url(#')) fail(`cannot safely duplicate reference in ${key}`)
         }
-        if (Object.values(child.style).some(value => /url\(\s*['"]?#/.test(value))) fail('cannot safely duplicate CSS fragment references')
+        if ([...Object.values(child.style), ...Object.values(child.styleStates).flatMap(plane => Object.values(plane ?? {}))].some(value => /url\(\s*['"]?#/.test(value))) fail('cannot safely duplicate CSS fragment references')
       }
       copy.attrs['data-fdn-name'] = op.name
       if (op.op === 'duplicate-artboard') {
@@ -251,6 +256,7 @@ export function expandArtboardOp(doc: FdnDocument, op: ArtboardOp): PatchOp[] {
     }
   }
   if (op.op === 'move-artboard-view' || op.op === 'set-artboard-view-visible' || op.op === 'set-artboard-view-size' || op.op === 'separate-artboard-view') {
+    if (op.op === 'set-artboard-view-size' && canonical(op)) fail('resize the canonical artboard with resize-artboard')
     if (op.op === 'move-artboard-view' && canonical(op)) fail('move the canonical artboard with move-artboard')
     const target = record(op)
     if (op.op === 'move-artboard-view') return [...target.ops, set(target.id, 'x', op.x), set(target.id, 'y', op.y)]
@@ -270,4 +276,27 @@ export function expandArtboardOp(doc: FdnDocument, op: ArtboardOp): PatchOp[] {
     return ops
   }
   return fail(`unsupported artboard operation ${op.op}`)
+}
+
+export function artboardActivity(before: FdnDocument, after: FdnDocument, ops: PatchOp[]): { artboardIds: string[]; pageIds: string[]; insertedNodeIds: string[]; removedNodeIds: string[] } {
+  const beforeIndex = indexNodes(before.body), afterIndex = indexNodes(after.body)
+  const insertedNodeIds = [...afterIndex.keys()].filter(id => !beforeIndex.has(id))
+  const removedNodeIds = [...beforeIndex.keys()].filter(id => !afterIndex.has(id))
+  const artboardIds = new Set<string>(), pageIds = new Set<string>()
+  const ids = new Set<string>()
+  for (const op of ops) {
+    if ('id' in op) ids.add(op.id)
+    if (op.op === 'insert-node') for (const id of indexNodes([op.node]).keys()) ids.add(id)
+  }
+  for (const index of [beforeIndex, afterIndex]) {
+    for (const id of new Set([...ids, ...insertedNodeIds, ...removedNodeIds])) {
+      let loc = index.get(id)
+      while (loc) {
+        if (loc.node.tag === 'fdn-artboard') artboardIds.add(loc.node.id)
+        if (loc.node.tag === 'fdn-page') pageIds.add(loc.node.id)
+        loc = loc.parent === null ? undefined : index.get(loc.parent)
+      }
+    }
+  }
+  return { artboardIds: [...artboardIds].sort(), pageIds: [...pageIds].sort(), insertedNodeIds, removedNodeIds }
 }

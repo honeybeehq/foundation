@@ -15,6 +15,7 @@ interface LayoutEntry {
 }
 
 interface RenderCell {
+  artboardId?: string
   state: string | null
   viewport: FdnViewport
   png: Uint8Array
@@ -23,7 +24,7 @@ interface RenderCell {
 }
 
 interface RenderModule {
-  renderDocument: (doc: FdnDocument, opts?: { state?: string; viewport?: string; deviceScaleFactor?: number; clipToViewport?: boolean }) => Promise<RenderCell[]>
+  renderDocument: (doc: FdnDocument, opts?: { state?: string; viewport?: string; artboardId?: string; pageId?: string; matrix?: boolean; deviceScaleFactor?: number; clipToViewport?: boolean }) => Promise<RenderCell[]>
 }
 
 const RENDER_MODULE_SPEC = ['foundation-engine', 'src', 'render', 'index.js'].join('/')
@@ -61,6 +62,8 @@ export async function runRender(args: string[], io: CliIO): Promise<number> {
   }
 
   const state = flagString(flags, 'state')
+  const artboardId = flagString(flags, 'artboard')
+  const pageId = flagString(flags, 'page')
   const viewport = flagString(flags, 'viewport')
   const outFile = flagString(flags, 'out')
   const outDir = flagString(flags, 'o', 'output')
@@ -93,6 +96,9 @@ export async function runRender(args: string[], io: CliIO): Promise<number> {
     const cells = await renderModule.renderDocument(doc, {
       ...(state !== undefined ? { state } : {}),
       ...(viewport !== undefined ? { viewport } : {}),
+      ...(artboardId !== undefined ? { artboardId } : {}),
+      ...(pageId !== undefined ? { pageId } : {}),
+      matrix: flags.matrix === true,
       deviceScaleFactor: scale,
       clipToViewport: outFile !== undefined,
     })
@@ -106,14 +112,19 @@ export async function runRender(args: string[], io: CliIO): Promise<number> {
       const path = resolve(outFile)
       mkdirSync(dirname(path), { recursive: true })
       writeFileSync(path, cell.png)
-      io.stdout(JSON.stringify({ path, width, height, scale }))
+      io.stdout(JSON.stringify({ path, width, height, scale, ...(cell.artboardId === undefined ? {} : { artboardId: cell.artboardId }) }))
       return 0
     }
 
     if (outDir) mkdirSync(outDir, { recursive: true })
 
+    const manifest: Array<{ label: string; artboardId?: string; state: string | null; viewport: string }> = []
+    const labels = new Set<string>()
     for (const cell of cells) {
-      const label = `${cell.state ?? 'default'}--${cell.viewport.name}`
+      const label = cell.artboardId === undefined ? `${cell.state ?? 'default'}--${cell.viewport.name}` : [cell.artboardId, cell.state ?? 'default', cell.viewport.name].map(encodeURIComponent).join('--')
+      if (labels.has(label)) throw new Error('export filename collision; use distinct artboard/state/viewport selectors')
+      labels.add(label)
+      manifest.push({ label, artboardId: cell.artboardId, state: cell.state, viewport: cell.viewport.name })
       if (outDir) {
         writeFileSync(join(outDir, `${label}.png`), cell.png)
         writeFileSync(join(outDir, `${label}.layout.json`), JSON.stringify(cell.layout, null, 2))
@@ -123,6 +134,7 @@ export async function runRender(args: string[], io: CliIO): Promise<number> {
       }
     }
 
+    if (outDir && cells.some(cell => cell.artboardId !== undefined)) writeFileSync(join(outDir, 'manifest.json'), JSON.stringify(manifest, null, 2))
     return 0
   } catch (err) {
     io.stderr(err instanceof Error ? err.message : String(err))

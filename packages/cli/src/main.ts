@@ -9,6 +9,7 @@
  * exit code — main.ts's only jobs are picking the command and calling
  * process.exit with what it returns.
  */
+import { runEdit } from './commands/edit.js'
 import { realpathSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { processIo } from './io.js'
@@ -52,6 +53,7 @@ const COMMANDS: Record<string, (args: string[], io: CliIO) => Promise<number>> =
   'git-merge-driver': runGitMergeDriver,
   project: runProject,
   session: runSession,
+  edit: runEdit,
 }
 
 const USAGE = `foundation — a design-document engine CLI
@@ -67,7 +69,8 @@ commands:
   import <source.tsx> --into <file.fdn.html> [--name N] [--props <json>] [--sealed] [--author A]
                                               harvest a React component and merge it into <file>
                                               (chain-committed when a chain exists)
-  bake <file> [--state S] [-o out]           bake a state to HTML
+  edit <file> --ops JSON | --ops-file FILE   one atomic semantic edit batch
+  bake <file> [--artboard ID] [--state S] [-o out]           bake a state to HTML
   render <file> [--state S] [--viewport V] [--scale 1..4] [-o dir | --out file.png] [--json]
   diff <a.html> <b.html>                     structural (+ visual, when available) diff
   serve <file> [--port N]                    live-reload dev server

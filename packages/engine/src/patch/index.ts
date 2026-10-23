@@ -203,7 +203,7 @@ function checkOp(op: PatchOp, doc: FdnDocument, index: Map<NodeId, NodeLocation>
     case 'set-viewport': {
       const items = doc.viewports
       if (!op.viewport.name) throw new PatchFailure('invalid-op', 'viewport needs a non-empty name')
-      if (![op.viewport.width, op.viewport.height].every((value) => Number.isInteger(value) && value > 0)) throw new PatchFailure('invalid-op', 'viewport dimensions must be positive integers')
+      if (![op.viewport.width, op.viewport.height].every((value) => Number.isFinite(value) && value > 0)) throw new PatchFailure('invalid-op', 'viewport dimensions must be finite and positive')
       return op.index === undefined ? op : { ...op, index: checkIndex(op.index, items.filter((item) => item.name !== op.viewport.name).length, lenient, op.op) }
     }
     case 'remove-viewport':

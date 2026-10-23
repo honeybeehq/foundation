@@ -24,14 +24,17 @@ export async function runBake(args: string[], io: CliIO): Promise<number> {
   }
 
   const state = flagString(flags, 'state')
+  const artboardId = flagString(flags, 'artboard')
   const out = flagString(flags, 'o', 'out', 'output')
 
   const { doc } = parseDocument(source)
-  const baked = bakeDocument(doc, state !== undefined ? { state } : undefined)
+  const baked = bakeDocument(doc, { ...(state !== undefined ? { state } : {}), ...(artboardId !== undefined ? { artboardId } : {}) })
 
   for (const line of baked.report.lines) {
     io.stderr(`${line.severity} ${line.code}: ${line.message}`)
   }
+
+  if (baked.report.lines.some(line => ['ambiguous-artboard', 'unknown-artboard'].includes(line.code))) return 2
 
   if (out) {
     writeFileSync(out, baked.html, 'utf8')

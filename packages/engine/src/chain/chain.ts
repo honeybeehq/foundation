@@ -1,3 +1,4 @@
+import { artboardActivity, explicitArtboards, assertFormatVersion } from '../artboards/index.js'
 /**
  * FdnChain over loro-crdt (LoroDoc + LoroTree movable tree) — the Foundation
  * chain module (SPEC D2 + resolved open question 1). Ports the proven
@@ -342,6 +343,7 @@ class LoroChain implements FdnChain {
     // own explicit commit() would silently steal our message.
     const prevHash = this.tryHead()?.hash ?? null
     for (const op of patch.applied) this.applyOp(op)
+    if (explicitArtboards(beforeDoc) || explicitArtboards(patch.doc)) this.meta.set('artboardActivity', stableStringify({ ...artboardActivity(beforeDoc, patch.doc, patch.applied), changeKey: `${this.peerIdStr}:${startCounter}` }))
     this.lastLocalChange = patch.inverse
     return meta => this.commitEnvelope(meta, startCounter, prevHash)
   }

@@ -13,6 +13,12 @@ const COMPONENT_OPS = new Set(['detach-instance', 'swap-instance', 'set-instance
 const MODE_OPS = new Set(['create-token-collection', 'add-token-mode', 'rename-token-mode', 'remove-token-mode', 'set-mode-token', 'set-collection-mode'])
 
 export function expandSessionOps(doc: FdnDocument, ops: SessionOp[], reports: InstanceSwapReport[] = [], detaches: InstanceDetachReport[] = []): PatchOp[] {
+  ops = ops.flatMap<SessionOp>(op => {
+    if (op.op !== 'remove-state' && op.op !== 'remove-viewport') return [op]
+    const key = op.op === 'remove-state' ? 'data-fdn-view-state' : 'data-fdn-view-viewport'
+    const remove: PatchOp[] = [...indexNodes(doc.body).values()].filter(loc => loc.node.tag === 'fdn-artboard-view' && loc.node.attrs[key] === op.name).map(loc => ({ op: 'remove-node', id: loc.node.id }))
+    return [...remove, op]
+  })
   if (ops.every((op): op is PatchOp | PlacementOp => !MODE_OPS.has(op.op) && !COMPONENT_OPS.has(op.op) && !ARTBOARD_OPS.has(op.op))) return expandPlacement(doc, ops)
   let working = doc
   const expanded: PatchOp[] = []

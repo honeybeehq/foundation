@@ -86,6 +86,7 @@ export class ChainActivity {
     const changed = new Set<string>()
     const sections = new Map<ChainLogSection, Set<string>>()
     let factsComplete = true
+    let context: { artboardIds: string[]; pageIds: string[] } | undefined
     let anchor: ChainLogEntry['anchor']
     const section = (name: ChainLogSection, key: string): void => {
       const names = sections.get(name) ?? new Set<string>()
@@ -94,6 +95,18 @@ export class ChainActivity {
     }
     const touch = (op: JsonOp): void => {
       const content = op.content
+      if (op.container === 'cid:root-meta:Map' && 'key' in content && content.key === 'artboardActivity') {
+        try {
+          const value = 'value' in content && typeof content.value === 'string' ? JSON.parse(content.value) : null
+          if (value && Array.isArray(value.artboardIds) && Array.isArray(value.pageIds) && Array.isArray(value.insertedNodeIds) && Array.isArray(value.removedNodeIds) && [...value.artboardIds, ...value.pageIds, ...value.insertedNodeIds, ...value.removedNodeIds].every(id => typeof id === 'string')) {
+            context = { artboardIds: value.artboardIds, pageIds: value.pageIds }
+            for (const id of value.insertedNodeIds) inserted.add(id)
+            for (const id of value.removedNodeIds) removed.add(id)
+          }
+          else factsComplete = false
+        } catch { factsComplete = false }
+        return
+      }
       if (op.container === 'cid:root-tree:Tree' && 'target' in content) {
         const id = this.owner(`cid:${content.target}:Map`)
         if (id === null) factsComplete = false
@@ -145,6 +158,7 @@ export class ChainActivity {
       nodes: { inserted: [...inserted].sort(), removed: [...removed].sort(), changed: [...changed].sort() },
       sections: [...sections].sort(([a], [b]) => a.localeCompare(b)).map(([name, names]) => ({ section: name, names: [...names].sort() })),
       factsComplete,
+      ...context,
     }
     if (this.entries.size >= 256) this.entries.delete(this.entries.keys().next().value!)
     this.entries.set(cursor, entry)
