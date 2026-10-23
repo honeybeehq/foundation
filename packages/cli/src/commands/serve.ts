@@ -34,7 +34,7 @@ export async function runServe(args: string[], io: CliIO, opts?: ServeRunOptions
 
   let handle
   try {
-    handle = await serveDocument(file, { author: defaultAuthor(), ...(port !== undefined ? { port } : {}) })
+    handle = await serveDocument(file, { author: defaultAuthor(), wallTime: () => new Date().toISOString(), ...(port !== undefined ? { port } : {}) })
   } catch (err) {
     io.stderr(`could not start server: ${err instanceof Error ? err.message : String(err)}`)
     return 2

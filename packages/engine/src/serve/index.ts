@@ -56,6 +56,7 @@ import { validateDocument } from '../validate/index.js'
 import type { ConformanceReport, FdnAnnotation, FdnDocument, ValidationResult } from '../types.js'
 
 export interface ServeOptions {
+  wallTime?: () => string
   port?: number
   /** Chain envelope author for annotations written through the JSON API
    *  (SPEC 13a-ii identity rules live in packages/cli, not the engine — the
@@ -513,7 +514,7 @@ export async function serveDocument(filePath: string, opts?: ServeOptions): Prom
       if (x !== undefined) annotation.x = x
       if (y !== undefined) annotation.y = y
       if (state !== undefined) annotation.state = state
-      chain.apply({ author: opts?.author ?? DEFAULT_SERVE_AUTHOR, message: `annotate: ${text}` }, [{ op: 'annotate', annotation }])
+      chain.apply({ author: opts?.author ?? DEFAULT_SERVE_AUTHOR, message: `annotate: ${text}`, wallTime: opts?.wallTime?.() }, [{ op: 'annotate', annotation }])
       saveChainAndBroadcast(chain)
       sendJson(res, 200, { annotation })
     } catch (err) {
@@ -542,7 +543,7 @@ export async function serveDocument(filePath: string, opts?: ServeOptions): Prom
         sendJson(res, 404, { error: `no annotation "${id}"` })
         return
       }
-      chain.apply({ author: opts?.author ?? DEFAULT_SERVE_AUTHOR, message: `annotation ${id}: mark ${status}` }, [
+      chain.apply({ author: opts?.author ?? DEFAULT_SERVE_AUTHOR, message: `annotation ${id}: mark ${status}`, wallTime: opts?.wallTime?.() }, [
         { op: 'set-annotation-status', id, status },
       ])
       saveChainAndBroadcast(chain)
