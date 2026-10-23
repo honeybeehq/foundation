@@ -242,7 +242,7 @@ describe('foundation session', () => {
       expect(only(commit, 'doc')[0]?.history).toEqual({ canUndo: true, canRedo: false, undoLabel: 'B', redoLabel: null })
     })
 
-    it('answers conflict and drops the entry when someone else changed the same property', () => {
+    it('undoes my property after another writer changed it', () => {
       const { open, say, session } = start(file)
       open()
       say({ t: 'commit', id: 'c', base: 1, ops: [{ op: 'set-style', id: 'n1', prop: 'color', value: 'red' }], label: 'Red' })
@@ -250,7 +250,7 @@ describe('foundation session', () => {
       theirs.apply({ author: 'agent:other', message: 'Blue' }, [{ op: 'set-style', id: 'n1', prop: 'color', value: 'blue' }])
       writeFileSync(`${file}.chain`, theirs.save())
       session.sync()
-      expect(result(say({ t: 'undo', id: 'u' }))).toMatchObject({ ok: false, code: 'conflict' })
+      expect(result(say({ t: 'undo', id: 'u' }))).toMatchObject({ ok: true })
       expect(result(say({ t: 'undo', id: 'u2' }))).toMatchObject({ ok: false, code: 'nothing-to-undo' })
     })
 

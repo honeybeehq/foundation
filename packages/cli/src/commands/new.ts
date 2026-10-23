@@ -20,7 +20,7 @@ import { flagString, parseArgs } from '../argv.js'
 import { injectDocIdAttr } from '../docid.js'
 import { defaultAuthor } from '../identity.js'
 import { writeChainInit } from './chain.js'
-import { writeAtomic } from '../disk.js'
+import { writeUntrackedDocument } from '../disk.js'
 
 function leafNode(partial: Partial<FdnNode> & Pick<FdnNode, 'id' | 'tag'>): FdnNode {
   return { attrs: {}, style: {}, styleStates: {}, children: [], ...partial }
@@ -155,8 +155,9 @@ export async function runNew(args: string[], io: CliIO): Promise<number> {
   const text = injectDocIdAttr(projectDocument(doc), docId)
   const author = flagString(flags, 'author') ?? defaultAuthor()
   const message = flagString(flags, 'm', 'message') ?? 'init'
-  const chain = flags['no-chain'] ? null : writeChainInit(filePath, doc, { author, message }, io, { docId })
-  writeAtomic(filePath, text)
+  const chain = flags['no-chain'] ? null : writeChainInit(filePath, doc, { author, message }, io, { docId, newDocument: true })
+  if (flags['no-chain']) writeUntrackedDocument(filePath, text, true)
+  else if (!chain) return 2
   io.stdout(`wrote ${filePath}`)
   if (chain) io.stdout(`wrote ${chain.chainPath} (head ${chain.head.hash.slice(0, 12)})`)
 

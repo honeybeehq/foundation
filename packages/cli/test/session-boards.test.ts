@@ -39,7 +39,7 @@ describe('session commit + undo on every board', () => {
     for (const dir of dirs.splice(0)) rmSync(dir, { recursive: true, force: true })
   })
 
-  it.each(boards)('%s comes back byte-identical', (board) => {
+  it.each(boards)('%s restores the same projection apart from its version marker', (board) => {
     const dir = mkdtempSync(join(tmpdir(), 'fdn-session-board-'))
     dirs.push(dir)
     const file = join(dir, board)
@@ -53,7 +53,7 @@ describe('session commit + undo on every board', () => {
     say({ t: 'hello', protocol: '0.1', client: 'test', author: 'user:test' })
     const welcome = sent.find((m): m is Extract<ServiceMessage, { t: 'welcome' }> => m.t === 'welcome')
     expect(welcome).toBeDefined()
-    expect(readFileSync(file, 'utf8')).toBe(original)
+    expect(readFileSync(file, 'utf8').replace(/ data-fdn-version="[^"]*"/, '')).toBe(original)
 
     const target = firstElement(welcome!.doc.body) as FdnNode
     say({ t: 'commit', id: 'c', base: 1, ops: [{ op: 'set-style', id: target.id, prop: 'outline-color', value: 'rgb(1, 2, 3)' }], label: 'Outline' })
@@ -63,7 +63,7 @@ describe('session commit + undo on every board', () => {
 
     say({ t: 'undo', id: 'u' })
     expect(sent.filter((m) => m.t === 'result').map((m) => (m as { ok: boolean }).ok)).toEqual([true, true])
-    expect(readFileSync(file, 'utf8')).toBe(original)
+    expect(readFileSync(file, 'utf8').replace(/ data-fdn-version="[^"]*"/, '')).toBe(original)
     session.close()
   })
 })

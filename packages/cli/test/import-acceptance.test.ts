@@ -122,7 +122,7 @@ describe('Wave 4 acceptance: import all four vendored fixtures', () => {
       await importAllFour(fileA)
       await importAllFour(fileB)
 
-      expect(readFileSync(fileB, 'utf8')).toBe(readFileSync(fileA, 'utf8'))
+      expect(readFileSync(fileB, 'utf8').replace(/ data-fdn-version="[^"]*"/, '')).toBe(readFileSync(fileA, 'utf8').replace(/ data-fdn-version="[^"]*"/, ''))
     })
 
     it('bakes a state that instantiates an imported enum-prop component (Badge) via fdn-use with prop bindings', async () => {

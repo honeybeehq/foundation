@@ -37,7 +37,7 @@ import type { ConformanceReport, FdnAnnotation, FdnChain, FdnComponent, FdnDocum
 // mirrored here rather than imported from commands/freeze.ts because that file
 // only exports a CLI entry point (runFreeze), not these two.
 import { freezeDocument, verifyFrozen } from 'foundation-engine/src/freeze/index.js'
-import { chainPathFor, hasUncommittedEdits, regenerateTextFromChain, writeChainInit } from '../commands/chain.js'
+import { chainPathFor, writeChainInit } from '../commands/chain.js'
 // Bug fix (dogfood cycle 3, friction §6): the document id lives outside
 // FdnDocument entirely (see docid.ts's module doc) — parseDocument/
 // projectDocument never see it, so any parse->project round-trip silently
@@ -67,7 +67,7 @@ import { skeletonDocument, skeletonDocumentEmpty } from '../commands/new.js'
 import { withWallTime } from '../change-meta.js'
 import { defaultAuthor } from '../identity.js'
 import { chainLabel, documentStatus, manifestPathFor, readManifest, statusLabel } from '../project.js'
-import { commitDocument, writeAtomic } from '../disk.js'
+import { commitDocument, documentText, projectedText, projectionVersion, readTextIfPresent, sourceBase, updateDocument, writeUntrackedDocument } from '../disk.js'
 
 const require = createRequire(import.meta.url)
 
@@ -303,8 +303,15 @@ async function toolRead(args: Record<string, unknown>): Promise<ToolResult> {
   const path = requireString(args, 'path')
   const read = readSource(path)
   if (!read.ok) return read.result
+  if (existsSync(chainPathFor(path))) {
+    const chain = loadChain(readFileSync(chainPathFor(path)))
+    const canonical = projectedText(chain, chain.docId() ?? readDocIdAttr(read.source))
+    return ok({ path, canonical, changedFromDisk: canonical !== read.source })
+  }
   const { doc } = parseDocument(read.source)
-  const canonical = projectDocument(doc)
+  const version = projectionVersion(read.source)
+  const text = documentText(doc, readDocIdAttr(read.source))
+  const canonical = version ? text.replace('<fdn-doc', `<fdn-doc data-fdn-version="${version}"`) : text
   return ok({ path, canonical, changedFromDisk: canonical !== read.source })
 }
 
@@ -320,6 +327,7 @@ async function toolValidate(args: Record<string, unknown>): Promise<ToolResult> 
 async function toolIngest(args: Record<string, unknown>): Promise<ToolResult> {
   const path = requireString(args, 'path')
   const content = optionalString(args, 'content')
+  const diskSource = readTextIfPresent(path)
   const commit = optionalBoolean(args, 'commit')
   const message = optionalString(args, 'message')
 
@@ -348,7 +356,7 @@ async function toolIngest(args: Record<string, unknown>): Promise<ToolResult> {
 
   let commitInfo: Record<string, unknown> | null = null
   let commitFailure: string | null = null
-  if (commit) {
+  if (commit || existsSync(chainPathFor(path))) {
     const chainPath = chainPathFor(path)
     if (!existsSync(chainPath)) {
       commitInfo = { status: 'skipped', reason: `no chain yet — call foundation_new or chain init to start tracking ${path}` }
@@ -358,7 +366,7 @@ async function toolIngest(args: Record<string, unknown>): Promise<ToolResult> {
       // bee actually made the change in the chain log.
       const commitMessage = message ?? (report.lines.length === 0 ? 'ingest' : `ingest — ${report.lines.length} normalization line(s)`)
       try {
-        const result = commitDocument(chainPath, { author: defaultAuthor(), message: commitMessage }, doc)
+        const result = commitDocument(chainPath, { author: defaultAuthor(), message: commitMessage }, doc, sourceBase(loadChain(readFileSync(chainPath)), source, path), diskSource)
         commitInfo =
           result.status === 'committed'
             ? { status: 'committed', hash: result.envelope.hash, message: commitMessage, chainPath }
@@ -370,7 +378,7 @@ async function toolIngest(args: Record<string, unknown>): Promise<ToolResult> {
   }
 
   try {
-    writeAtomic(path, canonicalWithDocId)
+    if (!existsSync(chainPathFor(path))) writeUntrackedDocument(path, canonicalWithDocId)
   } catch (err) {
     return fail(`could not write ${path}: ${err instanceof Error ? err.message : String(err)}`)
   }
@@ -560,8 +568,6 @@ async function toolChainLog(args: Record<string, unknown>): Promise<ToolResult> 
 //      guard chain pull/sync/annotate.ts's CLI path use so an annotate call
 //      never silently clobbers a hand-edit sitting in the text ———
 
-const NO_OP_IO = { stdout: (): void => {}, stderr: (): void => {} }
-
 function loadChainForAnnotate(path: string): { chain: FdnChain; chainPath: string } | { error: ToolResult } {
   const chainPath = chainPathFor(path)
   if (!existsSync(chainPath)) {
@@ -586,11 +592,13 @@ function commitAnnotationChange(
   meta: { author: string; message: string },
   ops: Parameters<FdnChain['apply']>[1],
 ): { hash: string; textRegenerated: boolean } {
-  const wasDirty = existsSync(path) && hasUncommittedEdits(path, chain)
-  const envelope = chain.apply(withWallTime(meta), ops)
-  writeAtomic(chainPath, chain.save())
-  if (!wasDirty) regenerateTextFromChain(path, chain, NO_OP_IO)
-  return { hash: envelope.hash, textRegenerated: !wasDirty }
+  return updateDocument(path, latest => {
+    for (const op of ops) {
+      if (op.op === 'annotate' && !chain.doc().annotations.some(item => item.id === op.annotation.id) && latest.doc().annotations.some(item => item.id === op.annotation.id)) op.annotation.id = mintAnnotationId(latest.doc().annotations)
+    }
+    const envelope = latest.apply(withWallTime(meta), ops)
+    return { hash: envelope.hash, textRegenerated: true }
+  })
 }
 
 /**
@@ -691,10 +699,10 @@ async function toolChainAnchor(args: Record<string, unknown>): Promise<ToolResul
     return fail(`${path}: no chain yet (${chainPath} not found) — call foundation_new or ingest with commit:true first`)
   }
   try {
-    const chain = loadChain(readFileSync(chainPath))
-    chain.anchor(name, withWallTime({ author: defaultAuthor(), message: `Anchor ${name}` }))
-    writeAtomic(chainPath, chain.save())
-    return ok({ path, chainPath, anchor: name, head: chain.head() })
+    return updateDocument(path, chain => {
+      chain.anchor(name, withWallTime({ author: defaultAuthor(), message: `Anchor ${name}` }))
+      return ok({ path, chainPath, anchor: name, head: chain.head() })
+    })
   } catch (err) {
     return fail(`chain anchor failed: ${err instanceof Error ? err.message : String(err)}`)
   }
@@ -779,9 +787,9 @@ async function toolNew(args: Record<string, unknown>): Promise<ToolResult> {
       doc,
       { author: defaultAuthor(), message: 'init' },
       { stdout: () => {}, stderr: () => {} },
-      { docId },
+      { docId, newDocument: true },
     )
-    writeAtomic(filePath, text)
+    if (!result) return fail(`refusing to overwrite ${filePath}`)
   } catch (err) {
     return fail(`could not write ${filePath}: ${err instanceof Error ? err.message : String(err)}`)
   }
@@ -821,6 +829,7 @@ async function toolImport(args: Record<string, unknown>): Promise<ToolResult> {
   const read = readSource(into)
   if (!read.ok) return read.result
 
+  const editBase = existsSync(chainPathFor(into)) ? sourceBase(loadChain(readFileSync(chainPathFor(into))), read.source, into) : parseDocument(read.source).doc
   const importer = await loadImporterModule()
 
   let artifact: RenderArtifact
@@ -879,7 +888,7 @@ async function toolImport(args: Record<string, unknown>): Promise<ToolResult> {
   if (existsSync(chainPath)) {
     const message = `import ${component.name} from ${source} (${projected.mode})`
     try {
-      const result = commitDocument(chainPath, { author: defaultAuthor(), message }, nextDoc)
+      const result = commitDocument(chainPath, { author: defaultAuthor(), message }, nextDoc, editBase, read.source)
       commitInfo =
         result.status === 'committed'
           ? { status: 'committed', hash: result.envelope.hash, message, chainPath }
@@ -889,7 +898,7 @@ async function toolImport(args: Record<string, unknown>): Promise<ToolResult> {
     }
   }
   try {
-    writeAtomic(into, canonicalWithDocId)
+    if (!existsSync(chainPath)) writeUntrackedDocument(into, canonicalWithDocId)
   } catch (err) {
     return fail(`could not write ${into}: ${err instanceof Error ? err.message : String(err)}`)
   }
@@ -965,8 +974,8 @@ export const TOOLS: ToolDefinition[] = [
     description:
       'THE write path for agents editing Foundation documents. Normalizes a .fdn.html file to canonical form '
       + '(parse -> project) and writes it back. Pass `content` to write new/edited text first, then ingest it in '
-      + 'one call. Pass `commit: true` (with an optional `message`) to also append the result to the document\'s '
-      + `chain, when one already exists (see foundation_new / foundation_chain_log). ${SUBSET_NOTE}`,
+      + 'one call. Tracked documents always append granular authored changes to their chain, even when commit is omitted. '
+      + `Preserve data-fdn-version from foundation_read when editing content. ${SUBSET_NOTE}`,
     inputSchema: {
       type: 'object',
       properties: {

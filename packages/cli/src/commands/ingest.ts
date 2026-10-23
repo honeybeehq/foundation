@@ -16,14 +16,14 @@
  * without its chain.
  */
 import { existsSync, readFileSync } from 'node:fs'
-import { parseDocument, projectDocument, validateDocument } from 'foundation-engine'
+import { loadChain, parseDocument, projectDocument, validateDocument } from 'foundation-engine'
 import type { NormalizationReport } from 'foundation-engine'
 import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
 import { defaultAuthor } from '../identity.js'
 import { injectDocIdAttr, readDocIdAttr } from '../docid.js'
 import { chainPathFor } from './chain.js'
-import { commitDocument, writeAtomic } from '../disk.js'
+import { commitDocument, sourceBase, writeUntrackedDocument } from '../disk.js'
 
 function summarizeReport(report: NormalizationReport): string {
   if (report.lines.length === 0) return 'no normalization changes'
@@ -76,7 +76,7 @@ export async function runIngest(args: string[], io: CliIO): Promise<number> {
   const commitLines: string[] = []
   let commitFailure: string | null = null
 
-  if (flags.commit) {
+  if (flags.commit || existsSync(chainPathFor(file))) {
     const chainPath = chainPathFor(file)
     if (!existsSync(chainPath)) {
       commitLines.push(`${file}: --commit requested but no chain yet — run \`foundation chain init ${file}\` to start tracking changes`)
@@ -84,7 +84,7 @@ export async function runIngest(args: string[], io: CliIO): Promise<number> {
       const author = flagString(flags, 'author') ?? defaultAuthor()
       const message = flagString(flags, 'm', 'message') ?? (report.lines.length === 0 ? 'ingest' : `ingest — ${summarizeReport(report)}`)
       try {
-        const commit = commitDocument(chainPath, { author, message }, doc)
+        const commit = commitDocument(chainPath, { author, message }, doc, sourceBase(loadChain(readFileSync(chainPath)), source, file), source)
         commitLines.push(
           commit.status === 'committed'
             ? `${chainPath}: committed ${commit.envelope.hash.slice(0, 12)} (${message})`
@@ -96,8 +96,8 @@ export async function runIngest(args: string[], io: CliIO): Promise<number> {
     }
   }
 
-  const changed = canonicalWithDocId !== source
-  writeAtomic(file, canonicalWithDocId)
+  if (!existsSync(chainPathFor(file))) writeUntrackedDocument(file, canonicalWithDocId)
+  const changed = readFileSync(file, 'utf8') !== source
   io.stdout(`${file}: ${changed ? 'rewritten to canonical form' : 'already canonical, unchanged'}`)
   for (const line of commitLines) io.stdout(line)
   if (commitFailure) {

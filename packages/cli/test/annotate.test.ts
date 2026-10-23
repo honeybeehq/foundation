@@ -143,18 +143,16 @@ describe('foundation annotate / foundation annotations', () => {
     expect(await runAnnotations([], io2)).toBe(2)
   })
 
-  it('an uncommitted text edit is not clobbered by an annotate write (chain still commits, text left alone with a warning)', async () => {
+  it('an external text edit is ingested before an annotation and both survive', async () => {
     const original = readFileSync(file, 'utf8')
     writeFileSync(file, original.replace('Hello, Foundation', 'Hello, Edited'), 'utf8')
 
     const io = captureIo()
     const code = await runAnnotate([file, '--text', 'note', '--node', 'n1'], io)
     expect(code).toBe(0)
-    expect(io.out.some((l) => l.includes('uncommitted edits'))).toBe(true)
+    expect(io.out.some((l) => l.includes('updated'))).toBe(true)
 
-    // the hand-edit survives untouched
     expect(readFileSync(file, 'utf8')).toContain('Hello, Edited')
-    // but the chain commit still happened
     const chain = loadChain(readFileSync(chainPath))
     expect(chain.doc().annotations).toHaveLength(1)
   })

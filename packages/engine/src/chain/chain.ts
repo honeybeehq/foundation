@@ -130,6 +130,9 @@ type Frontier = { peer: PeerID; counter: number }[]
  *  exchange.ts. */
 export interface FdnChain {
   doc(): FdnDocument
+  versionRef(): string
+  docAt(ref: string): FdnDocument
+  historyRoot(): string | null
   apply(meta: ChangeMeta, ops: PatchOp[]): EnvelopeRecord
   anchor(name: string, meta?: ChangeMeta): AnchorRef
   checkout(ref: AnchorRef): FdnDocument
@@ -268,6 +271,33 @@ class LoroChain implements FdnChain {
 
   doc(): FdnDocument {
     return this.materialize()
+  }
+
+  versionRef(): string {
+    const frontier = this.loro.frontiers().sort((a, b) => comparePeerIds(a.peer, b.peer) || a.counter - b.counter)
+    return Buffer.from(JSON.stringify(frontier)).toString('base64url')
+  }
+
+  docAt(ref: string): FdnDocument {
+    const decoded: unknown = JSON.parse(Buffer.from(ref, 'base64url').toString('utf8'))
+    if (!Array.isArray(decoded)) throw new Error('invalid document version')
+    const frontier: Frontier = decoded.map((item: unknown) => {
+      if (item === null || typeof item !== 'object' || !('peer' in item) || typeof item.peer !== 'string' || !/^\d+$/.test(item.peer) || !('counter' in item) || typeof item.counter !== 'number' || !Number.isSafeInteger(item.counter) || item.counter < 0) throw new Error('invalid document version')
+      return { peer: item.peer as PeerID, counter: item.counter }
+    })
+    const known = this.loro.oplogVersion()
+    if (frontier.some(id => (known.get(id.peer) ?? 0) <= id.counter)) throw new Error('document version is missing from this chain')
+    try {
+      this.loro.checkout(frontier)
+      return this.materialize()
+    } finally {
+      this.loro.checkoutToLatest()
+    }
+  }
+
+  historyRoot(): string | null {
+    const first = this.sortedChanges()[0]
+    return first ? this.envelopeFor(first).hash : null
   }
 
   apply(meta: ChangeMeta, ops: PatchOp[]): EnvelopeRecord {
@@ -447,8 +477,15 @@ class LoroChain implements FdnChain {
   // ——— envelope internals ———
 
   private tryHead(): EnvelopeRecord | null {
-    const records = this.log()
-    return records.length > 0 ? (records[records.length - 1] as EnvelopeRecord) : null
+    const last = this.sortedChanges().at(-1)
+    return last ? this.envelopeFor(last) : null
+  }
+
+  private envelopeFor(change: Change): EnvelopeRecord {
+    const decoded = decodeEnvelope(change.message)
+    const bytes = this.bytesForSpan(change.peer, change.counter, change.length)
+    const hash = computeEnvelopeHash(decoded.prevHash, decoded.author, decoded.message, decoded.specVersion, bytes)
+    return { hash, prevHash: decoded.prevHash, author: decoded.author, message: decoded.message, specVersion: decoded.specVersion, wallTime: decoded.wallTime ?? null }
   }
 
   private commitEnvelope(meta: ChangeMeta, startCounter: number, prevHash: string | null): EnvelopeRecord {
@@ -478,6 +515,9 @@ class LoroChain implements FdnChain {
 
   private applyOp(op: PatchOp): void {
     switch (op.op) {
+      case 'set-declaration-order':
+        this.order.set(op.section, JSON.stringify(op.names))
+        break
       case 'set-title':
         if (op.title === null) this.meta.delete('title')
         else this.meta.set('title', op.title)

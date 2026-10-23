@@ -4,3 +4,7 @@ dist/
 !spikes/render/fixtures/**
 spikes/render/out/
 .artifacts/verification/
+*.fdn.html.lock
+*.fdn.html.lock.reap
+*.fdn.html.chain.pending
+*.fdn.html.chain.projection

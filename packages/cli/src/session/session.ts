@@ -11,7 +11,6 @@ import {
   createChain,
   diffPatch,
   indexNodes,
-  invertOp,
   loadChain,
   normalizeDocument,
   parseDocument,
@@ -25,7 +24,9 @@ import type { Cause, ClientMessage, DocumentView, FaultCode, ResultCode, Service
 import { withWallTime } from '../change-meta.js'
 import { readDocIdAttr } from '../docid.js'
 import { skeletonDocumentEmpty, titleFromName } from '../commands/new.js'
-import { canonicalText, documentText, readBytesIfPresent, readTextIfPresent, sameBytes, writeAtomic } from '../disk.js'
+import { canonicalText, documentText, persistDocument, projectedText, projectionVersion, recoverDocument, sourceBase, readBytesIfPresent, readTextIfPresent, sameBytes, writeAtomic } from '../disk.js'
+import { DocumentBusyError, documentPath, isDocumentLocked, withDocumentLock } from '../document-lock.js'
+import { oppositeStep, undoOps, undoStep, type UndoStep } from './undo.js'
 
 export interface SessionOptions {
   path: string
@@ -46,12 +47,6 @@ export interface Session {
   readonly done: Promise<number>
 }
 
-interface Step {
-  label: string
-  revert: PatchOp[]
-  guard: string
-}
-
 interface Failure {
   code: ResultCode
   message: string
@@ -67,6 +62,7 @@ class DesignSession implements Session {
   readonly done: Promise<number>
   private finish!: (code: number) => void
   private readonly path: string
+  private readonly displayPath: string
   private readonly chainPath: string
   private readonly log: (line: string) => void
   private phase: 'waiting' | 'open' | 'closed' = 'waiting'
@@ -78,8 +74,8 @@ class DesignSession implements Session {
   private docId: string | null = null
   private issues: ReportLine[] = []
   private rev = 0
-  private undoStack: Step[] = []
-  private redoStack: Step[] = []
+  private undoStack: UndoStep[] = []
+  private redoStack: UndoStep[] = []
   private invalidExternalTokens: string | null = null
   private diskText: string | null = null
   private diskTextCanonical: string | null = null
@@ -90,9 +86,14 @@ class DesignSession implements Session {
   private poller: NodeJS.Timeout | null = null
   private seenSignature = ''
   private pendingSync: NodeJS.Timeout | null = null
+  private locked = false
+  private outbox: Array<() => void> = []
+  private pendingHello: NodeJS.Timeout | null = null
+  private helloWaitStarted: number | null = null
 
   constructor(private readonly options: SessionOptions) {
-    this.path = resolve(options.path)
+    this.path = documentPath(options.path)
+    this.displayPath = resolve(options.path)
     this.chainPath = `${this.path}.chain`
     this.log = options.log ?? (() => {})
     this.done = new Promise((resolveDone) => {
@@ -108,14 +109,56 @@ class DesignSession implements Session {
       return
     }
     try {
-      this.dispatch(message)
+      if (message.t === 'hello' && this.options.create) mkdirSync(dirname(this.path), { recursive: true })
+      this.inTransaction(() => this.dispatch(message), message.t === 'hello' ? 0 : 100)
     } catch (err) {
+      if (err instanceof DocumentBusyError && this.phase === 'waiting') {
+        this.helloWaitStarted ??= performance.now()
+        if (performance.now() - this.helloWaitStarted >= 5000) return this.fault('unreadable', err.message, 1)
+        this.pendingHello = setTimeout(() => { this.pendingHello = null; this.receive(line) }, 25)
+        return
+      }
       this.log(`internal error: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`)
+      if ('id' in message) return this.reject(message.id, { code: 'write-failed', message: err instanceof Error ? err.message : String(err) })
       this.fault('internal', err instanceof Error ? err.message : String(err), this.phase === 'waiting' ? 1 : null)
     }
   }
 
   sync(): void {
+    if (this.phase !== 'open') return
+    if (!this.locked && isDocumentLocked(this.path)) { this.scheduleSync(); return }
+    if (this.locked) return this.syncLocked()
+    try {
+      this.inTransaction(() => this.syncLocked(), 0)
+      this.seenSignature = this.fileSignature()
+    } catch (err) {
+      if (!(err instanceof DocumentBusyError)) throw err
+      this.scheduleSync()
+    }
+  }
+
+  private inTransaction(run: () => void, timeoutMs = 100): void {
+    this.outbox = []
+    try {
+      withDocumentLock(this.path, () => {
+        this.locked = true
+        recoverDocument(this.path)
+        run()
+      }, timeoutMs)
+    } finally {
+      this.locked = false
+      const outbox = this.outbox
+      this.outbox = []
+      for (const send of outbox) send()
+    }
+  }
+
+  private emit(message: ServiceMessage): void {
+    if (this.locked) this.outbox.push(() => this.options.send(message))
+    else this.options.send(message)
+  }
+
+  private syncLocked(): void {
     if (this.phase !== 'open') return
     if (this.pendingSync) clearTimeout(this.pendingSync)
     this.pendingSync = null
@@ -140,6 +183,8 @@ class DesignSession implements Session {
     this.phase = 'closed'
     if (this.pendingSync) clearTimeout(this.pendingSync)
     this.pendingSync = null
+    if (this.pendingHello) clearTimeout(this.pendingHello)
+    this.pendingHello = null
     this.watcher?.close()
     this.watcher = null
     if (this.poller) clearInterval(this.poller)
@@ -148,7 +193,7 @@ class DesignSession implements Session {
   }
 
   private fault(code: FaultCode, message: string, exitCode: number | null): void {
-    this.options.send({ t: 'fault', code, message })
+    this.emit({ t: 'fault', code, message })
     if (exitCode !== null) this.end(exitCode)
   }
 
@@ -169,7 +214,7 @@ class DesignSession implements Session {
         try {
           const reports: InstanceSwapReport[] = []
           expandComponentOp(this.doc, { ...message.op, previewRev: undefined, previewSignature: undefined }, reports)
-          return this.options.send({ t: 'instance-swap-preview', id: message.id, rev: this.rev, report: reports[0]! })
+          return this.emit({ t: 'instance-swap-preview', id: message.id, rev: this.rev, report: reports[0]! })
         } catch (err) {
           return this.reject(message.id, { code: 'invalid-op', message: err instanceof Error ? err.message : String(err) })
         }
@@ -186,7 +231,7 @@ class DesignSession implements Session {
         this.syncAndAnnounce()
         try {
           const page = this.chain?.logPage(message) ?? { entries: [], nextCursor: null, latestCursor: null, hasMore: false }
-          return this.options.send({ t: 'log', id: message.id, ...page })
+          return this.emit({ t: 'log', id: message.id, ...page })
         } catch (err) {
           return this.reject(message.id, { code: 'invalid-op', message: err instanceof Error ? err.message : String(err) })
         }
@@ -202,10 +247,10 @@ class DesignSession implements Session {
     if (created === null) return
     this.phase = 'open'
     this.rev = 1
-    this.options.send({
+    this.emit({
       t: 'welcome',
       protocol: SESSION_PROTOCOL,
-      path: this.path,
+      path: this.displayPath,
       docId: this.docId,
       chain: this.chain !== null,
       created,
@@ -252,7 +297,10 @@ class DesignSession implements Session {
     }
     this.setDoc(this.chain.doc())
     if (this.diskTextCanonical !== this.docText) {
-      this.ingest(this.doc, incoming)
+      try { this.ingest(sourceBase(this.chain, text, this.path), incoming) } catch (err) {
+        this.blockExternal(err)
+        return false
+      }
       this.persist()
     }
     return false
@@ -273,7 +321,7 @@ class DesignSession implements Session {
     this.setDoc(this.chain.doc())
     try {
       mkdirSync(dirname(this.path), { recursive: true })
-      this.persist()
+      this.persist(false)
     } catch (err) {
       this.fault('unreadable', `could not create ${this.path}: ${err instanceof Error ? err.message : String(err)}`, 1)
       return null
@@ -287,23 +335,19 @@ class DesignSession implements Session {
     this.issues = validateDocument(doc).issues
   }
 
-  private persist(): void {
-    this.persistChain()
-    this.persistText()
-  }
-
-  private persistChain(): void {
-    if (!this.chain) return
-    const bytes = this.chain.save()
-    writeAtomic(this.chainPath, bytes)
-    this.diskChain = bytes
+  private persist(protect = true): void {
+    if (!this.chain || this.invalidExternalTokens) return
+    const text = this.diskTextCanonical === this.docText && this.diskText !== null ? this.diskText : this.chain ? projectedText(this.chain, this.docId) : documentText(this.doc, this.docId)
+    this.diskChain = persistDocument(this.path, this.chain, text, protect)
+    this.diskText = text
+    this.diskTextCanonical = this.docText
     this.seenSignature = this.fileSignature()
   }
 
   private persistText(): void {
     if (this.invalidExternalTokens) return
     if (this.diskTextCanonical === this.docText && this.diskText !== null) return
-    const text = documentText(this.doc, this.docId)
+    const text = this.chain ? projectedText(this.chain, this.docId) : documentText(this.doc, this.docId)
     writeAtomic(this.path, text)
     this.diskText = text
     this.diskTextCanonical = this.docText
@@ -319,17 +363,18 @@ class DesignSession implements Session {
       this.diskChain = chainBytes
       try {
         const theirs = loadChain(chainBytes)
-        const theirLog = theirs.log()
-        if (this.chain && this.chain.log()[0]?.hash === theirLog[0]?.hash) {
+        if (this.chain && this.chain.historyRoot() === theirs.historyRoot()) {
           this.chain.merge(theirs)
-          chainAhead = this.chain.log().length > theirLog.length
+          chainAhead = this.chain.versionRef() !== theirs.versionRef()
         } else {
           if (this.chain) this.log(`${this.chainPath} was replaced by an unrelated chain; adopting it`)
+          this.undoStack = []
+          this.redoStack = []
           this.chain = loadChain(chainBytes, { actor: this.actor })
         }
         this.docId = this.chain.docId() ?? this.docId
         this.setDoc(this.chain.doc())
-        author = theirLog.at(-1)?.author ?? null
+        author = theirs.head().author
       } catch (err) {
         this.log(`ignoring unreadable ${this.chainPath}: ${err instanceof Error ? err.message : String(err)}`)
       }
@@ -342,7 +387,8 @@ class DesignSession implements Session {
       this.log(`ignoring unreadable ${this.path}: ${err instanceof Error ? err.message : String(err)}`)
     }
     if (text !== null && text !== this.diskText) {
-      const base = this.invalidExternalTokens || this.diskText === null ? this.doc : parseDocument(this.diskText).doc
+      const previousText = this.diskText
+      const wasBlocked = this.invalidExternalTokens
       const parsed = parseDocument(text)
       const incoming = parsed.doc
       const incomingCanonical = canonicalText(incoming)
@@ -355,19 +401,29 @@ class DesignSession implements Session {
         if (this.invalidExternalTokens !== message) this.fault('unreadable', message, null)
         this.invalidExternalTokens = message
       } else {
-        this.invalidExternalTokens = null
-        if (incomingCanonical !== baseCanonical && incomingCanonical !== this.docText) {
-          if (this.ingest(base, incoming)) {
-            chainAhead = true
-            author = FILE_AUTHOR
+        try {
+          const version = projectionVersion(text)
+          const base = this.chain && (version || existsSync(`${this.path}.chain.projection`)) ? sourceBase(this.chain, text, this.path) : wasBlocked || previousText === null ? this.doc : parseDocument(previousText).doc
+          this.invalidExternalTokens = null
+          if ((wasBlocked || incomingCanonical !== baseCanonical) && incomingCanonical !== this.docText) {
+            if (this.ingest(base, incoming)) {
+              chainAhead = true
+              author = FILE_AUTHOR
+            }
           }
-        }
+        } catch (err) { this.blockExternal(err) }
       }
     }
 
-    if (chainAhead) this.persistChain()
-    if (author !== undefined) this.persistText()
+    if (chainAhead) this.persist()
+    else if (author !== undefined) this.persistText()
     return author
+  }
+
+  private blockExternal(err: unknown): void {
+    const message = `external changes blocked; source preserved: ${err instanceof Error ? err.message : String(err)}; run foundation chain recover ${JSON.stringify(this.path)} to back up unapplied text and restore the projection`
+    if (this.invalidExternalTokens !== message && this.phase === 'open') this.fault('unreadable', message, null)
+    this.invalidExternalTokens = message
   }
 
   private ingest(base: FdnDocument, incoming: FdnDocument): boolean {
@@ -376,7 +432,7 @@ class DesignSession implements Session {
       ...incoming.viewports.map((viewport): PatchOp => ({ op: 'set-viewport', viewport })),
     ])
     const ops = diffPatch(base, incoming)
-    const patch = !declarations.ok ? declarations : ops === null ? applyPatch(this.doc, [{ op: 'replace-document', doc: incoming }]) : applyPatch(this.doc, ops, { lenient: true })
+    const patch = !declarations.ok ? declarations : ops === null ? { ok: false as const, error: { code: 'invalid-op' as const, message: 'external edit cannot be expressed as granular changes' } } : applyPatch(this.doc, ops)
     if (!patch.ok) {
       this.invalidExternalTokens = `external changes cannot be applied; source preserved and commits blocked until repaired: ${patch.error.message}`
       if (this.phase === 'open') this.fault('unreadable', this.invalidExternalTokens, null)
@@ -394,49 +450,67 @@ class DesignSession implements Session {
 
   private commit(message: Extract<ClientMessage, { t: 'commit' }>): void {
     this.syncAndAnnounce()
+    if (this.invalidExternalTokens) return this.reject(message.id, { code: 'invalid-op', message: this.invalidExternalTokens })
     if (message.ops.length === 0) return this.reject(message.id, { code: 'invalid-op', message: 'commit has no ops' })
     if (message.base > this.rev) return this.reject(message.id, { code: 'invalid-op', message: `base ${message.base} is ahead of rev ${this.rev}` })
     const componentSwaps: InstanceSwapReport[] = []
     for (const op of message.ops) if ('previewRev' in op && op.previewRev !== undefined && (op.previewRev > this.rev || op.previewRev < this.rev && !op.previewSignature)) return this.reject(message.id, { code: 'conflict', message: 'swap preview is stale; preview the swap again' })
     let ops: PatchOp[]
     try {
-      ops = expandSessionOps(this.doc, message.ops, componentSwaps)
+      const primitive: PatchOp[] = []
+      let target = this.doc
+      for (const op of message.ops) {
+        const expanded = op.op === 'replace-document' ? diffPatch(target, op.doc) : [op]
+        if (expanded === null) throw new Error('edit cannot be expressed as granular changes')
+        const checked = applyPatch(target, expandSessionOps(target, expanded, componentSwaps), { validateComponents: false })
+        if (!checked.ok) throw new PlacementError(checked.error.code, checked.error.message)
+        primitive.push(...checked.applied)
+        target = checked.doc
+      }
+      ops = primitive
     } catch (err) {
       return this.reject(message.id, { code: err instanceof PlacementError ? err.code : err instanceof Error && err.message.startsWith('swap preview changed') ? 'conflict' : 'invalid-op', message: err instanceof Error ? err.message : String(err) })
     }
     const patch = applyPatch(this.doc, ops)
     if (!patch.ok) return this.reject(message.id, patch.error)
     if (patch.inverse.length === 0 && canonicalText(patch.doc) === this.docText) {
-      this.options.send({ t: 'result', id: message.id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}) })
+      this.emit({ t: 'result', id: message.id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}) })
       return
     }
+    const before = this.doc
     const label = message.label || 'Edit'
     const failure = this.record(patch.applied, label)
     if (failure) return this.reject(message.id, failure)
-    this.undoStack.push({ label, revert: patch.inverse, guard: this.guard(patch.inverse) })
+    this.undoStack.push(undoStep(label, patch.inverse, before, this.doc, patch.applied))
     this.redoStack = []
     this.accept(message.id, { kind: 'commit', id: message.id, author: this.author }, componentSwaps)
   }
 
   private step(id: string, direction: 'undo' | 'redo'): void {
     this.syncAndAnnounce()
+    if (this.invalidExternalTokens) return this.reject(id, { code: 'invalid-op', message: this.invalidExternalTokens })
     const from = direction === 'undo' ? this.undoStack : this.redoStack
     const to = direction === 'undo' ? this.redoStack : this.undoStack
-    const step = from.pop()
+    const step = from.at(-1)
     if (!step) return this.reject(id, { code: direction === 'undo' ? 'nothing-to-undo' : 'nothing-to-redo', message: `nothing to ${direction}` })
     const conflict = { code: 'conflict' as const, message: `"${step.label}" can no longer be ${direction === 'undo' ? 'undone' : 'redone'}: those nodes changed since` }
-    if (this.guard(step.revert) !== step.guard) return this.reject(id, conflict)
-    const patch = applyPatch(this.doc, step.revert)
+    let ops: PatchOp[]
+    try { ops = undoOps(step, this.doc) } catch (err) {
+      from.pop()
+      return this.reject(id, { ...conflict, message: `${err instanceof Error ? err.message : String(err)}; skipped this undo step` })
+    }
+    const before = this.doc
+    const patch = applyPatch(this.doc, ops)
     if (!patch.ok) {
-      from.push(step)
-      return this.reject(id, patch.error)
+      from.pop()
+      return this.reject(id, { code: 'conflict', message: `${patch.error.message}; skipped this undo step` })
     }
     const failure = this.record(patch.applied, `${direction === 'undo' ? 'Undo' : 'Redo'} ${step.label}`)
     if (failure) {
-      from.push(step)
       return this.reject(id, failure)
     }
-    to.push({ label: step.label, revert: patch.inverse, guard: this.guard(patch.inverse) })
+    from.pop()
+    to.push(oppositeStep(step, before, this.doc))
     this.accept(id, { kind: direction, id, author: this.author })
   }
 
@@ -484,16 +558,6 @@ class DesignSession implements Session {
     this.setDoc(previous.doc)
   }
 
-  private guard(revert: PatchOp[]): string {
-    const index = indexNodes(this.doc.body)
-    return stableStringify(
-      revert.map((op) => {
-        const current = invertOp(op, this.doc, index)
-        return current !== null && current !== 'fallback' && current.op === 'insert-node' ? { ...current, index: 0 } : current
-      }),
-    )
-  }
-
   private syncAndAnnounce(): void {
     const before = this.docText
     const author = this.syncFromDisk()
@@ -502,21 +566,21 @@ class DesignSession implements Session {
 
   private accept(id: string, cause: Cause, componentSwaps: InstanceSwapReport[] = []): void {
     this.announce(cause)
-    this.options.send({ t: 'result', id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}) })
+    this.emit({ t: 'result', id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}) })
   }
 
   private reject(id: string, failure: Failure): void {
-    this.options.send({ t: 'result', id, ok: false, code: failure.code, message: failure.message })
+    this.emit({ t: 'result', id, ok: false, code: failure.code, message: failure.message })
   }
 
   private announce(cause: Cause): void {
     this.rev++
-    this.options.send({ t: 'doc', cause, ...this.documentView() })
+    this.emit({ t: 'doc', cause, ...this.documentView() })
     this.sendBakes()
   }
 
   private documentView(): DocumentView {
-    const top = (stack: Step[]): string | null => stack.at(-1)?.label ?? null
+    const top = (stack: UndoStep[]): string | null => stack.at(-1)?.label ?? null
     return {
       rev: this.rev,
       doc: this.doc,
@@ -536,14 +600,21 @@ class DesignSession implements Session {
   }
 
   private sendBakes(): void {
+    const doc = this.doc
+    const rev = this.rev
+    if (this.locked) this.outbox.push(() => this.sendBakesFor(doc, rev))
+    else this.sendBakesFor(doc, rev)
+  }
+
+  private sendBakesFor(doc: FdnDocument, rev: number): void {
     for (const state of this.view.states) {
-      const baked = this.bake(() => bakeEditorDocument(this.doc, state === null ? undefined : { state }))
-      if (this.changed(`state:${JSON.stringify(state)}`, baked)) this.options.send({ t: 'baked', rev: this.rev, state, ...baked })
+      const baked = this.bake(() => bakeEditorDocument(doc, state === null ? undefined : { state }))
+      if (this.changed(`state:${JSON.stringify(state)}`, baked)) this.emit({ t: 'baked', rev: rev, state, ...baked })
     }
     if (!this.view.components) return
-    for (const component of [...this.doc.components, ...(this.doc.componentSets ?? [])]) {
-      const baked = this.bake(() => bakeEditorComponent(this.doc, component.name))
-      if (this.changed(`component:${component.name}`, baked)) this.options.send({ t: 'component', rev: this.rev, name: component.name, ...baked })
+    for (const component of [...doc.components, ...(doc.componentSets ?? [])]) {
+      const baked = this.bake(() => bakeEditorComponent(doc, component.name))
+      if (this.changed(`component:${component.name}`, baked)) this.emit({ t: 'component', rev: rev, name: component.name, ...baked })
     }
   }
 
@@ -595,7 +666,6 @@ class DesignSession implements Session {
 
   private syncSafely(): void {
     try {
-      this.seenSignature = this.fileSignature()
       this.sync()
     } catch (err) {
       this.log(`sync failed: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`)

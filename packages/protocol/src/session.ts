@@ -199,6 +199,7 @@ const PATCH_OPS: Record<PatchOp['op'], Check> = {
   'set-viewport': shape({ viewport: isViewport, index: optional(isCount) }),
   'remove-viewport': shape({ name: isString }),
   'set-matrix': shape({ cells: arrayOf(shape({ state: isString, viewport: isString })) }),
+  'set-declaration-order': shape({ section: oneOf(['params', 'data', 'lookups', 'states', 'viewports', 'namedStyles', 'components', 'componentSets', 'tokenCollections']), names: arrayOf(isString) }),
   annotate: shape({ annotation: isAnnotation }),
   'set-annotation-status': shape({ id: isString, status: isAnnotationStatus }),
   'remove-annotation': shape({ id: isString }),

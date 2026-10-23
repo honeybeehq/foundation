@@ -42,6 +42,9 @@ loadChain(bytes: Uint8Array, opts?: { actor?: string }): FdnChain
 //  independent loads of the same snapshot both edit locally before merging)
 interface FdnChain {
   doc(): FdnDocument
+  versionRef(): string
+  docAt(ref: string): FdnDocument
+  historyRoot(): string | null
   apply(meta: ChangeMeta, ops: PatchOp[]): EnvelopeRecord   // one call = one change
   anchor(name: string): AnchorRef
   checkout(ref: AnchorRef): FdnDocument                      // non-destructive read

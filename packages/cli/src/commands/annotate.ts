@@ -29,8 +29,8 @@ import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
 import { withWallTime } from '../change-meta.js'
 import { defaultAuthor } from '../identity.js'
-import { writeAtomic } from '../disk.js'
-import { chainPathFor, hasUncommittedEdits, regenerateTextFromChain } from './chain.js'
+import { updateDocument } from '../disk.js'
+import { chainPathFor } from './chain.js'
 
 function loadChainFor(chainPath: string): FdnChain {
   return loadChain(readFileSync(chainPath))
@@ -50,10 +50,6 @@ function requireChain(file: string, io: CliIO): FdnChain | null {
   }
 }
 
-/** Commits `ops`, saves `<file>.chain`, and regenerates `<file>`'s canonical
- *  text from the merged chain — UNLESS `file` already has uncommitted edits
- *  sitting in it, in which case the chain write still happens but the text
- *  is left alone (same guard `chain pull`/`chain sync` use, see chain.ts). */
 function commitAndSync(
   file: string,
   chain: FdnChain,
@@ -61,19 +57,14 @@ function commitAndSync(
   ops: Parameters<FdnChain['apply']>[1],
   io: CliIO,
 ): { hash: string } {
-  const chainPath = chainPathFor(file)
-  const wasDirty = existsSync(file) && hasUncommittedEdits(file, chain)
-  const envelope = chain.apply(withWallTime(meta), ops)
-  writeAtomic(chainPath, chain.save())
-  if (wasDirty) {
-    io.stdout(
-      `${file}: has uncommitted edits — not regenerated from the chain (annotation still committed). ` +
-        `Run \`foundation ingest ${file} --commit\` first, then re-run this to see the annotation in the text.`,
-    )
-  } else {
-    regenerateTextFromChain(file, chain, io)
-  }
-  return { hash: envelope.hash }
+  return updateDocument(file, latest => {
+    for (const op of ops) {
+      if (op.op === 'annotate' && !chain.doc().annotations.some(item => item.id === op.annotation.id) && latest.doc().annotations.some(item => item.id === op.annotation.id)) op.annotation.id = mintAnnotationId(latest.doc().annotations)
+    }
+    const envelope = latest.apply(withWallTime(meta), ops)
+    io.stdout(`updated ${file} from merged chain`)
+    return { hash: envelope.hash }
+  })
 }
 
 function formatAnnotation(a: FdnAnnotation): string {
@@ -130,7 +121,7 @@ async function runAnnotateCreate(
   const author = flagString(flags, 'author') ?? defaultAuthor()
   const message = flagString(flags, 'm', 'message') ?? `annotate: ${text}`
   const { hash } = commitAndSync(file, chain, { author, message }, [{ op: 'annotate', annotation }], io)
-  io.stdout(`${chainPathFor(file)}: committed ${hash.slice(0, 12)} — annotation ${id} added`)
+  io.stdout(`${chainPathFor(file)}: committed ${hash.slice(0, 12)} — annotation ${annotation.id} added`)
   return 0
 }
 

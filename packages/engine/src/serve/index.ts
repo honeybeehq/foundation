@@ -56,6 +56,7 @@ import { validateDocument } from '../validate/index.js'
 import type { ConformanceReport, FdnAnnotation, FdnDocument, ValidationResult } from '../types.js'
 
 export interface ServeOptions {
+  transaction?: <T>(mutate: (chain: FdnChain) => T) => T
   wallTime?: () => string
   port?: number
   /** Chain envelope author for annotations written through the JSON API
@@ -483,6 +484,17 @@ export async function serveDocument(filePath: string, opts?: ServeOptions): Prom
     scheduleReload()
   }
 
+  function mutateChain<T>(chain: FdnChain, mutate: (chain: FdnChain) => T): T {
+    if (opts?.transaction) {
+      const result = opts.transaction(mutate)
+      scheduleReload()
+      return result
+    }
+    const result = mutate(chain)
+    saveChainAndBroadcast(chain)
+    return result
+  }
+
   async function handleApiAnnotatePost(req: IncomingMessage, res: ServerResponse): Promise<void> {
     let body: Record<string, unknown>
     try {
@@ -508,6 +520,7 @@ export async function serveDocument(filePath: string, opts?: ServeOptions): Prom
     try {
       const chain = requireChainOr409(res)
       if (!chain) return
+      const annotation = mutateChain(chain, chain => {
       const id = mintAnnotationId(chain.doc().annotations)
       const annotation: FdnAnnotation = { id, text, status: 'open' }
       if (nodeId !== undefined) annotation.nodeId = nodeId
@@ -515,7 +528,8 @@ export async function serveDocument(filePath: string, opts?: ServeOptions): Prom
       if (y !== undefined) annotation.y = y
       if (state !== undefined) annotation.state = state
       chain.apply({ author: opts?.author ?? DEFAULT_SERVE_AUTHOR, message: `annotate: ${text}`, wallTime: opts?.wallTime?.() }, [{ op: 'annotate', annotation }])
-      saveChainAndBroadcast(chain)
+      return annotation
+      })
       sendJson(res, 200, { annotation })
     } catch (err) {
       sendJson(res, 500, { error: err instanceof Error ? err.message : String(err) })
@@ -543,10 +557,9 @@ export async function serveDocument(filePath: string, opts?: ServeOptions): Prom
         sendJson(res, 404, { error: `no annotation "${id}"` })
         return
       }
-      chain.apply({ author: opts?.author ?? DEFAULT_SERVE_AUTHOR, message: `annotation ${id}: mark ${status}`, wallTime: opts?.wallTime?.() }, [
+      mutateChain(chain, chain => chain.apply({ author: opts?.author ?? DEFAULT_SERVE_AUTHOR, message: `annotation ${id}: mark ${status}`, wallTime: opts?.wallTime?.() }, [
         { op: 'set-annotation-status', id, status },
-      ])
-      saveChainAndBroadcast(chain)
+      ]))
       sendJson(res, 200, { id, status })
     } catch (err) {
       sendJson(res, 500, { error: err instanceof Error ? err.message : String(err) })

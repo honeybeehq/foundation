@@ -131,6 +131,31 @@ step = one authored unit (one envelope, one hash, one author, one message).
 Finer-grained input — keystrokes, drag ticks — batches client-side before commit and
 never enters the chain individually.
 
+**Concurrent same-file writers (G16, 2026-10-23):** updated Foundation sessions,
+CLI commands and MCP tools coordinate each read/merge/apply/save transaction with
+one exclusive document lock. A successful acknowledgement follows saving both the
+latest chain and its projection. No cooperating writer may replace the chain with
+a snapshot missing a previously acknowledged change. Later transactions observe
+earlier ones; a later write to the same node property wins. Offline CRDT merges
+retain causal ordering and deterministic peer tie-breaking, not wall-clock ordering.
+A pending-save record lets the next writer finish an interrupted projection after
+a process exits. Busy or invalid transactions fail visibly; they are never reported
+as saved. All same-file writers must use this protocol; older executables and tools
+that overwrite chain bytes directly do not participate.
+
+Each live session owns its Undo and Redo stacks. Undo appends only the granular
+inverse of that session's edit, applied to the latest merged document, even if a
+peer subsequently changed the same property. Unrelated peer properties survive.
+Nested declaration inverses, including component sets, preserve unrelated current
+fields and identity-keyed entries.
+Redo replays the writer's original values, not a peer's overwritten values. Neither
+operation restores a whole-document snapshot. Undoing an inserted container moves
+peer-added descendants to its parent at its former position before removing the
+container. Targets moved to another parent, missing targets and invalid restores
+fail explicitly and skip the obstructed step, so the next Undo reaches older edits.
+Transient busy/write failures retain the step. Structural restores use sibling
+identities rather than stale indices. Stacks remain local to the running writer and are not reconstructed on reopen.
+
 **Recorded wall-clock time (2026-10-23):** a caller may supply an optional UTC
 ISO-8601 `wallTime` with a change's author and message. CLI and session mutation
 boundaries supply their machine's commit time; the engine never reads the current
@@ -248,6 +273,27 @@ text. Both are served by one rule:
   suggestion — is **ingested**: parsed, validated against the subset, diffed against the
   current state, and appended to the chain as an ordinary change. Text editing is not a
   second truth; it is an input method.
+- Live file projections carry an opaque `data-fdn-version` on `<fdn-doc>`, alongside
+  document identity, outside `FdnDocument` and canonical bake/render input. It names
+  the retained version the text came from. Ingestion diffs that version's canonical
+  projection against the edited text and applies those granular changes to the
+  latest chain, so a stale buffer does not replay unrelated old values. Preserve
+  the marker when editing. Unknown versions fail without rewriting the source.
+  After the first authored save, a protected projection receipt rejects text that
+  drops its marker. Legacy text before that first upgrade uses the available
+  current/last-observed baseline; its true
+  former version cannot be recovered. `foundation chain recover <file>` backs up
+  unapplied text and any pending journal before restoring the current chain projection.
+  Tracked CLI/MCP ingests always commit under
+  the caller's author identity. A raw filesystem edit made before that call may
+  already have been ingested as `file`; callers needing attribution submit content
+  through MCP or use session operations, rather than saving raw text first.
+- `set-declaration-order {section,names}` reorders named declarations independently
+  of their contents, including component sets. Supported sections are params, data,
+  lookups, states, viewports, namedStyles, components, componentSets and
+  tokenCollections. Names must be unique and exist; unlisted current declarations
+  follow in their existing order. This supports granular text reconciliation and
+  Undo without replacing definitions or the document.
 - **Freeze** = write the projection + a lock header (spec version, engine version,
   chain-head hash, imported-component artifact hashes) into a repo. Frozen files are dead text with a
   verifiable pedigree — reviewable in the same PR as the component they sit beside, and
@@ -428,7 +474,7 @@ reject the whole commit without a revision or undo step. The session expands sem
 against the sequential batch state into existing set-attr/set-style patches, then
 records one envelope and undo step for the entire commit. Chains store those
 primitive patches, not semantic requests. Undo/redo restore the exact previous
-attribute/style declarations through the existing guarded inverse machinery; no
+attribute/style declarations through writer-local granular inverses; no
 replace-document is used. Results and document/bake notifications retain the
 existing protocol shapes. Undo history remains session-local.
 
@@ -535,6 +581,14 @@ targets. `reset-instance-override {id,target}` removes all records for that targ
 Operations expand to child insertion/removal and per-key attribute/style patches,
 with one commit/undo step. Undo restores exact original record/fill order. New
 records get unique source identities once; redo reuses their recorded identity.
+Writer-local Undo of a newly created record removes only its authored fields,
+retaining unrelated peer fields and the target address. Redo reapplies those fields
+to the same retained record identity. An explicit reset still removes the whole
+record as the latest edit. Swap attributes form one owned field group, so Undo
+and Redo clear or restore the whole swap even after another swap edit. An emptied
+record may remain as inert, warning-free metadata after both writers undo their
+fields; reset-instance-override removes it. Hidden targets leave their container,
+possibly empty.
 
 The parser retains instance fills and overrides while collapsing derived baked
 children. Project→parse→project is a fixpoint for canonical fills/overrides. This
@@ -564,7 +618,16 @@ scales linearly and badly).
 `swap-instance {id,target}` changes a source instance to `{component}` or
 `{componentSet,variants?}`. Its existing prop attributes, fills, styles and override
 payloads remain stored. Selection and target retargeting are one semantic batch,
-with exact per-attribute undo. `set-instance-variant` uses the same planner, as do
+with exact per-attribute undo. Writer-local Undo/Redo skips derived target
+updates for metadata records removed by another writer while still restoring the
+instance selection. A swap step whose only remaining effects targeted records
+since removed by another writer is skipped. Created-record field ownership follows
+the retained record identity and leaves its current target unchanged. If a
+creator Undo removed the record after another writer swapped the instance, Redo
+reinserts the authored target, which may be dormant under the current selector.
+Compatibility previews show whether another selection can revive or retarget it;
+previews do not mutate the record.
+`set-instance-variant` uses the same planner, as do
 nested swap overrides and resetting a nested swap. Sealed targets accept swaps;
 all interior overrides become dormant. A newly introduced structural component cycle is refused
 before any write, including a cycle hidden behind a current condition. Existing
@@ -601,8 +664,9 @@ slot schema are inert. No payload is silently pruned.
 
 A read-only `preview-instance-swap {id,op}` accepts a `swap-instance` or
 `set-instance-variant` operation and returns
-`instance-swap-preview {id,rev,report}` without changing document, chain or
-history. The report includes a deterministic SHA-256 compatibility-plan
+`instance-swap-preview {id,rev,report}` without an edit or history entry of its
+own. Normal disk synchronization can first ingest and announce pending external
+changes. The report includes a deterministic SHA-256 compatibility-plan
 signature. Both root operations accept optional `previewRev` and
 `previewSignature`: future revisions, stale revisions without a signature, or a
 changed signature are refused with `conflict`, asking the caller to preview
@@ -690,9 +754,10 @@ Session operations use the normal commit batch and standard results:
 These expand to keyed `set-token-collection {collection,index?}` and
 `remove-token-collection {name}`, plus ordinary attribute/component patches.
 Collection primitives have typed inverses; they never replace the document.
-One commit is one undo step. The guarded inverse owns the affected collection
-object, so a competing edit in that same collection may conflict; unrelated
-collections and flat tokens are independent. Candidate batches are validated
+One commit is one undo step. Writer-local inverses restore changed collection
+fields and token values against the current collection, keeping unrelated peer
+values and tokens. Invalid structural restores fail visibly; unrelated collections
+and flat tokens remain independent. Candidate batches are validated
 before persistence; type/name/mode/alias errors leave revision, document and chain
 bytes unchanged. Undo/redo restores prior declarations/attributes and appends
 history as usual. Cross-document libraries, moving/renaming collections and
@@ -705,7 +770,8 @@ descendants to one named document state. When baking a named state, an unmarked
 element is included normally; a marked element is included only when its marker
 exactly equals the requested state name. The marker is a literal, case-sensitive
 single name: it is not trimmed, interpolated, or split into a list. Existing
-validation warns about undeclared names, including the empty name.
+validation warns about undeclared names, including the empty name. Override
+metadata cannot carry this marker; scope the instance or its target layer instead.
 
 With no state selected, all scopes remain visible as the existing stacked
 overview. An unknown requested state still reports `unknown-state` and uses
@@ -731,7 +797,8 @@ component wrappers keep their existing attribute emission rules.
 Excluded nodes remain in the document and can still be edited by id. They do not
 appear in the selected state's editor HTML or render layout report; callers must
 measure the chosen rendered state. Excluded subtrees are not evaluated, so their
-interpolation, style and other conformance reports are absent. Token-use audits
+interpolation, style and other conformance reports are absent. Override dormancy
+reports also reflect state and slot inactivity. Token-use audits
 also reflect only included content; a token used only in another scope can be
 reported unused. Document validation and canonical projection remain unfiltered;
 changing the previewed state does not mutate the document or chain.

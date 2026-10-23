@@ -313,6 +313,7 @@ export type PatchOp =
   | { op: 'set-viewport'; viewport: FdnViewport; index?: number }
   | { op: 'remove-viewport'; name: string }
   | { op: 'set-matrix'; cells: FdnDocument['matrix'] }
+  | { op: 'set-declaration-order'; section: 'params' | 'data' | 'lookups' | 'states' | 'viewports' | 'namedStyles' | 'components' | 'componentSets' | 'tokenCollections'; names: string[] }
   | { op: 'annotate'; annotation: FdnAnnotation }
   | { op: 'set-annotation-status'; id: string; status: FdnAnnotation['status'] }
   | { op: 'remove-annotation'; id: string }

@@ -35,14 +35,14 @@
  * hand-edit would get for free from parseDocument's single shared counter.
  */
 import { existsSync, readFileSync } from 'node:fs'
-import { parseDocument, projectDocument } from 'foundation-engine'
+import { loadChain, parseDocument, projectDocument } from 'foundation-engine'
 import type { FdnComponent, FdnDocument, FdnLookup, FdnNode, FdnProp } from 'foundation-engine'
 import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
 import { defaultAuthor } from '../identity.js'
 import { injectDocIdAttr, readDocIdAttr } from '../docid.js'
 import { chainPathFor } from './chain.js'
-import { commitDocument, writeAtomic } from '../disk.js'
+import { commitDocument, sourceBase, writeUntrackedDocument } from '../disk.js'
 
 // ——— lazy foundation-importer loader (computed specifier — see module doc) ———
 
@@ -264,6 +264,7 @@ export async function runImport(args: string[], io: CliIO): Promise<number> {
     return 2
   }
 
+  const editBase = existsSync(chainPathFor(into)) ? sourceBase(loadChain(readFileSync(chainPathFor(into))), targetSource, into) : parseDocument(targetSource).doc
   const importer = await loadImporterModule()
 
   let artifact: RenderArtifact
@@ -324,7 +325,7 @@ export async function runImport(args: string[], io: CliIO): Promise<number> {
     const author = flagString(flags, 'author') ?? defaultAuthor()
     const message = `import ${component.name} from ${source} (${projected.mode})`
     try {
-      const commit = commitDocument(chainPath, { author, message }, nextDoc)
+      const commit = commitDocument(chainPath, { author, message }, nextDoc, editBase, targetSource)
       commitLine =
         commit.status === 'committed'
           ? `${chainPath}: committed ${commit.envelope.hash.slice(0, 12)} (${message})`
@@ -333,7 +334,7 @@ export async function runImport(args: string[], io: CliIO): Promise<number> {
       commitFailure = `chain commit failed: ${err instanceof Error ? err.message : String(err)}`
     }
   }
-  writeAtomic(into, canonicalWithDocId)
+  if (!existsSync(chainPath)) writeUntrackedDocument(into, canonicalWithDocId)
 
   for (const line of [...projected.report, ...tokenResult.conflicts]) {
     io.stdout(`${line.severity} ${line.code}: ${line.message}`)

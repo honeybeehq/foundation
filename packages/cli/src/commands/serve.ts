@@ -9,6 +9,7 @@ import { serveDocument } from 'foundation-engine/src/serve/index.js'
 import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
 import { defaultAuthor } from '../identity.js'
+import { updateDocument } from '../disk.js'
 
 export interface ServeRunOptions {
   signal?: AbortSignal
@@ -34,7 +35,7 @@ export async function runServe(args: string[], io: CliIO, opts?: ServeRunOptions
 
   let handle
   try {
-    handle = await serveDocument(file, { author: defaultAuthor(), wallTime: () => new Date().toISOString(), ...(port !== undefined ? { port } : {}) })
+    handle = await serveDocument(file, { transaction: mutate => updateDocument(file, mutate), author: defaultAuthor(), wallTime: () => new Date().toISOString(), ...(port !== undefined ? { port } : {}) })
   } catch (err) {
     io.stderr(`could not start server: ${err instanceof Error ? err.message : String(err)}`)
     return 2

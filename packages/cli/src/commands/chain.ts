@@ -19,9 +19,10 @@ import type { ChangeMeta, EnvelopeRecord, FdnChain, FdnDocument, OverlapReport, 
 import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
 import { injectDocIdAttr, readDocIdAttr } from '../docid.js'
+import { withDocumentLock } from '../document-lock.js'
 import { withWallTime } from '../change-meta.js'
 import { defaultAuthor } from '../identity.js'
-import { writeAtomic } from '../disk.js'
+import { persistDocument, updateDocument, writeAtomic } from '../disk.js'
 
 export function chainPathFor(file: string): string {
   return `${file}.chain`
@@ -38,16 +39,22 @@ export function writeChainInit(
   doc: FdnDocument,
   meta: ChangeMeta,
   io: CliIO,
-  opts?: { docId?: string },
+  opts?: { docId?: string; newDocument?: boolean },
 ): { chainPath: string; head: EnvelopeRecord } | null {
-  const chainPath = chainPathFor(file)
-  if (existsSync(chainPath)) {
-    io.stderr(`refusing to init: ${chainPath} already exists`)
-    return null
-  }
-  const chain = createChain(doc, withWallTime(meta), opts?.docId ? { docId: opts.docId } : undefined)
-  writeAtomic(chainPath, chain.save())
-  return { chainPath, head: chain.head() }
+  return withDocumentLock(file, () => {
+    const chainPath = chainPathFor(file)
+    if (opts?.newDocument && existsSync(file)) {
+      io.stderr(`refusing to create: ${file} already exists`)
+      return null
+    }
+    if (existsSync(chainPath)) {
+      io.stderr(`refusing to init: ${chainPath} already exists`)
+      return null
+    }
+    const chain = createChain(doc, withWallTime(meta), opts?.docId ? { docId: opts.docId } : undefined)
+    persistDocument(file, chain, undefined, false)
+    return { chainPath, head: chain.head() }
+  })
 }
 
 function printOverlaps(overlaps: OverlapReport, io: CliIO): void {
@@ -115,7 +122,6 @@ async function runChainInitCommand(positionals: string[], flags: Record<string, 
 
   const result = writeChainInit(file, doc, { author, message }, io, { docId })
   if (!result) return 2
-  if (stampedDocId === null) writeAtomic(file, injectDocIdAttr(source, docId))
 
   io.stdout(`wrote ${result.chainPath} (head ${result.head.hash.slice(0, 12)})`)
   return 0
@@ -134,17 +140,15 @@ async function runChainAnchor(positionals: string[], io: CliIO): Promise<number>
     return 0
   }
 
-  let chain: FdnChain
   try {
-    chain = loadChainFor(chainPath)
+    updateDocument(file, chain => {
+      chain.anchor(name, withWallTime({ author: defaultAuthor(), message: `Anchor ${name}` }))
+      io.stdout(`${chainPath}: anchored '${name}' at ${chain.head().hash.slice(0, 12)}`)
+    })
   } catch (err) {
-    io.stderr(`could not read ${chainPath}: ${err instanceof Error ? err.message : String(err)}`)
+    io.stderr(`could not anchor ${file}: ${err instanceof Error ? err.message : String(err)}`)
     return 2
   }
-
-  chain.anchor(name, withWallTime({ author: defaultAuthor(), message: `Anchor ${name}` }))
-  writeAtomic(chainPath, chain.save())
-  io.stdout(`${chainPath}: anchored '${name}' at ${chain.head().hash.slice(0, 12)}`)
   return 0
 }
 
@@ -278,28 +282,8 @@ export function hasUncommittedEdits(file: string, chain: FdnChain): boolean {
  *  `.fdn.html` text, so a peer who only ever looks at the text would keep
  *  seeing their own edit forever even after a successful pull. */
 export function regenerateTextFromChain(file: string, chain: FdnChain, io: CliIO): void {
-  let text = projectDocument(chain.doc())
-  const docId = chain.docId()
-  if (docId) text = injectDocIdAttr(text, docId)
-  writeAtomic(file, text)
+  updateDocument(file, latest => { latest.merge(chain) })
   io.stdout(`updated ${file} from merged chain`)
-}
-
-/** Shared by pull/sync: after an import, either regenerate the text or, if
- *  the file has uncommitted edits, warn and leave it untouched (chain import
- *  itself already happened either way — only the TEXT regeneration is
- *  gated). Always exit 0: per the task brief, an uncommitted-edits guard is
- *  a warning, not a failure — the chain is still correctly up to date. */
-function reconcileTextAfterPull(file: string, chain: FdnChain, imported: number, wasDirty: boolean, io: CliIO): void {
-  if (imported === 0) return
-  if (wasDirty) {
-    io.stdout(
-      `${file}: has uncommitted edits — not regenerated from the merged chain ` +
-        `(chain import still applied). Run \`foundation ingest ${file} --commit\` first, then pull/sync again.`,
-    )
-    return
-  }
-  regenerateTextFromChain(file, chain, io)
 }
 
 async function runChainPush(positionals: string[], io: CliIO): Promise<number> {
@@ -328,13 +312,12 @@ async function runChainPull(positionals: string[], io: CliIO): Promise<number> {
   }
   const chain = requireChain(file, io)
   if (!chain) return 0
-  const wasDirty = existsSync(file) && hasUncommittedEdits(file, chain)
   try {
     const { imported, overlaps } = await importBlobs(chain, dir)
-    if (imported > 0) writeAtomic(chainPathFor(file), chain.save())
+    if (imported > 0) updateDocument(file, latest => { latest.merge(chain) })
     io.stdout(`${chainPathFor(file)}: pulled ${imported} blob(s) from ${dir}/${chain.docId()}`)
     printOverlaps(overlaps, io)
-    reconcileTextAfterPull(file, chain, imported, wasDirty, io)
+    if (imported > 0) io.stdout(`updated ${file} from merged chain`)
     return 0
   } catch (err) {
     io.stderr(`chain pull: ${err instanceof Error ? err.message : String(err)}`)
@@ -348,16 +331,16 @@ async function runChainSync(positionals: string[], io: CliIO): Promise<number> {
     io.stderr('usage: foundation chain sync <file> <dir>')
     return 2
   }
-  const chain = requireChain(file, io)
+  let chain = requireChain(file, io)
   if (!chain) return 0
-  const wasDirty = existsSync(file) && hasUncommittedEdits(file, chain)
   try {
     const { imported, overlaps } = await importBlobs(chain, dir)
-    if (imported > 0) writeAtomic(chainPathFor(file), chain.save())
+    const importedChain = chain
+    chain = updateDocument(file, latest => { latest.merge(importedChain); return latest })
     const { written } = await exportBlobs(chain, dir)
     io.stdout(`${chainPathFor(file)}: synced with ${dir}/${chain.docId()} — pulled ${imported}, pushed ${written}`)
     printOverlaps(overlaps, io)
-    reconcileTextAfterPull(file, chain, imported, wasDirty, io)
+    if (imported > 0) io.stdout(`updated ${file} from merged chain`)
     return 0
   } catch (err) {
     io.stderr(`chain sync: ${err instanceof Error ? err.message : String(err)}`)
@@ -395,18 +378,35 @@ async function runChainMerge(positionals: string[], io: CliIO): Promise<number> 
     return 2
   }
 
-  const { merged, overlaps } = mergeChains(ours, theirs)
-  writeAtomic(chainPath, merged)
-
-  const mergedChain = loadChain(merged)
-  let text = projectDocument(mergedChain.doc())
-  const docId = mergedChain.docId()
-  if (docId) text = injectDocIdAttr(text, docId)
-  writeAtomic(file, text)
-
-  io.stdout(`${chainPath}: merged with ${theirsPath} (head ${mergedChain.head().hash.slice(0, 12)}) — rewrote ${file}`)
+  const { overlaps } = mergeChains(ours, theirs)
+  const mergedChain = loadChain(theirs)
+  updateDocument(file, chain => { chain.merge(mergedChain) })
+  io.stdout(`${chainPath}: merged with ${theirsPath} — rewrote ${file}`)
   printOverlaps(overlaps, io)
   return 0
+}
+
+async function runChainRecover(positionals: string[], io: CliIO): Promise<number> {
+  const [file] = positionals
+  if (!file) { io.stderr('usage: foundation chain recover <file>'); return 2 }
+  try {
+    withDocumentLock(file, () => {
+      const chain = loadChain(readFileSync(chainPathFor(file)))
+      const suffix = randomUUID()
+      for (const source of [file, `${file}.chain.pending`]) {
+        if (!existsSync(source)) continue
+        const backup = `${source}.unapplied-${suffix}`
+        writeAtomic(backup, readFileSync(source))
+        io.stdout(`backed up ${source} to ${backup}`)
+      }
+      persistDocument(file, chain)
+      io.stdout(`restored ${file} from the current chain; reapply unapplied edits from the backups`)
+    })
+    return 0
+  } catch (err) {
+    io.stderr(err instanceof Error ? err.message : String(err))
+    return 2
+  }
 }
 
 export async function runChain(args: string[], io: CliIO): Promise<number> {
@@ -415,6 +415,7 @@ export async function runChain(args: string[], io: CliIO): Promise<number> {
 
   if (first === 'init') return runChainInitCommand(positionals.slice(1), flags, io)
   if (first === 'anchor') return runChainAnchor(positionals.slice(1), io)
+  if (first === 'recover') return runChainRecover(positionals.slice(1), io)
   if (first === 'diff') return runChainDiff(positionals.slice(1), io)
   if (first === 'push') return runChainPush(positionals.slice(1), io)
   if (first === 'pull') return runChainPull(positionals.slice(1), io)

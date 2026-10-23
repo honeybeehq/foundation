@@ -93,6 +93,11 @@ function isWithin(index: Map<NodeId, NodeLocation>, id: NodeId, ancestor: NodeId
 
 function checkOp(op: PatchOp, doc: FdnDocument, index: Map<NodeId, NodeLocation>, lenient: boolean): PatchOp {
   switch (op.op) {
+    case 'set-declaration-order': {
+      const names = (doc[op.section] ?? []).map(item => item.name)
+      if (new Set(op.names).size !== op.names.length || op.names.some(name => !names.includes(name))) throw new PatchFailure('invalid-op', 'declaration order needs unique existing names')
+      return { ...op, names: [...op.names, ...names.filter(name => !op.names.includes(name))] }
+    }
     case 'insert-node': {
       const siblings = childrenOf(doc, index, op.parent)
       const ids = subtreeIds(op.node)
@@ -211,6 +216,11 @@ function upsertByName<T extends { name: string }>(items: T[], item: T, index?: n
 function applyOp(doc: FdnDocument, op: PatchOp, index: Map<NodeId, NodeLocation>): FdnDocument {
   const node = (id: NodeId): FdnNode => (index.get(id) as NodeLocation).node
   switch (op.op) {
+    case 'set-declaration-order': {
+      const rank = new Map(op.names.map((name, index) => [name, index]))
+      doc[op.section]?.sort((a, b) => rank.get(a.name)! - rank.get(b.name)!)
+      return doc
+    }
     case 'set-title':
       if (op.title === null) delete doc.title
       else doc.title = op.title
@@ -346,16 +356,16 @@ export function diffPatch(original: FdnDocument, target: FdnDocument): PatchOp[]
   if (from.specVersion !== to.specVersion) return null
   const ops: PatchOp[] = []
   if (from.title !== to.title) ops.push({ op: 'set-title', title: to.title ?? null })
-  if (!diffNamed(from.params, to.params, (param) => ({ op: 'set-param', param }), (name) => ({ op: 'remove-param', name }), ops)) return null
-  if (!diffNamed(from.lookups, to.lookups, (lookup) => ({ op: 'set-lookup', lookup }), (name) => ({ op: 'remove-lookup', name }), ops)) return null
-  if (!diffNamed(from.states, to.states, (state) => ({ op: 'set-state', state }), (name) => ({ op: 'remove-state', name }), ops)) return null
-  if (!diffNamed(from.namedStyles, to.namedStyles, (style) => ({ op: 'set-named-style', style }), (name) => ({ op: 'remove-named-style', name }), ops)) return null
-  if (!diffNamed(from.components, to.components, (component) => ({ op: 'set-component', component }), (name) => ({ op: 'remove-component', name }), ops)) return null
-  if (!diffNamed(from.tokenCollections ?? [], to.tokenCollections ?? [], (collection) => ({ op: 'set-token-collection', collection }), (name) => ({ op: 'remove-token-collection', name }), ops)) return null
-  if (!diffNamed(from.data, to.data, (data) => ({ op: 'set-data', data }), (name) => ({ op: 'remove-data', name }), ops)) return null
-  if (!diffNamed(from.viewports, to.viewports, (viewport) => ({ op: 'set-viewport', viewport }), (name) => ({ op: 'remove-viewport', name }), ops)) return null
+  if (!diffNamed('params', from.params, to.params, (param) => ({ op: 'set-param', param }), (name) => ({ op: 'remove-param', name }), ops)) return null
+  if (!diffNamed('lookups', from.lookups, to.lookups, (lookup) => ({ op: 'set-lookup', lookup }), (name) => ({ op: 'remove-lookup', name }), ops)) return null
+  if (!diffNamed('states', from.states, to.states, (state) => ({ op: 'set-state', state }), (name) => ({ op: 'remove-state', name }), ops)) return null
+  if (!diffNamed('namedStyles', from.namedStyles, to.namedStyles, (style) => ({ op: 'set-named-style', style }), (name) => ({ op: 'remove-named-style', name }), ops)) return null
+  if (!diffNamed('components', from.components, to.components, (component) => ({ op: 'set-component', component }), (name) => ({ op: 'remove-component', name }), ops)) return null
+  if (!diffNamed('tokenCollections', from.tokenCollections ?? [], to.tokenCollections ?? [], (collection) => ({ op: 'set-token-collection', collection }), (name) => ({ op: 'remove-token-collection', name }), ops)) return null
+  if (!diffNamed('data', from.data, to.data, (data) => ({ op: 'set-data', data }), (name) => ({ op: 'remove-data', name }), ops)) return null
+  if (!diffNamed('viewports', from.viewports, to.viewports, (viewport) => ({ op: 'set-viewport', viewport }), (name) => ({ op: 'remove-viewport', name }), ops)) return null
   if (!sameJson(from.matrix, to.matrix)) ops.push({ op: 'set-matrix', cells: to.matrix })
-  if (!diffNamed(from.componentSets ?? [], to.componentSets ?? [], (componentSet) => ({ op: 'set-component-set', componentSet }), (name) => ({ op: 'remove-component-set', name }), ops)) return null
+  if (!diffNamed('componentSets', from.componentSets ?? [], to.componentSets ?? [], (componentSet) => ({ op: 'set-component-set', componentSet }), (name) => ({ op: 'remove-component-set', name }), ops)) return null
   diffRecord(from.tokens, to.tokens, (name, value) => ops.push({ op: 'set-token', name, value }))
   ops.push(...diffNodes(from.body, to.body))
   const beforeAnnotations = new Map(from.annotations.map((a) => [a.id, a]))
@@ -372,6 +382,7 @@ function sameJson(a: unknown, b: unknown): boolean {
 }
 
 function diffNamed<T extends { name: string }>(
+  section: Extract<PatchOp, { op: 'set-declaration-order' }>['section'],
   from: T[],
   to: T[],
   set: (item: T) => PatchOp,
@@ -380,15 +391,13 @@ function diffNamed<T extends { name: string }>(
 ): boolean {
   const before = new Map(from.map((item) => [item.name, item]))
   const afterNames = new Set(to.map((item) => item.name))
-  const keptOrder = from.map((item) => item.name).filter((name) => afterNames.has(name))
-  const resultingOrder = [...keptOrder, ...to.map((item) => item.name).filter((name) => !before.has(name))]
-  if (resultingOrder.join('\u0000') !== to.map((item) => item.name).join('\u0000')) return false
   for (const name of before.keys()) {
     if (afterNames.has(name)) continue
     if (!remove) return false
     ops.push(remove(name))
   }
   for (const item of to) if (!sameJson(before.get(item.name), item)) ops.push(set(item))
+  if (from.map(item => item.name).join('\u0000') !== to.map(item => item.name).join('\u0000')) ops.push({ op: 'set-declaration-order', section, names: to.map(item => item.name) })
   return true
 }
 

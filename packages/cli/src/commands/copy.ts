@@ -65,7 +65,7 @@ export async function runCopy(args: string[], io: CliIO): Promise<number> {
       path: sourcePath,
       docId: chainId ?? stampedId,
       head: sourceChain?.head().hash ?? null,
-      dirty: sourceChain !== null && canonicalText(doc) !== canonicalText(sourceChain.doc()),
+      dirty: sourceChain !== null && canonicalText(doc) !== canonicalText(parseDocument(canonicalText(sourceChain.doc())).doc),
     }
     const title = flagString(flags, 'title')
     if (title !== undefined) doc.title = title

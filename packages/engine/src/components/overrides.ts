@@ -47,8 +47,12 @@ export function overrideSwap(node: FdnNode): ComponentSwapTarget | null {
   return null
 }
 
+function hasOverrideValues(node: FdnNode): boolean {
+  return Object.keys(node.attrs).some(key => key !== 'target') || Object.keys(node.style).length > 0 || Object.values(node.styleStates).some(style => style && Object.keys(style).length > 0)
+}
+
 export function ownOverrides(instance: FdnNode, owner: string): LayerOverride[] {
-  return instance.children.filter((node) => node.tag === 'fdn-override').flatMap((node) => {
+  return instance.children.filter((node) => node.tag === 'fdn-override' && hasOverrideValues(node)).flatMap((node) => {
     const target = overrideTarget(node)
     return target ? [{ origin: { node, owner, target, reason: 'target no longer exists' }, target }] : []
   })
@@ -184,11 +188,11 @@ export function validateInstanceOverrides(doc: FdnDocument): ReportLine[] {
         }
         validatePlane(node.style)
         for (const plane of Object.values(node.styleStates)) if (plane) validatePlane(plane)
-        if (target && parent?.tag === 'fdn-use' && !resolved) issues.push({ code: 'override-dormant', severity: 'warning', message: `override target ${stableStringify(target)} is not present in the current definition`, nodeId: node.id, detail: { instanceId: parent.id, target } })
+        if (target && parent?.tag === 'fdn-use' && !resolved && hasOverrideValues(node)) issues.push({ code: 'override-dormant', severity: 'warning', message: `override target ${stableStringify(target)} is not present in the current definition`, nodeId: node.id, detail: { instanceId: parent.id, target } })
       }
       if (node.tag === 'fdn-use') {
         const targets = new Set<string>()
-        for (const child of node.children.filter((entry) => entry.tag === 'fdn-override')) {
+        for (const child of node.children.filter((entry) => entry.tag === 'fdn-override' && hasOverrideValues(entry))) {
           const target = overrideTarget(child)
           if (!target) continue
           const key = stableStringify(target)

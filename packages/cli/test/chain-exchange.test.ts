@@ -2,7 +2,7 @@ import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSy
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { loadChain } from 'foundation-engine'
+import { loadChain, parseDocument } from 'foundation-engine'
 import { captureIo } from '../src/io.js'
 import { runNew } from '../src/commands/new.js'
 import { runChain } from '../src/commands/chain.js'
@@ -182,7 +182,7 @@ describe('chain push / pull / sync / merge (CLI)', () => {
     expect(chainA.log()).toEqual(chainB.log())
   })
 
-  it('pull/sync guards uncommitted local text edits: chain still imports, but the text is left alone with a warning', async () => {
+  it('pull/sync ingests local text edits and projects the merged chain', async () => {
     const targetA = join(dir, 'board')
     const fileA = `${targetA}.fdn.html`
     await runNew([targetA], captureIo())
@@ -205,15 +205,15 @@ describe('chain push / pull / sync / merge (CLI)', () => {
 
     const io = captureIo()
     const code = await runChain(['pull', fileB, mailbox], io)
-    expect(code).toBe(0) // guard is a warning, not a failure
+    expect(code).toBe(0)
     expect(io.out.some((l) => l.includes('pulled'))).toBe(true) // the chain DID import
-    expect(io.out.some((l) => l.includes('uncommitted edits') && l.includes('ingest'))).toBe(true)
-    expect(io.out.some((l) => l.includes('updated'))).toBe(false) // text was NOT regenerated
+    expect(io.out.some((l) => l.includes('uncommitted edits'))).toBe(false)
+    expect(io.out.some((l) => l.includes('updated'))).toBe(true)
 
     // the chain import happened for real (docId/log reflect A's change)...
     const chainB = loadChain(readFileSync(`${fileB}.chain`))
     expect(chainB.log().some((e) => e.message === 'a edits')).toBe(true)
-    // ...but the on-disk text is untouched — B's uncommitted edit survives.
-    expect(readFileSync(fileB, 'utf8')).toBe(dirtyTextB)
+    expect(readFileSync(fileB, 'utf8')).toContain('Uncommitted B edit')
+    expect(parseDocument(readFileSync(fileB, 'utf8')).doc.title).toBe('Board A')
   })
 })

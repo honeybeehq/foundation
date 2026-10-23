@@ -63,7 +63,7 @@ commands:
   copy <src> <dest> [--title T] [--json]      create an independent document with a fresh identity and chain
   inspect <file>                             summarize a document
   validate <file>                            print validation issues
-  ingest <file> [--commit [-m msg] [--author A]]   normalize in place, print the report
+  ingest <file> [--commit [-m msg] [--author A]]   normalize in place; tracked files always commit with author
   import <source.tsx> --into <file.fdn.html> [--name N] [--props <json>] [--sealed] [--author A]
                                               harvest a React component and merge it into <file>
                                               (chain-committed when a chain exists)
@@ -73,6 +73,7 @@ commands:
   serve <file> [--port N]                    live-reload dev server
   chain init <file> [--author A] [-m msg]    start a chain for <file> (mints a data-fdn-doc-id)
   chain <file> log|verify                    operate on <file>.chain
+  chain recover <file>                      back up unapplied text and restore the current projection
   chain anchor <file> <name>                 name the chain's current head
   chain diff <file> <anchorA> <anchorB>      show SemanticOps between two anchors
   chain push <file> <dir>                    export missing blobs to <dir>/<docId>/
