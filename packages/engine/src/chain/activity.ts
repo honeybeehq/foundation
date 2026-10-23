@@ -15,7 +15,7 @@ export class ChainActivity {
 
   constructor(private readonly doc: LoroDoc) {}
 
-  page(opts: ChainLogOptions = {}): ChainLogPage {
+  page(opts: ChainLogOptions = {}, anchors: ReadonlyMap<string, readonly { peer: string; counter: number }[]> = new Map()): ChainLogPage {
     const requested = opts.limit ?? 50
     if (!Number.isInteger(requested) || requested < 0) throw new Error('log limit must be a nonnegative integer')
     const limit = Math.min(requested, 200)
@@ -29,8 +29,20 @@ export class ChainActivity {
     const from = Math.max(0, end - limit)
     const selected = end > 0 && limit > 0 ? this.changes.slice(from, end).reverse() : []
     const hasMore = selected.length > 0 && from > 0
+    const names = new Map<string, string[]>()
+    for (const [name, frontier] of anchors) {
+      for (const point of frontier) {
+        const key = `${point.peer}:${point.counter}`
+        const list = names.get(key) ?? []
+        list.push(name)
+        names.set(key, list)
+      }
+    }
     return {
-      entries: selected.map(change => this.entry(change)),
+      entries: selected.map(change => ({
+        ...this.entry(change),
+        anchors: (names.get(`${change.peer}:${change.counter + change.length - 1}`) ?? []).sort(),
+      })),
       nextCursor: hasMore ? cursorOf(selected[selected.length - 1]!) : null,
       latestCursor: this.changes.length ? cursorOf(this.changes[this.changes.length - 1]!) : null,
       hasMore,
@@ -74,6 +86,7 @@ export class ChainActivity {
     const changed = new Set<string>()
     const sections = new Map<ChainLogSection, Set<string>>()
     let factsComplete = true
+    let anchor: ChainLogEntry['anchor']
     const section = (name: ChainLogSection, key: string): void => {
       const names = sections.get(name) ?? new Set<string>()
       names.add(key)
@@ -87,6 +100,17 @@ export class ChainActivity {
         else if (content.type === 'create') inserted.add(id)
         else if (content.type === 'delete') removed.add(id)
         else changed.add(id)
+        return
+      }
+      if (op.container === 'cid:root-meta:Map' && 'key' in content && content.key === 'namedVersion') {
+        try {
+          const value: unknown = 'value' in content && typeof content.value === 'string' ? JSON.parse(content.value) : null
+          if (typeof value === 'object' && value !== null && 'name' in value && typeof value.name === 'string' && 'targetHash' in value && (value.targetHash === null || typeof value.targetHash === 'string')) {
+            anchor = { name: value.name, targetHash: value.targetHash }
+          } else factsComplete = false
+        } catch {
+          factsComplete = false
+        }
         return
       }
       const root = /^cid:root-([^:]+):/.exec(op.container)?.[1]
@@ -113,6 +137,8 @@ export class ChainActivity {
       hash: computeEnvelopeHash(decoded.prevHash, decoded.author, decoded.message, decoded.specVersion, bytes),
       ...decoded,
       cursor,
+      anchors: [],
+      ...(anchor ? { anchor } : {}),
       time: { kind: 'logical', value: change.timestamp },
       wallTime: decoded.wallTime ?? null,
       nodeIds: [...new Set([...inserted, ...removed, ...changed])].sort(),

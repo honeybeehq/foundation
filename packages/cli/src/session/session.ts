@@ -165,6 +165,8 @@ class DesignSession implements Session {
         return this.sendBakes()
       case 'commit':
         return this.commit(message)
+      case 'anchor':
+        return this.anchor(message)
       case 'undo':
         return this.step(message.id, 'undo')
       case 'redo':
@@ -412,7 +414,20 @@ class DesignSession implements Session {
     this.accept(id, { kind: direction, id, author: this.author })
   }
 
+  private anchor(message: Extract<ClientMessage, { t: 'anchor' }>): void {
+    this.syncAndAnnounce()
+    if (!message.name.trim()) return this.reject(message.id, { code: 'invalid-op', message: 'anchor name must not be empty' })
+    const label = `Anchor ${message.name}`
+    const failure = this.transact(chain => { chain.anchor(message.name, withWallTime({ author: this.author, message: label })) })
+    if (failure) return this.reject(message.id, failure)
+    this.accept(message.id, { kind: 'commit', id: message.id, author: this.author })
+  }
+
   private record(ops: PatchOp[], message: string): Failure | null {
+    return this.transact(chain => { chain.apply(withWallTime({ author: this.author, message }), ops) })
+  }
+
+  private transact(mutate: (chain: FdnChain) => void): Failure | null {
     if (this.invalidExternalTokens) return { code: 'invalid-op', message: this.invalidExternalTokens }
     const snapshot = this.chain?.save() ?? null
     const previous = { doc: this.doc, docId: this.docId }
@@ -421,7 +436,7 @@ class DesignSession implements Session {
         this.docId ??= readDocIdAttr(this.diskText ?? '') ?? randomUUID()
         this.chain = createChain(this.doc, withWallTime({ author: this.author, message: 'init' }), { actor: this.actor, docId: this.docId })
       }
-      this.chain.apply(withWallTime({ author: this.author, message }), ops)
+      mutate(this.chain)
       this.setDoc(this.chain.doc())
     } catch (err) {
       this.rollback(snapshot, previous)

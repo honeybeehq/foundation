@@ -52,6 +52,7 @@ export type ClientMessage =
   | { t: 'hello'; protocol: string; client: string; author: string }
   | { t: 'view'; states: Array<string | null>; components: boolean }
   | { t: 'commit'; id: string; base: number; ops: SessionOp[]; label: string }
+  | { t: 'anchor'; id: string; name: string }
   | { t: 'undo'; id: string }
   | { t: 'redo'; id: string }
   | { t: 'log'; id: string; limit: number; before?: string }
@@ -211,6 +212,7 @@ const CLIENT_MESSAGES: Record<ClientMessage['t'], Check> = {
   hello: shape({ protocol: isString, client: isString, author: isString }),
   view: shape({ states: arrayOf(nullable(isString)), components: isBoolean }),
   commit: shape({ id: isString, base: isCount, ops: arrayOf((value) => isPatchOp(value) || isPlacementOp(value) || isTokenModeOp(value)), label: isString }),
+  anchor: shape({ id: isString, name: isString }),
   undo: shape({ id: isString }),
   redo: shape({ id: isString }),
   log: shape({ id: isString, limit: isCount, before: optional(isString) }),
@@ -219,6 +221,8 @@ const CLIENT_MESSAGES: Record<ClientMessage['t'], Check> = {
 const isEnvelope = shape({ hash: isString, prevHash: nullable(isString), author: isString, message: isString, specVersion: isString })
 const isLogEntry: Check = (value) => isEnvelope(value) && shape({
   cursor: optional(isString),
+  anchors: optional(arrayOf(isString)),
+  anchor: optional(shape({ name: isString, targetHash: nullable(isString) })),
   time: optional(shape({ kind: oneOf(['logical']), value: isNumber })),
   wallTime: optional(nullable(isString)),
   nodeIds: optional(arrayOf(isString)),

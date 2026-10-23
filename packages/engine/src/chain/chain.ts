@@ -137,7 +137,7 @@ type Frontier = { peer: PeerID; counter: number }[]
 export interface FdnChain {
   doc(): FdnDocument
   apply(meta: ChangeMeta, ops: PatchOp[]): EnvelopeRecord
-  anchor(name: string): AnchorRef
+  anchor(name: string, meta?: ChangeMeta): AnchorRef
   checkout(ref: AnchorRef): FdnDocument
   diff(a: AnchorRef, b: AnchorRef): SemanticOp[]
   undo(meta: ChangeMeta): EnvelopeRecord
@@ -299,7 +299,16 @@ class LoroChain implements FdnChain {
     return this.apply(meta, inverseOps)
   }
 
-  anchor(name: string): AnchorRef {
+  anchor(name: string, meta?: ChangeMeta): AnchorRef {
+    if (meta) {
+      if (!name.trim()) throw new Error('anchor name must not be empty')
+      const wallTime = parseWallTime(meta.wallTime)
+      if (meta.wallTime !== undefined && wallTime === undefined) throw new Error('wallTime must be an ISO UTC timestamp')
+      const prevHash = this.tryHead()?.hash ?? null
+      const start = this.loro.version().get(this.peerIdStr) ?? 0
+      this.meta.set('namedVersion', stableStringify({ name, targetHash: prevHash }))
+      this.commitEnvelope({ ...meta, wallTime }, start, prevHash)
+    }
     this.anchors.set(name, this.loro.frontiers())
     return name
   }
@@ -337,7 +346,7 @@ class LoroChain implements FdnChain {
 
   logPage(opts?: ChainLogOptions): ChainLogPage {
     this.activity ??= new ChainActivity(this.loro)
-    return this.activity.page(opts)
+    return this.activity.page(opts, this.anchors)
   }
 
   docId(): string | null {

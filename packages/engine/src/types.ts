@@ -221,6 +221,8 @@ export type ChainLogSection = Extract<SemanticOp, { op: 'section-changed' }>['se
 
 export interface ChainLogEntry extends EnvelopeRecord {
   cursor: string
+  anchors: string[]
+  anchor?: { name: string; targetHash: string | null }
   time: { kind: 'logical'; value: number }
   wallTime: string | null
   nodeIds: NodeId[]
