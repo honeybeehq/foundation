@@ -1,9 +1,9 @@
 import { createSession } from './session/session.js'
 import type { FdnDocument } from 'foundation-engine'
-import type { ServiceMessage, SessionOp } from 'foundation-protocol'
+import type { WireServiceMessage, SessionOp } from 'foundation-protocol'
 
 export function editDocument(path: string, ops: SessionOp[], label: string, author: string): { rev: number; doc: FdnDocument } {
-  const messages: ServiceMessage[] = []
+  const messages: WireServiceMessage[] = []
   const session = createSession({ path, watch: false, send: message => messages.push(message) })
   try {
     session.receive(JSON.stringify({ t: 'hello', protocol: '0.2', client: 'foundation-edit', author }))

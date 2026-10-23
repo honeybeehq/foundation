@@ -12,6 +12,8 @@ const COMPONENT_OPS = new Set(['detach-instance', 'swap-instance', 'set-instance
 
 const MODE_OPS = new Set(['create-token-collection', 'add-token-mode', 'rename-token-mode', 'remove-token-mode', 'set-mode-token', 'set-collection-mode'])
 
+export function isArtboardOperation(op: SessionOp): op is ArtboardOp { return ARTBOARD_OPS.has(op.op) }
+
 export function expandSessionOps(doc: FdnDocument, ops: SessionOp[], reports: InstanceSwapReport[] = [], detaches: InstanceDetachReport[] = []): PatchOp[] {
   ops = ops.flatMap<SessionOp>(op => {
     if (op.op !== 'remove-state' && op.op !== 'remove-viewport') return [op]

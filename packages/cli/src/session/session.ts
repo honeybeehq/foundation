@@ -1,9 +1,10 @@
+import { legacyMessage, legacyBoardRef, legacyArtboardReason, legacyArtboardOpReason } from './legacy.js'
 import { ArtboardError, explicitArtboards, artboardPages, boardViews, boardView, boardKey } from 'foundation-engine'
 import type { BoardRef } from 'foundation-engine'
 import { bakeImpact, mergeBakeImpact, type BakeImpact } from './bake-impact.js'
 import { PlacementError } from './placement.js'
 import { expandComponentOp } from './components.js'
-import { expandSessionOps } from './token-modes.js'
+import { expandSessionOps, isArtboardOperation } from './token-modes.js'
 import { randomUUID } from 'node:crypto'
 import { existsSync, mkdirSync, statSync, watch, type FSWatcher } from 'node:fs'
 import { basename, dirname, resolve } from 'node:path'
@@ -24,8 +25,8 @@ import {
   validateStateStyles,
 } from 'foundation-engine'
 import type { EnvelopeRecord, FdnChain, FdnDocument, InstanceDetachReport, InstanceSwapReport, PatchOp, ReportLine } from 'foundation-engine'
-import { parseClientMessage, SESSION_PROTOCOL } from 'foundation-protocol'
-import type { Cause, ClientMessage, DocumentView, FaultCode, ResultCode, ServiceMessage } from 'foundation-protocol'
+import { parseWireClientMessage, SESSION_PROTOCOL, LEGACY_SESSION_PROTOCOL, isSessionProtocol } from 'foundation-protocol'
+import type { Cause, WireClientMessage, DocumentView, FaultCode, ResultCode, ServiceMessage, WireServiceMessage, SessionProtocol } from 'foundation-protocol'
 import { withWallTime } from '../change-meta.js'
 import { defaultAuthor } from '../identity.js'
 import { readDocIdAttr } from '../docid.js'
@@ -39,7 +40,7 @@ export interface SessionOptions {
   create?: boolean
   title?: string
   author?: string
-  send: (message: ServiceMessage) => void
+  send: (message: WireServiceMessage) => void
   flush?: () => Promise<void>
   log?: (line: string) => void
   watch?: boolean
@@ -74,6 +75,7 @@ class DesignSession implements Session {
   private readonly log: (line: string) => void
   private phase: 'waiting' | 'open' | 'closed' = 'waiting'
   private author = ''
+  private protocol: SessionProtocol = SESSION_PROTOCOL
   private earlyResult = false
   private actor = `session:${randomUUID()}`
   private chain: FdnChain | null = null
@@ -115,11 +117,12 @@ class DesignSession implements Session {
 
   receive(line: string): void {
     if (this.phase === 'closed' || line.trim() === '') return
-    const message = parseClientMessage(line)
+    const message = parseWireClientMessage(line)
     if (!message) {
       this.fault('protocol', `malformed message: ${line.slice(0, 200)}`, this.phase === 'waiting' ? 2 : null)
       return
     }
+    if (message.t === 'hello' && !isSessionProtocol(message.protocol)) return this.fault('protocol', `protocol ${message.protocol} is not supported; use ${LEGACY_SESSION_PROTOCOL} or ${SESSION_PROTOCOL}`, 2)
     try {
       if (message.t === 'hello' && this.options.create) mkdirSync(dirname(this.path), { recursive: true })
       this.inTransaction(() => this.dispatch(message), message.t === 'hello' ? 0 : 100)
@@ -167,8 +170,9 @@ class DesignSession implements Session {
   }
 
   private emit(message: ServiceMessage): void {
-    if (this.locked) this.outbox.push(() => this.options.send(message))
-    else this.options.send(message)
+    const wire = this.protocol === LEGACY_SESSION_PROTOCOL ? legacyMessage(message) : message
+    if (this.locked) this.outbox.push(() => this.options.send(wire))
+    else this.options.send(wire)
   }
 
   private syncLocked(): void {
@@ -211,7 +215,7 @@ class DesignSession implements Session {
     if (exitCode !== null) this.end(exitCode)
   }
 
-  private dispatch(message: ClientMessage): void {
+  private dispatch(message: WireClientMessage): void {
     if (this.phase === 'waiting') {
       if (message.t !== 'hello') return this.fault('protocol', `expected hello, got ${message.t}`, 2)
       return this.hello(message)
@@ -219,12 +223,16 @@ class DesignSession implements Session {
     switch (message.t) {
       case 'hello':
         return this.fault('protocol', 'hello was already received', null)
-      case 'view':
-        this.view = { boards: [...new Map(message.boards.map(ref => [boardKey(ref), ref])).values()], components: message.components, bakeDiffs: message.bakeDiffs === true }
+      case 'view': {
+        const legacy = this.protocol === LEGACY_SESSION_PROTOCOL
+        if (legacy !== ('states' in message)) return this.fault('protocol', legacy ? 'legacy view needs states' : 'artboard view needs boards', null)
+        const refs = 'states' in message ? message.states.map(state => legacyBoardRef(this.doc, state)) : message.boards
+        this.view = { boards: [...new Map(refs.map(ref => [boardKey(ref), ref])).values()], components: message.components, bakeDiffs: message.bakeDiffs === true }
         this.sentBakes.clear()
         this.stateBakes.clear()
         if (this.unavailableBoards().length) this.emit({ t: 'doc', cause: { kind: 'open' }, ...this.documentView() })
         return this.sendBakes()
+      }
       case 'preview-instance-swap': {
         this.syncAndAnnounce()
         try {
@@ -254,10 +262,11 @@ class DesignSession implements Session {
     }
   }
 
-  private hello(message: Extract<ClientMessage, { t: 'hello' }>): void {
-    if (message.protocol !== SESSION_PROTOCOL) {
+  private hello(message: Extract<WireClientMessage, { t: 'hello' }>): void {
+    if (!isSessionProtocol(message.protocol)) {
       return this.fault('protocol', `protocol ${message.protocol} is not supported; this service speaks ${SESSION_PROTOCOL}`, 2)
     }
+    this.protocol = message.protocol
     this.author = message.author || this.options.author || defaultAuthor()
     this.earlyResult = message.earlyResult === true
     const created = this.open()
@@ -350,7 +359,14 @@ class DesignSession implements Session {
   }
 
   private setDoc(doc: FdnDocument): void {
-    if (this.doc && explicitArtboards(this.doc) !== explicitArtboards(doc)) {
+    if (this.protocol === LEGACY_SESSION_PROTOCOL) {
+      const refs = this.view.boards.map(ref => legacyBoardRef(doc, ref.state))
+      if (refs.some((ref, index) => boardKey(ref) !== boardKey(this.view.boards[index]!))) {
+        this.view.boards = [...new Map(refs.map(ref => [boardKey(ref), ref])).values()]
+        this.sentBakes.clear()
+        this.stateBakes.clear()
+      }
+    } else if (this.doc && explicitArtboards(this.doc) !== explicitArtboards(doc)) {
       const entering = explicitArtboards(doc)
       const ids = artboardPages(entering ? doc : this.doc).flatMap(page => page.artboardIds)
       if (ids.length === 1) {
@@ -485,8 +501,9 @@ class DesignSession implements Session {
     return true
   }
 
-  private commit(message: Extract<ClientMessage, { t: 'commit' }>): void {
+  private commit(message: Extract<WireClientMessage, { t: 'commit' }>): void {
     this.syncAndAnnounce()
+    if (this.protocol === LEGACY_SESSION_PROTOCOL && (explicitArtboards(this.doc) || message.ops.some(op => isArtboardOperation(op) || op.op === 'set-spec-version'))) return this.reject(message.id, { code: 'invalid-op', message: explicitArtboards(this.doc) ? legacyArtboardReason : legacyArtboardOpReason })
     if (this.invalidExternalTokens) return this.reject(message.id, { code: 'invalid-op', message: this.invalidExternalTokens })
     if (message.ops.length === 0) return this.reject(message.id, { code: 'invalid-op', message: 'commit has no ops' })
     if (message.base > this.rev) return this.reject(message.id, { code: 'invalid-op', message: `base ${message.base} is ahead of rev ${this.rev}` })
@@ -513,6 +530,7 @@ class DesignSession implements Session {
     }
     const patch = message.ops.length === 1 && singlePatch ? singlePatch : applyPatch(this.doc, ops)
     if (!patch.ok) return this.reject(message.id, patch.error)
+    if (this.protocol === LEGACY_SESSION_PROTOCOL && explicitArtboards(patch.doc)) return this.reject(message.id, { code: 'invalid-op', message: legacyArtboardOpReason })
     if (patch.inverse.length === 0 && canonicalText(patch.doc) === this.docText) {
       this.emit({ t: 'result', id: message.id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}), ...(componentDetaches.length ? { componentDetaches } : {}) })
       return
@@ -532,6 +550,7 @@ class DesignSession implements Session {
 
   private step(id: string, direction: 'undo' | 'redo'): void {
     this.syncAndAnnounce()
+    if (this.protocol === LEGACY_SESSION_PROTOCOL && explicitArtboards(this.doc)) return this.reject(id, { code: 'invalid-op', message: legacyArtboardReason })
     if (this.invalidExternalTokens) return this.reject(id, { code: 'invalid-op', message: this.invalidExternalTokens })
     const from = direction === 'undo' ? this.undoStack : this.redoStack
     const to = direction === 'undo' ? this.redoStack : this.undoStack
@@ -558,8 +577,9 @@ class DesignSession implements Session {
     this.accept(id, { kind: direction, id, author: this.author }, bakeImpact(this.doc, patch.applied, before))
   }
 
-  private anchor(message: Extract<ClientMessage, { t: 'anchor' }>): void {
+  private anchor(message: Extract<WireClientMessage, { t: 'anchor' }>): void {
     this.syncAndAnnounce()
+    if (this.protocol === LEGACY_SESSION_PROTOCOL && explicitArtboards(this.doc)) return this.reject(message.id, { code: 'invalid-op', message: legacyArtboardReason })
     if (!message.name.trim()) return this.reject(message.id, { code: 'invalid-op', message: 'anchor name must not be empty' })
     const label = `Anchor ${message.name}`
     const failure = this.transact(chain => { chain.anchor(message.name, withWallTime({ author: this.author, message: label })) })

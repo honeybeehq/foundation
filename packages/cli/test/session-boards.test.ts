@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { afterEach, describe, expect, it } from 'vitest'
 import { parseDocument } from 'foundation-engine'
 import type { FdnDocument, FdnNode } from 'foundation-engine'
-import type { ServiceMessage } from 'foundation-protocol'
+import type { WireServiceMessage } from 'foundation-protocol'
 import { createSession } from '../src/session/session.js'
 
 const BOARDS = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'boards')
@@ -47,11 +47,11 @@ describe('session commit + undo on every board', () => {
     copyFileSync(join(BOARDS, `${board}.chain`), `${file}.chain`)
     const original = readFileSync(file, 'utf8')
 
-    const sent: ServiceMessage[] = []
+    const sent: WireServiceMessage[] = []
     const session = createSession({ path: file, send: (message) => sent.push(message), watch: false })
     const say = (message: object): void => session.receive(JSON.stringify(message))
     say({ t: 'hello', protocol: '0.2', client: 'test', author: 'user:test' })
-    const welcome = sent.find((m): m is Extract<ServiceMessage, { t: 'welcome' }> => m.t === 'welcome')
+    const welcome = sent.find((m): m is Extract<WireServiceMessage, { t: 'welcome' }> => m.t === 'welcome')
     expect(welcome).toBeDefined()
     expect(readFileSync(file, 'utf8').replace(/ data-fdn-version="[^"]*"/, '')).toBe(original)
 

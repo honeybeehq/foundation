@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createChain, loadChain, projectDocument } from 'foundation-engine'
 import type { FdnDocument, FdnNode } from 'foundation-engine'
-import type { ServiceMessage } from 'foundation-protocol'
+import type { WireServiceMessage } from 'foundation-protocol'
 import { captureIo } from '../src/io.js'
 import { runIngest } from '../src/commands/ingest.js'
 import { callTool } from '../src/mcp/tools.js'
@@ -55,7 +55,7 @@ describe('text and chain writers racing a live session', () => {
   let file: string
   let chainPath: string
   let session: Session
-  let sent: ServiceMessage[]
+  let sent: WireServiceMessage[]
 
   beforeEach(() => {
     dir = mkdtempSync(join(tmpdir(), 'fdn-writer-race-'))
@@ -83,7 +83,7 @@ describe('text and chain writers racing a live session', () => {
 
   function expectSingleCopy(): void {
     session.sync()
-    const view = sent.filter((m): m is Extract<ServiceMessage, { t: 'doc' }> => m.t === 'doc').at(-1)
+    const view = sent.filter((m): m is Extract<WireServiceMessage, { t: 'doc' }> => m.t === 'doc').at(-1)
     expect(view && bodyIds(view.doc)).toEqual(['n1', 'n2', 'cagent001'])
     expect(bodyIds(loadChain(readFileSync(chainPath)).doc())).toEqual(['n1', 'n2', 'cagent001'])
   }

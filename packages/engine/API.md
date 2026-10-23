@@ -235,7 +235,7 @@ saved local size override; `matrix:true` enumerates declared matrix cells.
 Clipped artboards capture exactly the artboard bounds. Visible and legacy
 artboards preserve their existing overflow capture policy.
 
-Session protocol is `0.2`; no `0.1` adapter is provided. The `view` request uses
+Session protocol `0.2` is the artboard API. A bounded `0.1` adapter is owned by the Foundation T97/session maintainer until no installed Apiary client speaks `0.1`. Negotiation occurs at hello before opening or creating a document. Unsupported versions refuse before any filesystem mutation. A connection cannot renegotiate. The `view` request uses
 `boards:[{artboardId,state,viewport}]`, `components`, and optional `bakeDiffs`.
 Welcome/doc messages carry `pages` and `boards`; all baked/baked-diff messages
 carry the complete `BoardView` descriptor. Diff offsets remain UTF-16 and bases
@@ -262,7 +262,7 @@ CLI bake accepts `--artboard ID`. Render accepts `--artboard ID`, `--page ID`,
 JSON adds `artboardId` for explicit boards. Directory exports use encoded stable
 IDs and write a manifest. MCP bake/render use `artboardId`/`pageId`/`matrix`.
 Vendoring must copy document.ts/session.ts/PIN from the same runtime commit;
-ship Foundation service and Apiary client as one supported protocol pair.
+publish the negotiating Foundation runtime first, then promote the T98 Apiary client. Retire the adapter only after the installed-client inventory proves `0.1` is unused.
 
 The common validateDocument entry point includes artboard diagnostics. Malformed
 artboards remain in source snapshots but have no renderable descriptor until
@@ -270,3 +270,5 @@ repaired; welcome/doc remain valid protocol messages. Initial chain import
 preserves the existing artboard source, including its diagnostics, so a first
 repair can create history without discarding content. Subsequent authored edits
 use the introduced-issue guard; unsupported format versions always refuse.
+
+For negotiated `0.1`, `view.states` and state-keyed bakes retain the legacy wire shape; `welcome.protocol` is `0.1`. Legacy documents retain normal content editing and Undo/Redo without an upgrade. Artboard semantic operations and `set-spec-version` are refused, and final-patch validation also refuses primitive attempts to introduce artboards. An explicit document is projected to its first artboard in page/document order for viewing only, with a warning and disabled Undo/Redo; all commits, anchors and Undo/Redo are refused. The canonical source is never flattened or saved by this projection. Peer upgrades switch an existing old connection to the same read-only view; its state subscriptions follow that first board. Protocol `0.2` retains complete canonical documents and tuple subscriptions. This adapter does not make old CLI/MCP binaries or old Cell engines safe: their separate writer-rollout gate remains open.

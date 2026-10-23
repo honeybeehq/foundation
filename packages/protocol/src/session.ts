@@ -4,6 +4,9 @@ import type { ChainLogEntry, EnvelopeRecord, FdnDocument, ComponentSwapTarget, I
 export type { EnvelopeRecord, FdnDocument, FdnNode, PatchOp, ReportLine } from './document.ts'
 
 export const SESSION_PROTOCOL = '0.2'
+export const LEGACY_SESSION_PROTOCOL = '0.1'
+export type SessionProtocol = typeof SESSION_PROTOCOL | typeof LEGACY_SESSION_PROTOCOL
+export function isSessionProtocol(value: string): value is SessionProtocol { return value === SESSION_PROTOCOL || value === LEGACY_SESSION_PROTOCOL }
 
 export interface History {
   canUndo: boolean
@@ -72,6 +75,9 @@ export type ClientMessage =
   | { t: 'redo'; id: string }
   | { t: 'log'; id: string; limit: number; before?: string }
 
+export type LegacyClientMessage = Exclude<ClientMessage, { t: 'view' }> | { t: 'view'; states: Array<string | null>; components: boolean; bakeDiffs?: boolean }
+export type WireClientMessage = ClientMessage | LegacyClientMessage
+
 export type ServiceMessage =
   | ({ t: 'welcome'; protocol: string; path: string; docId: string | null; chain: boolean; created: boolean } & DocumentView)
   | ({ t: 'doc'; cause: Cause } & DocumentView)
@@ -83,6 +89,15 @@ export type ServiceMessage =
   | { t: 'result'; id: string; ok: false; code: ResultCode; message: string }
   | { t: 'log'; id: string; entries: Array<EnvelopeRecord & Partial<Omit<ChainLogEntry, keyof EnvelopeRecord>>>; nextCursor?: string | null; latestCursor?: string | null; hasMore?: boolean }
   | { t: 'fault'; code: FaultCode; message: string }
+
+export type LegacyDocumentView = Omit<DocumentView, 'pages' | 'boards' | 'unavailableBoards'>
+export type LegacyServiceMessage =
+  | ({ t: 'welcome'; protocol: typeof LEGACY_SESSION_PROTOCOL; path: string; docId: string | null; chain: boolean; created: boolean } & LegacyDocumentView)
+  | ({ t: 'doc'; cause: Cause } & LegacyDocumentView)
+  | { t: 'baked'; rev: number; state: string | null; html: string; report: ReportLine[] }
+  | { t: 'baked-diff'; rev: number; state: string | null; baseRev: number; start: number; deleteCount: number; insert: string; report: ReportLine[] }
+  | Exclude<ServiceMessage, { t: 'welcome' | 'doc' | 'baked' | 'baked-diff' }>
+export type WireServiceMessage = ServiceMessage | LegacyServiceMessage
 
 export const RESULT_CODES = ['unknown-node', 'duplicate-id', 'invalid-op', 'nothing-to-undo', 'nothing-to-redo', 'conflict', 'write-failed'] as const
 export type ResultCode = (typeof RESULT_CODES)[number]
@@ -345,6 +360,10 @@ function parseTagged<T>(line: string, checks: Record<string, Check>): T | null {
 
 export function parseClientMessage(line: string): ClientMessage | null {
   return parseTagged<ClientMessage>(line, CLIENT_MESSAGES)
+}
+
+export function parseWireClientMessage(line: string): WireClientMessage | null {
+  return parseTagged<WireClientMessage>(line, { ...CLIENT_MESSAGES, view: (value) => isRecord(value) && (('boards' in value && !('states' in value) && CLIENT_MESSAGES.view(value)) || ('states' in value && !('boards' in value) && shape({ states: arrayOf(nullable(isString)), components: isBoolean, bakeDiffs: optional(isBoolean) })(value))) })
 }
 
 export function parseServiceMessage(line: string): ServiceMessage | null {

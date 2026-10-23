@@ -4,31 +4,31 @@ import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createChain, loadChain, parseDocument, projectDocument } from 'foundation-engine'
 import type { FdnDocument, FdnNode } from 'foundation-engine'
-import type { ClientMessage, ServiceMessage } from 'foundation-protocol'
+import type { ClientMessage, WireServiceMessage } from 'foundation-protocol'
 import { createSession, type SessionOptions } from '../src/session/session.js'
 import { skeletonDocument } from '../src/commands/new.js'
 import { defaultAuthor } from '../src/identity.js'
 
-type Of<T extends ServiceMessage['t']> = Extract<ServiceMessage, { t: T }>
+type Of<T extends WireServiceMessage['t']> = Extract<WireServiceMessage, { t: T }>
 
 const el = (id: string, extra: Partial<FdnNode> = {}): FdnNode => ({ id, tag: 'p', attrs: {}, style: {}, styleStates: {}, children: [], ...extra })
 
 function start(path: string, options: Partial<SessionOptions> = {}) {
-  const sent: ServiceMessage[] = []
+  const sent: WireServiceMessage[] = []
   const session = createSession({ path, send: (message) => sent.push(message), watch: false, ...options })
-  const say = (message: ClientMessage): ServiceMessage[] => {
+  const say = (message: ClientMessage): WireServiceMessage[] => {
     session.receive(JSON.stringify(message))
     return sent.splice(0)
   }
-  const open = (author = 'user:test'): ServiceMessage[] => say({ t: 'hello', protocol: '0.2', client: 'test', author })
+  const open = (author = 'user:test'): WireServiceMessage[] => say({ t: 'hello', protocol: '0.2', client: 'test', author })
   return { session, sent, say, open }
 }
 
-function only<T extends ServiceMessage['t']>(messages: ServiceMessage[], t: T): Of<T>[] {
+function only<T extends WireServiceMessage['t']>(messages: WireServiceMessage[], t: T): Of<T>[] {
   return messages.filter((message): message is Of<T> => message.t === t)
 }
 
-function result(messages: ServiceMessage[]): Of<'result'> {
+function result(messages: WireServiceMessage[]): Of<'result'> {
   const found = only(messages, 'result')
   expect(found).toHaveLength(1)
   return found[0] as Of<'result'>
