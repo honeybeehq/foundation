@@ -200,12 +200,14 @@ export interface ConformanceReport { lines: ReportLine[] }
 // ——— chain (D2 + resolved Q1: Loro under a Foundation envelope) ———
 
 export interface ChangeMeta {
+  wallTime?: string
   /** "agent:<bee>" | "user:<id>" */
   author: string
   message: string
 }
 
 export interface EnvelopeRecord {
+  wallTime?: string | null
   /** Foundation-owned SHA-256 over (prevHash + author + message + specVersion
    *  + the underlying library commit bytes). Never the library's own id. */
   hash: string

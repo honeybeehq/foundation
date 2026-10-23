@@ -27,6 +27,7 @@ import { loadChain, mintAnnotationId, parseDocument } from 'foundation-engine'
 import type { FdnAnnotation, FdnChain } from 'foundation-engine'
 import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
+import { withWallTime } from '../change-meta.js'
 import { defaultAuthor } from '../identity.js'
 import { writeAtomic } from '../disk.js'
 import { chainPathFor, hasUncommittedEdits, regenerateTextFromChain } from './chain.js'
@@ -62,7 +63,7 @@ function commitAndSync(
 ): { hash: string } {
   const chainPath = chainPathFor(file)
   const wasDirty = existsSync(file) && hasUncommittedEdits(file, chain)
-  const envelope = chain.apply(meta, ops)
+  const envelope = chain.apply(withWallTime(meta), ops)
   writeAtomic(chainPath, chain.save())
   if (wasDirty) {
     io.stdout(

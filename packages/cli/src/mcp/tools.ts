@@ -64,6 +64,7 @@ import {
   type RenderArtifact,
 } from '../commands/import.js'
 import { skeletonDocument, skeletonDocumentEmpty } from '../commands/new.js'
+import { withWallTime } from '../change-meta.js'
 import { defaultAuthor } from '../identity.js'
 import { chainLabel, documentStatus, manifestPathFor, readManifest, statusLabel } from '../project.js'
 import { commitDocument, writeAtomic } from '../disk.js'
@@ -584,7 +585,7 @@ function commitAnnotationChange(
   ops: Parameters<FdnChain['apply']>[1],
 ): { hash: string; textRegenerated: boolean } {
   const wasDirty = existsSync(path) && hasUncommittedEdits(path, chain)
-  const envelope = chain.apply(meta, ops)
+  const envelope = chain.apply(withWallTime(meta), ops)
   writeAtomic(chainPath, chain.save())
   if (!wasDirty) regenerateTextFromChain(path, chain, NO_OP_IO)
   return { hash: envelope.hash, textRegenerated: !wasDirty }

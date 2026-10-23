@@ -21,6 +21,7 @@ import {
 import type { EnvelopeRecord, FdnChain, FdnDocument, PatchOp, ReportLine } from 'foundation-engine'
 import { parseClientMessage, SESSION_PROTOCOL } from 'foundation-protocol'
 import type { Cause, ClientMessage, DocumentView, FaultCode, ResultCode, ServiceMessage } from 'foundation-protocol'
+import { withWallTime } from '../change-meta.js'
 import { readDocIdAttr } from '../docid.js'
 import { skeletonDocumentEmpty, titleFromName } from '../commands/new.js'
 import { canonicalText, documentText, readBytesIfPresent, readTextIfPresent, sameBytes, writeAtomic } from '../disk.js'
@@ -254,7 +255,7 @@ class DesignSession implements Session {
     }
     const doc = skeletonDocumentEmpty(this.options.title ?? titleFromName(this.path))
     this.docId = randomUUID()
-    this.chain = createChain(doc, { author: this.author, message: 'init' }, { actor: this.actor, docId: this.docId })
+    this.chain = createChain(doc, withWallTime({ author: this.author, message: 'init' }), { actor: this.actor, docId: this.docId })
     this.setDoc(this.chain.doc())
     try {
       mkdirSync(dirname(this.path), { recursive: true })
@@ -364,7 +365,7 @@ class DesignSession implements Session {
     }
     if (patch.applied.length === 0) return false
     if (this.chain) {
-      this.chain.apply({ author: FILE_AUTHOR, message: 'ingest' }, patch.applied)
+      this.chain.apply(withWallTime({ author: FILE_AUTHOR, message: 'ingest' }), patch.applied)
       this.setDoc(this.chain.doc())
     } else {
       this.setDoc(normalizeDocument(patch.doc))
@@ -418,9 +419,9 @@ class DesignSession implements Session {
     try {
       if (!this.chain) {
         this.docId ??= readDocIdAttr(this.diskText ?? '') ?? randomUUID()
-        this.chain = createChain(this.doc, { author: this.author, message: 'init' }, { actor: this.actor, docId: this.docId })
+        this.chain = createChain(this.doc, withWallTime({ author: this.author, message: 'init' }), { actor: this.actor, docId: this.docId })
       }
-      this.chain.apply({ author: this.author, message }, ops)
+      this.chain.apply(withWallTime({ author: this.author, message }), ops)
       this.setDoc(this.chain.doc())
     } catch (err) {
       this.rollback(snapshot, previous)

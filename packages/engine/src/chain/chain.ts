@@ -116,7 +116,7 @@ import type {
   SemanticOp,
   StateStyleKey,
 } from '../types.js'
-import { computeEnvelopeHash, decodeEnvelope, encodeEnvelope, type PackedEnvelope } from './envelope.js'
+import { computeEnvelopeHash, decodeEnvelope, encodeEnvelope, parseWallTime, type PackedEnvelope } from './envelope.js'
 import { structuralDiff } from './model.js'
 import { applyPatch, diffNodes } from '../patch/index.js'
 import { comparePeerIds, derivePeerId, DeterministicClock, stableStringify } from './util.js'
@@ -276,6 +276,8 @@ class LoroChain implements FdnChain {
 
   apply(meta: ChangeMeta, ops: PatchOp[]): EnvelopeRecord {
     if (ops.length === 0) throw new Error('apply: ops must not be empty')
+    const wallTime = parseWallTime(meta.wallTime)
+    if (meta.wallTime !== undefined && wallTime === undefined) throw new Error('wallTime must be an ISO UTC timestamp')
     const beforeDoc = this.materialize()
     const patch = applyPatch(beforeDoc, ops)
     if (!patch.ok) throw new Error(patch.error.message)
@@ -288,7 +290,7 @@ class LoroChain implements FdnChain {
     const prevHash = this.tryHead()?.hash ?? null
     for (const op of patch.applied) this.applyOp(op)
     this.lastLocalChange = patch.inverse
-    return this.commitEnvelope(meta, startCounter, prevHash)
+    return this.commitEnvelope({ ...meta, wallTime }, startCounter, prevHash)
   }
 
   undo(meta: ChangeMeta): EnvelopeRecord {
@@ -349,7 +351,7 @@ class LoroChain implements FdnChain {
       const bytes = this.bytesForSpan(c.peer, c.counter, c.length)
       const hash = computeEnvelopeHash(decoded.prevHash, decoded.author, decoded.message, decoded.specVersion, bytes)
       out.push({
-        envelope: { hash, prevHash: decoded.prevHash, author: decoded.author, message: decoded.message, specVersion: decoded.specVersion },
+        envelope: { hash, prevHash: decoded.prevHash, author: decoded.author, message: decoded.message, specVersion: decoded.specVersion, wallTime: decoded.wallTime ?? null },
         bytes,
       })
     }
@@ -415,13 +417,13 @@ class LoroChain implements FdnChain {
 
   private commitEnvelope(meta: ChangeMeta, startCounter: number, prevHash: string | null): EnvelopeRecord {
     const specVersion = (this.meta.get('specVersion') as string | undefined) ?? ''
-    const packed: PackedEnvelope = { author: meta.author, message: meta.message, specVersion, prevHash }
+    const packed: PackedEnvelope = { author: meta.author, message: meta.message, specVersion, prevHash, ...(meta.wallTime !== undefined ? { wallTime: meta.wallTime } : {}) }
     this.loro.commit({ message: encodeEnvelope(packed), timestamp: this.clock.next() })
     const endCounter = this.loro.version().get(this.peerIdStr) ?? 0
     const len = endCounter - startCounter
     const bytes = this.bytesForSpan(this.peerIdStr, startCounter, len)
     const hash = computeEnvelopeHash(prevHash, meta.author, meta.message, specVersion, bytes)
-    return { hash, prevHash, author: meta.author, message: meta.message, specVersion }
+    return { hash, prevHash, author: meta.author, message: meta.message, specVersion, wallTime: meta.wallTime ?? null }
   }
 
   private bytesForSpan(peer: PeerID, counter: number, len: number): Uint8Array {

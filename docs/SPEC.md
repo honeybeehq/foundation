@@ -131,6 +131,17 @@ step = one authored unit (one envelope, one hash, one author, one message).
 Finer-grained input — keystrokes, drag ticks — batches client-side before commit and
 never enters the chain individually.
 
+**Recorded wall-clock time (2026-10-23):** a caller may supply an optional UTC
+ISO-8601 `wallTime` with a change's author and message. CLI and session mutation
+boundaries supply their machine's commit time; the engine never reads the current
+clock. The optional value is stored inside the packed envelope message, so the
+existing hash over exported commit bytes covers it. Older envelopes are unchanged
+and report null. This is an observation for activity display, not a merge clock:
+causal/Lamport order and deterministic peer tie-breaking remain unchanged. Given
+identical document, operations and supplied metadata, the engine remains deterministic.
+An external-file ingest records when the ingest was committed; it does not recover
+the original editor's clock or identity.
+
 Why: this gives multiplayer (changes merge), local-first (chains sync lazily and
 offline), audit (every change carries authorship — `agent:<bee>` or `user:<id>`), and
 time-travel diffing ("render anchor 12 vs anchor 9") from one primitive. It is also the

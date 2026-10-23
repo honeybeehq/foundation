@@ -31,10 +31,19 @@
 import { createHash } from 'node:crypto'
 
 export interface PackedEnvelope {
+  wallTime?: string
   author: string
   message: string
   specVersion: string
   prevHash: string | null
+}
+
+export function parseWallTime(value: unknown): string | undefined {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/.test(value)) return undefined
+  const millis = Date.parse(value)
+  if (!Number.isFinite(millis)) return undefined
+  const canonical = new Date(millis).toISOString()
+  return canonical.slice(0, 19) === value.slice(0, 19) ? canonical : undefined
 }
 
 export function encodeEnvelope(env: PackedEnvelope): string {
@@ -47,11 +56,13 @@ export function decodeEnvelope(raw: string | undefined): PackedEnvelope {
   if (raw === undefined) return { author: 'unknown', message: '', specVersion: '', prevHash: null }
   try {
     const parsed = JSON.parse(raw) as Partial<PackedEnvelope>
+    const wallTime = parseWallTime(parsed.wallTime)
     return {
       author: typeof parsed.author === 'string' ? parsed.author : 'unknown',
       message: typeof parsed.message === 'string' ? parsed.message : '',
       specVersion: typeof parsed.specVersion === 'string' ? parsed.specVersion : '',
       prevHash: typeof parsed.prevHash === 'string' ? parsed.prevHash : null,
+      ...(wallTime !== undefined ? { wallTime } : {}),
     }
   } catch {
     return { author: 'unknown', message: raw, specVersion: '', prevHash: null }

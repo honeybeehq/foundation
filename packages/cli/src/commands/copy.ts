@@ -6,6 +6,7 @@ import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
 import { readDocIdAttr } from '../docid.js'
 import { canonicalText, documentText, readBytesIfPresent } from '../disk.js'
+import { withWallTime } from '../change-meta.js'
 import { defaultAuthor } from '../identity.js'
 
 function writeCopy(path: string, text: string, bytes: Uint8Array): void {
@@ -67,7 +68,7 @@ export async function runCopy(args: string[], io: CliIO): Promise<number> {
     if (title !== undefined) doc.title = title
     const docId = randomUUID()
     const message = `copied from ${source.docId ?? 'unidentified'}@${source.head ?? 'untracked'}${source.dirty ? '+working' : ''} (${sourcePath})`
-    const chain = createChain(doc, { author: defaultAuthor(), message }, { docId })
+    const chain = createChain(doc, withWallTime({ author: defaultAuthor(), message }), { docId })
     writeCopy(path, documentText(doc, docId), chain.save())
     const result = { path, docId, chainPath, head: chain.head().hash, source }
     io.stdout(flags.json ? JSON.stringify(result) : `copied ${sourcePath} to ${path} (docId ${docId})`)

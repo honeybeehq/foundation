@@ -3,6 +3,7 @@ import { readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { basename, dirname, join } from 'node:path'
 import { diffPatch, loadChain, normalizeDocument, projectDocument } from 'foundation-engine'
 import type { ChangeMeta, EnvelopeRecord, FdnChain, FdnDocument } from 'foundation-engine'
+import { withWallTime } from './change-meta.js'
 import { injectDocIdAttr } from './docid.js'
 
 function isMissing(err: unknown): boolean {
@@ -53,13 +54,14 @@ export type DocumentCommit =
   | { status: 'no-op'; chain: FdnChain }
 
 export function commitDocument(chainPath: string, meta: ChangeMeta, target: FdnDocument): DocumentCommit {
+  const recordedMeta = withWallTime(meta)
   for (let attempt = 1; ; attempt++) {
     const before = readFileSync(chainPath)
     const chain = loadChain(before, { actor: `${meta.author}#${randomUUID()}` })
     const current = chain.doc()
     if (canonicalText(current) === canonicalText(target)) return { status: 'no-op', chain }
     const ops = diffPatch(current, target)
-    const envelope = chain.apply(meta, ops && ops.length > 0 ? ops : [{ op: 'replace-document', doc: target }])
+    const envelope = chain.apply(recordedMeta, ops && ops.length > 0 ? ops : [{ op: 'replace-document', doc: target }])
     const latest = readBytesIfPresent(chainPath)
     if (!sameBytes(latest, before)) {
       if (attempt < 5) continue

@@ -19,6 +19,7 @@ import type { ChangeMeta, EnvelopeRecord, FdnChain, FdnDocument, OverlapReport, 
 import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
 import { injectDocIdAttr, readDocIdAttr } from '../docid.js'
+import { withWallTime } from '../change-meta.js'
 import { defaultAuthor } from '../identity.js'
 import { writeAtomic } from '../disk.js'
 
@@ -44,7 +45,7 @@ export function writeChainInit(
     io.stderr(`refusing to init: ${chainPath} already exists`)
     return null
   }
-  const chain = createChain(doc, meta, opts?.docId ? { docId: opts.docId } : undefined)
+  const chain = createChain(doc, withWallTime(meta), opts?.docId ? { docId: opts.docId } : undefined)
   writeAtomic(chainPath, chain.save())
   return { chainPath, head: chain.head() }
 }

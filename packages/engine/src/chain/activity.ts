@@ -114,7 +114,7 @@ export class ChainActivity {
       ...decoded,
       cursor,
       time: { kind: 'logical', value: change.timestamp },
-      wallTime: null,
+      wallTime: decoded.wallTime ?? null,
       nodeIds: [...new Set([...inserted, ...removed, ...changed])].sort(),
       nodes: { inserted: [...inserted].sort(), removed: [...removed].sort(), changed: [...changed].sort() },
       sections: [...sections].sort(([a], [b]) => a.localeCompare(b)).map(([name, names]) => ({ section: name, names: [...names].sort() })),
