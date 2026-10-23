@@ -45,7 +45,7 @@ export function applyPatch(doc: FdnDocument, ops: PatchOp[], opts?: { lenient?: 
     if (inverse === 'fallback') fallback = true
     else if (inverse !== null) inverses.push(inverse)
     working = applyOp(working, effective, index)
-    if (['insert-node', 'remove-node', 'move-node', 'replace-document'].includes(effective.op)) index = indexNodes(working.body)
+    if (!['set-attr', 'set-style', 'set-style-ref', 'set-text', 'set-when'].includes(effective.op)) index = indexNodes(working.body)
     applied.push(effective)
   }
   if (opts?.validateTokens !== false) {

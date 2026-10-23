@@ -556,10 +556,7 @@ class LoroChain implements FdnChain {
         }
         break
       }
-      case 'insert-node':
-      case 'remove-node':
-      case 'move-node':
-      case 'replace-document':
+      default:
         this.materializedNodes.clear()
     }
     switch (op.op) {

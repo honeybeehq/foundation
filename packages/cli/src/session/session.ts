@@ -87,6 +87,7 @@ class DesignSession implements Session {
   private diskChain: Uint8Array | null = null
   private view: { states: Array<string | null>; components: boolean; bakeDiffs: boolean } = { states: [], components: false, bakeDiffs: false }
   private sentBakes = new Map<string, string>()
+  private bakeGeneration = 0
   private pendingBakeImpact: BakeImpact | null = null
   private stateBakes = new Map<string | null, { rev: number; html: string }>()
   private watcher: FSWatcher | null = null
@@ -188,6 +189,7 @@ class DesignSession implements Session {
 
   private end(code: number): void {
     this.phase = 'closed'
+    this.preparedChain = null
     if (this.pendingSync) clearTimeout(this.pendingSync)
     this.pendingSync = null
     if (this.pendingHello) clearTimeout(this.pendingHello)
@@ -344,6 +346,7 @@ class DesignSession implements Session {
   private setDoc(doc: FdnDocument): void {
     this.doc = doc
     this.docText = canonicalText(doc)
+    if (this.preparedChain && (this.chain || this.preparedChain.text !== this.docText)) this.preparedChain = null
     this.issues = validateDocument(doc).issues
   }
 
@@ -628,11 +631,12 @@ class DesignSession implements Session {
   private sendBakes(impact: BakeImpact = { states: null, components: true }): void {
     const doc = this.doc
     const rev = this.rev
+    const generation = ++this.bakeGeneration
     if (this.earlyResult) this.pendingBakeImpact = this.pendingBakeImpact ? mergeBakeImpact(this.pendingBakeImpact, impact) : impact
     const send = (): void => {
       if (!this.earlyResult) return this.sendBakesFor(doc, rev, impact)
       void Promise.resolve(this.options.flush?.()).then(() => {
-        if (this.phase !== 'open' || this.rev !== rev) return
+        if (this.phase !== 'open' || this.rev !== rev || this.bakeGeneration !== generation) return
         const pending = this.pendingBakeImpact ?? impact
         this.pendingBakeImpact = null
         this.sendBakesFor(doc, rev, pending)
