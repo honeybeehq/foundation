@@ -63,7 +63,7 @@ commands:
                                               harvest a React component and merge it into <file>
                                               (chain-committed when a chain exists)
   bake <file> [--state S] [-o out]           bake a state to HTML
-  render <file> [--state S] [--viewport V] [-o dir]   render (Wave 2)
+  render <file> [--state S] [--viewport V] [--scale 1..4] [-o dir | --out file.png] [--json]
   diff <a.html> <b.html>                     structural (+ visual, when available) diff
   serve <file> [--port N]                    live-reload dev server
   chain init <file> [--author A] [-m msg]    start a chain for <file> (mints a data-fdn-doc-id)

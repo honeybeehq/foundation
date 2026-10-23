@@ -15,7 +15,7 @@
  */
 
 import type { Browser, BrowserContextOptions } from 'playwright'
-import { bakeDocument, emitHtml } from '../bake/index.js'
+import { bakeDocument, bakeEditorDocument, emitHtml } from '../bake/index.js'
 import { getBrowser } from './browser.js'
 import type {
   ConformanceReport,
@@ -30,6 +30,7 @@ import type {
 export interface RenderConfig {
   viewport: FdnViewport
   deviceScaleFactor?: number
+  clipToViewport?: boolean
 }
 
 export interface LayoutEntry {
@@ -101,7 +102,15 @@ async function captureHtml(browser: Browser, html: string, config: RenderConfig)
     // theoretically be composited first (ported from the spike).
     await page.evaluate(() => document.fonts.ready)
 
-    const png = await page.screenshot({ type: 'png', fullPage: true })
+    const clip = config.clipToViewport
+      ? {
+          x: 0,
+          y: 0,
+          width: config.viewport.width,
+          height: await page.evaluate(() => Math.max(window.innerHeight, document.documentElement.scrollHeight, document.body.scrollHeight)),
+        }
+      : undefined
+    const png = await page.screenshot({ type: 'png', fullPage: true, ...(clip ? { clip } : {}) })
 
     // Layout report: every [data-fdn-id] or [id] element, keyed by that
     // element's own id attribute (data-fdn-id preferred when both are
@@ -294,10 +303,14 @@ function detectSystemFontStackLines(doc: FdnDocument, tree: FdnNode[], html: str
 
 export async function renderDocument(
   doc: FdnDocument,
-  opts?: { state?: string; viewport?: string },
+  opts?: { state?: string; viewport?: string; deviceScaleFactor?: number; clipToViewport?: boolean },
 ): Promise<
   Array<{ state: string | null; viewport: FdnViewport; png: Uint8Array; layout: LayoutEntry[]; report: ConformanceReport }>
 > {
+  const scale = opts?.deviceScaleFactor ?? 1
+  if (!Number.isFinite(scale) || scale < 1 || scale > 4) {
+    throw new Error('scale must be a finite number between 1 and 4')
+  }
   const cells = resolveCells(doc, opts)
   const browser = await getBrowser()
   const results: Array<{
@@ -313,11 +326,16 @@ export async function renderDocument(
   // process itself (browser.ts) is launched once, not per cell.
   for (const cell of cells) {
     // eslint-disable-next-line no-await-in-loop -- intentional: one shared browser, sequential contexts
-    const baked = bakeDocument(doc, cell.state !== null ? { state: cell.state } : undefined)
-    const html = emitHtml(doc, injectFdnIds(baked.tree))
+    const bake = opts?.clipToViewport ? bakeEditorDocument : bakeDocument
+    const baked = bake(doc, cell.state !== null ? { state: cell.state } : undefined)
+    const html = opts?.clipToViewport ? baked.html : emitHtml(doc, injectFdnIds(baked.tree))
     const fontLines = detectSystemFontStackLines(doc, baked.tree, html)
     // eslint-disable-next-line no-await-in-loop -- see above
-    const capture = await captureHtml(browser, html, { viewport: cell.viewport })
+    const capture = await captureHtml(browser, html, {
+      viewport: cell.viewport,
+      deviceScaleFactor: scale,
+      clipToViewport: opts?.clipToViewport,
+    })
     results.push({
       state: cell.state,
       viewport: cell.viewport,
