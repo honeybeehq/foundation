@@ -1007,7 +1007,7 @@ export function parseDocument(html: string): { doc: FdnDocument; report: Normali
         severity: 'warning',
         message: `no data-fdn-spec-version on <fdn-doc> — defaulted to ${DEFAULT_SPEC_VERSION}`,
       })
-    if (a['data-fdn-title']) title = a['data-fdn-title']
+    if (a['data-fdn-title'] !== undefined) title = a['data-fdn-title']
     params = parseParams(fdnDoc)
     data = parseDataSets(fdnDoc)
     lookups = parseLookups(fdnDoc)
