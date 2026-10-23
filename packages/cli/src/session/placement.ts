@@ -21,7 +21,7 @@ export function expandPlacement(doc: FdnDocument, ops: Array<PatchOp | Placement
     switch (op.op) {
       case 'set-frame-mode': {
         if (!node) throw new PlacementError('unknown-node', `unknown node "${op.id}"`)
-        batch = [{ op: 'set-attr', id: op.id, key: 'data-fdn-layout', value: op.mode }, ...style(op.id, { position: 'relative', display: op.mode === 'free' ? 'block' : (node.style.display === 'grid' ? 'grid' : 'flex') })]
+        batch = [{ op: 'set-attr', id: op.id, key: 'data-fdn-layout', value: op.mode }, ...style(op.id, { position: node.style.position === 'absolute' ? 'absolute' : 'relative', display: op.mode === 'free' ? 'block' : (node.style.display === 'grid' ? 'grid' : 'flex') })]
         break
       }
       case 'set-placement':
@@ -33,11 +33,11 @@ export function expandPlacement(doc: FdnDocument, ops: Array<PatchOp | Placement
         if (!node) throw new PlacementError('unknown-node', `unknown node "${op.id}"`)
         const parentId = index.get(op.id)?.parent
         const parent = parentId ? index.get(parentId)?.node : undefined
-        if (!parent || !['free', 'flow'].includes(parent.attrs['data-fdn-layout'] ?? '') || parent.style.position !== 'relative') {
-          throw new Error('placement needs a direct parent frame with data-fdn-layout and position:relative')
+        if (!parent || !['free', 'flow'].includes(parent.attrs['data-fdn-layout'] ?? '') || !['relative', 'absolute'].includes(parent.style.position ?? '')) {
+          throw new Error('placement needs a direct parent frame with data-fdn-layout and position:relative or absolute')
         }
         if (op.op === 'set-placement' && op.mode === 'flow') {
-          batch = style(op.id, { position: 'static', left: 'auto', top: 'auto', right: 'auto', bottom: 'auto' })
+          batch = style(op.id, { position: ['free', 'flow'].includes(node.attrs['data-fdn-layout'] ?? '') ? 'relative' : 'static', left: 'auto', top: 'auto', right: 'auto', bottom: 'auto' })
           const currentStyle = effectiveStyle(working, node)
           const transform = canonicalTransform(currentStyle)
           if (transform) {

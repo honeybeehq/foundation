@@ -374,10 +374,10 @@ function walkNode(ctx: ValidateCtx, node: FdnNode, scope: Scope, inOverlay: bool
   }
 
   const layout = node.attrs['data-fdn-layout']
-  if (layout !== undefined && (!['free', 'flow'].includes(layout) || node.style.position !== 'relative' || (layout === 'free' ? node.style.display !== 'block' : !['flex', 'grid'].includes(node.style.display ?? '')))) {
-    push(ctx, { code: 'invalid-frame-layout', severity: 'error', message: 'frame layout must be free or flow with inline position:relative; free frames need display:block and flow frames need display:flex or grid', nodeId: node.id })
+  if (layout !== undefined && (!['free', 'flow'].includes(layout) || !['relative', 'absolute'].includes(node.style.position ?? '') || (layout === 'free' ? node.style.display !== 'block' : !['flex', 'grid'].includes(node.style.display ?? '')))) {
+    push(ctx, { code: 'invalid-frame-layout', severity: 'error', message: 'frame layout must be free or flow with inline position:relative or absolute; free frames need display:block and flow frames need display:flex or grid', nodeId: node.id })
   }
-  const allowFreePosition = parent !== undefined && ['free', 'flow'].includes(parent.attrs['data-fdn-layout'] ?? '') && parent.style.position === 'relative'
+  const allowFreePosition = parent !== undefined && ['free', 'flow'].includes(parent.attrs['data-fdn-layout'] ?? '') && ['relative', 'absolute'].includes(parent.style.position ?? '')
   const overlayHere = node.tag === OVERLAY_ELEMENT || inOverlay
   checkDeclarations(ctx, node.style, { nodeId: node.id, allowOverlayPosition: overlayHere, allowFreePosition, label: 'style' })
   for (const decls of Object.values(node.styleStates)) {

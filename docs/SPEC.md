@@ -283,8 +283,10 @@ lack of it — finding b.6).
 ### 3a. Free placement inside frames (2026-10-23)
 
 A frame is an ordinary HTML container with `data-fdn-layout="free"` or
-`data-fdn-layout="flow"` and inline `position:relative`. Free mode also declares
-inline `display:block`; flow mode uses the container's flex/grid layout. These
+`data-fdn-layout="flow"` and inline `position:relative` or `position:absolute`. A
+flow/root frame uses relative positioning; a freely placed frame uses absolute
+positioning within its parent frame. Both establish a containing block for their
+own free children. Free mode also declares inline `display:block`; flow mode uses the container's flex/grid layout. These
 attributes and styles are document truth, not editor hints. Existing containers
 without this attribute retain their existing behavior. This is an additive grammar
 extension under the current spec version; no document migration is performed.
@@ -303,7 +305,9 @@ Free children occupy no flow space; other children follow ordinary block, flex o
 grid layout in DOM order. Switching a frame mode changes its display only, keeping
 children's placement and DOM order. Overflow, clipping and stacking use standard
 CSS; the mode adds no automatic clipping or z-index. Nested frames each establish
-their own containing block. Overlay semantics remain unchanged; fixed positioning
+their own containing block, whether the frame itself is a flow child or a free
+child. Its layout mode (block/flex/grid) is independent of its placement mode.
+Overlay semantics remain unchanged; fixed positioning
 is not enabled by a frame. Position declarations in named styles remain prohibited
 because their containing context is unknown statically.
 
@@ -319,16 +323,17 @@ component expansion, with no editor runtime needed.
 The session protocol accepts these semantic operations in a normal `commit.ops`
 batch alongside existing patch verbs:
 
-- `set-frame-mode {id, mode:"free"|"flow"}` sets the attribute and relative
-  positioning. Free chooses block display; flow retains inline flex/grid, otherwise
-  chooses flex. Children are unchanged.
+- `set-frame-mode {id, mode:"free"|"flow"}` sets the attribute and display,
+  preserving absolute positioning on an already-free frame and otherwise using
+  relative positioning. Free chooses block display; flow retains inline flex/grid,
+  otherwise chooses flex. Children are unchanged.
 - `set-placement {id, mode:"free", bounds:{x,y,width,height}}` converts a direct
   frame child using caller-measured, untransformed bounds relative to that frame's
   padding edge, including scroll offset and excluding child margins. The caller
   measures the chosen rendered instance/state before committing. It must account
   for ancestor transforms; ambiguous transformed geometry is outside this slice.
-- `set-placement {id, mode:"flow"}` sets static positioning and auto offsets,
-  retaining size. Flow chooses its position by DOM order and layout, so retaining
+- `set-placement {id, mode:"flow"}` sets static positioning (relative for a layout
+  frame) and auto offsets, retaining size. Flow chooses its position by DOM order and layout, so retaining
   arbitrary free x/y is not generally possible.
 - `set-free-position {id,x,y,bounds?}` moves an already-free child, preserving its
   canonical constraint modes, rotation and flips. Legacy noncanonical constraints
@@ -406,9 +411,9 @@ canonical form. Calculated CSS retains finite native floating-point precision
 without snapping coordinates. These
 operations author the base style plane, not a forced interaction-state override.
 
-Geometry operations require an explicit, relatively positioned direct frame
-parent. Invalid numbers, missing nodes, or missing frame context reject the whole
-commit without a revision or undo step. The session expands semantic operations
+Geometry operations require an explicit, positioned (relative or absolute)
+direct frame parent. Invalid numbers, missing nodes, or missing frame context
+reject the whole commit without a revision or undo step. The session expands semantic operations
 against the sequential batch state into existing set-attr/set-style patches, then
 records one envelope and undo step for the entire commit. Chains store those
 primitive patches, not semantic requests. Undo/redo restore the exact previous
