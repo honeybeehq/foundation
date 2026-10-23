@@ -1,46 +1,84 @@
 import { applyPatch, indexNodes, invertOp, stableStringify } from 'foundation-engine'
 import type { FdnDocument, FdnNode, PatchOp } from 'foundation-engine'
 
+type Placement = { parent: string | null; previous: string | null }
+
 export interface UndoStep {
   label: string
   revert: PatchOp[]
   repeat: PatchOp[]
   created: string[]
-  placements: Record<string, { parent: string | null; previous: string | null }>
-  removedFrom: Record<string, string | null>
+  placements: Array<Placement | undefined>
+  removedFrom: Array<string | null | undefined>
   expected: Array<PatchOp | null>
   repeatExpected: Array<PatchOp | null>
   repeatPlacements: UndoStep['placements']
+  repeatRemovedFrom: UndoStep['removedFrom']
   createdOverrides: Map<string, FdnNode>
   retargetedOverrides: Set<string>
   selectorTargets: Set<string>
   replacedSubtrees: Map<string, string>
 }
 
-export function undoStep(label: string, revert: PatchOp[], before: FdnDocument, after: FdnDocument, repeat: PatchOp[]): UndoStep {
+type PlacementHistory = Pick<UndoStep, 'placements' | 'repeatPlacements' | 'removedFrom' | 'repeatRemovedFrom'>
+
+function placement(op: PatchOp, children: Map<string | null, string[]>): Placement | undefined {
+  if (op.op !== 'insert-node' && op.op !== 'move-node') return undefined
+  return { parent: op.parent, previous: children.get(op.parent)![op.index - 1] ?? null }
+}
+
+export function placementHistory(before: FdnDocument, repeat: PatchOp[], revert: PatchOp[]): PlacementHistory {
+  const history: PlacementHistory = { placements: [], repeatPlacements: [], removedFrom: [], repeatRemovedFrom: [] }
+  if (revert.some(op => op.op === 'replace-document') || !repeat.some(op => ['insert-node', 'move-node', 'remove-node'].includes(op.op))) return history
+  history.placements = Array(revert.length).fill(undefined)
+  history.removedFrom = Array(revert.length).fill(undefined)
+  history.repeatPlacements = Array(repeat.length).fill(undefined)
+  history.repeatRemovedFrom = Array(repeat.length).fill(undefined)
+  const children = new Map<string | null, string[]>()
+  const parents = new Map<string, string | null>()
+  const add = (nodes: FdnNode[], parent: string | null): void => {
+    children.set(parent, nodes.map(node => node.id))
+    for (const node of nodes) { parents.set(node.id, parent); add(node.children, node.id) }
+  }
+  const remove = (id: string): void => {
+    for (const child of children.get(id)!) remove(child)
+    children.delete(id)
+    parents.delete(id)
+  }
+  add(before.body, null)
+  const inversePositions = revert.flatMap((op, position) => ['insert-node', 'move-node', 'remove-node'].includes(op.op) ? [position] : [])
+  for (const [position, op] of repeat.entries()) {
+    if (op.op !== 'insert-node' && op.op !== 'move-node' && op.op !== 'remove-node') continue
+    const inversePosition = inversePositions.pop()!
+    const inverse = revert[inversePosition]!
+    history.placements[inversePosition] = placement(inverse, children)
+    if (op.op !== 'insert-node') {
+      const parent = parents.get(op.id)!
+      if (op.op === 'remove-node') history.repeatRemovedFrom[position] = parent
+      const siblings = children.get(parent)!
+      siblings.splice(siblings.indexOf(op.id), 1)
+      if (op.op === 'remove-node') remove(op.id)
+    }
+    if (op.op !== 'remove-node') {
+      const id = op.op === 'insert-node' ? op.node.id : op.id
+      children.get(op.parent)!.splice(op.index, 0, id)
+      parents.set(id, op.parent)
+      if (op.op === 'insert-node') add(op.node.children, id)
+      history.repeatPlacements[position] = placement(op, children)
+      if (inverse.op === 'remove-node') history.removedFrom[inversePosition] = op.parent
+    }
+  }
+  return history
+}
+
+export function undoStep(label: string, revert: PatchOp[], before: FdnDocument, after: FdnDocument, repeat: PatchOp[], history = placementHistory(before, repeat, revert)): UndoStep {
   const oldIndex = indexNodes(before.body)
   const newIndex = indexNodes(after.body)
   const created: string[] = []
-  const placements: UndoStep['placements'] = {}
-  const removedFrom: UndoStep['removedFrom'] = {}
   const collect = (node: FdnNode): void => { created.push(node.id); node.children.forEach(collect) }
-  for (const op of revert) {
-    if (op.op === 'remove-node') {
-      const loc = newIndex.get(op.id)
-      if (loc) { collect(loc.node); removedFrom[op.id] = loc.parent }
-    }
-    if (op.op === 'insert-node' || op.op === 'move-node') {
-      const siblings = op.parent === null ? before.body : oldIndex.get(op.parent)?.node.children ?? []
-      placements[op.op === 'insert-node' ? op.node.id : op.id] = { parent: op.parent, previous: siblings[op.index - 1]?.id ?? null }
-    }
-  }
+  for (const op of repeat) if (op.op === 'insert-node') collect(op.node)
   const expected = revert.map(op => { const inverse = invertOp(op, after, newIndex); return inverse === 'fallback' ? null : inverse })
   const repeatExpected = repeat.map(op => { const inverse = invertOp(op, before, oldIndex); return inverse === 'fallback' ? null : inverse })
-  const repeatPlacements: UndoStep['placements'] = {}
-  for (const op of repeat) if (op.op === 'insert-node' || op.op === 'move-node') {
-    const siblings = op.parent === null ? after.body : newIndex.get(op.parent)?.node.children ?? []
-    repeatPlacements[op.op === 'insert-node' ? op.node.id : op.id] = { parent: op.parent, previous: siblings[op.index - 1]?.id ?? null }
-  }
   const createdOverrides = new Map<string, FdnNode>()
   for (const op of repeat) if (op.op === 'insert-node' && op.node.tag === 'fdn-override') createdOverrides.set(op.node.id, structuredClone(op.node))
   const retargetedOverrides = new Set<string>()
@@ -53,11 +91,12 @@ export function undoStep(label: string, revert: PatchOp[], before: FdnDocument, 
     const replacement = newIndex.get(op.node.id)
     if (replacement) replacedSubtrees.set(op.node.id, stableStringify(replacement.node))
   }
-  return { label, revert, repeat, created, placements, removedFrom, expected, repeatExpected, repeatPlacements, createdOverrides, retargetedOverrides, selectorTargets, replacedSubtrees }
+  return { label, revert, repeat, created, ...history, expected, repeatExpected, createdOverrides, retargetedOverrides, selectorTargets, replacedSubtrees }
 }
 
 export function oppositeStep(step: UndoStep, before: FdnDocument, after: FdnDocument): UndoStep {
-  return { ...undoStep(step.label, step.repeat, before, after, step.revert), expected: step.repeatExpected, repeatExpected: step.expected, placements: step.repeatPlacements, repeatPlacements: step.placements, createdOverrides: step.createdOverrides, retargetedOverrides: step.retargetedOverrides, selectorTargets: step.selectorTargets }
+  const history: PlacementHistory = { placements: step.repeatPlacements, repeatPlacements: step.placements, removedFrom: step.repeatRemovedFrom, repeatRemovedFrom: step.removedFrom }
+  return { ...undoStep(step.label, step.repeat, before, after, step.revert, history), expected: step.repeatExpected, repeatExpected: step.expected, createdOverrides: step.createdOverrides, retargetedOverrides: step.retargetedOverrides, selectorTargets: step.selectorTargets }
 }
 
 function isSelectorKey(key: string): boolean {
@@ -124,7 +163,7 @@ function rebaseValue(op: PatchOp, expected: PatchOp | null | undefined, current:
 }
 
 export function undoOps(step: UndoStep, doc: FdnDocument): PatchOp[] {
-  const replacementPlacements = new Map<string, UndoStep['placements'][string]>()
+  const replacementPlacements = new Map<string, Placement>()
   if (step.replacedSubtrees.size) {
     const index = indexNodes(doc.body)
     for (const [id, expected] of step.replacedSubtrees) {
@@ -156,7 +195,7 @@ export function undoOps(step: UndoStep, doc: FdnDocument): PatchOp[] {
     }
     if (op.op === 'remove-node') {
       const loc = index.get(op.id)
-      if (!loc || loc.parent !== step.removedFrom[op.id]) throw new Error('inserted node was moved or removed by another writer')
+      if (!loc || loc.parent !== step.removedFrom[position]) throw new Error('inserted node was moved or removed by another writer')
       const owned = step.createdOverrides.get(op.id)
       if (owned && loc.node.tag !== 'fdn-override') throw new Error('override metadata was replaced by another writer')
       if (owned) {
@@ -184,7 +223,7 @@ export function undoOps(step: UndoStep, doc: FdnDocument): PatchOp[] {
         }
       }
       const id = op.op === 'insert-node' ? op.node.id : op.id
-      const placement = replacementPlacements.get(id) ?? step.placements[id]
+      const placement = replacementPlacements.get(id) ?? step.placements[position]
       if (placement) {
         const siblings = (placement.parent === null ? current.body : index.get(placement.parent)?.node.children ?? []).filter(node => node.id !== id)
         const previous = siblings.findIndex(node => node.id === placement.previous)

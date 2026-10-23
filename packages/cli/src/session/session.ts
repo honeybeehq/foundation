@@ -28,7 +28,7 @@ import { readDocIdAttr } from '../docid.js'
 import { skeletonDocumentEmpty, titleFromName } from '../commands/new.js'
 import { canonicalText, documentText, persistDocument, projectedText, projectionVersion, recoverDocument, sourceBase, readBytesIfPresent, readTextIfPresent, sameBytes, writeAtomic } from '../disk.js'
 import { DocumentBusyError, documentPath, isDocumentLocked, withDocumentLock } from '../document-lock.js'
-import { oppositeStep, undoOps, undoStep, type UndoStep } from './undo.js'
+import { oppositeStep, placementHistory, undoOps, undoStep, type UndoStep } from './undo.js'
 
 export interface SessionOptions {
   path: string
@@ -497,9 +497,13 @@ class DesignSession implements Session {
     }
     const before = this.doc
     const label = message.label || 'Edit'
+    let history: ReturnType<typeof placementHistory>
+    try { history = placementHistory(before, patch.applied, patch.inverse) } catch (err) {
+      return this.reject(message.id, { code: 'invalid-op', message: err instanceof Error ? err.message : String(err) })
+    }
     const failure = this.record(patch.applied, label)
     if (failure) return this.reject(message.id, failure)
-    this.undoStack.push(undoStep(label, patch.inverse, before, this.doc, patch.applied))
+    this.undoStack.push(undoStep(label, patch.inverse, before, this.doc, patch.applied, history))
     this.redoStack = []
     this.accept(message.id, { kind: 'commit', id: message.id, author: this.author }, bakeImpact(this.doc, patch.applied), componentSwaps, componentDetaches)
   }
