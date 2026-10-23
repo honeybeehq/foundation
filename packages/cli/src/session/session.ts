@@ -1,4 +1,4 @@
-import { ArtboardError, explicitArtboards, artboardPages, boardViews, boardView, boardKey, validateArtboards } from 'foundation-engine'
+import { ArtboardError, explicitArtboards, artboardPages, boardViews, boardView, boardKey } from 'foundation-engine'
 import type { BoardRef } from 'foundation-engine'
 import { bakeImpact, mergeBakeImpact, type BakeImpact } from './bake-impact.js'
 import { PlacementError } from './placement.js'
@@ -363,7 +363,7 @@ class DesignSession implements Session {
     this.doc = doc
     this.docText = canonicalText(doc)
     if (this.preparedChain && (this.chain || this.preparedChain.text !== this.docText)) this.preparedChain = null
-    this.issues = [...validateDocument(doc).issues, ...validateArtboards(doc)]
+    this.issues = validateDocument(doc).issues
   }
 
   private persist(protect = true): void {

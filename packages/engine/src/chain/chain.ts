@@ -334,8 +334,10 @@ class LoroChain implements FdnChain {
 
   private prepareApply(ops: PatchOp[]): (meta: ChangeMeta) => EnvelopeRecord {
     const beforeDoc = this.materialize()
-    const patch = applyPatch(beforeDoc, ops)
+    const initializing = this.meta.get('specVersion') === undefined && ops.length === 1 && ops[0]!.op === 'replace-document'
+    const patch = applyPatch(beforeDoc, ops, { validateArtboards: !initializing })
     if (!patch.ok) throw new Error(patch.error.message)
+    assertFormatVersion(patch.doc)
     const beforeVV = this.loro.version()
     const startCounter = beforeVV.get(this.peerIdStr) ?? 0
     // Must read `head`/prevHash BEFORE mutating: log()/head() walk

@@ -263,3 +263,10 @@ JSON adds `artboardId` for explicit boards. Directory exports use encoded stable
 IDs and write a manifest. MCP bake/render use `artboardId`/`pageId`/`matrix`.
 Vendoring must copy document.ts/session.ts/PIN from the same runtime commit;
 ship Foundation service and Apiary client as one supported protocol pair.
+
+The common validateDocument entry point includes artboard diagnostics. Malformed
+artboards remain in source snapshots but have no renderable descriptor until
+repaired; welcome/doc remain valid protocol messages. Initial chain import
+preserves the existing artboard source, including its diagnostics, so a first
+repair can create history without discarding content. Subsequent authored edits
+use the introduced-issue guard; unsupported format versions always refuse.

@@ -18,6 +18,8 @@ export function assertFormatVersion(doc: Pick<FdnDocument, 'specVersion'>): void
 }
 
 export function validateArtboards(doc: FdnDocument): ReportLine[] {
+  const containsStructure = (nodes: FdnNode[]): boolean => nodes.some(node => ARTBOARD_TAGS.has(node.tag) || containsStructure(node.children))
+  if (!explicitArtboards(doc) && !containsStructure(doc.body) && !doc.components.some(component => containsStructure(component.body))) return []
   const issues: ReportLine[] = []
   const issue = (node: FdnNode, code: string, message: string) => issues.push({ nodeId: node.id, code, message, severity: 'error' })
   const explicit = explicitArtboards(doc)
@@ -99,7 +101,9 @@ export function boardView(doc: FdnDocument, ref: BoardRef): BoardView {
     const priorRecord = board.children.find(child => child.tag === 'fdn-artboard-view' && viewRef(child).state === ref.state && viewRef(child).viewport === ref.viewport)
     return sum + (priorRecord && attr(priorRecord, 'width') !== undefined ? number(priorRecord, 'width') : doc.viewports.find(viewport => viewport.name === ref.viewport)?.width ?? number(board, 'width')) + 120
   }, 0)
-  return { ...ref, pageId: page!.id, name: attr(board, 'name') ?? board.id, x: record && attr(record, 'x') !== undefined ? number(record, 'x') : number(board, 'x') + xOffset, y: record && attr(record, 'y') !== undefined ? number(record, 'y') : number(board, 'y'), width: sizeOverride ? number(record!, 'width') : viewport?.width ?? number(board, 'width'), height: sizeOverride ? number(record!, 'height') : viewport?.height ?? number(board, 'height'), visible: attr(record ?? board, 'visible') !== 'false', overflow: attr(board, 'overflow') === 'clip' ? 'clip' : 'visible', sizeOverride }
+  const view: BoardView = { ...ref, pageId: page!.id, name: attr(board, 'name') ?? board.id, x: record && attr(record, 'x') !== undefined ? number(record, 'x') : number(board, 'x') + xOffset, y: record && attr(record, 'y') !== undefined ? number(record, 'y') : number(board, 'y'), width: sizeOverride ? number(record!, 'width') : viewport?.width ?? number(board, 'width'), height: sizeOverride ? number(record!, 'height') : viewport?.height ?? number(board, 'height'), visible: attr(record ?? board, 'visible') !== 'false', overflow: attr(board, 'overflow') === 'clip' ? 'clip' : 'visible', sizeOverride }
+  if (![view.x, view.y, view.width, view.height].every(Number.isFinite) || view.width <= 0 || view.height <= 0) throw new Error(`invalid-artboard-geometry: ${ref.artboardId}`)
+  return view
 }
 
 export function boardViews(doc: FdnDocument): BoardView[] {

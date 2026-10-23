@@ -1,3 +1,4 @@
+import { validateArtboards } from '../artboards/index.js'
 import { validateInstanceOverrides } from '../components/overrides.js'
 import { validateStateStyles } from '../state-styles.js'
 import { validateStyleDeclarations } from './styles.js'
@@ -481,6 +482,7 @@ export function validateDocument(doc: FdnDocument): ValidationResult {
 
   ctx.issues.push(...validateTokenCollections(doc))
   ctx.issues.push(...validateStateStyles(doc))
+  ctx.issues.push(...validateArtboards(doc))
   const valid = !ctx.issues.some((i) => i.severity === 'error')
   return { valid, issues: ctx.issues }
 }
