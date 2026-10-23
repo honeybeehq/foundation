@@ -69,6 +69,8 @@ export function invertOp(
   nodeIndex: Map<NodeId, NodeLocation>,
 ): PatchOp | null | 'fallback' {
   switch (op.op) {
+    case 'set-title':
+      return { op: 'set-title', title: beforeDoc.title ?? null }
     case 'insert-node':
       return { op: 'remove-node', id: op.node.id }
     case 'remove-node': {

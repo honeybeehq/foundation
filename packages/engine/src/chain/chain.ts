@@ -440,6 +440,10 @@ class LoroChain implements FdnChain {
 
   private applyOp(op: PatchOp): void {
     switch (op.op) {
+      case 'set-title':
+        if (op.title === null) this.meta.delete('title')
+        else this.meta.set('title', op.title)
+        break
       case 'insert-node': {
         const parentTreeId = op.parent === null ? undefined : this.treeIdOf(op.parent)
         this.createSubtree(parentTreeId, op.index, op.node)

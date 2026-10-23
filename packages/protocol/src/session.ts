@@ -156,6 +156,7 @@ const isDocument = shape({
 })
 
 const PATCH_OPS: Record<PatchOp['op'], Check> = {
+  'set-title': shape({ title: nullable(isString) }),
   'insert-node': shape({ parent: nullable(isString), index: isInteger, node: isNode }),
   'remove-node': shape({ id: isString }),
   'move-node': shape({ id: isString, parent: nullable(isString), index: isInteger }),

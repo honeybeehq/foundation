@@ -163,6 +163,10 @@ function upsertByName<T extends { name: string }>(items: T[], item: T, index?: n
 function applyOp(doc: FdnDocument, op: PatchOp, index: Map<NodeId, NodeLocation>): FdnDocument {
   const node = (id: NodeId): FdnNode => (index.get(id) as NodeLocation).node
   switch (op.op) {
+    case 'set-title':
+      if (op.title === null) delete doc.title
+      else doc.title = op.title
+      return doc
     case 'insert-node':
       childrenOf(doc, index, op.parent).splice(op.index, 0, structuredClone(op.node))
       return doc
@@ -263,9 +267,10 @@ export function normalizeDocument(doc: FdnDocument): FdnDocument {
 export function diffPatch(original: FdnDocument, target: FdnDocument): PatchOp[] | null {
   const from = normalizeDocument(original)
   const to = normalizeDocument(target)
-  if (from.specVersion !== to.specVersion || from.title !== to.title) return null
+  if (from.specVersion !== to.specVersion) return null
   if (!sameJson(from.data, to.data) || !sameJson(from.viewports, to.viewports) || !sameJson(from.matrix, to.matrix)) return null
   const ops: PatchOp[] = []
+  if (from.title !== to.title) ops.push({ op: 'set-title', title: to.title ?? null })
   if (!diffNamed(from.params, to.params, (param) => ({ op: 'set-param', param }), null, ops)) return null
   if (!diffNamed(from.lookups, to.lookups, (lookup) => ({ op: 'set-lookup', lookup }), (name) => ({ op: 'remove-lookup', name }), ops)) return null
   if (!diffNamed(from.states, to.states, (state) => ({ op: 'set-state', state }), null, ops)) return null

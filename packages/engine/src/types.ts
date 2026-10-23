@@ -241,6 +241,7 @@ export interface ChainLogPage {
 
 /** Write operations — one PatchOp[] batch = one change = one envelope (D2). */
 export type PatchOp =
+  | { op: 'set-title'; title: string | null }
   | { op: 'insert-node'; parent: NodeId | null; index: number; node: FdnNode }
   | { op: 'remove-node'; id: NodeId }
   | { op: 'move-node'; id: NodeId; parent: NodeId | null; index: number }

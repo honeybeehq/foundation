@@ -68,6 +68,6 @@ describe('diffPatch', () => {
   })
 
   it('returns null for changes the op vocabulary cannot express', () => {
-    expect(diffPatch(base, { ...base, title: 'New' })).toBeNull()
+    expect(diffPatch(base, { ...base, specVersion: 'unrepresentable' })).toBeNull()
   })
 })
