@@ -46,7 +46,9 @@ export type TokenModeOp =
   | { op: 'set-mode-token'; collection: string; name: string; type?: import('./document.ts').FdnTokenType; mode: string; value: import('./document.ts').FdnTokenValue }
   | { op: 'set-collection-mode'; id: string; collection: string; mode: string | null }
 
-export type SessionOp = PatchOp | PlacementOp | TokenModeOp
+export type ComponentOp = { op: 'set-instance-variant'; id: string; values: Record<string, string | null> | null }
+
+export type SessionOp = PatchOp | PlacementOp | TokenModeOp | ComponentOp
 
 export type ClientMessage =
   | { t: 'hello'; protocol: string; client: string; author: string }
@@ -126,6 +128,7 @@ const isComponent = shape({
   sealed: optional(shape({ html: isString, css: isString })),
   provenance: optional(shape({ source: isString, contentSha256: isString })),
 })
+const isComponentSet = shape({ name: isString, properties: recordOf(arrayOf(isString)), defaultVariant: isStringMap, variants: arrayOf(shape({ values: isStringMap, component: isString })) })
 const isAnnotationStatus = oneOf(['open', 'resolved', 'wontfix'])
 const isAnnotation = shape({
   id: isString,
@@ -143,6 +146,7 @@ const isDocument = shape({
   specVersion: isString,
   title: optional(isString),
   tokens: isStringMap,
+  componentSets: optional(arrayOf(isComponentSet)),
   tokenCollections: optional(arrayOf(isTokenCollection)),
   params: arrayOf(isParam),
   data: arrayOf(isDataSet),
@@ -166,6 +170,8 @@ const PATCH_OPS: Record<PatchOp['op'], Check> = {
   'set-style-ref': shape({ id: isString, styleRef: nullable(isString) }),
   'set-text': shape({ id: isString, text: isString }),
   'set-when': shape({ id: isString, when: nullable(isString) }),
+  'set-component-set': shape({ componentSet: isComponentSet, index: optional(isCount) }),
+  'remove-component-set': shape({ name: isString }),
   'set-token-collection': shape({ collection: isTokenCollection, index: optional(isCount) }),
   'remove-token-collection': shape({ name: isString }),
   'set-token': shape({ name: isString, value: nullable(isString) }),
@@ -213,12 +219,13 @@ const TOKEN_MODE_OPS: Record<TokenModeOp['op'], Check> = {
   'set-mode-token': shape({ collection: isString, name: isString, type: optional(isTokenType), mode: isString, value: isTokenValue }),
   'set-collection-mode': shape({ id: isString, collection: isString, mode: nullable(isString) }),
 }
+const isComponentOp: Check = (value) => isRecord(value) && value.op === 'set-instance-variant' && shape({ id: isString, values: nullable(recordOf(nullable(isString))) })(value)
 const isTokenModeOp: Check = (value) => isRecord(value) && typeof value.op === 'string' && Object.hasOwn(TOKEN_MODE_OPS, value.op) && TOKEN_MODE_OPS[value.op as TokenModeOp['op']](value)
 
 const CLIENT_MESSAGES: Record<ClientMessage['t'], Check> = {
   hello: shape({ protocol: isString, client: isString, author: isString }),
   view: shape({ states: arrayOf(nullable(isString)), components: isBoolean }),
-  commit: shape({ id: isString, base: isCount, ops: arrayOf((value) => isPatchOp(value) || isPlacementOp(value) || isTokenModeOp(value)), label: isString }),
+  commit: shape({ id: isString, base: isCount, ops: arrayOf((value) => isPatchOp(value) || isPlacementOp(value) || isTokenModeOp(value) || isComponentOp(value)), label: isString }),
   anchor: shape({ id: isString, name: isString }),
   undo: shape({ id: isString }),
   redo: shape({ id: isString }),
@@ -234,7 +241,7 @@ const isLogEntry: Check = (value) => isEnvelope(value) && shape({
   wallTime: optional(nullable(isString)),
   nodeIds: optional(arrayOf(isString)),
   nodes: optional(shape({ inserted: arrayOf(isString), removed: arrayOf(isString), changed: arrayOf(isString) })),
-  sections: optional(arrayOf(shape({ section: oneOf(['tokens', 'params', 'data', 'lookups', 'states', 'viewports', 'matrix', 'namedStyles', 'components', 'annotations', 'meta']), names: arrayOf(isString) }))),
+  sections: optional(arrayOf(shape({ section: oneOf(['tokens', 'tokenCollections', 'componentSets', 'params', 'data', 'lookups', 'states', 'viewports', 'matrix', 'namedStyles', 'components', 'annotations', 'meta']), names: arrayOf(isString) }))),
   factsComplete: optional(isBoolean),
 })(value)
 const isReport = arrayOf(shape({ code: isString, severity: oneOf(['error', 'warning', 'info']), message: isString, nodeId: optional(isString), detail: isAnything }))

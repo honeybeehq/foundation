@@ -1,19 +1,23 @@
 import { applyPatch, indexNodes } from 'foundation-engine'
 import type { FdnDocument, FdnNode, PatchOp } from 'foundation-engine'
-import type { PlacementOp, SessionOp, TokenModeOp } from 'foundation-protocol'
+import { expandComponentOp } from './components.js'
+import type { ComponentOp, PlacementOp, SessionOp, TokenModeOp } from 'foundation-protocol'
 import { expandPlacement, PlacementError } from './placement.js'
+
+const COMPONENT_OPS = new Set(['set-instance-variant'])
 
 const MODE_OPS = new Set(['create-token-collection', 'add-token-mode', 'rename-token-mode', 'remove-token-mode', 'set-mode-token', 'set-collection-mode'])
 
 export function expandSessionOps(doc: FdnDocument, ops: SessionOp[]): PatchOp[] {
-  if (ops.every((op): op is PatchOp | PlacementOp => !MODE_OPS.has(op.op))) return expandPlacement(doc, ops)
+  if (ops.every((op): op is PatchOp | PlacementOp => !MODE_OPS.has(op.op) && !COMPONENT_OPS.has(op.op))) return expandPlacement(doc, ops)
   let working = doc
   const expanded: PatchOp[] = []
   for (const op of ops) {
     let batch: PatchOp[]
-    if (!MODE_OPS.has(op.op)) batch = expandPlacement(working, [op as PatchOp | PlacementOp])
+    if (COMPONENT_OPS.has(op.op)) batch = expandComponentOp(working, op as ComponentOp)
+    else if (!MODE_OPS.has(op.op)) batch = expandPlacement(working, [op as PatchOp | PlacementOp])
     else batch = modeOps(working, op as TokenModeOp)
-    const patch = applyPatch(working, batch, { validateTokens: false })
+    const patch = applyPatch(working, batch, { validateTokens: false, validateComponents: false })
     if (!patch.ok) throw new PlacementError(patch.error.code, patch.error.message)
     working = patch.doc
     expanded.push(...patch.applied)

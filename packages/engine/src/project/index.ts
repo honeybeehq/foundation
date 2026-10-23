@@ -214,6 +214,13 @@ function emitFdnDoc(w: Writer, depth: number, doc: FdnDocument): void {
     wroteAny = true
   }
 
+  for (const componentSet of doc.componentSets ?? []) {
+    w.push(depth + 1, `<fdn-component-set name="${escapeAttr(componentSet.name)}" properties="${escapeAttr(stableStringify(componentSet.properties))}" default-variant="${escapeAttr(stableStringify(componentSet.defaultVariant))}">`)
+    for (const variant of componentSet.variants) emitElement(w, depth + 2, 'fdn-variant', [['component', variant.component], ['values', stableStringify(variant.values)]], null)
+    w.push(depth + 1, '</fdn-component-set>')
+    wroteAny = true
+  }
+
   if (doc.viewports.length > 0 || doc.matrix.length > 0) {
     w.push(depth + 1, '<fdn-matrix>')
     for (const v of doc.viewports) {

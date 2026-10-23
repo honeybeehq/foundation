@@ -333,6 +333,8 @@ async function toolIngest(args: Record<string, unknown>): Promise<ToolResult> {
   }
 
   const { doc, report } = parseDocument(source)
+  const malformedSet = report.lines.find((line) => line.code === 'malformed-component-set')
+  if (malformedSet) return fail(malformedSet.message)
   const canonical = projectDocument(doc)
   // Bug fix (friction §6): re-stamp data-fdn-doc-id off the ORIGINAL source
   // onto the freshly-projected text, exactly as commands/ingest.ts's CLI
@@ -839,7 +841,9 @@ async function toolImport(args: Record<string, unknown>): Promise<ToolResult> {
     return fail(`foundation_import: ${formatStructuredError('project', err)}`, harnessErrorCode(err))
   }
 
-  const { doc } = parseDocument(read.source)
+  const { doc, report: sourceReport } = parseDocument(read.source)
+  const malformedSet = sourceReport.lines.find((line) => line.code === 'malformed-component-set')
+  if (malformedSet) return fail(malformedSet.message)
 
   const targetName = projected.component.name
   const existingIndex = doc.components.findIndex((c) => c.name === targetName)

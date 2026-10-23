@@ -41,6 +41,7 @@ export async function runInspect(args: string[], io: CliIO): Promise<number> {
   io.stdout(`params: ${doc.params.length}`)
   io.stdout(`states: ${doc.states.length}`)
   io.stdout(`components: ${doc.components.length}`)
+  if (doc.componentSets?.length) io.stdout(`component sets: ${doc.componentSets.length}`)
   io.stdout(`nodes: ${nodeCount}`)
   io.stdout(`valid: ${result.valid}`)
   io.stdout(`issues: ${result.issues.length} (${errorCount} error, ${warningCount} warning, ${infoCount} info)`)

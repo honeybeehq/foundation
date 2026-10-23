@@ -286,7 +286,9 @@ export async function runImport(args: string[], io: CliIO): Promise<number> {
     return 1
   }
 
-  const { doc } = parseDocument(targetSource)
+  const { doc, report: sourceReport } = parseDocument(targetSource)
+  const malformedSet = sourceReport.lines.find((line) => line.code === 'malformed-component-set')
+  if (malformedSet) { io.stderr(malformedSet.message); return 1 }
 
   const targetName = projected.component.name
   const existingIndex = doc.components.findIndex((c) => c.name === targetName)

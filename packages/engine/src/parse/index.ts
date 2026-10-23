@@ -1,3 +1,4 @@
+import { isComponentSet } from '../components/variants.js'
 import { isJsonValue } from '../data.js'
 /**
  * foundation-engine — parse: `.fdn.html` text -> FdnDocument + NormalizationReport.
@@ -19,6 +20,7 @@ import {
 import type {
   FdnAnnotation,
   FdnComponent,
+  FdnComponentSet,
   FdnDataSet,
   FdnDocument,
   FdnTokenCollection,
@@ -1003,6 +1005,7 @@ export function parseDocument(html: string): { doc: FdnDocument; report: Normali
   let data: FdnDataSet[] = []
   let lookups: FdnLookup[] = []
   let tokenCollections: FdnTokenCollection[] = []
+  const componentSets: FdnComponentSet[] = []
   let states: FdnState[] = []
   let viewports: FdnViewport[] = []
   let matrix: { state: string; viewport: string }[] = []
@@ -1022,6 +1025,22 @@ export function parseDocument(html: string): { doc: FdnDocument; report: Normali
     data = parseDataSets(fdnDoc, lines)
     lookups = parseLookups(fdnDoc)
     tokenCollections = parseTokenCollections(fdnDoc)
+    for (const element of directChildrenByTag(fdnDoc, 'fdn-component-set')) {
+      const attrs = attrsOf(element)
+      try {
+        const componentSet = {
+          name: attrs.name ?? '',
+          properties: JSON.parse(attrs.properties ?? '{}'),
+          defaultVariant: JSON.parse(attrs['default-variant'] ?? '{}'),
+          variants: directChildrenByTag(element, 'fdn-variant').map((variant) => ({ component: attrsOf(variant).component ?? '', values: JSON.parse(attrsOf(variant).values ?? '{}') })),
+        }
+        if (!isComponentSet(componentSet)) throw new Error('invalid component set metadata shape')
+        componentSets.push(componentSet)
+      } catch {
+        componentSets.push({ name: attrs.name ?? '', properties: {}, defaultVariant: {}, variants: [] })
+        lines.push({ code: 'malformed-component-set', severity: 'error', message: 'invalid component set JSON metadata; repair the source before editing' })
+      }
+    }
     states = parseStates(fdnDoc, params)
     const m = parseMatrix(fdnDoc)
     viewports = m.viewports
@@ -1085,6 +1104,7 @@ export function parseDocument(html: string): { doc: FdnDocument; report: Normali
     specVersion,
     tokens,
     ...(tokenCollections.length ? { tokenCollections } : {}),
+    ...(componentSets.length ? { componentSets } : {}),
     params,
     data,
     lookups,

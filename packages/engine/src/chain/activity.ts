@@ -3,7 +3,7 @@ import type { ChainLogEntry, ChainLogOptions, ChainLogPage, ChainLogSection } fr
 import { comparePeerIds } from './util.js'
 import { computeEnvelopeHash, decodeEnvelope } from './envelope.js'
 
-const SECTIONS = new Set<ChainLogSection>(['tokens', 'params', 'data', 'lookups', 'states', 'viewports', 'matrix', 'namedStyles', 'components', 'annotations', 'meta'])
+const SECTIONS = new Set<ChainLogSection>(['tokens', 'tokenCollections', 'componentSets', 'params', 'data', 'lookups', 'states', 'viewports', 'matrix', 'namedStyles', 'components', 'annotations', 'meta'])
 const cursorOf = (change: Change): string => `log1:${change.lamport}:${change.peer}:${change.counter}`
 
 export class ChainActivity {

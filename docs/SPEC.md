@@ -287,7 +287,7 @@ attribute, so a plain browser renders only design content.
 
 To fill: the exclusion list made exact, attribute enumeration per element, full
 grammar (schema), node identity rules (stable ids for diff/anchoring/comments), named
-styles (see open question 12), component/variant declaration syntax, inheritance from
+styles (see open question 12), inheritance from
 design system documents (both boards duplicated their full token + component sets for
 lack of it — finding b.6).
 
@@ -431,6 +431,55 @@ primitive patches, not semantic requests. Undo/redo restore the exact previous
 attribute/style declarations through the existing guarded inverse machinery; no
 replace-document is used. Results and document/bake notifications retain the
 existing protocol shapes. Undo history remains session-local.
+
+### Native component sets and variants
+
+A document may declare `componentSets`, each with `name`, `properties` (axis name
+→ nonempty unique string values), `defaultVariant` (one value per axis), and
+`variants` (ordered `{values,component}` entries referencing native definitions).
+Sparse combinations are legal. Every declared combination is unique and complete;
+the default must resolve to one declared combination. A member belongs to one
+combination in one set, once; ordinary direct uses of that member remain legal.
+Set names share the component namespace and cannot collide with definitions.
+Axes use `[a-z][a-z0-9-]*`; values are nonempty case-sensitive strings without
+control characters, as are set names and member layer identities. Definition
+layer ids are unique within a member and may be shared across members to identify
+the same layer across variants. A member's typed props describe nonvariant settings
+and must not reuse an axis name; existing `when`, lookups and slots still work.
+
+Canonical inert header metadata uses `<fdn-component-set name="Button"
+properties="…" default-variant="…">` with JSON objects escaped as HTML attributes,
+and `<fdn-variant component="ButtonSmall" values="…"></fdn-variant>` children.
+JSON keys are sorted deterministically. The existing native component bodies stay
+in their ordinary definitions. Malformed metadata is reported, and sessions retain
+the source and block writes until repair. No mode CSS or editor state is stored here.
+
+An instance uses `<fdn-use component-set="Button" data-fdn-variant-size="sm">`.
+Exactly one of `component` or `component-set` is allowed. Literal variant selections
+are separate from prop bindings. Omitted axes inherit `defaultVariant`; changing
+that default updates unpinned instances. Explicit values equal to a default remain
+pinned. Unknown values, extra axes or unlisted combinations are validation errors;
+session batches reject newly introduced issues atomically. An invalid instance
+omits only that instance and emits a local bake report. Already-invalid instances
+from a concurrent merge do not block unrelated edits or repairs. Broken set declarations similarly omit only uses of that set; the rest of the
+document still bakes. Validation issue keys use stable subjects, so diagnostic
+wording changes do not turn existing errors into new write barriers. Member props not understood by a selected
+variant remain on the instance and are reported as inert. Editor output identifies
+both the set and selected native definition; set catalog previews show its default.
+
+`set-component-set {componentSet,index?}` and `remove-component-set {name}` are
+keyed granular patches with the existing ordered declaration inverse contract.
+`set-instance-variant {id,values}` merges supplied axis values, with a null axis value clearing just that axis; `values:null` clears
+all explicit axes to the set default. It expands to per-attribute patches, with the
+exact previous attributes restored by undo. One commit batch is one undo step.
+Set/member removal does not cascade; update references in the same batch. Definitions
+and set declarations remain whole named Loro values, so concurrent edits to the
+same definition/set use that register's last writer; instance attributes are per key.
+Documents without sets retain byte-identical bakes, projections and chain writes.
+Variant selections in this slice are literal; driving a nested variant through a
+parent prop expression is out of scope and reported as an invalid selection.
+Nested overrides, swap and detach are separate slices of the component contract.
+Slot authoring and richer list/record schemas remain outside these four slices.
 
 ## 4. Tokens, params, conditionals, data — *skeleton*
 

@@ -229,7 +229,7 @@ class DesignSession implements Session {
     this.diskTextCanonical = canonicalText(incoming)
     this.diskChain = chainBytes
     this.docId = this.chain?.docId() ?? readDocIdAttr(text)
-    const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json') ?? validateTokenCollections(incoming)[0]
+    const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json' || line.code === 'malformed-component-set') ?? validateTokenCollections(incoming)[0]
     if (issue) {
       this.invalidExternalTokens = `external metadata is invalid; source preserved and commits blocked until repaired: ${issue.message}`
       this.setDoc(this.chain ? this.chain.doc() : normalizeDocument(incoming))
@@ -338,7 +338,7 @@ class DesignSession implements Session {
       const baseCanonical = this.diskTextCanonical
       this.diskText = text
       this.diskTextCanonical = incomingCanonical
-      const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json') ?? validateTokenCollections(incoming)[0]
+      const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json' || line.code === 'malformed-component-set') ?? validateTokenCollections(incoming)[0]
       if (issue) {
         const message = `external metadata is invalid; source preserved and commits blocked until repaired: ${issue.message}`
         if (this.invalidExternalTokens !== message) this.fault('unreadable', message, null)
@@ -414,7 +414,10 @@ class DesignSession implements Session {
     const conflict = { code: 'conflict' as const, message: `"${step.label}" can no longer be ${direction === 'undo' ? 'undone' : 'redone'}: those nodes changed since` }
     if (this.guard(step.revert) !== step.guard) return this.reject(id, conflict)
     const patch = applyPatch(this.doc, step.revert)
-    if (!patch.ok) return this.reject(id, conflict)
+    if (!patch.ok) {
+      from.push(step)
+      return this.reject(id, patch.error)
+    }
     const failure = this.record(patch.applied, `${direction === 'undo' ? 'Undo' : 'Redo'} ${step.label}`)
     if (failure) {
       from.push(step)
@@ -525,7 +528,7 @@ class DesignSession implements Session {
       if (this.changed(`state:${JSON.stringify(state)}`, baked)) this.options.send({ t: 'baked', rev: this.rev, state, ...baked })
     }
     if (!this.view.components) return
-    for (const component of this.doc.components) {
+    for (const component of [...this.doc.components, ...(this.doc.componentSets ?? [])]) {
       const baked = this.bake(() => bakeEditorComponent(this.doc, component.name))
       if (this.changed(`component:${component.name}`, baked)) this.options.send({ t: 'component', rev: this.rev, name: component.name, ...baked })
     }

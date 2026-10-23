@@ -143,6 +143,8 @@ export const FDN_ELEMENTS: Record<string, FdnElementRule> = {
   },
   'fdn-data': { metadata: true, knownAttrs: ['name'], requiredAttrs: ['name'], allowsChildren: true },
   'fdn-item': { metadata: true, requiredAttrs: ['id'], allowsChildren: false },
+  'fdn-component-set': { metadata: true, knownAttrs: ['name', 'properties', 'default-variant'], requiredAttrs: ['name', 'properties', 'default-variant'], allowsChildren: true },
+  'fdn-variant': { metadata: true, knownAttrs: ['component', 'values'], requiredAttrs: ['component', 'values'], allowsChildren: false },
   'fdn-token-collection': { metadata: true, knownAttrs: ['name', 'modes'], requiredAttrs: ['name', 'modes'], allowsChildren: true },
   'fdn-token': { metadata: true, knownAttrs: ['name', 'type'], requiredAttrs: ['name', 'type'], allowsChildren: true },
   'fdn-token-value': { metadata: true, knownAttrs: ['mode', 'value', 'alias'], requiredAttrs: ['mode'], allowsChildren: false },
@@ -191,7 +193,7 @@ export const FDN_ELEMENTS: Record<string, FdnElementRule> = {
   'fdn-sealed-html': { metadata: true, allowsChildren: false },
   'fdn-sealed-css': { metadata: true, allowsChildren: false },
   'fdn-slot': { metadata: false, knownAttrs: ['name'], requiredAttrs: ['name'], allowsChildren: true },
-  'fdn-use': { metadata: false, knownAttrs: ['component'], requiredAttrs: ['component'], allowsChildren: true },
+  'fdn-use': { metadata: false, knownAttrs: ['component', 'component-set'], requiredAttrs: ['component'], allowsChildren: true },
   'fdn-fill': { metadata: false, knownAttrs: ['slot'], requiredAttrs: ['slot'], allowsChildren: true },
 
   // overlay (resolved SPEC open question 2)

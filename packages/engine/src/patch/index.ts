@@ -1,4 +1,5 @@
 import { isJsonValue } from '../data.js'
+import { componentIssueKey, validateComponentSets } from '../components/variants.js'
 import { validateTokenCollections } from '../tokens/index.js'
 import type { FdnDocument, FdnNode, NodeId, PatchOp, StateStyleKey } from '../types.js'
 import { indexNodes, invertOp, type NodeLocation } from '../chain/model.js'
@@ -23,7 +24,7 @@ class PatchFailure extends Error {
   }
 }
 
-export function applyPatch(doc: FdnDocument, ops: PatchOp[], opts?: { lenient?: boolean; validateTokens?: boolean }): PatchResult {
+export function applyPatch(doc: FdnDocument, ops: PatchOp[], opts?: { lenient?: boolean; validateTokens?: boolean; validateComponents?: boolean }): PatchResult {
   const lenient = opts?.lenient ?? false
   let working = structuredClone(doc)
   const applied: PatchOp[] = []
@@ -47,6 +48,11 @@ export function applyPatch(doc: FdnDocument, ops: PatchOp[], opts?: { lenient?: 
   }
   if (opts?.validateTokens !== false) {
     const issue = validateTokenCollections(working)[0]
+    if (issue) return { ok: false, error: { code: 'invalid-op', message: issue.message } }
+  }
+  if (opts?.validateComponents !== false) {
+    const prior = new Set(validateComponentSets(doc).map(componentIssueKey))
+    const issue = validateComponentSets(working).find((item) => !prior.has(componentIssueKey(item)))
     if (issue) return { ok: false, error: { code: 'invalid-op', message: issue.message } }
   }
   const inverse: PatchOp[] = fallback ? [{ op: 'replace-document', doc: structuredClone(doc) }] : inverses.reverse()
@@ -126,6 +132,11 @@ function checkOp(op: PatchOp, doc: FdnDocument, index: Map<NodeId, NodeLocation>
     case 'set-token':
       if (op.name === '') throw new PatchFailure('invalid-op', 'set-token needs a non-empty name')
       return op
+    case 'set-component-set': {
+      const items = doc.componentSets ?? []
+      if (!op.componentSet.name) throw new PatchFailure('invalid-op', 'component set needs a name')
+      return op.index === undefined ? op : { ...op, index: checkIndex(op.index, items.filter((item) => item.name !== op.componentSet.name).length, lenient, op.op) }
+    }
     case 'set-token-collection': {
       const items = doc.tokenCollections ?? []
       if (!op.collection.name) throw new PatchFailure('invalid-op', 'set-token-collection needs a name')
@@ -174,8 +185,9 @@ function checkOp(op: PatchOp, doc: FdnDocument, index: Map<NodeId, NodeLocation>
       if (op.index === undefined) return op
       return { ...op, index: checkIndex(op.index, items.filter((item) => item.name !== name).length, lenient, op.op) }
     }
+    case 'remove-component-set':
     case 'remove-lookup':
-      if (op.name === '') throw new PatchFailure('invalid-op', 'remove-lookup needs a non-empty name')
+      if (op.name === '') throw new PatchFailure('invalid-op', `${op.op} needs a non-empty name`)
       return op
     case 'set-annotation-status':
       if (!doc.annotations.some((a) => a.id === op.id)) throw new PatchFailure('invalid-op', `unknown annotation "${op.id}"`)
@@ -244,6 +256,13 @@ function applyOp(doc: FdnDocument, op: PatchOp, index: Map<NodeId, NodeLocation>
       else target.when = op.when
       return doc
     }
+    case 'set-component-set':
+      doc.componentSets = upsertByName(doc.componentSets ?? [], op.componentSet, op.index)
+      return doc
+    case 'remove-component-set':
+      doc.componentSets = (doc.componentSets ?? []).filter((item) => item.name !== op.name)
+      if (doc.componentSets.length === 0) delete doc.componentSets
+      return doc
     case 'set-token-collection':
       doc.tokenCollections = upsertByName(doc.tokenCollections ?? [], op.collection, op.index)
       return doc
@@ -335,6 +354,7 @@ export function diffPatch(original: FdnDocument, target: FdnDocument): PatchOp[]
   if (!diffNamed(from.data, to.data, (data) => ({ op: 'set-data', data }), (name) => ({ op: 'remove-data', name }), ops)) return null
   if (!diffNamed(from.viewports, to.viewports, (viewport) => ({ op: 'set-viewport', viewport }), (name) => ({ op: 'remove-viewport', name }), ops)) return null
   if (!sameJson(from.matrix, to.matrix)) ops.push({ op: 'set-matrix', cells: to.matrix })
+  if (!diffNamed(from.componentSets ?? [], to.componentSets ?? [], (componentSet) => ({ op: 'set-component-set', componentSet }), (name) => ({ op: 'remove-component-set', name }), ops)) return null
   diffRecord(from.tokens, to.tokens, (name, value) => ops.push({ op: 'set-token', name, value }))
   ops.push(...diffNodes(from.body, to.body))
   const beforeAnnotations = new Map(from.annotations.map((a) => [a.id, a]))

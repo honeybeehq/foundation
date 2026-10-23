@@ -1,3 +1,4 @@
+import { componentSelection, validateComponentSets } from '../components/variants.js'
 import { mapStyleValues, mergeStyles, styleEntries } from './styles.js'
 /**
  * bakeDocument — template + state → BakeResult (see API.md, src/types.ts).
@@ -51,6 +52,7 @@ interface BakeCtx extends ExprContext {
   doc: FdnDocument
   selectedState: string | null
   componentStack: string[]
+  invalidComponentSets: Set<string>
   slotFills?: Record<string, FdnNode[]>
   reports: ReportLine[]
   tokenValueIndex: Map<string, string[]>
@@ -85,10 +87,11 @@ export function bakeEditorDocument(doc: FdnDocument, opts?: { state?: string }):
 export function bakeEditorComponent(doc: FdnDocument, name: string): { html: string; tree: FdnNode[]; report: ConformanceReport } {
   const issue = validateTokenCollections(doc)[0]
   if (issue) throw new Error(issue.message)
-  const component = doc.components.find((c) => c.name === name)
+  const componentSet = doc.componentSets?.find((item) => item.name === name)
+  const component = componentSet ? componentSelection(doc, { attrs: { 'component-set': name } }).component : doc.components.find((c) => c.name === name)
   const samples = component && !component.sealed ? sampleProps(component) : {}
   const sampled = Object.keys(samples)
-  const attrs: Record<string, string> = { component: name }
+  const attrs: Record<string, string> = componentSet ? { 'component-set': name } : { component: name }
   for (const [prop, value] of Object.entries(samples)) attrs[`data-fdn-prop-${prop}`] = value
   if (sampled.length > 0) attrs['data-fdn-sample'] = sampled.join(',')
   const instance: FdnNode = { id: name, tag: 'fdn-use', attrs, style: {}, styleStates: {}, children: [] }
@@ -203,6 +206,7 @@ function bakeTree(doc: FdnDocument, stateName: string | null, editor: boolean): 
     bindings: { prop: {}, param: params },
     lookups: doc.lookups,
     componentStack: [],
+    invalidComponentSets: new Set(validateComponentSets(doc, { instances: false }).map((issue) => (issue.detail as { componentSet: string }).componentSet)),
     reports,
     tokenValueIndex,
     referencedTokens: new Set(),
@@ -574,7 +578,7 @@ function buildRegularNode(node: FdnNode, ctx: BakeCtx): FdnNode {
 }
 
 function editorIdentity(node: FdnNode, componentName: string, ctx: BakeCtx): Record<string, string> {
-  return ctx.editor ? { 'data-fdn-id': ctx.editor.idPrefix + node.id, 'data-fdn-component': componentName } : {}
+  return ctx.editor ? { 'data-fdn-id': ctx.editor.idPrefix + node.id, 'data-fdn-component': componentName, ...(node.attrs['component-set'] ? { 'data-fdn-component-set': node.attrs['component-set'] } : {}) } : {}
 }
 
 function withEditorIds(nodes: FdnNode[], prefix: string): FdnNode[] {
@@ -707,7 +711,17 @@ function applyInstanceStyle(node: FdnNode, componentName: string, roots: FdnNode
 }
 
 function instantiateComponent(node: FdnNode, ctx: BakeCtx): FdnNode[] {
-  const componentName = node.attrs['component']
+  let selected: ReturnType<typeof componentSelection> | undefined
+  if (node.attrs['component-set']) {
+    try {
+      if (ctx.invalidComponentSets.has(node.attrs['component-set'])) throw new Error(`component set "${node.attrs['component-set']}" has invalid declarations`)
+      selected = componentSelection(ctx.doc, node)
+    } catch (err) {
+      pushReport(ctx, { code: 'invalid-instance-variant', severity: 'error', message: err instanceof Error ? err.message : String(err), nodeId: node.id })
+      return []
+    }
+  }
+  const componentName = selected?.component.name ?? node.attrs['component']
   if (!componentName) {
     pushReport(ctx, { code: 'component-not-found', severity: 'error', message: 'fdn-use is missing its component="…" attribute', nodeId: node.id })
     return []
@@ -740,8 +754,11 @@ function instantiateComponent(node: FdnNode, ctx: BakeCtx): FdnNode[] {
     }
   }
 
+  if (selected) for (const name of Object.keys(propsRaw)) {
+    if (!component.props.some((prop) => prop.name === name)) pushReport(ctx, { code: 'instance-prop-inert', severity: 'info', message: `prop "${name}" is not declared by selected variant "${componentName}"; binding retained`, nodeId: node.id })
+  }
   const propsTyped: Record<string, unknown> = {}
-  const finalAttrs: Record<string, string> = { ...bakedAttrs, component: componentName, ...editorIdentity(node, componentName, ctx) }
+  const finalAttrs: Record<string, string> = { ...bakedAttrs, ...(selected ? {} : { component: componentName }), ...editorIdentity(node, componentName, ctx) }
   for (const propDef of component.props) {
     const raw = propsRaw[propDef.name]
     if (raw === undefined) {

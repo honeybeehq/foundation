@@ -50,6 +50,8 @@ export async function runIngest(args: string[], io: CliIO): Promise<number> {
   }
 
   const { doc, report } = parseDocument(source)
+  const malformedSet = report.lines.find((line) => line.code === 'malformed-component-set')
+  if (malformedSet) { io.stderr(malformedSet.message); return 1 }
   const canonical = projectDocument(doc)
   // SPEC 13a-i: the document id lives outside FdnDocument entirely (see
   // packages/cli/src/docid.ts) — parseDocument/projectDocument never see it,

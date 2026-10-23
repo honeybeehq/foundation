@@ -5,6 +5,7 @@
  * what's wrong AND the sanctioned alternative, e.g. "float is not in the subset;
  * use flex on the parent" rather than a bare "invalid property".
  */
+import { validateComponentSets } from '../components/variants.js'
 import { validateTokenCollections } from '../tokens/index.js'
 import {
   excludedStylePropertyMessage,
@@ -292,7 +293,7 @@ function walkNode(ctx: ValidateCtx, node: FdnNode, scope: Scope, inOverlay: bool
   const rule = FDN_ELEMENTS[node.tag]
   if (rule?.requiredAttrs) {
     for (const req of rule.requiredAttrs) {
-      if (!node.attrs[req]) {
+      if (!node.attrs[req] && !(node.tag === 'fdn-use' && req === 'component' && node.attrs['component-set'])) {
         push(ctx, {
           code: 'missing-required-attribute',
           severity: 'error',
@@ -448,7 +449,7 @@ function checkNamedStyle(ctx: ValidateCtx, style: FdnNamedStyle): void {
 
 export function validateDocument(doc: FdnDocument): ValidationResult {
   const ctx: ValidateCtx = {
-    issues: [],
+    issues: validateComponentSets(doc),
     doc,
     paramNames: new Set(doc.params.map((p) => p.name)),
     dataNames: new Set(doc.data.map((d) => d.name)),

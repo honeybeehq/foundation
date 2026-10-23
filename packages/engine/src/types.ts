@@ -90,6 +90,13 @@ export interface FdnProp {
   default?: unknown
 }
 
+export interface FdnComponentSet {
+  name: string
+  properties: Record<string, string[]>
+  defaultVariant: Record<string, string>
+  variants: { values: Record<string, string>; component: string }[]
+}
+
 export interface FdnComponent {
   name: string
   props: FdnProp[]
@@ -131,6 +138,7 @@ export interface FdnDocument {
   /** :root custom properties — the token layer. */
   tokens: Record<string, string>
   tokenCollections?: FdnTokenCollection[]
+  componentSets?: FdnComponentSet[]
   params: FdnParam[]
   data: FdnDataSet[]
   lookups: FdnLookup[]
@@ -254,6 +262,8 @@ export type PatchOp =
   | { op: 'set-style-ref'; id: NodeId; styleRef: string | null }
   | { op: 'set-text'; id: NodeId; text: string }
   | { op: 'set-when'; id: NodeId; when: string | null }
+  | { op: 'set-component-set'; componentSet: FdnComponentSet; index?: number }
+  | { op: 'remove-component-set'; name: string }
   | { op: 'set-token-collection'; collection: FdnTokenCollection; index?: number }
   | { op: 'remove-token-collection'; name: string }
   | { op: 'set-token'; name: string; value: string | null }
@@ -287,7 +297,7 @@ export type SemanticOp =
   | { op: 'set-text'; id: NodeId; text: string }
   | { op: 'set-style-ref'; id: NodeId; styleRef: string | null }
   | { op: 'set-when'; id: NodeId; when: string | null }
-  | { op: 'section-changed'; section: 'tokens' | 'tokenCollections' | 'params' | 'data' | 'lookups' | 'states' | 'viewports' | 'matrix' | 'namedStyles' | 'components' | 'meta' | 'annotations'; name: string }
+  | { op: 'section-changed'; section: 'tokens' | 'componentSets' | 'tokenCollections' | 'params' | 'data' | 'lookups' | 'states' | 'viewports' | 'matrix' | 'namedStyles' | 'components' | 'meta' | 'annotations'; name: string }
 
 export type AnchorRef = string
 

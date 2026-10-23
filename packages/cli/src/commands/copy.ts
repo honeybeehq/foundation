@@ -57,7 +57,10 @@ export async function runCopy(args: string[], io: CliIO): Promise<number> {
     if (stampedId && chainId && stampedId !== chainId) {
       throw new Error('source document and chain have different document ids')
     }
-    const doc = normalizeDocument(parseDocument(sourceText).doc)
+    const parsed = parseDocument(sourceText)
+    const malformedSet = parsed.report.lines.find((line) => line.code === 'malformed-component-set')
+    if (malformedSet) throw new Error(malformedSet.message)
+    const doc = normalizeDocument(parsed.doc)
     const source = {
       path: sourcePath,
       docId: chainId ?? stampedId,

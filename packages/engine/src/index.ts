@@ -4,6 +4,7 @@
  * their own entry points; importing the root never starts a browser.
  */
 export * from './types.js'
+export { componentSelection, validateComponentSets } from './components/variants.js'
 export { parseDocument } from './parse/index.js'
 export { validateDocument } from './validate/index.js'
 export { projectDocument } from './project/index.js'
