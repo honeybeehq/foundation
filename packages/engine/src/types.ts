@@ -164,6 +164,8 @@ export interface FdnAnnotation {
   id: string
   /** Anchor: a data-fdn-id when available; else bake-state viewport coords. */
   nodeId?: NodeId
+  artboardId?: NodeId
+  viewport?: string
   x?: number
   y?: number
   /** Which declared state the annotator was viewing (context for the reader). */
@@ -275,6 +277,8 @@ export interface ChainLogEntry extends EnvelopeRecord {
   time: { kind: 'logical'; value: number }
   wallTime: string | null
   nodeIds: NodeId[]
+  artboardIds?: NodeId[]
+  pageIds?: NodeId[]
   nodes: { inserted: NodeId[]; removed: NodeId[]; changed: NodeId[] }
   sections: Array<{ section: ChainLogSection; names: string[] }>
   factsComplete: boolean
@@ -294,6 +298,7 @@ export interface ChainLogPage {
 
 /** Write operations — one PatchOp[] batch = one change = one envelope (D2). */
 export type PatchOp =
+  | { op: 'set-spec-version'; specVersion: string }
   | { op: 'set-title'; title: string | null }
   | { op: 'insert-node'; parent: NodeId | null; index: number; node: FdnNode }
   | { op: 'remove-node'; id: NodeId }
@@ -355,3 +360,48 @@ export interface BakeResult {
   state: string | null
   report: ConformanceReport
 }
+
+export interface BoardRef {
+  artboardId: string | null
+  state: string | null
+  viewport: string | null
+}
+
+export interface BoardView extends BoardRef {
+  pageId: string | null
+  name: string
+  x: number
+  y: number
+  width: number
+  height: number
+  visible: boolean
+  overflow: 'clip' | 'visible'
+  sizeOverride: boolean
+}
+
+export interface ArtboardPage {
+  id: string
+  name: string
+  artboardIds: string[]
+}
+
+export type ArtboardOp =
+  | { op: 'create-page'; id: string; name: string; beforeId: string | null }
+  | { op: 'rename-page'; id: string; name: string }
+  | { op: 'reorder-page'; id: string; beforeId: string | null }
+  | { op: 'duplicate-page'; id: string; newId: string; name: string; idMap: Record<string, string> }
+  | { op: 'delete-page'; id: string }
+  | { op: 'create-artboard'; id: string; pageId: string; name: string; x: number; y: number; width: number; height: number; beforeId: string | null; overflow?: 'clip' | 'visible' }
+  | { op: 'rename-artboard'; id: string; name: string }
+  | { op: 'move-artboard'; id: string; x: number; y: number }
+  | { op: 'resize-artboard'; id: string; width: number; height: number }
+  | { op: 'move-artboard-view'; id: string; artboardId: string; state: string | null; viewport: string | null; x: number; y: number }
+  | { op: 'set-artboard-view-visible'; id: string; artboardId: string; state: string | null; viewport: string | null; visible: boolean }
+  | { op: 'set-artboard-view-size'; id: string; artboardId: string; state: string | null; viewport: string | null; width: number | null; height: number | null }
+  | { op: 'separate-artboard-view'; id: string; artboardId: string; state: string | null; viewport: string; width: number; height: number; expectedViewport: { width: number; height: number }; restoreViewport: { width: number; height: number } }
+  | { op: 'rename-viewport' | 'rename-state'; name: string; newName: string }
+  | { op: 'resize-viewport'; name: string; width: number; height: number }
+  | { op: 'duplicate-artboard'; id: string; newId: string; pageId: string; name: string; x: number; y: number; beforeId: string | null; idMap: Record<string, string> }
+  | { op: 'reorder-artboard'; id: string; pageId: string; beforeId: string | null }
+  | { op: 'delete-artboard'; id: string }
+  | { op: 'upgrade-artboards'; pageId: string; artboardId: string; name: string; width: number; height: number; placements: Array<{ id: string; state: string | null; viewport: string | null; x: number; y: number }> }

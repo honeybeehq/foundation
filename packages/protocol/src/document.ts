@@ -1,1 +1,406 @@
-export type * from '../../engine/src/types.ts'
+/**
+ * foundation-engine — core contract types.
+ *
+ * THE contract file: every engine module (grammar/, parse/, project/, bake/,
+ * chain/, render/, diff/) implements against these types. This file is owned
+ * by the integrator — implementor agents must NOT edit it; a type that doesn't
+ * fit an implementation is a finding to report, not a definition to change.
+ *
+ * Semantics source: docs/SPEC.md (D1–D4, resolved open questions 1–2, 4, 9–12)
+ * and boards/GRAMMAR-FINDINGS.md (the derived syntax).
+ */
+
+// ——— document model (template form — SPEC Q10: this IS the document) ———
+
+export type NodeId = string
+export type StateStyleKey = 'hover' | 'focus' | 'active' | 'disabled'
+
+/** One element in the design tree. Template form: text/attrs may carry {{ … }}. */
+export interface FdnNode {
+  /** Stable identity (minted at ingestion, survives projection round-trips). */
+  id: NodeId
+  /** HTML tag or fdn-* element (fdn-use, fdn-slot, fdn-overlay). */
+  tag: string
+  /** Ordinary HTML attributes (id, aria-*, src, alt, data-testid, …) plus
+   *  data-fdn-* bookkeeping (reserved namespace). Values may interpolate. */
+  attrs: Record<string, string>
+  /** Canonical longhand style declarations. Values are raw CSS values or
+   *  var(--token) references — arbitrary values are legal (D1). */
+  style: Record<string, string>
+  /** Interaction-state style planes (resolved SPEC Q11). */
+  styleStates: Partial<Record<StateStyleKey, Record<string, string>>>
+  /** Named-style reference — symbolic in canonical form (SPEC Q12). */
+  styleRef?: string
+  /** Conditional presence expression (see EXPRESSION GRAMMAR below). */
+  when?: string
+  /** Iteration: "item in <dataset-or-listprop-ref>". */
+  each?: string
+  /** Text content (leaf). May interpolate. Mutually exclusive with children
+   *  in practice; both present = children win, text is a validation issue. */
+  text?: string
+  children: FdnNode[]
+}
+
+export type FdnParamType =
+  | 'string' | 'number' | 'boolean' | 'enum' | 'token' | 'list' | 'record'
+
+export type FdnTokenType = 'color' | 'number' | 'string' | 'boolean'
+export type FdnTokenValue = string | number | boolean | { alias: string }
+export interface FdnToken { name: string; type: FdnTokenType; values: Record<string, FdnTokenValue> }
+export interface FdnTokenCollection { name: string; modes: string[]; tokens: FdnToken[] }
+
+export interface FdnParam {
+  name: string
+  type: FdnParamType
+  /** For enum: allowed values. For list/record: item field names (v0: informal). */
+  values?: string[]
+  /** Bake with no state selected uses this; absent → bake empty + report line. */
+  default?: unknown
+  description?: string
+}
+
+export interface FdnDataSet { name: string; items: Record<string, unknown>[] }
+
+/** Declared lookup table (resolved SPEC Q9 — the enum→value mapping primitive). */
+export interface FdnLookup { name: string; entries: Record<string, string> }
+
+export interface FdnState {
+  name: string
+  /** param name → value assignment */
+  assignments: Record<string, unknown>
+  viewport?: string
+}
+
+export interface FdnViewport { name: string; width: number; height: number }
+
+export interface FdnNamedStyle {
+  name: string
+  style: Record<string, string>
+  styleStates: Partial<Record<StateStyleKey, Record<string, string>>>
+}
+
+export interface FdnProp {
+  name: string
+  type: FdnParamType
+  /** For enum props: the allowed values (mirrors FdnParam.values — added for
+   *  the Wave 4 importer, whose enum domains must live in the schema, not be
+   *  reverse-engineered from render samples). */
+  values?: string[]
+  required?: boolean
+  default?: unknown
+}
+
+export type ComponentSwapTarget = { component: string } | { componentSet: string; variants?: Record<string, string> }
+export interface InstanceDetachReport {
+  instanceId: string
+  state: string | null
+  rootId: string
+  createdIds: string[]
+  preservedIds: string[]
+  dormantOverridesDropped: string[]
+  snapshot: 'chosen-state'
+}
+
+export interface InstanceSwapReport {
+  signature: string
+  instanceId: string
+  scope: string[]
+  component: string
+  componentSet?: string
+  values?: Record<string, string>
+  overrides: {
+    overrideId: string
+    fromName?: string
+    toName?: string
+    from: string[]
+    to?: string[]
+    status: 'exact' | 'retargeted-by-name' | 'dormant'
+    reason?: string
+    compatibleFields: string[]
+    inactiveFields: string[]
+  }[]
+  props: { name: string; status: 'kept' | 'inert' | 'reinterpreted' | 'invalid-for-target'; fromType?: FdnParamType; toType?: FdnParamType }[]
+  fills: { fillId: string; slot: string; status: 'kept' | 'inert' }[]
+}
+
+export interface InstanceOverridePatch {
+  text?: string | null
+  hidden?: boolean | null
+  style?: Record<string, string | null>
+  styleStates?: Partial<Record<StateStyleKey, Record<string, string | null>>>
+  swap?: ComponentSwapTarget | null
+}
+
+export interface FdnComponentSet {
+  name: string
+  properties: Record<string, string[]>
+  defaultVariant: Record<string, string>
+  variants: { values: Record<string, string>; component: string }[]
+}
+
+export interface FdnComponent {
+  name: string
+  props: FdnProp[]
+  /** Slot names declared via <fdn-slot name="…"> in the body. */
+  slots: string[]
+  /** Template body: subset nodes, may interpolate and use when/each.
+   *  Empty when `sealed` is present (a sealed capsule IS the body). */
+  body: FdnNode[]
+  /** Sealed capsule (SPEC Q3, resolved): raw markup + scoped CSS produced by
+   *  the importer when transparent projection fails. CSS may use interaction
+   *  pseudo-classes and transitions; never scripts (compiler-enforced). Bake
+   *  scopes the css under a generated capsule class. Excluded from edit/diff. */
+  sealed?: { html: string; css: string }
+  /** Import provenance for divergence tracking (D3): where the component came
+   *  from and the content hash of its source at import time. */
+  provenance?: { source: string; contentSha256: string }
+}
+
+/** Spatial annotation — a first-class chain citizen (Veft's founding idea):
+ *  anchored to a node (preferred) or viewport coords, resolvable, authored via
+ *  the envelope of the change that created it. No timestamps (determinism);
+ *  time lives in the chain order. */
+export interface FdnAnnotation {
+  id: string
+  /** Anchor: a data-fdn-id when available; else bake-state viewport coords. */
+  nodeId?: NodeId
+  artboardId?: NodeId
+  viewport?: string
+  x?: number
+  y?: number
+  /** Which declared state the annotator was viewing (context for the reader). */
+  state?: string
+  text: string
+  status: 'open' | 'resolved' | 'wontfix'
+}
+
+/** The document — template form, one file, one hash, all states (SPEC Q10). */
+export interface FdnDocument {
+  specVersion: string
+  title?: string
+  /** :root custom properties — the token layer. */
+  tokens: Record<string, string>
+  tokenCollections?: FdnTokenCollection[]
+  componentSets?: FdnComponentSet[]
+  params: FdnParam[]
+  data: FdnDataSet[]
+  lookups: FdnLookup[]
+  states: FdnState[]
+  viewports: FdnViewport[]
+  matrix: { state: string; viewport: string }[]
+  namedStyles: FdnNamedStyle[]
+  components: FdnComponent[]
+  /** Design content (template form — fdn-use instances are NOT resolved here). */
+  body: FdnNode[]
+  /** Spatial annotations (in-chain review state; hidden metadata in projection,
+   *  never baked into design output). */
+  annotations: FdnAnnotation[]
+}
+
+// ——— EXPRESSION GRAMMAR (resolved SPEC Q9; reconciled with bake v0) ———
+// {{ <expr> }} where <expr> is exactly one of:
+//   ref        := prefix '.' ident ('.' ident)*
+//   prefix     := 'prop' | 'item' | 'param' | <active-each-binding-name>
+//                 // "row in items" makes `row` a dynamically-scoped prefix
+//                 // inside that each subtree; `item` is the default binding.
+//   ternary    := <cond> '?' <value> ':' <value>
+//   lookupref  := ident '[' ref ']'          // ident names an FdnLookup
+//   value      := ref | lookupref | quoted-string-literal | number-literal
+//               | <cond>                      // comparison as boolean value
+//               | '(' <value> ')'             // grouping (incl. nested ternary)
+//   cond       := ref
+//               | <operand> ('==' | '!=') <operand>
+//   operand    := ref | quoted-string-literal | number-literal | boolean
+//                 // ref-vs-ref comparison is legal (selection idiom:
+//                 // item.id == prop.selecteditemid) — dogfood round 2
+// `when` attributes accept <cond> plus '&&' / '||' / '!' composition and
+// parentheses (precedence: '!' > '&&' > '||').
+// NOTHING else: no arithmetic, no method calls, no string operations.
+// Conventions: primitive list items are addressed as <binding>.value (the bake
+// wraps primitives as { value: item }); doc.tokens keys are stored WITHOUT the
+// leading '--' (tokens['color-accent'], referenced as var(--color-accent)).
+// The `each` SOURCE ("<alias> in <source>") is its own small grammar, not a ref:
+//   source := 'data' '.' ident            // a declared FdnDataSet
+//           | 'prop' '.' ident            // a list-typed component prop
+//           | 'param' '.' ident           // a list-typed param
+// validated against declarations, never through the {{ }} ref checker.
+
+// ——— reports ———
+
+export type Severity = 'error' | 'warning' | 'info'
+
+export interface ReportLine {
+  /** Stable machine code, kebab-case, e.g. "excluded-element-dropped",
+   *  "shorthand-expanded", "off-token-value", "param-missing-default". */
+  code: string
+  severity: Severity
+  message: string
+  nodeId?: NodeId
+  detail?: unknown
+}
+
+/** Ingestion output (D1: lossy-but-total, every transformation legible). */
+export interface NormalizationReport { lines: ReportLine[] }
+
+export interface ValidationResult { valid: boolean; issues: ReportLine[] }
+
+/** Audit plane (D1: report, never reject): off-token values, unused tokens,
+ *  missing param defaults hit during bake, undeclared lookup keys, … */
+export interface ConformanceReport { lines: ReportLine[] }
+
+// ——— chain (D2 + resolved Q1: Loro under a Foundation envelope) ———
+
+export interface ChangeMeta {
+  wallTime?: string
+  /** "agent:<bee>" | "user:<id>" */
+  author: string
+  message: string
+}
+
+export interface EnvelopeRecord {
+  wallTime?: string | null
+  /** Foundation-owned SHA-256 over (prevHash + author + message + specVersion
+   *  + the underlying library commit bytes). Never the library's own id. */
+  hash: string
+  prevHash: string | null
+  author: string
+  message: string
+  specVersion: string
+}
+
+export type ChainLogSection = Extract<SemanticOp, { op: 'section-changed' }>['section']
+
+export interface ChainLogEntry extends EnvelopeRecord {
+  cursor: string
+  anchors: string[]
+  anchor?: { name: string; targetHash: string | null }
+  time: { kind: 'logical'; value: number }
+  wallTime: string | null
+  nodeIds: NodeId[]
+  artboardIds?: NodeId[]
+  pageIds?: NodeId[]
+  nodes: { inserted: NodeId[]; removed: NodeId[]; changed: NodeId[] }
+  sections: Array<{ section: ChainLogSection; names: string[] }>
+  factsComplete: boolean
+}
+
+export interface ChainLogOptions {
+  limit?: number
+  before?: string
+}
+
+export interface ChainLogPage {
+  entries: ChainLogEntry[]
+  nextCursor: string | null
+  latestCursor: string | null
+  hasMore: boolean
+}
+
+/** Write operations — one PatchOp[] batch = one change = one envelope (D2). */
+export type PatchOp =
+  | { op: 'set-spec-version'; specVersion: string }
+  | { op: 'set-title'; title: string | null }
+  | { op: 'insert-node'; parent: NodeId | null; index: number; node: FdnNode }
+  | { op: 'remove-node'; id: NodeId }
+  | { op: 'move-node'; id: NodeId; parent: NodeId | null; index: number }
+  | { op: 'set-attr'; id: NodeId; key: string; value: string | null }
+  | { op: 'set-style'; id: NodeId; prop: string; value: string | null; state?: StateStyleKey }
+  | { op: 'set-style-ref'; id: NodeId; styleRef: string | null }
+  | { op: 'set-text'; id: NodeId; text: string }
+  | { op: 'set-when'; id: NodeId; when: string | null }
+  | { op: 'set-component-set'; componentSet: FdnComponentSet; index?: number }
+  | { op: 'remove-component-set'; name: string }
+  | { op: 'set-token-collection'; collection: FdnTokenCollection; index?: number }
+  | { op: 'remove-token-collection'; name: string }
+  | { op: 'set-token'; name: string; value: string | null }
+  | { op: 'set-named-style'; style: FdnNamedStyle }
+  | { op: 'remove-named-style'; name: string }
+  | { op: 'set-component'; component: FdnComponent; index?: number }
+  | { op: 'remove-component'; name: string }
+  | { op: 'set-param'; param: FdnParam; index?: number }
+  | { op: 'remove-param'; name: string }
+  | { op: 'set-lookup'; lookup: FdnLookup; index?: number }
+  | { op: 'remove-lookup'; name: string }
+  | { op: 'set-state'; state: FdnState; index?: number }
+  | { op: 'remove-state'; name: string }
+  | { op: 'set-data'; data: FdnDataSet; index?: number }
+  | { op: 'remove-data'; name: string }
+  | { op: 'set-viewport'; viewport: FdnViewport; index?: number }
+  | { op: 'remove-viewport'; name: string }
+  | { op: 'set-matrix'; cells: FdnDocument['matrix'] }
+  | { op: 'set-declaration-order'; section: 'params' | 'data' | 'lookups' | 'states' | 'viewports' | 'namedStyles' | 'components' | 'componentSets' | 'tokenCollections'; names: string[] }
+  | { op: 'annotate'; annotation: FdnAnnotation }
+  | { op: 'set-annotation-status'; id: string; status: FdnAnnotation['status'] }
+  | { op: 'remove-annotation'; id: string }
+  | { op: 'replace-document'; doc: FdnDocument }
+
+/** Read-side structural diff, lifted to document vocabulary (SPEC §6). */
+export type SemanticOp =
+  | { op: 'insert-node'; id: NodeId; parent: NodeId | null; index: number; tag: string }
+  | { op: 'remove-node'; id: NodeId }
+  | { op: 'move-node'; id: NodeId; parent: NodeId | null; index: number }
+  | { op: 'set-attr'; id: NodeId; key: string; value: string | null }
+  | { op: 'set-style'; id: NodeId; prop: string; value: string | null; state?: StateStyleKey }
+  | { op: 'set-text'; id: NodeId; text: string }
+  | { op: 'set-style-ref'; id: NodeId; styleRef: string | null }
+  | { op: 'set-when'; id: NodeId; when: string | null }
+  | { op: 'section-changed'; section: 'tokens' | 'componentSets' | 'tokenCollections' | 'params' | 'data' | 'lookups' | 'states' | 'viewports' | 'matrix' | 'namedStyles' | 'components' | 'meta' | 'annotations'; name: string }
+
+export type AnchorRef = string
+
+// ——— bake output (Q10: derived artifact, never truth) ———
+
+export interface BakeResult {
+  /** Fully resolved HTML for one state — browser-ready, engine-generated. */
+  html: string
+  /** The resolved node tree (interpolations applied, components instantiated,
+   *  named styles inlined, when/each evaluated). */
+  tree: FdnNode[]
+  state: string | null
+  report: ConformanceReport
+}
+
+export interface BoardRef {
+  artboardId: string | null
+  state: string | null
+  viewport: string | null
+}
+
+export interface BoardView extends BoardRef {
+  pageId: string | null
+  name: string
+  x: number
+  y: number
+  width: number
+  height: number
+  visible: boolean
+  overflow: 'clip' | 'visible'
+  sizeOverride: boolean
+}
+
+export interface ArtboardPage {
+  id: string
+  name: string
+  artboardIds: string[]
+}
+
+export type ArtboardOp =
+  | { op: 'create-page'; id: string; name: string; beforeId: string | null }
+  | { op: 'rename-page'; id: string; name: string }
+  | { op: 'reorder-page'; id: string; beforeId: string | null }
+  | { op: 'duplicate-page'; id: string; newId: string; name: string; idMap: Record<string, string> }
+  | { op: 'delete-page'; id: string }
+  | { op: 'create-artboard'; id: string; pageId: string; name: string; x: number; y: number; width: number; height: number; beforeId: string | null; overflow?: 'clip' | 'visible' }
+  | { op: 'rename-artboard'; id: string; name: string }
+  | { op: 'move-artboard'; id: string; x: number; y: number }
+  | { op: 'resize-artboard'; id: string; width: number; height: number }
+  | { op: 'move-artboard-view'; id: string; artboardId: string; state: string | null; viewport: string | null; x: number; y: number }
+  | { op: 'set-artboard-view-visible'; id: string; artboardId: string; state: string | null; viewport: string | null; visible: boolean }
+  | { op: 'set-artboard-view-size'; id: string; artboardId: string; state: string | null; viewport: string | null; width: number | null; height: number | null }
+  | { op: 'separate-artboard-view'; id: string; artboardId: string; state: string | null; viewport: string; width: number; height: number; expectedViewport: { width: number; height: number }; restoreViewport: { width: number; height: number } }
+  | { op: 'rename-viewport' | 'rename-state'; name: string; newName: string }
+  | { op: 'resize-viewport'; name: string; width: number; height: number }
+  | { op: 'duplicate-artboard'; id: string; newId: string; pageId: string; name: string; x: number; y: number; beforeId: string | null; idMap: Record<string, string> }
+  | { op: 'reorder-artboard'; id: string; pageId: string; beforeId: string | null }
+  | { op: 'delete-artboard'; id: string }
+  | { op: 'upgrade-artboards'; pageId: string; artboardId: string; name: string; width: number; height: number; placements: Array<{ id: string; state: string | null; viewport: string | null; x: number; y: number }> }

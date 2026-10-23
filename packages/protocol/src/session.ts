@@ -1,8 +1,9 @@
+import type { ArtboardOp, BoardRef, BoardView, ArtboardPage } from './document.ts'
 import type { ChainLogEntry, EnvelopeRecord, FdnDocument, ComponentSwapTarget, InstanceDetachReport, InstanceSwapReport, InstanceOverridePatch, PatchOp, ReportLine } from './document.ts'
 
 export type { EnvelopeRecord, FdnDocument, FdnNode, PatchOp, ReportLine } from './document.ts'
 
-export const SESSION_PROTOCOL = '0.1'
+export const SESSION_PROTOCOL = '0.2'
 
 export interface History {
   canUndo: boolean
@@ -22,6 +23,8 @@ export interface DocumentView {
   head: EnvelopeRecord | null
   history: History
   issues: ReportLine[]
+  pages: ArtboardPage[]
+  boards: BoardView[]
 }
 
 export type HorizontalConstraint = 'left' | 'right' | 'left-right' | 'center' | 'scale'
@@ -56,11 +59,11 @@ export type ComponentOp =
   | { op: 'reset-instance-override'; id: string; target: string[] }
   | { op: 'reset-instance-overrides'; id: string }
 
-export type SessionOp = PatchOp | PlacementOp | TokenModeOp | ComponentOp
+export type SessionOp = PatchOp | PlacementOp | TokenModeOp | ComponentOp | ArtboardOp
 
 export type ClientMessage =
   | { t: 'hello'; protocol: string; client: string; author: string; earlyResult?: boolean }
-  | { t: 'view'; states: Array<string | null>; components: boolean; bakeDiffs?: boolean }
+  | { t: 'view'; boards: BoardRef[]; components: boolean; bakeDiffs?: boolean }
   | { t: 'commit'; id: string; base: number; ops: SessionOp[]; label: string }
   | { t: 'preview-instance-swap'; id: string; op: Extract<ComponentOp, { op: 'swap-instance' | 'set-instance-variant' }> }
   | { t: 'anchor'; id: string; name: string }
@@ -71,8 +74,8 @@ export type ClientMessage =
 export type ServiceMessage =
   | ({ t: 'welcome'; protocol: string; path: string; docId: string | null; chain: boolean; created: boolean } & DocumentView)
   | ({ t: 'doc'; cause: Cause } & DocumentView)
-  | { t: 'baked'; rev: number; state: string | null; html: string; report: ReportLine[] }
-  | { t: 'baked-diff'; rev: number; state: string | null; baseRev: number; start: number; deleteCount: number; insert: string; report: ReportLine[] }
+  | ({ t: 'baked'; rev: number; html: string; report: ReportLine[] } & BoardView)
+  | ({ t: 'baked-diff'; rev: number; baseRev: number; start: number; deleteCount: number; insert: string; report: ReportLine[] } & BoardView)
   | { t: 'component'; rev: number; name: string; html: string; report: ReportLine[] }
   | { t: 'instance-swap-preview'; id: string; rev: number; report: InstanceSwapReport }
   | { t: 'result'; id: string; ok: true; rev: number; componentSwaps?: InstanceSwapReport[]; componentDetaches?: InstanceDetachReport[] }
@@ -144,6 +147,8 @@ const isAnnotationStatus = oneOf(['open', 'resolved', 'wontfix'])
 const isAnnotation = shape({
   id: isString,
   nodeId: optional(isString),
+  artboardId: optional(isString),
+  viewport: optional(isString),
   x: optional(isNumber),
   y: optional(isNumber),
   state: optional(isString),
@@ -172,6 +177,7 @@ const isDocument = shape({
 })
 
 const PATCH_OPS: Record<PatchOp['op'], Check> = {
+  'set-spec-version': shape({ specVersion: isString }),
   'set-title': shape({ title: nullable(isString) }),
   'insert-node': shape({ parent: nullable(isString), index: isInteger, node: isNode }),
   'remove-node': shape({ id: isString }),
@@ -245,11 +251,39 @@ const COMPONENT_OPS: Record<ComponentOp['op'], Check> = {
 const isComponentOp: Check = (value) => isRecord(value) && typeof value.op === 'string' && Object.hasOwn(COMPONENT_OPS, value.op) && COMPONENT_OPS[value.op as ComponentOp['op']](value)
 const isTokenModeOp: Check = (value) => isRecord(value) && typeof value.op === 'string' && Object.hasOwn(TOKEN_MODE_OPS, value.op) && TOKEN_MODE_OPS[value.op as TokenModeOp['op']](value)
 
+const isBoardRef = shape({ artboardId: nullable(isString), state: nullable(isString), viewport: nullable(isString) })
+const isBoardView = (value: unknown) => isBoardRef(value) && shape({ pageId: nullable(isString), name: isString, x: isNumber, y: isNumber, width: isNumber, height: isNumber, visible: isBoolean, overflow: oneOf(['clip', 'visible']), sizeOverride: isBoolean })(value)
+const placementFields = { id: isString, artboardId: isString, state: nullable(isString), viewport: nullable(isString) }
+const sizeFields = { width: isNumber, height: isNumber }
+const ARTBOARD_OPS: Record<ArtboardOp['op'], Check> = {
+  'create-page': shape({ id: isString, name: isString, beforeId: nullable(isString) }),
+  'rename-page': shape({ id: isString, name: isString }),
+  'reorder-page': shape({ id: isString, beforeId: nullable(isString) }),
+  'duplicate-page': shape({ id: isString, newId: isString, name: isString, idMap: isStringMap }),
+  'delete-page': shape({ id: isString }),
+  'create-artboard': shape({ id: isString, pageId: isString, name: isString, x: isNumber, y: isNumber, ...sizeFields, beforeId: nullable(isString), overflow: optional(oneOf(['clip', 'visible'])) }),
+  'rename-artboard': shape({ id: isString, name: isString }),
+  'move-artboard': shape({ id: isString, x: isNumber, y: isNumber }),
+  'resize-artboard': shape({ id: isString, ...sizeFields }),
+  'move-artboard-view': shape({ ...placementFields, x: isNumber, y: isNumber }),
+  'set-artboard-view-visible': shape({ ...placementFields, visible: isBoolean }),
+  'set-artboard-view-size': shape({ ...placementFields, width: nullable(isNumber), height: nullable(isNumber) }),
+  'separate-artboard-view': shape({ ...placementFields, viewport: isString, ...sizeFields, expectedViewport: shape(sizeFields), restoreViewport: shape(sizeFields) }),
+  'resize-viewport': shape({ name: isString, ...sizeFields }),
+  'rename-viewport': shape({ name: isString, newName: isString }),
+  'rename-state': shape({ name: isString, newName: isString }),
+  'duplicate-artboard': shape({ id: isString, newId: isString, pageId: isString, name: isString, x: isNumber, y: isNumber, beforeId: nullable(isString), idMap: isStringMap }),
+  'reorder-artboard': shape({ id: isString, pageId: isString, beforeId: nullable(isString) }),
+  'delete-artboard': shape({ id: isString }),
+  'upgrade-artboards': shape({ pageId: isString, artboardId: isString, name: isString, ...sizeFields, placements: arrayOf(shape({ id: isString, state: nullable(isString), viewport: nullable(isString), x: isNumber, y: isNumber })) }),
+}
+const isArtboardOp: Check = (value) => isRecord(value) && typeof value.op === 'string' && Object.hasOwn(ARTBOARD_OPS, value.op) && ARTBOARD_OPS[value.op as ArtboardOp['op']](value)
+
 const CLIENT_MESSAGES: Record<ClientMessage['t'], Check> = {
   hello: shape({ protocol: isString, client: isString, author: isString, earlyResult: optional(isBoolean) }),
-  view: shape({ states: arrayOf(nullable(isString)), components: isBoolean, bakeDiffs: optional(isBoolean) }),
+  view: shape({ boards: arrayOf(isBoardRef), components: isBoolean, bakeDiffs: optional(isBoolean) }),
   'preview-instance-swap': shape({ id: isString, op: (value) => isRecord(value) && ['swap-instance', 'set-instance-variant'].includes(String(value.op)) && isComponentOp(value) }),
-  commit: shape({ id: isString, base: isCount, ops: arrayOf((value) => isPatchOp(value) || isPlacementOp(value) || isTokenModeOp(value) || isComponentOp(value)), label: isString }),
+  commit: shape({ id: isString, base: isCount, ops: arrayOf((value) => isPatchOp(value) || isPlacementOp(value) || isTokenModeOp(value) || isComponentOp(value) || isArtboardOp(value)), label: isString }),
   anchor: shape({ id: isString, name: isString }),
   undo: shape({ id: isString }),
   redo: shape({ id: isString }),
@@ -264,6 +298,8 @@ const isLogEntry: Check = (value) => isEnvelope(value) && shape({
   time: optional(shape({ kind: oneOf(['logical']), value: isNumber })),
   wallTime: optional(nullable(isString)),
   nodeIds: optional(arrayOf(isString)),
+  artboardIds: optional(arrayOf(isString)),
+  pageIds: optional(arrayOf(isString)),
   nodes: optional(shape({ inserted: arrayOf(isString), removed: arrayOf(isString), changed: arrayOf(isString) })),
   sections: optional(arrayOf(shape({ section: oneOf(['tokens', 'tokenCollections', 'componentSets', 'params', 'data', 'lookups', 'states', 'viewports', 'matrix', 'namedStyles', 'components', 'annotations', 'meta']), names: arrayOf(isString) }))),
   factsComplete: optional(isBoolean),
@@ -276,13 +312,13 @@ const isCause: Check = (value) => {
   if (value.kind === 'external') return value.author === null || isString(value.author)
   return oneOf(['commit', 'undo', 'redo'])(value.kind) && isString(value.id) && isString(value.author)
 }
-const isView = shape({ rev: isCount, doc: isDocument, head: nullable(isEnvelope), history: isHistory, issues: isReport })
+const isView = shape({ rev: isCount, doc: isDocument, head: nullable(isEnvelope), history: isHistory, issues: isReport, pages: arrayOf(shape({ id: isString, name: isString, artboardIds: arrayOf(isString) })), boards: arrayOf(isBoardView) })
 
 const SERVICE_MESSAGES: Record<ServiceMessage['t'], Check> = {
   welcome: (value) => isView(value) && shape({ protocol: isString, path: isString, docId: nullable(isString), chain: isBoolean, created: isBoolean })(value),
   doc: (value) => isView(value) && shape({ cause: isCause })(value),
-  baked: shape({ rev: isCount, state: nullable(isString), html: isString, report: isReport }),
-  'baked-diff': shape({ rev: isCount, state: nullable(isString), baseRev: isCount, start: isCount, deleteCount: isCount, insert: isString, report: isReport }),
+  baked: (value) => isBoardView(value) && shape({ rev: isCount, state: nullable(isString), html: isString, report: isReport })(value),
+  'baked-diff': (value) => isBoardView(value) && shape({ rev: isCount, state: nullable(isString), baseRev: isCount, start: isCount, deleteCount: isCount, insert: isString, report: isReport })(value),
   component: shape({ rev: isCount, name: isString, html: isString, report: isReport }),
   'instance-swap-preview': shape({ id: isString, rev: isCount, report: shape({ signature: isString, instanceId: isString, scope: arrayOf(isString), component: isString, overrides: arrayOf(isRecord), props: arrayOf(isRecord), fills: arrayOf(isRecord) }) }),
   result: (value) =>
