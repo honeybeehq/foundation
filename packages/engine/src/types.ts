@@ -215,6 +215,30 @@ export interface EnvelopeRecord {
   specVersion: string
 }
 
+export type ChainLogSection = Extract<SemanticOp, { op: 'section-changed' }>['section']
+
+export interface ChainLogEntry extends EnvelopeRecord {
+  cursor: string
+  time: { kind: 'logical'; value: number }
+  wallTime: null
+  nodeIds: NodeId[]
+  nodes: { inserted: NodeId[]; removed: NodeId[]; changed: NodeId[] }
+  sections: Array<{ section: ChainLogSection; names: string[] }>
+  factsComplete: boolean
+}
+
+export interface ChainLogOptions {
+  limit?: number
+  before?: string
+}
+
+export interface ChainLogPage {
+  entries: ChainLogEntry[]
+  nextCursor: string | null
+  latestCursor: string | null
+  hasMore: boolean
+}
+
 /** Write operations — one PatchOp[] batch = one change = one envelope (D2). */
 export type PatchOp =
   | { op: 'insert-node'; parent: NodeId | null; index: number; node: FdnNode }

@@ -184,9 +184,13 @@ async function runChainDiff(positionals: string[], io: CliIO): Promise<number> {
   return 0
 }
 
-async function runChainLogVerify(file: string, subcommand: string, io: CliIO): Promise<number> {
+async function runChainLogVerify(file: string, subcommand: string, io: CliIO, flags: Record<string, string | boolean>): Promise<number> {
   const chainPath = chainPathFor(file)
   if (!existsSync(chainPath)) {
+    if (subcommand === 'log' && flags.json) {
+      io.stdout(JSON.stringify({ entries: [], nextCursor: null, latestCursor: null, hasMore: false }))
+      return 0
+    }
     io.stdout(`${file}: no chain yet (${chainPath} not found) — this document is plain text so far`)
     return 0
   }
@@ -202,6 +206,22 @@ async function runChainLogVerify(file: string, subcommand: string, io: CliIO): P
   const chain = loadChain(bytes)
 
   if (subcommand === 'log') {
+    if (flags.json) {
+      try {
+        for (const flag of ['limit', 'before']) {
+          if (flags[flag] === true) throw new Error(`--${flag} requires a value`)
+        }
+        const limit = flagString(flags, 'limit')
+        io.stdout(JSON.stringify(chain.logPage({
+          ...(limit !== undefined ? { limit: Number(limit) } : {}),
+          before: flagString(flags, 'before'),
+        })))
+        return 0
+      } catch (err) {
+        io.stderr(err instanceof Error ? err.message : String(err))
+        return 2
+      }
+    }
     const entries = chain.log()
     if (entries.length === 0) {
       io.stdout(`${chainPath}: empty chain`)
@@ -408,5 +428,5 @@ export async function runChain(args: string[], io: CliIO): Promise<number> {
     io.stderr(`usage: foundation chain <file> log|verify (got "${subcommand}")`)
     return 2
   }
-  return runChainLogVerify(file, subcommand, io)
+  return runChainLogVerify(file, subcommand, io, flags)
 }

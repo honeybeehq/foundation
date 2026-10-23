@@ -169,7 +169,13 @@ class DesignSession implements Session {
       case 'redo':
         return this.step(message.id, 'redo')
       case 'log':
-        return this.options.send({ t: 'log', id: message.id, entries: this.chain ? this.chain.log().reverse().slice(0, message.limit) : [] })
+        this.syncAndAnnounce()
+        try {
+          const page = this.chain?.logPage(message) ?? { entries: [], nextCursor: null, latestCursor: null, hasMore: false }
+          return this.options.send({ t: 'log', id: message.id, ...page })
+        } catch (err) {
+          return this.reject(message.id, { code: 'invalid-op', message: err instanceof Error ? err.message : String(err) })
+        }
     }
   }
 

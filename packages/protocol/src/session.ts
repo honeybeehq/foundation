@@ -1,4 +1,4 @@
-import type { EnvelopeRecord, FdnDocument, PatchOp, ReportLine } from './document.ts'
+import type { ChainLogEntry, EnvelopeRecord, FdnDocument, PatchOp, ReportLine } from './document.ts'
 
 export type { EnvelopeRecord, FdnDocument, FdnNode, PatchOp, ReportLine } from './document.ts'
 
@@ -54,7 +54,7 @@ export type ClientMessage =
   | { t: 'commit'; id: string; base: number; ops: SessionOp[]; label: string }
   | { t: 'undo'; id: string }
   | { t: 'redo'; id: string }
-  | { t: 'log'; id: string; limit: number }
+  | { t: 'log'; id: string; limit: number; before?: string }
 
 export type ServiceMessage =
   | ({ t: 'welcome'; protocol: string; path: string; docId: string | null; chain: boolean; created: boolean } & DocumentView)
@@ -63,7 +63,7 @@ export type ServiceMessage =
   | { t: 'component'; rev: number; name: string; html: string; report: ReportLine[] }
   | { t: 'result'; id: string; ok: true; rev: number }
   | { t: 'result'; id: string; ok: false; code: ResultCode; message: string }
-  | { t: 'log'; id: string; entries: EnvelopeRecord[] }
+  | { t: 'log'; id: string; entries: Array<EnvelopeRecord & Partial<Omit<ChainLogEntry, keyof EnvelopeRecord>>>; nextCursor?: string | null; latestCursor?: string | null; hasMore?: boolean }
   | { t: 'fault'; code: FaultCode; message: string }
 
 export const RESULT_CODES = ['unknown-node', 'duplicate-id', 'invalid-op', 'nothing-to-undo', 'nothing-to-redo', 'conflict', 'write-failed'] as const
@@ -212,10 +212,19 @@ const CLIENT_MESSAGES: Record<ClientMessage['t'], Check> = {
   commit: shape({ id: isString, base: isCount, ops: arrayOf((value) => isPatchOp(value) || isPlacementOp(value) || isTokenModeOp(value)), label: isString }),
   undo: shape({ id: isString }),
   redo: shape({ id: isString }),
-  log: shape({ id: isString, limit: isCount }),
+  log: shape({ id: isString, limit: isCount, before: optional(isString) }),
 }
 
 const isEnvelope = shape({ hash: isString, prevHash: nullable(isString), author: isString, message: isString, specVersion: isString })
+const isLogEntry: Check = (value) => isEnvelope(value) && shape({
+  cursor: optional(isString),
+  time: optional(shape({ kind: oneOf(['logical']), value: isNumber })),
+  wallTime: optional(oneOf([null])),
+  nodeIds: optional(arrayOf(isString)),
+  nodes: optional(shape({ inserted: arrayOf(isString), removed: arrayOf(isString), changed: arrayOf(isString) })),
+  sections: optional(arrayOf(shape({ section: oneOf(['tokens', 'params', 'data', 'lookups', 'states', 'viewports', 'matrix', 'namedStyles', 'components', 'annotations', 'meta']), names: arrayOf(isString) }))),
+  factsComplete: optional(isBoolean),
+})(value)
 const isReport = arrayOf(shape({ code: isString, severity: oneOf(['error', 'warning', 'info']), message: isString, nodeId: optional(isString), detail: isAnything }))
 const isHistory = shape({ canUndo: isBoolean, canRedo: isBoolean, undoLabel: nullable(isString), redoLabel: nullable(isString) })
 const isCause: Check = (value) => {
@@ -233,7 +242,7 @@ const SERVICE_MESSAGES: Record<ServiceMessage['t'], Check> = {
   component: shape({ rev: isCount, name: isString, html: isString, report: isReport }),
   result: (value) =>
     isRecord(value) && isString(value.id) && (value.ok === true ? isCount(value.rev) : value.ok === false && oneOf(RESULT_CODES)(value.code) && isString(value.message)),
-  log: shape({ id: isString, entries: arrayOf(isEnvelope) }),
+  log: shape({ id: isString, entries: arrayOf(isLogEntry), nextCursor: optional(nullable(isString)), latestCursor: optional(nullable(isString)), hasMore: optional(isBoolean) }),
   fault: shape({ code: oneOf(FAULT_CODES), message: isString }),
 }
 

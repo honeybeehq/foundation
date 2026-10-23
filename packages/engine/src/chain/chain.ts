@@ -97,6 +97,8 @@ import type { Change, LoroList, LoroTree, LoroTreeNode, PeerID, TreeID } from 'l
 import type {
   AnchorRef,
   ChangeMeta,
+  ChainLogOptions,
+  ChainLogPage,
   EnvelopeRecord,
   FdnAnnotation,
   FdnComponent,
@@ -118,6 +120,7 @@ import { computeEnvelopeHash, decodeEnvelope, encodeEnvelope, type PackedEnvelop
 import { structuralDiff } from './model.js'
 import { applyPatch, diffNodes } from '../patch/index.js'
 import { comparePeerIds, derivePeerId, DeterministicClock, stableStringify } from './util.js'
+import { ChainActivity } from './activity.js'
 import { createHash } from 'node:crypto'
 
 const STATE_KEYS: StateStyleKey[] = ['hover', 'focus', 'active', 'disabled']
@@ -140,6 +143,7 @@ export interface FdnChain {
   undo(meta: ChangeMeta): EnvelopeRecord
   head(): EnvelopeRecord
   log(): EnvelopeRecord[]
+  logPage(opts?: ChainLogOptions): ChainLogPage
   fork(actor: string): FdnChain
   merge(other: FdnChain): void
   save(): Uint8Array
@@ -199,6 +203,7 @@ class LoroChain implements FdnChain {
   private annotations: LoroMap
   private order: LoroMap
 
+  private activity: ChainActivity | undefined
   private clock = new DeterministicClock()
   private idToTree = new Map<NodeId, TreeID>()
   private peerId: number
@@ -326,6 +331,11 @@ class LoroChain implements FdnChain {
 
   log(): EnvelopeRecord[] {
     return this.changes().map((c) => c.envelope)
+  }
+
+  logPage(opts?: ChainLogOptions): ChainLogPage {
+    this.activity ??= new ChainActivity(this.loro)
+    return this.activity.page(opts)
   }
 
   docId(): string | null {
