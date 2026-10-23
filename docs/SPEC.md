@@ -167,6 +167,27 @@ identical document, operations and supplied metadata, the engine remains determi
 An external-file ingest records when the ingest was committed; it does not recover
 the original editor's clock or identity.
 
+**Incremental activity reads (2026-10-23):** the additive session request
+`{t:'activity',id,limit,since?,cursor?}` returns
+`{t:'activity',id,entries,frontier,nextCursor,hasMore}`. A first read with neither
+token establishes the current frontier and returns no history. Later reads use
+`since`; page continuations use `cursor` alone. Positive limits are capped at 200
+envelopes. A drain fixes its target frontier across every page; the reader advances
+its watermark only after the final page. Writes arriving during paging, including
+imports older than the previous head in sort order, belong to the next drain.
+Order is newest-first causal/Lamport order with numeric peer and counter ties,
+not wall-clock order. Facts and envelope fields match the existing log API.
+
+Tokens bind causal frontier points and their envelope hashes to the document.
+Malformed, foreign or unavailable tokens produce an id-bearing `invalid-op`
+result requiring a new baseline, never an empty or truncated substitute. A read
+does not create a chain: an unchained document has empty history, and its first
+later chain is reported from the init envelope onward. Without a document id,
+that empty baseline is local to the running session; chain-backed tokens survive
+restart while their history remains available. Existing log/history APIs are
+unchanged. Activity reads enumerate only uncovered Loro change spans and decode
+at most one page of facts; they do not enumerate or sort covered history.
+
 Why: this gives multiplayer (changes merge), local-first (chains sync lazily and
 offline), audit (every change carries authorship — `agent:<bee>` or `user:<id>`), and
 time-travel diffing ("render anchor 12 vs anchor 9") from one primitive. It is also the

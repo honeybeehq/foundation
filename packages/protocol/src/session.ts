@@ -74,6 +74,7 @@ export type ClientMessage =
   | { t: 'undo'; id: string }
   | { t: 'redo'; id: string }
   | { t: 'log'; id: string; limit: number; before?: string }
+  | { t: 'activity'; id: string; limit: number; since?: string; cursor?: string }
 
 export type LegacyClientMessage = Exclude<ClientMessage, { t: 'view' }> | { t: 'view'; states: Array<string | null>; components: boolean; bakeDiffs?: boolean }
 export type WireClientMessage = ClientMessage | LegacyClientMessage
@@ -88,6 +89,7 @@ export type ServiceMessage =
   | { t: 'result'; id: string; ok: true; rev: number; componentSwaps?: InstanceSwapReport[]; componentDetaches?: InstanceDetachReport[] }
   | { t: 'result'; id: string; ok: false; code: ResultCode; message: string }
   | { t: 'log'; id: string; entries: Array<EnvelopeRecord & Partial<Omit<ChainLogEntry, keyof EnvelopeRecord>>>; nextCursor?: string | null; latestCursor?: string | null; hasMore?: boolean }
+  | { t: 'activity'; id: string; entries: ChainLogEntry[]; frontier: string; nextCursor: string | null; hasMore: boolean }
   | { t: 'fault'; code: FaultCode; message: string }
 
 export type LegacyDocumentView = Omit<DocumentView, 'pages' | 'boards' | 'unavailableBoards'>
@@ -304,6 +306,7 @@ const CLIENT_MESSAGES: Record<ClientMessage['t'], Check> = {
   undo: shape({ id: isString }),
   redo: shape({ id: isString }),
   log: shape({ id: isString, limit: isCount, before: optional(isString) }),
+  activity: shape({ id: isString, limit: isCount, since: optional(isString), cursor: optional(isString) }),
 }
 
 const isEnvelope = shape({ hash: isString, prevHash: nullable(isString), author: isString, message: isString, specVersion: isString })
@@ -320,6 +323,7 @@ const isLogEntry: Check = (value) => isEnvelope(value) && shape({
   sections: optional(arrayOf(shape({ section: oneOf(['tokens', 'tokenCollections', 'componentSets', 'params', 'data', 'lookups', 'states', 'viewports', 'matrix', 'namedStyles', 'components', 'annotations', 'meta']), names: arrayOf(isString) }))),
   factsComplete: optional(isBoolean),
 })(value)
+const isActivityEntry: Check = (value) => isLogEntry(value) && isRecord(value) && ['cursor', 'anchors', 'time', 'wallTime', 'nodeIds', 'nodes', 'sections', 'factsComplete'].every(key => value[key] !== undefined)
 const isReport = arrayOf(shape({ code: isString, severity: oneOf(['error', 'warning', 'info']), message: isString, nodeId: optional(isString), detail: isAnything }))
 const isHistory = shape({ canUndo: isBoolean, canRedo: isBoolean, undoLabel: nullable(isString), redoLabel: nullable(isString) })
 const isCause: Check = (value) => {
@@ -340,6 +344,7 @@ const SERVICE_MESSAGES: Record<ServiceMessage['t'], Check> = {
   result: (value) =>
     isRecord(value) && isString(value.id) && (value.ok === true ? isCount(value.rev) : value.ok === false && oneOf(RESULT_CODES)(value.code) && isString(value.message)),
   log: shape({ id: isString, entries: arrayOf(isLogEntry), nextCursor: optional(nullable(isString)), latestCursor: optional(nullable(isString)), hasMore: optional(isBoolean) }),
+  activity: shape({ id: isString, entries: arrayOf(isActivityEntry), frontier: isString, nextCursor: nullable(isString), hasMore: isBoolean }),
   fault: shape({ code: oneOf(FAULT_CODES), message: isString }),
 }
 

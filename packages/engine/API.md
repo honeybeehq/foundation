@@ -52,12 +52,28 @@ interface FdnChain {
   undo(meta: ChangeMeta): EnvelopeRecord                     // inverse-append
   head(): EnvelopeRecord
   log(): EnvelopeRecord[]
+  logPage(opts?: ChainLogOptions): ChainLogPage
+  activityPage(opts?: ChainActivityOptions): ChainActivityPage
   fork(actor: string): FdnChain
   merge(other: FdnChain): void
   save(): Uint8Array
   verify(): { ok: boolean; brokenAt?: string }               // envelope hash chain
 }
 ```
+
+`activityPage({ limit?, since?, cursor? })` establishes a baseline with no entries
+when neither token is supplied. Subsequent reads use `since` with the last fully
+drained frontier; continuations use `cursor` alone. Positive limits default to 200
+and are capped at 200. The result contains `entries: ChainLogEntry[]`,
+`frontier: string`, `nextCursor: string | null` and `hasMore: boolean`.
+Every page in a drain has the same captured target frontier; advance `since` only
+when `hasMore` is false. Entries are newest-first in causal Lamport order with
+numeric peer/counter ties, including late imports behind the former head.
+
+Tokens are opaque, document-bound causal frontiers with envelope-hash checks.
+Malformed, foreign or unavailable frontiers throw an error requiring a new
+baseline. `emptyActivityPage(docId)` provides an empty-history baseline without
+creating a chain. The normal `log()` and `logPage()` APIs retain their semantics.
 
 ## Wave 2 signatures
 

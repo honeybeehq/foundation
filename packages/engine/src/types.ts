@@ -296,6 +296,19 @@ export interface ChainLogPage {
   hasMore: boolean
 }
 
+export interface ChainActivityOptions {
+  limit?: number
+  since?: string
+  cursor?: string
+}
+
+export interface ChainActivityPage {
+  entries: ChainLogEntry[]
+  frontier: string
+  nextCursor: string | null
+  hasMore: boolean
+}
+
 /** Write operations — one PatchOp[] batch = one change = one envelope (D2). */
 export type PatchOp =
   | { op: 'set-spec-version'; specVersion: string }

@@ -14,6 +14,7 @@ import {
   bakeEditorDocument,
   createChain,
   diffPatch,
+  emptyActivityPage,
   indexNodes,
   loadChain,
   normalizeDocument,
@@ -79,6 +80,8 @@ class DesignSession implements Session {
   private earlyResult = false
   private actor = `session:${randomUUID()}`
   private chain: FdnChain | null = null
+  private readonly activityIdentity = randomUUID()
+  private emptyActivityFrontier: { token: string; docId: string | null } | null = null
   private preparedChain: { text: string; actor: string; docId: string; finish: ReturnType<typeof prepareChain> } | null = null
   private doc!: FdnDocument
   private docText = ''
@@ -251,6 +254,23 @@ class DesignSession implements Session {
         return this.step(message.id, 'undo')
       case 'redo':
         return this.step(message.id, 'redo')
+      case 'activity':
+        this.syncAndAnnounce()
+        try {
+          if (message.since !== undefined && message.cursor !== undefined) throw new Error('activity accepts since or cursor, not both')
+          if (!Number.isSafeInteger(message.limit) || message.limit < 1) throw new Error('activity limit must be a positive integer')
+          if (!this.chain) {
+            const page = emptyActivityPage(this.docId ?? this.activityIdentity)
+            if (message.cursor !== undefined || (message.since !== undefined && message.since !== page.frontier)) throw new Error('invalid or stale activity token; establish a new baseline')
+            this.emptyActivityFrontier = { token: page.frontier, docId: this.docId }
+            return this.emit({ t: 'activity', id: message.id, ...page })
+          }
+          const baseline = this.emptyActivityFrontier
+          const since = baseline && message.since === baseline.token && (baseline.docId === null || baseline.docId === this.chain.docId()) ? emptyActivityPage(this.chain.docId()).frontier : message.since
+          return this.emit({ t: 'activity', id: message.id, ...this.chain.activityPage({ ...message, since }) })
+        } catch (err) {
+          return this.reject(message.id, { code: 'invalid-op', message: err instanceof Error ? err.message : String(err) })
+        }
       case 'log':
         this.syncAndAnnounce()
         try {

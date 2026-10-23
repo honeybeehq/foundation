@@ -91,6 +91,8 @@ import type { Change, LoroList, LoroTree, LoroTreeNode, PeerID, TreeID } from 'l
 import type {
   AnchorRef,
   ChangeMeta,
+  ChainActivityOptions,
+  ChainActivityPage,
   ChainLogOptions,
   ChainLogPage,
   EnvelopeRecord,
@@ -142,6 +144,7 @@ export interface FdnChain {
   head(): EnvelopeRecord
   log(): EnvelopeRecord[]
   logPage(opts?: ChainLogOptions): ChainLogPage
+  activityPage(opts?: ChainActivityOptions): ChainActivityPage
   fork(actor: string): FdnChain
   merge(other: FdnChain): void
   save(): Uint8Array
@@ -405,8 +408,13 @@ class LoroChain implements FdnChain {
   }
 
   logPage(opts?: ChainLogOptions): ChainLogPage {
-    this.activity ??= new ChainActivity(this.loro)
+    this.activity ??= new ChainActivity(this.loro, () => this.docId())
     return this.activity.page(opts, this.anchors)
+  }
+
+  activityPage(opts?: ChainActivityOptions): ChainActivityPage {
+    this.activity ??= new ChainActivity(this.loro, () => this.docId())
+    return this.activity.read(opts, this.anchors)
   }
 
   docId(): string | null {
