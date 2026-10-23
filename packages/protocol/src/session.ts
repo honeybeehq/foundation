@@ -25,6 +25,7 @@ export interface DocumentView {
   issues: ReportLine[]
   pages: ArtboardPage[]
   boards: BoardView[]
+  unavailableBoards?: BoardRef[]
 }
 
 export type HorizontalConstraint = 'left' | 'right' | 'left-right' | 'center' | 'scale'
@@ -312,7 +313,7 @@ const isCause: Check = (value) => {
   if (value.kind === 'external') return value.author === null || isString(value.author)
   return oneOf(['commit', 'undo', 'redo'])(value.kind) && isString(value.id) && isString(value.author)
 }
-const isView = shape({ rev: isCount, doc: isDocument, head: nullable(isEnvelope), history: isHistory, issues: isReport, pages: arrayOf(shape({ id: isString, name: isString, artboardIds: arrayOf(isString) })), boards: arrayOf(isBoardView) })
+const isView = shape({ rev: isCount, doc: isDocument, head: nullable(isEnvelope), history: isHistory, issues: isReport, pages: arrayOf(shape({ id: isString, name: isString, artboardIds: arrayOf(isString) })), boards: arrayOf(isBoardView), unavailableBoards: optional(arrayOf(isBoardRef)) })
 
 const SERVICE_MESSAGES: Record<ServiceMessage['t'], Check> = {
   welcome: (value) => isView(value) && shape({ protocol: isString, path: isString, docId: nullable(isString), chain: isBoolean, created: isBoolean })(value),

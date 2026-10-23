@@ -1,4 +1,4 @@
-import { ArtboardError, artboardPages, boardViews, boardView, boardKey, validateArtboards } from 'foundation-engine'
+import { ArtboardError, explicitArtboards, artboardPages, boardViews, boardView, boardKey, validateArtboards } from 'foundation-engine'
 import type { BoardRef } from 'foundation-engine'
 import { bakeImpact, mergeBakeImpact, type BakeImpact } from './bake-impact.js'
 import { PlacementError } from './placement.js'
@@ -130,6 +130,7 @@ class DesignSession implements Session {
         this.pendingHello = setTimeout(() => { this.pendingHello = null; this.receive(line) }, 25)
         return
       }
+      if (err instanceof Error && err.message.includes('unsupported-format-version') && this.phase === 'waiting') return this.fault('unreadable', err.message, 1)
       this.log(`internal error: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`)
       if ('id' in message) return this.reject(message.id, { code: 'write-failed', message: err instanceof Error ? err.message : String(err) })
       this.fault('internal', err instanceof Error ? err.message : String(err), this.phase === 'waiting' ? 1 : null)
@@ -222,6 +223,7 @@ class DesignSession implements Session {
         this.view = { boards: [...new Map(message.boards.map(ref => [boardKey(ref), ref])).values()], components: message.components, bakeDiffs: message.bakeDiffs === true }
         this.sentBakes.clear()
         this.stateBakes.clear()
+        if (this.unavailableBoards().length) this.emit({ t: 'doc', cause: { kind: 'open' }, ...this.documentView() })
         return this.sendBakes()
       case 'preview-instance-swap': {
         this.syncAndAnnounce()
@@ -348,6 +350,16 @@ class DesignSession implements Session {
   }
 
   private setDoc(doc: FdnDocument): void {
+    if (this.doc && explicitArtboards(this.doc) !== explicitArtboards(doc)) {
+      const entering = explicitArtboards(doc)
+      const ids = artboardPages(entering ? doc : this.doc).flatMap(page => page.artboardIds)
+      if (ids.length === 1) {
+        const refs = this.view.boards.map(ref => entering && ref.artboardId === null ? { ...ref, artboardId: ids[0]! } : !entering && ref.artboardId === ids[0] ? { ...ref, artboardId: null } : ref)
+        this.view.boards = [...new Map(refs.map(ref => [boardKey(ref), ref])).values()]
+        this.sentBakes.clear()
+        this.stateBakes.clear()
+      }
+    }
     this.doc = doc
     this.docText = canonicalText(doc)
     if (this.preparedChain && (this.chain || this.preparedChain.text !== this.docText)) this.preparedChain = null
@@ -408,7 +420,13 @@ class DesignSession implements Session {
     if (text !== null && text !== this.diskText) {
       const previousText = this.diskText
       const wasBlocked = this.invalidExternalTokens
-      const parsed = parseDocument(text)
+      let parsed: ReturnType<typeof parseDocument>
+      try { parsed = parseDocument(text) } catch (err) {
+        this.diskText = text
+        this.diskTextCanonical = null
+        this.blockExternal(err)
+        return author
+      }
       const incoming = parsed.doc
       const incomingCanonical = canonicalText(incoming)
       const baseCanonical = this.diskTextCanonical
@@ -509,12 +527,6 @@ class DesignSession implements Session {
     if (failure) return this.reject(message.id, failure)
     this.undoStack.push(undoStep(label, patch.inverse, before, this.doc, patch.applied, history))
     this.redoStack = []
-    const upgrade = message.ops.find(op => op.op === 'upgrade-artboards')
-    if (upgrade?.op === 'upgrade-artboards') {
-      this.view.boards = this.view.boards.map(ref => ref.artboardId === null ? { ...ref, artboardId: upgrade.artboardId } : ref)
-      this.sentBakes.clear()
-      this.stateBakes.clear()
-    }
     this.accept(message.id, { kind: 'commit', id: message.id, author: this.author }, bakeImpact(this.doc, patch.applied, before), componentSwaps, componentDetaches)
   }
 
@@ -623,6 +635,10 @@ class DesignSession implements Session {
     this.sendBakes(impact)
   }
 
+  private unavailableBoards(): BoardRef[] {
+    return this.view.boards.filter(ref => { try { boardView(this.doc, ref); return false } catch { return true } })
+  }
+
   private documentView(): DocumentView {
     const top = (stack: UndoStep[]): string | null => stack.at(-1)?.label ?? null
     return {
@@ -633,6 +649,7 @@ class DesignSession implements Session {
       issues: this.issues,
       pages: artboardPages(this.doc),
       boards: boardViews(this.doc),
+      unavailableBoards: this.unavailableBoards(),
     }
   }
 

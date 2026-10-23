@@ -92,10 +92,14 @@ export function boardView(doc: FdnDocument, ref: BoardRef): BoardView {
   const board = page?.children.find(board => board.id === ref.artboardId)
   if (!board) throw new Error(`unknown-artboard: ${ref.artboardId}`)
   const record = board.children.find(node => node.tag === 'fdn-artboard-view' && viewRef(node).state === ref.state && viewRef(node).viewport === ref.viewport)
-  const refs = [{ state: null, viewport: null }, ...generatedRefs(doc)].filter((item, i, all) => all.findIndex(other => other.state === item.state && other.viewport === item.viewport) === i)
+  const refs = [{ state: null, viewport: null }, ...generatedRefs(doc), ...board.children.filter(child => child.tag === 'fdn-artboard-view').map(viewRef)].filter((item, i, all) => all.findIndex(other => other.state === item.state && other.viewport === item.viewport) === i)
   const offset = Math.max(0, refs.findIndex(item => item.state === ref.state && item.viewport === ref.viewport))
   const sizeOverride = record !== undefined && attr(record, 'width') !== undefined
-  return { ...ref, pageId: page!.id, name: attr(board, 'name') ?? board.id, x: record && attr(record, 'x') !== undefined ? number(record, 'x') : number(board, 'x') + offset * (number(board, 'width') + 120), y: record && attr(record, 'y') !== undefined ? number(record, 'y') : number(board, 'y'), width: sizeOverride ? number(record!, 'width') : viewport?.width ?? number(board, 'width'), height: sizeOverride ? number(record!, 'height') : viewport?.height ?? number(board, 'height'), visible: attr(record ?? board, 'visible') !== 'false', overflow: attr(board, 'overflow') === 'clip' ? 'clip' : 'visible', sizeOverride }
+  const xOffset = refs.slice(0, offset).reduce((sum, ref) => {
+    const priorRecord = board.children.find(child => child.tag === 'fdn-artboard-view' && viewRef(child).state === ref.state && viewRef(child).viewport === ref.viewport)
+    return sum + (priorRecord && attr(priorRecord, 'width') !== undefined ? number(priorRecord, 'width') : doc.viewports.find(viewport => viewport.name === ref.viewport)?.width ?? number(board, 'width')) + 120
+  }, 0)
+  return { ...ref, pageId: page!.id, name: attr(board, 'name') ?? board.id, x: record && attr(record, 'x') !== undefined ? number(record, 'x') : number(board, 'x') + xOffset, y: record && attr(record, 'y') !== undefined ? number(record, 'y') : number(board, 'y'), width: sizeOverride ? number(record!, 'width') : viewport?.width ?? number(board, 'width'), height: sizeOverride ? number(record!, 'height') : viewport?.height ?? number(board, 'height'), visible: attr(record ?? board, 'visible') !== 'false', overflow: attr(board, 'overflow') === 'clip' ? 'clip' : 'visible', sizeOverride }
 }
 
 export function boardViews(doc: FdnDocument): BoardView[] {
@@ -161,10 +165,22 @@ export function expandArtboardOp(doc: FdnDocument, op: ArtboardOp): PatchOp[] {
   if (op.op === 'upgrade-artboards') {
     if (explicitArtboards(doc)) fail('document already has explicit artboards')
     name(op.name); size(op.width, op.height)
-    const native = op.placements.find(canonical) ?? op.placements[0]
+    const legacyViews = boardViews(doc)
+    const takenIds = new Set([...index.keys(), op.pageId, op.artboardId, ...op.placements.map(ref => ref.id)])
+    let serial = 0
+    const freshId = (): string => { let id: string; do { id = `${op.artboardId}-view-${++serial}` } while (takenIds.has(id)); takenIds.add(id); return id }
+    const supplied = new Map(op.placements.map(ref => [boardKey({ artboardId: op.artboardId, state: ref.state, viewport: ref.viewport }), ref]))
+    if (supplied.size !== op.placements.length) fail('upgrade placements must have unique state/viewport tuples')
+    const complete = new Map(legacyViews.map(ref => {
+      const key = boardKey({ artboardId: op.artboardId, state: ref.state, viewport: ref.viewport })
+      return [key, supplied.get(key) ?? { id: freshId(), state: ref.state, viewport: ref.viewport, x: ref.x, y: ref.y }]
+    }))
+    for (const [key, ref] of supplied) complete.set(key, ref)
+    const placementsInput = [...complete.values()]
+    const native = placementsInput.find(canonical) ?? { x: legacyViews[0]?.x ?? 0, y: Math.max(0, ...legacyViews.map(ref => ref.y + ref.height)) + 120 }
     const page = emptyNode(op.pageId, 'fdn-page', { 'data-fdn-name': 'Page 1' })
     const board = emptyNode(op.artboardId, 'fdn-artboard', { 'data-fdn-name': op.name, 'data-fdn-x': String(native?.x ?? 0), 'data-fdn-y': String(native?.y ?? 0), 'data-fdn-width': String(op.width), 'data-fdn-height': String(op.height), 'data-fdn-overflow': 'visible' })
-    const placements = op.placements.filter(ref => !canonical(ref)).map(ref => emptyNode(ref.id, 'fdn-artboard-view', { ...(ref.state === null ? {} : { 'data-fdn-view-state': ref.state }), ...(ref.viewport === null ? {} : { 'data-fdn-view-viewport': ref.viewport }), 'data-fdn-x': String(ref.x), 'data-fdn-y': String(ref.y) }))
+    const placements = placementsInput.filter(ref => !canonical(ref)).map(ref => emptyNode(ref.id, 'fdn-artboard-view', { ...(ref.state === null ? {} : { 'data-fdn-view-state': ref.state }), ...(ref.viewport === null ? {} : { 'data-fdn-view-viewport': ref.viewport }), 'data-fdn-x': String(ref.x), 'data-fdn-y': String(ref.y) }))
     const ops: PatchOp[] = [{ op: 'set-spec-version', specVersion: ARTBOARD_VERSION }, { op: 'insert-node', parent: null, index: doc.body.length, node: page }, { op: 'insert-node', parent: page.id, index: 0, node: board }]
     doc.body.forEach((child, i) => ops.push({ op: 'move-node', id: child.id, parent: board.id, index: i }))
     placements.forEach((view, i) => ops.push({ op: 'insert-node', parent: board.id, index: doc.body.length + i, node: view }))
@@ -239,7 +255,7 @@ export function expandArtboardOp(doc: FdnDocument, op: ArtboardOp): PatchOp[] {
         child.id = mapping[child.id]!
         for (const [key, value] of Object.entries(child.attrs)) {
           if (key === 'id') child.attrs[key] = replacements.get(value)!
-          else if (refs.has(key)) child.attrs[key] = key.includes('href') ? value.startsWith('#') && replacements.has(value.slice(1)) ? `#${replacements.get(value.slice(1))}` : value : value.split(' ').map(part => mapping[part] ?? replacements.get(part) ?? part).join(' ')
+          else if (refs.has(key)) child.attrs[key] = key.includes('href') ? value.startsWith('#') && replacements.has(value.slice(1)) ? `#${replacements.get(value.slice(1))}` : value : value.split(' ').map(part => key === 'data-fdn-anchor-ref' ? mapping[part] ?? part : replacements.get(part) ?? part).join(' ')
           else if (value.includes('url(#')) fail(`cannot safely duplicate reference in ${key}`)
         }
         if ([...Object.values(child.style), ...Object.values(child.styleStates).flatMap(plane => Object.values(plane ?? {}))].some(value => /url\(\s*['"]?#/.test(value))) fail('cannot safely duplicate CSS fragment references')
@@ -258,6 +274,11 @@ export function expandArtboardOp(doc: FdnDocument, op: ArtboardOp): PatchOp[] {
   if (op.op === 'move-artboard-view' || op.op === 'set-artboard-view-visible' || op.op === 'set-artboard-view-size' || op.op === 'separate-artboard-view') {
     if (op.op === 'set-artboard-view-size' && canonical(op)) fail('resize the canonical artboard with resize-artboard')
     if (op.op === 'move-artboard-view' && canonical(op)) fail('move the canonical artboard with move-artboard')
+    if (op.op === 'set-artboard-view-size' && op.width === null && op.height === null) {
+      boardView(doc, op)
+      const board = node(op.artboardId, 'fdn-artboard')
+      if (!board.children.some(child => child.tag === 'fdn-artboard-view' && viewRef(child).state === op.state && viewRef(child).viewport === op.viewport)) return []
+    }
     const target = record(op)
     if (op.op === 'move-artboard-view') return [...target.ops, set(target.id, 'x', op.x), set(target.id, 'y', op.y)]
     if (op.op === 'set-artboard-view-visible') return [...target.ops, set(target.id, 'visible', op.visible)]

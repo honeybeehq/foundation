@@ -241,8 +241,10 @@ Welcome/doc messages carry `pages` and `boards`; all baked/baked-diff messages
 carry the complete `BoardView` descriptor. Diff offsets remain UTF-16 and bases
 are tracked independently per tuple. Geometry-only edits update doc descriptors
 without content bakes. Missing subscriptions are removed from bake caches without faulting; the doc
-board inventory tells clients which previews were removed. Accepted legacy
-upgrade rekeys existing subscriptions to the new artboard until resubscription.
+board inventory tells clients which previews were removed. All legacy/explicit transitions (including peer sync and Undo/Redo) rekey
+subscriptions when the explicit side has exactly one artboard, deduplicating
+the result. `unavailableBoards` in doc snapshots explicitly lists genuinely
+missing subscribed tuples; requesting missing views returns a current snapshot.
 
 `ArtboardOp` in the vendored document types defines page/artboard CRUD,
 identity-anchored reorder, duplicate ID maps, preview placement/visibility/size,
