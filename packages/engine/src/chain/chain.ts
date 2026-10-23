@@ -651,6 +651,13 @@ class LoroChain implements FdnChain {
         this.setKeyed('lookups', this.lookups, op.lookup.name, op.lookup, op.index)
         break
       }
+      case 'set-lookup-entry': {
+        const lookup = JSON.parse(this.lookups.get(op.name) as string) as FdnDocument['lookups'][number]
+        if (op.value === null) delete lookup.entries[op.key]
+        else lookup.entries = { ...lookup.entries, [op.key]: op.value }
+        this.setKeyed('lookups', this.lookups, op.name, lookup)
+        break
+      }
       case 'remove-lookup': {
         this.removeKeyed('lookups', this.lookups, op.name)
         break

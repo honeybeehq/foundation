@@ -5,6 +5,7 @@ import { validateTokenCollections } from '../tokens/index.js'
 import type { FdnDocument, FdnNode, NodeId, PatchOp, StateStyleKey } from '../types.js'
 import { indexNodes, invertOp, type NodeLocation } from '../chain/model.js'
 import { stableStringify } from '../chain/util.js'
+import { stateStyleLookup, validateStateStyles } from '../state-styles.js'
 
 export type PatchErrorCode = 'unknown-node' | 'duplicate-id' | 'invalid-op'
 
@@ -25,7 +26,7 @@ class PatchFailure extends Error {
   }
 }
 
-export function applyPatch(doc: FdnDocument, ops: PatchOp[], opts?: { lenient?: boolean; validateTokens?: boolean; validateComponents?: boolean }): PatchResult {
+export function applyPatch(doc: FdnDocument, ops: PatchOp[], opts?: { lenient?: boolean; validateTokens?: boolean; validateComponents?: boolean; validateStateStyles?: boolean }): PatchResult {
   const lenient = opts?.lenient ?? false
   let working = structuredClone(doc)
   const applied: PatchOp[] = []
@@ -56,6 +57,14 @@ export function applyPatch(doc: FdnDocument, ops: PatchOp[], opts?: { lenient?: 
     const prior = new Set([...validateComponentSets(doc), ...validateInstanceOverrides(doc).filter((item) => item.severity === 'error')].map(componentIssueKey))
     const issue = [...validateComponentSets(working), ...validateInstanceOverrides(working).filter((item) => item.severity === 'error')].find((item) => !prior.has(componentIssueKey(item)))
     if (issue) return { ok: false, error: { code: 'invalid-op', message: issue.message } }
+  }
+  if (opts?.validateStateStyles !== false) {
+    const issues = validateStateStyles(working)
+    if (issues.length) {
+      const prior = new Set(validateStateStyles(doc).map(issue => stableStringify(issue)))
+      const issue = issues.find(issue => !prior.has(stableStringify(issue)))
+      if (issue) return { ok: false, error: { code: 'invalid-op', message: issue.message } }
+    }
   }
   const inverse: PatchOp[] = fallback ? [{ op: 'replace-document', doc: structuredClone(doc) }] : inverses.reverse()
   return { ok: true, doc: working, applied, inverse }
@@ -126,11 +135,16 @@ function checkOp(op: PatchOp, doc: FdnDocument, index: Map<NodeId, NodeLocation>
       requireNode(index, op.id)
       if (op.key === '') throw new PatchFailure('invalid-op', 'set-attr needs a non-empty key')
       return op
-    case 'set-style':
-      requireNode(index, op.id)
+    case 'set-style': {
+      const node = requireNode(index, op.id).node
       if (op.prop === '') throw new PatchFailure('invalid-op', 'set-style needs a non-empty prop')
       if (op.state !== undefined && !STATE_KEYS.includes(op.state)) throw new PatchFailure('invalid-op', `unknown style state "${op.state}"`)
+      const named = node.styleRef ? doc.namedStyles.find(style => style.name === node.styleRef) : undefined
+      const own = (op.state ? node.styleStates[op.state] : node.style)?.[op.prop]
+      const value = own ?? (op.state ? named?.styleStates[op.state] : named?.style)?.[op.prop]
+      if (op.value !== value && (op.value !== null || own !== undefined) && stateStyleLookup(value) && op.replaceBinding !== true) throw new PatchFailure('invalid-op', `"${op.prop}" has a state binding; edit its lookup entry or explicitly replaceBinding`)
       return op
+    }
     case 'set-style-ref':
     case 'set-text':
     case 'set-when':
@@ -138,6 +152,9 @@ function checkOp(op: PatchOp, doc: FdnDocument, index: Map<NodeId, NodeLocation>
       return op
     case 'set-token':
       if (op.name === '') throw new PatchFailure('invalid-op', 'set-token needs a non-empty name')
+      return op
+    case 'set-lookup-entry':
+      if (!doc.lookups.some(table => table.name === op.name)) throw new PatchFailure('invalid-op', `lookup "${op.name}" is not declared`)
       return op
     case 'set-component-set': {
       const items = doc.componentSets ?? []
@@ -186,6 +203,7 @@ function checkOp(op: PatchOp, doc: FdnDocument, index: Map<NodeId, NodeLocation>
       return op
     case 'set-lookup':
     case 'set-component': {
+      if (op.op === 'set-lookup' && op.createOnly === true && doc.lookups.some(table => table.name === op.lookup.name)) throw new PatchFailure('invalid-op', `lookup "${op.lookup.name}" already exists; choose another name or edit the bound table`)
       const items = op.op === 'set-lookup' ? doc.lookups : doc.components
       const name = op.op === 'set-lookup' ? op.lookup.name : op.component.name
       if (name === '') throw new PatchFailure('invalid-op', `${op.op} needs a non-empty name`)
@@ -306,6 +324,12 @@ function applyOp(doc: FdnDocument, op: PatchOp, index: Map<NodeId, NodeLocation>
     case 'set-lookup':
       doc.lookups = upsertByName(doc.lookups, op.lookup, op.index)
       return doc
+    case 'set-lookup-entry': {
+      const table = doc.lookups.find(table => table.name === op.name)!
+      if (op.value === null) delete table.entries[op.key]
+      else table.entries = { ...table.entries, [op.key]: op.value }
+      return doc
+    }
     case 'remove-lookup':
       doc.lookups = doc.lookups.filter((lookup) => lookup.name !== op.name)
       return doc
@@ -359,6 +383,14 @@ export function diffPatch(original: FdnDocument, target: FdnDocument): PatchOp[]
   if (from.title !== to.title) ops.push({ op: 'set-title', title: to.title ?? null })
   if (!diffNamed('params', from.params, to.params, (param) => ({ op: 'set-param', param }), (name) => ({ op: 'remove-param', name }), ops)) return null
   if (!diffNamed('lookups', from.lookups, to.lookups, (lookup) => ({ op: 'set-lookup', lookup }), (name) => ({ op: 'remove-lookup', name }), ops)) return null
+  for (const [position, op] of [...ops.entries()].reverse()) if (op.op === 'set-lookup') {
+    const previous = from.lookups.find(table => table.name === op.lookup.name)
+    if (previous) {
+      const entries: PatchOp[] = []
+      diffRecord(previous.entries, op.lookup.entries, (key, value) => entries.push({ op: 'set-lookup-entry', name: op.lookup.name, key, value }))
+      ops.splice(position, 1, ...entries)
+    }
+  }
   if (!diffNamed('states', from.states, to.states, (state) => ({ op: 'set-state', state }), (name) => ({ op: 'remove-state', name }), ops)) return null
   if (!diffNamed('namedStyles', from.namedStyles, to.namedStyles, (style) => ({ op: 'set-named-style', style }), (name) => ({ op: 'remove-named-style', name }), ops)) return null
   if (!diffNamed('components', from.components, to.components, (component) => ({ op: 'set-component', component }), (name) => ({ op: 'remove-component', name }), ops)) return null
@@ -368,7 +400,7 @@ export function diffPatch(original: FdnDocument, target: FdnDocument): PatchOp[]
   if (!sameJson(from.matrix, to.matrix)) ops.push({ op: 'set-matrix', cells: to.matrix })
   if (!diffNamed('componentSets', from.componentSets ?? [], to.componentSets ?? [], (componentSet) => ({ op: 'set-component-set', componentSet }), (name) => ({ op: 'remove-component-set', name }), ops)) return null
   diffRecord(from.tokens, to.tokens, (name, value) => ops.push({ op: 'set-token', name, value }))
-  ops.push(...diffNodes(from.body, to.body))
+  ops.push(...diffNodes(from.body, to.body, [...from.namedStyles, ...to.namedStyles]))
   const beforeAnnotations = new Map(from.annotations.map((a) => [a.id, a]))
   const afterIds = new Set(to.annotations.map((a) => a.id))
   for (const annotation of to.annotations) {
@@ -404,14 +436,14 @@ function diffNamed<T extends { name: string }>(
 
 function diffRecord(from: Record<string, string>, to: Record<string, string>, emit: (key: string, value: string | null) => void): void {
   for (const [key, value] of Object.entries(to)) if (from[key] !== value) emit(key, value)
-  for (const key of Object.keys(from)) if (!(key in to)) emit(key, null)
+  for (const key of Object.keys(from)) if (!Object.hasOwn(to, key)) emit(key, null)
 }
 
 function needsReplacement(a: FdnNode, b: FdnNode): boolean {
   return a.tag !== b.tag || a.each !== b.each || (a.text !== undefined && b.text === undefined)
 }
 
-export function diffNodes(from: FdnNode[], to: FdnNode[]): PatchOp[] {
+export function diffNodes(from: FdnNode[], to: FdnNode[], styles: FdnDocument['namedStyles'] = []): PatchOp[] {
   const ops: PatchOp[] = []
   const before = indexNodes(from)
   const after = indexNodes(to)
@@ -449,7 +481,7 @@ export function diffNodes(from: FdnNode[], to: FdnNode[]): PatchOp[] {
           siblings.splice(index, 0, node.id)
           parentOf.set(node.id, parent)
         }
-        diffNode((before.get(node.id) as NodeLocation).node, node, ops)
+        diffNode((before.get(node.id) as NodeLocation).node, node, ops, styles)
         place(node.children, node.id)
         return
       }
@@ -467,12 +499,13 @@ export function diffNodes(from: FdnNode[], to: FdnNode[]): PatchOp[] {
   return ops
 }
 
-function diffNode(a: FdnNode, b: FdnNode, ops: PatchOp[]): void {
+function diffNode(a: FdnNode, b: FdnNode, ops: PatchOp[], styles: FdnDocument['namedStyles']): void {
   const id = b.id
+  const replacesBinding = (prop: string, state?: StateStyleKey): boolean => Boolean(stateStyleLookup((state ? a.styleStates[state] : a.style)?.[prop]) || styles.some(style => (style.name === a.styleRef || style.name === b.styleRef) && stateStyleLookup((state ? style.styleStates[state] : style.style)?.[prop])))
   diffRecord(a.attrs, b.attrs, (key, value) => ops.push({ op: 'set-attr', id, key, value }))
-  diffRecord(a.style, b.style, (prop, value) => ops.push({ op: 'set-style', id, prop, value }))
+  diffRecord(a.style, b.style, (prop, value) => ops.push({ op: 'set-style', id, prop, value, ...(replacesBinding(prop) ? { replaceBinding: true } : {}) }))
   for (const state of STATE_KEYS) {
-    diffRecord(a.styleStates[state] ?? {}, b.styleStates[state] ?? {}, (prop, value) => ops.push({ op: 'set-style', id, prop, value, state }))
+    diffRecord(a.styleStates[state] ?? {}, b.styleStates[state] ?? {}, (prop, value) => ops.push({ op: 'set-style', id, prop, value, state, ...(replacesBinding(prop, state) ? { replaceBinding: true } : {}) }))
   }
   if (b.text !== undefined && a.text !== b.text) ops.push({ op: 'set-text', id, text: b.text })
   if ((a.styleRef ?? null) !== (b.styleRef ?? null)) ops.push({ op: 'set-style-ref', id, styleRef: b.styleRef ?? null })

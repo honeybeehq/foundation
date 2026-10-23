@@ -961,6 +961,70 @@ it preserves the current position or appends a new declaration. These verbs use
 the ordinary one-batch/one-undo protocol, never a whole-document inverse. Component
 prop declarations use `set-component`; instance prop bindings use `set-attr`.
 
+### Per-document-state style values
+
+A style value can use `{{ section-2a-height[state.name] }}` with an ordinary
+`fdn-lookup`. `state.name` is the requested document-state name, or the empty
+string for the overview and component masters. Undeclared requested states keep
+the unknown-state error and use the requested name. The binding follows native
+components, variants, slots and iteration. `state` is read-only and cannot be an
+iteration alias; only its `name` field is defined. Lookup names are a separate
+namespace, so `state[param.key]` remains unambiguous. Lookup identifiers admit
+letters/underscore first, then letters, digits, underscores and hyphens.
+
+A state-indexed lookup must declare an empty-key entry as its authored default.
+Exact state entries win. A missing named entry uses that default and reports
+`lookup-default-used` as a warning; other lookup expressions retain exact-key
+semantics. Missing tables/defaults report errors and omit the unresolved style
+declaration, including named-style and interaction planes. Other expression
+errors retain their existing bake behavior. Values are CSS strings
+and do not recursively evaluate expressions. Projection retains the expressions
+and tables. T81's state scopes still gate content before evaluation.
+
+`set-lookup-entry {name,key,value}` edits one entry in an existing table. Null
+removes that key; identical writes and absent removals are no-ops. Undo restores
+only the prior entry, preserving a peer's other entries. Table creation remains
+`set-lookup`; its Undo is refused atomically if another writer changed the new
+table. A binding-only Undo leaves the table intact. Redo refuses a peer's
+same-name replacement. There is no automatic table cleanup. Updated writers on
+one file serialize entry updates; offline forks still merge whole serialized
+lookup values, without an entry-level merge guarantee.
+
+Creating a private table uses `set-lookup {lookup,createOnly:true}`. It refuses an
+occupied name under the transaction lock, including a collision after a stale
+client selected its name. Omitting the flag retains deliberate whole-table
+replacement. Editors reuse a table only when this property already binds it.
+
+`set-style` accepts `replaceBinding?:boolean`. Replacing a direct state binding
+with any different value, including null, needs explicit replacement intent.
+An own literal overriding an inherited state binding from the referenced named
+style also needs that intent; an absent-own-property reset is a no-op.
+Generated placement/move/resize writes do not supply that intent
+and refuse destructive replacement. Inverses automatically carry the flag when
+needed. Deliberate text edits generate flagged replacements; changes to entries
+of an existing lookup generate entry operations. Final-batch validation refuses
+new missing-table/default errors. Intermediate operations may temporarily break
+those references. Adding states uses the authored default rather than rewriting
+every table. An invalid external document is preserved for repair.
+
+Editors should use readable deterministic names such as `section-2a-height`,
+with numeric suffixes on collision, never overwriting an occupied table unless
+the property already binds it. Names stay fixed when a layer is renamed. A
+duplicated layer's shared binding must be shown and copied before its first
+divergent edit. Free conversion measures each current state and the overview,
+retains fractional values, and batches creation, binding and layout edits.
+Missing/stale measurements or differing geometry across relevant viewports must
+be refused: these tables are keyed by state, not viewport. Commit base semantics
+do not provide a measurement compare-and-swap.
+
+Document states remain independent of variant axes and token modes. Interaction
+style planes and the existing cascade are unchanged. Instance placement styles
+may bind state lookups; definition-layer override records stay literal. Detach
+freezes node-own expressions in the chosen state and keeps its dynamic-named-style
+refusal. Lookup edits conservatively rebake all subscribed states and masters.
+The entry op and replacement flag are additive protocol fields; envelope shapes
+and the protocol version are unchanged.
+
 ### Document declarations and matrix edits
 
 Session commits accept `set-param {param,index?}`, `remove-param {name}`,

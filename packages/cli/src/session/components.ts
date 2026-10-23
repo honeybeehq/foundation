@@ -22,7 +22,7 @@ export function expandComponentOp(doc: FdnDocument, op: ComponentOp, reports: In
     }
   }
   if (!scopes.length) return ops
-  const patch = applyPatch(doc, ops, { validateTokens: false, validateComponents: false })
+  const patch = applyPatch(doc, ops, { validateTokens: false, validateComponents: false, validateStateStyles: false })
   if (!patch.ok) throw new Error(patch.error.message)
   let after = indexNodes(patch.doc.body).get(op.id)!.node
   const retargets: PatchOp[] = []
@@ -33,7 +33,7 @@ export function expandComponentOp(doc: FdnDocument, op: ComponentOp, reports: In
     reports.push(plan.report)
     retargets.push(...plan.ops)
     if (plan.ops.length) {
-      const changed = applyPatch({ ...doc, body: [after] }, plan.ops, { validateTokens: false, validateComponents: false })
+      const changed = applyPatch({ ...doc, body: [after] }, plan.ops, { validateTokens: false, validateComponents: false, validateStateStyles: false })
       if (!changed.ok) throw new Error(changed.error.message)
       after = changed.doc.body[0]!
     }

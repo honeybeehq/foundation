@@ -498,16 +498,19 @@ function evalValueNode(node: ValueNode, ctx: ExprContext, nodeId?: NodeId): { va
     return { value: r.value, reports: [] }
   }
   if (node.kind === 'lookup') {
+    const stateLookup = node.ref.length === 2 && node.ref[0] === 'state' && node.ref[1] === 'name'
     const lookup = ctx.lookups.find((l) => l.name === node.name)
     if (!lookup) {
-      return { value: '', reports: [makeReport('undeclared-lookup', `lookup table '${node.name}' is not declared`, nodeId)] }
+      return { value: '', reports: [{ ...makeReport('undeclared-lookup', `lookup table '${node.name}' is not declared`, nodeId), ...(stateLookup ? { severity: 'error' as const } : {}) }] }
     }
     const keyRes = resolveRef(node.ref, ctx)
     if (!keyRes.ok) {
       return { value: '', reports: [makeReport('unknown-ref', `unknown reference '${refLabel(node.ref)}' used as lookup key`, nodeId)] }
     }
     const key = stringifyValue(keyRes.value)
+    if (stateLookup && !Object.hasOwn(lookup.entries, '')) return { value: '', reports: [{ code: 'lookup-default-missing', severity: 'error', message: `state lookup '${node.name}' needs an authored empty-key default`, nodeId }] }
     if (!Object.prototype.hasOwnProperty.call(lookup.entries, key)) {
+      if (stateLookup) return { value: lookup.entries[''], reports: [{ code: 'lookup-default-used', severity: 'warning', message: `lookup '${node.name}' uses its authored default for state '${key}'`, nodeId }] }
       return { value: '', reports: [makeReport('lookup-key-miss', `lookup '${node.name}' has no entry for key '${key}'`, nodeId)] }
     }
     return { value: lookup.entries[key], reports: [] }

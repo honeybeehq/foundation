@@ -19,6 +19,7 @@ import {
   stableStringify,
   validateDocument,
   validateTokenCollections,
+  validateStateStyles,
 } from 'foundation-engine'
 import type { EnvelopeRecord, FdnChain, FdnDocument, InstanceDetachReport, InstanceSwapReport, PatchOp, ReportLine } from 'foundation-engine'
 import { parseClientMessage, SESSION_PROTOCOL } from 'foundation-protocol'
@@ -299,7 +300,7 @@ class DesignSession implements Session {
     this.diskTextCanonical = canonicalText(incoming)
     this.diskChain = chainBytes
     this.docId = this.chain?.docId() ?? readDocIdAttr(text)
-    const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json' || ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code)) ?? validateTokenCollections(incoming)[0]
+    const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json' || ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code)) ?? validateTokenCollections(incoming)[0] ?? validateStateStyles(incoming)[0]
     if (issue) {
       this.invalidExternalTokens = `external metadata is invalid; source preserved and commits blocked until repaired: ${issue.message}`
       this.setDoc(this.chain ? this.chain.doc() : normalizeDocument(incoming))
@@ -410,7 +411,7 @@ class DesignSession implements Session {
       const baseCanonical = this.diskTextCanonical
       this.diskText = text
       this.diskTextCanonical = incomingCanonical
-      const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json' || ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code)) ?? validateTokenCollections(incoming)[0]
+      const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json' || ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code)) ?? validateTokenCollections(incoming)[0] ?? validateStateStyles(incoming)[0]
       if (issue) {
         const message = `external metadata is invalid; source preserved and commits blocked until repaired: ${issue.message}`
         if (this.invalidExternalTokens !== message) this.fault('unreadable', message, null)
@@ -479,7 +480,7 @@ class DesignSession implements Session {
       for (const op of message.ops) {
         const expanded = op.op === 'replace-document' ? diffPatch(target, op.doc) : [op]
         if (expanded === null) throw new Error('edit cannot be expressed as granular changes')
-        const checked = applyPatch(target, expandSessionOps(target, expanded, componentSwaps, componentDetaches), { validateComponents: message.ops.length === 1 })
+        const checked = applyPatch(target, expandSessionOps(target, expanded, componentSwaps, componentDetaches), { validateComponents: message.ops.length === 1, validateStateStyles: message.ops.length === 1 })
         if (!checked.ok) throw new PlacementError(checked.error.code, checked.error.message)
         primitive.push(...checked.applied)
         singlePatch = checked

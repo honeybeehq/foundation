@@ -788,7 +788,7 @@ function parseLookups(fdnDoc: ElementNode): FdnLookup[] {
     const entries: Record<string, string> = {}
     for (const entryEl of directChildrenByTag(lookupEl, 'fdn-entry')) {
       const a = attrsOf(entryEl)
-      if (a.key !== undefined && a.value !== undefined) entries[a.key] = a.value
+      if (a.key !== undefined && a.value !== undefined) Object.defineProperty(entries, a.key, { value: a.value, enumerable: true, writable: true, configurable: true })
     }
     out.push({ name, entries })
   }

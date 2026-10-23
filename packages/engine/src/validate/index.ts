@@ -1,4 +1,5 @@
 import { validateInstanceOverrides } from '../components/overrides.js'
+import { validateStateStyles } from '../state-styles.js'
 import { validateStyleDeclarations } from './styles.js'
 /**
  * foundation-engine — validate: FdnDocument -> ValidationResult.
@@ -54,7 +55,7 @@ function checkDeclarations(ctx: ValidateCtx, decls: Record<string, string>, opts
 // ——————————————————————————————————————————————————————————————————————————
 
 function refRootLegal(ctx: ValidateCtx, root: string, scope: Scope): boolean {
-  if (root === 'param' || root === 'item') return true
+  if (root === 'param' || root === 'item' || root === 'state') return true
   if (root === 'prop') return scope.props !== null
   if (scope.aliases.has(root)) return true
   return false
@@ -479,6 +480,7 @@ export function validateDocument(doc: FdnDocument): ValidationResult {
   for (const node of doc.body) walkNode(ctx, node, topScope, false)
 
   ctx.issues.push(...validateTokenCollections(doc))
+  ctx.issues.push(...validateStateStyles(doc))
   const valid = !ctx.issues.some((i) => i.severity === 'error')
   return { valid, issues: ctx.issues }
 }

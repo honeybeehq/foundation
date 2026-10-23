@@ -95,7 +95,7 @@ export function expandPlacement(doc: FdnDocument, ops: Array<PatchOp | Placement
       expanded.push(...batch)
       break
     }
-    const patch = applyPatch(working, batch, { validateTokens: false, validateComponents: false })
+    const patch = applyPatch(working, batch, { validateTokens: false, validateComponents: false, validateStateStyles: false })
     if (!patch.ok) throw new PlacementError(patch.error.code, patch.error.message)
     working = patch.doc
     expanded.push(...patch.applied)

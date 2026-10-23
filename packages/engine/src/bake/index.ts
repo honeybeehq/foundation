@@ -218,7 +218,7 @@ function bakeTree(doc: FdnDocument, stateName: string | null, editor: boolean, m
     doc,
     selectedState: stateName,
     ...(materialization ? { materialization } : {}),
-    bindings: { prop: {}, param: params },
+    bindings: { prop: {}, param: params, state: { name: stateName ?? '' } },
     lookups: doc.lookups,
     componentStack: [],
     instancePath: [],
@@ -376,6 +376,10 @@ function bakeEach(node: FdnNode, ctx: BakeCtx): FdnNode[] {
   const spec = parseEachSpec(node.each as string)
   if (!spec) {
     pushReport(ctx, { code: 'expr-parse-error', severity: 'error', message: `malformed each="${node.each}" (expected "<name> in <ref>")`, nodeId: node.id })
+    return []
+  }
+  if (spec.binding === 'state') {
+    pushReport(ctx, { code: 'reserved-state-binding', severity: 'error', message: 'state is read-only; choose another each alias', nodeId: node.id })
     return []
   }
   const items = resolveEachSource(spec.source, node, ctx)
@@ -551,6 +555,7 @@ function resolveNodeStyle(node: FdnNode, ctx: BakeCtx): ResolvedStyle {
   const style = mapStyleValues(mergedRaw, (prop, raw) => {
     const { value, reports } = interpolateString(raw, ctx, node.id)
     ctx.reports.push(...reports)
+    if (/\bstate\s*\.\s*name\b/.test(raw) && reports.some(report => report.severity === 'error')) return undefined
     auditStyleValue(prop, value, ctx, node.id)
     return value
   })
@@ -568,10 +573,12 @@ function resolveNodeStyle(node: FdnNode, ctx: BakeCtx): ResolvedStyle {
     const resolved = mapStyleValues(merged, (propName, raw) => {
       const { value, reports } = interpolateString(raw, ctx, node.id)
       ctx.reports.push(...reports)
+      if (/\bstate\s*\.\s*name\b/.test(raw) && reports.some(report => report.severity === 'error')) return undefined
       parts.push(`${propName}:${value}`)
       auditStyleValue(propName, value, ctx, node.id)
       return value
     })
+    if (!Object.keys(resolved).length) continue
     styleStates[key] = resolved
     attrs[`style-${key}`] = parts.join(';')
   }
@@ -875,7 +882,7 @@ function instantiateComponent(node: FdnNode, ctx: BakeCtx): FdnNode[] {
   const innerCtx: BakeCtx = {
     ...ctx,
     ...(nestedMaterialization ? { materialization: nestedMaterialization, preserveSourceIds: false } : {}),
-    bindings: { prop: propsTyped, param: ctx.bindings['param'] ?? {} },
+    bindings: { prop: propsTyped, param: ctx.bindings['param'] ?? {}, state: ctx.bindings['state'] ?? { name: ctx.selectedState ?? '' } },
     componentStack: [...ctx.componentStack, componentName],
     instancePath: [...ctx.instancePath, node.id],
     componentOverrides: prepared,

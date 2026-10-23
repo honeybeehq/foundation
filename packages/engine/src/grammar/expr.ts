@@ -41,8 +41,8 @@ export interface LookupRef {
 }
 
 const INTERPOLATION_RE = /\{\{\s*([\s\S]*?)\s*\}\}/g
-const REF_RE = /([A-Za-z_][A-Za-z0-9_]*)((?:\.[A-Za-z_][A-Za-z0-9_]*)+)/g
-const LOOKUP_RE = /([A-Za-z_][A-Za-z0-9_]*)\[\s*([^\]]+?)\s*\]/g
+const REF_RE = /([A-Za-z_][A-Za-z0-9_-]*)((?:\s*\.\s*[A-Za-z_][A-Za-z0-9_-]*)+)/g
+const LOOKUP_RE = /([A-Za-z_][A-Za-z0-9_-]*)\s*\[\s*([^\]]+?)\s*\]/g
 
 /** Extract the inner expression text of every `{{ … }}` span in `text`. */
 export function extractInterpolations(text: string): string[] {
@@ -66,7 +66,7 @@ export function extractRefs(expr: string): Ref[] {
     const root = m[1]
     const rest = m[2]
     if (root === undefined || rest === undefined) continue
-    const path = rest.split('.').filter(Boolean)
+    const path = rest.split('.').map(part => part.trim()).filter(Boolean)
     refs.push({ root, path, index: m.index ?? 0 })
   }
   return refs
@@ -88,7 +88,7 @@ export function extractLookupRefs(expr: string): LookupRef[] {
 }
 
 /** The fixed set of ref roots the grammar names literally. */
-export const FIXED_REF_ROOTS = new Set(['prop', 'param', 'item'])
+export const FIXED_REF_ROOTS = new Set(['prop', 'param', 'item', 'state'])
 
 /**
  * Parse a top-level `each="<alias> in <ref-expr>"` binding.

@@ -24,6 +24,7 @@ import type {
   SemanticOp,
   StateStyleKey,
 } from '../types.js'
+import { stateStyleLookup } from '../state-styles.js'
 
 // ——— node location index (shared by undo-inversion and tree diff) ———
 
@@ -94,7 +95,7 @@ export function invertOp(
       if (!loc) return 'fallback'
       const plane = op.state ? loc.node.styleStates[op.state] : loc.node.style
       const prev = plane?.[op.prop] ?? null
-      return { op: 'set-style', id: op.id, prop: op.prop, value: prev, state: op.state }
+      return { op: 'set-style', id: op.id, prop: op.prop, value: prev, state: op.state, ...(stateStyleLookup(prev ?? undefined) || stateStyleLookup(op.value ?? undefined) ? { replaceBinding: true } : {}) }
     }
     case 'set-style-ref': {
       const loc = nodeIndex.get(op.id)
@@ -158,6 +159,12 @@ export function invertOp(
     case 'set-lookup': {
       const prev = beforeDoc.lookups.find((l) => l.name === op.lookup.name)
       return prev ? { op: 'set-lookup', lookup: prev, ...(op.index === undefined ? {} : { index: beforeDoc.lookups.indexOf(prev) }) } : { op: 'remove-lookup', name: op.lookup.name }
+    }
+    case 'set-lookup-entry': {
+      const table = beforeDoc.lookups.find(table => table.name === op.name)
+      if (!table) return null
+      const previous = Object.hasOwn(table.entries, op.key) ? table.entries[op.key]! : null
+      return previous === op.value ? null : { ...op, value: previous }
     }
     case 'remove-lookup': {
       const prev = beforeDoc.lookups.find((l) => l.name === op.name)

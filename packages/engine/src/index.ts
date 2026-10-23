@@ -23,6 +23,7 @@ export { invertOp, indexNodes } from './chain/model.js'
 export { stableStringify } from './chain/util.js'
 
 export { validateTokenCollections } from './tokens/index.js'
+export { stateStyleLookup, validateStateStyles } from './state-styles.js'
 export { planInstanceSwap, assertInstanceAcyclic } from './components/swap.js'
 
 export { detachInstance } from './components/detach.js'

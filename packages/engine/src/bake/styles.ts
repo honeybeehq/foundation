@@ -15,8 +15,11 @@ export function mergeStyles(base: Record<string, string>, own: Record<string, st
   return merged
 }
 
-export function mapStyleValues(style: Record<string, string>, map: (prop: string, value: string) => string): Record<string, string> {
-  const resolved = Object.fromEntries(styleEntries(style).map(([prop, value]) => [prop, map(prop, value)]))
+export function mapStyleValues(style: Record<string, string>, map: (prop: string, value: string) => string | undefined): Record<string, string> {
+  const resolved = Object.fromEntries(styleEntries(style).flatMap(([prop, value]) => {
+    const mapped = map(prop, value)
+    return mapped === undefined ? [] : [[prop, mapped]]
+  }))
   layeredStyles.add(resolved)
   return resolved
 }

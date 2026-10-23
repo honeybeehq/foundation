@@ -18,6 +18,7 @@ export interface UndoStep {
   retargetedOverrides: Set<string>
   selectorTargets: Set<string>
   replacedSubtrees: Map<string, string>
+  createdLookups: Map<string, string>
 }
 
 type PlacementHistory = Pick<UndoStep, 'placements' | 'repeatPlacements' | 'removedFrom' | 'repeatRemovedFrom'>
@@ -91,12 +92,15 @@ export function undoStep(label: string, revert: PatchOp[], before: FdnDocument, 
     const replacement = newIndex.get(op.node.id)
     if (replacement) replacedSubtrees.set(op.node.id, stableStringify(replacement.node))
   }
-  return { label, revert, repeat, created, ...history, expected, repeatExpected, createdOverrides, retargetedOverrides, selectorTargets, replacedSubtrees }
+  const createdLookups = new Map<string, string>()
+  for (const op of repeat) if (op.op === 'set-lookup' && !before.lookups.some(table => table.name === op.lookup.name)) createdLookups.set(op.lookup.name, stableStringify(after.lookups.find(table => table.name === op.lookup.name) ?? null))
+  return { label, revert, repeat, created, ...history, expected, repeatExpected, createdOverrides, retargetedOverrides, selectorTargets, replacedSubtrees, createdLookups }
 }
 
 export function oppositeStep(step: UndoStep, before: FdnDocument, after: FdnDocument): UndoStep {
   const history: PlacementHistory = { placements: step.repeatPlacements, repeatPlacements: step.placements, removedFrom: step.repeatRemovedFrom, repeatRemovedFrom: step.removedFrom }
-  return { ...undoStep(step.label, step.repeat, before, after, step.revert, history), expected: step.repeatExpected, repeatExpected: step.expected, createdOverrides: step.createdOverrides, retargetedOverrides: step.retargetedOverrides, selectorTargets: step.selectorTargets }
+  const createdLookups = new Map([...step.createdLookups.keys()].map(name => [name, stableStringify(after.lookups.find(table => table.name === name) ?? null)]))
+  return { ...undoStep(step.label, step.repeat, before, after, step.revert, history), expected: step.repeatExpected, repeatExpected: step.expected, createdOverrides: step.createdOverrides, retargetedOverrides: step.retargetedOverrides, selectorTargets: step.selectorTargets, createdLookups }
 }
 
 function isSelectorKey(key: string): boolean {
@@ -163,6 +167,7 @@ function rebaseValue(op: PatchOp, expected: PatchOp | null | undefined, current:
 }
 
 export function undoOps(step: UndoStep, doc: FdnDocument): PatchOp[] {
+  for (const [name, expected] of step.createdLookups) if (stableStringify(doc.lookups.find(table => table.name === name) ?? null) !== expected) throw new Error(`created lookup "${name}" changed since this edit`)
   const replacementPlacements = new Map<string, Placement>()
   if (step.replacedSubtrees.size) {
     const index = indexNodes(doc.body)
@@ -179,7 +184,7 @@ export function undoOps(step: UndoStep, doc: FdnDocument): PatchOp[] {
   const out: PatchOp[] = []
   let skippedRetarget = false
   const apply = (op: PatchOp): void => {
-    const patch = applyPatch(current, [op], { validateTokens: false, validateComponents: false })
+    const patch = applyPatch(current, [op], { validateTokens: false, validateComponents: false, validateStateStyles: false })
     if (!patch.ok) throw new Error(patch.error.message)
     current = patch.doc
     out.push(...patch.applied)
