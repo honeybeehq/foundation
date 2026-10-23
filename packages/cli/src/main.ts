@@ -11,6 +11,7 @@
  */
 import { processIo } from './io.js'
 import { runNew } from './commands/new.js'
+import { runCopy } from './commands/copy.js'
 import { runInspect } from './commands/inspect.js'
 import { runValidate } from './commands/validate.js'
 import { runIngest } from './commands/ingest.js'
@@ -31,6 +32,7 @@ import type { CliIO } from './io.js'
 
 const COMMANDS: Record<string, (args: string[], io: CliIO) => Promise<number>> = {
   new: runNew,
+  copy: runCopy,
   inspect: runInspect,
   validate: runValidate,
   ingest: runIngest,
@@ -56,6 +58,7 @@ usage: foundation <command> [args]
 
 commands:
   new <name> [--no-chain]                    write a minimal .fdn.html skeleton (chain-inits it too)
+  copy <src> <dest> [--title T] [--json]      create an independent document with a fresh identity and chain
   inspect <file>                             summarize a document
   validate <file>                            print validation issues
   ingest <file> [--commit [-m msg] [--author A]]   normalize in place, print the report
