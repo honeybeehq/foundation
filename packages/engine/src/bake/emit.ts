@@ -1,3 +1,4 @@
+import { styleEntries } from './styles.js'
 /**
  * Small HTML emitter: resolved FdnNode tree → readable HTML string.
  * Pure, deterministic (sorted attrs/tokens/declarations) — required for the
@@ -42,9 +43,9 @@ function renderNode(node: FdnNode, depth: number): string {
   for (const key of Object.keys(node.attrs).sort()) {
     attrParts.push(`${key}="${escapeAttr(node.attrs[key] as string)}"`)
   }
-  const styleKeys = Object.keys(node.style).sort()
-  if (styleKeys.length > 0) {
-    const styleStr = styleKeys.map((k) => `${k}:${node.style[k]}`).join(';')
+  const declarations = styleEntries(node.style)
+  if (declarations.length > 0) {
+    const styleStr = declarations.map(([key, value]) => `${key}:${value}`).join(';')
     attrParts.push(`style="${escapeAttr(styleStr)}"`)
   }
   const openTag = `<${node.tag}${attrParts.length > 0 ? ' ' + attrParts.join(' ') : ''}>`

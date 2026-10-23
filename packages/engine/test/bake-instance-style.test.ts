@@ -46,7 +46,7 @@ describe('instance styles', () => {
 
   it('merges the instance style, named style and state planes onto the root, instance winning per property', () => {
     expect(normal.html).toContain(
-      '<fdn-use component="Chip" style="display:contents">\n    <span style-hover="background-color:yellow;color:blue" style="color:red;flex-grow:1;padding-top:4px;width:200px">chip</span>\n  </fdn-use>',
+      '<fdn-use component="Chip" style="display:contents">\n    <span style-hover="color:blue;background-color:yellow" style="color:red;padding-top:4px;flex-grow:1;width:200px">chip</span>\n  </fdn-use>',
     )
   })
 
@@ -61,7 +61,7 @@ describe('instance styles', () => {
   })
 
   it('applies to the capsule wrapper of a sealed component', () => {
-    expect(normal.html).toContain('<div class="fdn-capsule-Boxed" style-hover="background-color:yellow;color:blue" style="flex-grow:1;padding-top:4px;width:200px">')
+    expect(normal.html).toContain('<div class="fdn-capsule-Boxed" style-hover="color:blue;background-color:yellow" style="padding-top:4px;flex-grow:1;width:200px">')
   })
 
   it('reports a style that has no element to land on', () => {
@@ -69,13 +69,13 @@ describe('instance styles', () => {
   })
 
   it('passes through a nested instance root to its own root', () => {
-    expect(normal.html).toMatch(/<fdn-use component="Nested" style="display:contents">\s*<fdn-use component="Chip" style="display:contents">\s*<span style-hover="color:green" style="color:red;margin:0px;width:10px">/)
+    expect(normal.html).toMatch(/<fdn-use component="Nested" style="display:contents">\s*<fdn-use component="Chip" style="display:contents">\s*<span style-hover="color:green" style="color:red;width:10px;margin:0px">/)
   })
 
   it('does the same in the editor bake, keeping editor ids', () => {
     expect(editor.html).toContain('<fdn-use component="Chip" data-fdn-component="Chip" data-fdn-id="n1" style="display:contents">')
-    expect(editor.html).toContain('<span data-fdn-id="n1::c1" style-hover="background-color:yellow;color:blue" style="color:red;flex-grow:1;padding-top:4px;width:200px">chip</span>')
-    expect(editor.html).toContain('<div class="fdn-capsule-Boxed" data-fdn-component="Boxed" data-fdn-id="n4" style-hover="background-color:yellow;color:blue" style="flex-grow:1;padding-top:4px;width:200px">')
+    expect(editor.html).toContain('<span data-fdn-id="n1::c1" style-hover="color:blue;background-color:yellow" style="color:red;padding-top:4px;flex-grow:1;width:200px">chip</span>')
+    expect(editor.html).toContain('<div class="fdn-capsule-Boxed" data-fdn-component="Boxed" data-fdn-id="n4" style-hover="color:blue;background-color:yellow" style="padding-top:4px;flex-grow:1;width:200px">')
   })
 })
 

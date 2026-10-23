@@ -1,3 +1,4 @@
+import { mapStyleValues, mergeStyles, styleEntries } from './styles.js'
 /**
  * bakeDocument — template + state → BakeResult (see API.md, src/types.ts).
  *
@@ -511,33 +512,30 @@ function resolveNodeStyle(node: FdnNode, ctx: BakeCtx): ResolvedStyle {
     pushReport(ctx, { code: 'unknown-style-ref', severity: 'warning', message: `named style "${node.styleRef}" is not declared`, nodeId: node.id })
   }
 
-  const mergedRaw: Record<string, string> = { ...(namedStyle?.style ?? {}), ...node.style }
-  const style: Record<string, string> = {}
-  for (const [prop, raw] of Object.entries(mergedRaw)) {
+  const mergedRaw = mergeStyles(namedStyle?.style ?? {}, node.style)
+  const style = mapStyleValues(mergedRaw, (prop, raw) => {
     const { value, reports } = interpolateString(raw, ctx, node.id)
     ctx.reports.push(...reports)
-    style[prop] = value
     auditStyleValue(prop, value, ctx, node.id)
-  }
+    return value
+  })
   if (node.styleRef) attrs['data-fdn-style'] = node.styleRef
 
   const styleStates: Partial<Record<StateStyleKey, Record<string, string>>> = {}
   for (const key of STATE_STYLE_KEYS) {
     const base = namedStyle?.styleStates?.[key] ?? {}
     const own = node.styleStates?.[key] ?? {}
-    const merged: Record<string, string> = { ...base, ...own }
-    const propNames = Object.keys(merged).sort()
+    const merged = mergeStyles(base, own)
+    const propNames = styleEntries(merged).map(([prop]) => prop)
     if (propNames.length === 0) continue
-    const resolved: Record<string, string> = {}
     const parts: string[] = []
-    for (const propName of propNames) {
-      const raw = merged[propName] as string
+    const resolved = mapStyleValues(merged, (propName, raw) => {
       const { value, reports } = interpolateString(raw, ctx, node.id)
       ctx.reports.push(...reports)
-      resolved[propName] = value
       parts.push(`${propName}:${value}`)
       auditStyleValue(propName, value, ctx, node.id)
-    }
+      return value
+    })
     styleStates[key] = resolved
     attrs[`style-${key}`] = parts.join(';')
   }
@@ -671,13 +669,13 @@ function withInstanceStyle(root: FdnNode, instance: InstanceStyle): FdnNode {
   const attrs = { ...root.attrs }
   const styleStates: Partial<Record<StateStyleKey, Record<string, string>>> = { ...root.styleStates }
   for (const key of STATE_STYLE_KEYS) {
-    const merged = { ...(root.styleStates[key] ?? {}), ...(instance.styleStates[key] ?? {}) }
-    const props = Object.keys(merged).sort()
+    const merged = mergeStyles(root.styleStates[key] ?? {}, instance.styleStates[key] ?? {})
+    const props = styleEntries(merged).map(([prop]) => prop)
     if (props.length === 0) continue
     styleStates[key] = merged
     attrs[`style-${key}`] = props.map((prop) => `${prop}:${merged[prop]}`).join(';')
   }
-  return { ...root, attrs, style: { ...root.style, ...instance.style }, styleStates }
+  return { ...root, attrs, style: mergeStyles(root.style, instance.style), styleStates }
 }
 
 function applyInstanceStyle(node: FdnNode, componentName: string, roots: FdnNode[], instance: InstanceStyle, ctx: BakeCtx): FdnNode[] {

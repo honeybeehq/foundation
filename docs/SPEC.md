@@ -559,6 +559,18 @@ under pixelmatch tolerance.
 To fill: exact pinning mechanism, the layout-report schema, capsule hydration rules
 at render time.
 
+Node declarations override their named style in the same style plane, including
+shorthand/longhand conflicts. Bake emits sorted named-style declarations first,
+then sorted node declarations; identical property names retain only the node's
+value. Component instance overrides follow the same rule after the component
+root's resolved declarations. Each interaction-state plane uses this ordering too.
+This is plain CSS declaration ordering, including the browser's usual `!important`
+and invalid-declaration behavior. Canonical document projection remains unchanged;
+only derived HTML declaration order carries the cascade layers. Bake output HTML
+is the rendering artifact; callers must rebake the document rather than clone or
+JSON-round-trip a resolved tree and re-emit it, because the internal emitter keeps
+layer order on the original resolved style records.
+
 ## 6. Diff semantics — *skeleton*
 
 Intent: three diff planes, all first-class engine outputs: **structural** (tree +
