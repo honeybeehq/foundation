@@ -24,10 +24,17 @@ export interface DocumentView {
   issues: ReportLine[]
 }
 
+export type HorizontalConstraint = 'left' | 'right' | 'left-right' | 'center' | 'scale'
+export type VerticalConstraint = 'top' | 'bottom' | 'top-bottom' | 'center' | 'scale'
+export interface FreeBounds { x: number; y: number; width: number; height: number; frameWidth: number; frameHeight: number }
+
 export type PlacementOp =
   | { op: 'set-frame-mode'; id: string; mode: 'free' | 'flow' }
-  | { op: 'set-free-position'; id: string; x: number; y: number }
-  | { op: 'resize-free'; id: string; width: number; height: number }
+  | { op: 'set-free-position'; id: string; x: number; y: number; bounds?: FreeBounds }
+  | { op: 'resize-free'; id: string; width: number; height: number; bounds?: FreeBounds }
+  | { op: 'set-free-rotation'; id: string; degrees: number }
+  | { op: 'set-free-flip'; id: string; x?: boolean; y?: boolean }
+  | { op: 'set-free-constraints'; id: string; h: HorizontalConstraint; v: VerticalConstraint; bounds?: FreeBounds }
   | { op: 'set-placement'; id: string; mode: 'free'; bounds: { x: number; y: number; width: number; height: number } }
   | { op: 'set-placement'; id: string; mode: 'flow' }
 
@@ -174,10 +181,15 @@ const PATCH_OPS: Record<PatchOp['op'], Check> = {
   'replace-document': shape({ doc: isDocument }),
 }
 
+const isFreeBounds = shape({ x: isNumber, y: isNumber, width: isNumber, height: isNumber, frameWidth: isNumber, frameHeight: isNumber })
+
 const PLACEMENT_OPS: Record<PlacementOp['op'], Check> = {
   'set-frame-mode': shape({ id: isString, mode: oneOf(['free', 'flow']) }),
-  'set-free-position': shape({ id: isString, x: isNumber, y: isNumber }),
-  'resize-free': shape({ id: isString, width: isNumber, height: isNumber }),
+  'set-free-position': shape({ id: isString, x: isNumber, y: isNumber, bounds: optional(isFreeBounds) }),
+  'resize-free': shape({ id: isString, width: isNumber, height: isNumber, bounds: optional(isFreeBounds) }),
+  'set-free-rotation': shape({ id: isString, degrees: isNumber }),
+  'set-free-flip': shape({ id: isString, x: optional(isBoolean), y: optional(isBoolean) }),
+  'set-free-constraints': shape({ id: isString, h: oneOf(['left', 'right', 'left-right', 'center', 'scale']), v: oneOf(['top', 'bottom', 'top-bottom', 'center', 'scale']), bounds: optional(isFreeBounds) }),
   'set-placement': (value) => shape({ id: isString, mode: oneOf(['free', 'flow']) })(value) && (isRecord(value) && (value.mode === 'flow' || shape({ bounds: shape({ x: isNumber, y: isNumber, width: isNumber, height: isNumber }) })(value))),
 }
 const isPlacementOp: Check = (value) => isRecord(value) && typeof value.op === 'string' && Object.hasOwn(PLACEMENT_OPS, value.op) && PLACEMENT_OPS[value.op as PlacementOp['op']](value)

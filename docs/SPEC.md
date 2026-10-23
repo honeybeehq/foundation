@@ -294,8 +294,8 @@ A direct child may opt out of either frame's flow with inline `position:absolute
 `box-sizing:border-box`. x/y are finite CSS pixels from the containing block's
 padding edge; width/height are nonnegative border-box CSS pixels. Negative x/y and
 fractional pixels are legal. Canonical editor operations clear right/bottom to auto
-and child margins to zero. The first slice pins left/top: changing the frame's size
-does not scale or center a free child. Width/height follow ordinary CSS min/max
+and child margins to zero. New free children initially pin left/top; the
+constraint operations below can change those anchors. Width/height follow ordinary CSS min/max
 constraints if present. Frames should declare dimensions when their free children
 must define a visible canvas: absolute children do not contribute intrinsic size.
 
@@ -307,9 +307,9 @@ their own containing block. Overlay semantics remain unchanged; fixed positionin
 is not enabled by a frame. Position declarations in named styles remain prohibited
 because their containing context is unknown statically.
 
-Right/bottom, center and proportional scale constraints, rotation/flip authoring,
-and transform-aware conversion are later slices. Existing legal CSS transforms
-still render normally; this slice adds no transform or constraint metadata.
+Rotation, flip and axis constraints are authored as native CSS as described below.
+Arbitrary transformed-coordinate conversion remains outside this slice; existing
+legal CSS transforms keep rendering without migration.
 Artboards, pages, sections, guides, selection, zoom/pan, snapping and editor window
 arrangement acquire no new document semantics here. Editor viewport measurements
 are inputs used to author CSS; they are not a second persisted geometry model.
@@ -330,8 +330,81 @@ batch alongside existing patch verbs:
 - `set-placement {id, mode:"flow"}` sets static positioning and auto offsets,
   retaining size. Flow chooses its position by DOM order and layout, so retaining
   arbitrary free x/y is not generally possible.
-- `set-free-position {id,x,y}` updates an already-free child's left/top.
-- `resize-free {id,width,height}` updates an already-free child's border-box size.
+- `set-free-position {id,x,y,bounds?}` moves an already-free child, preserving its
+  canonical constraint modes, rotation and flips. Legacy noncanonical constraints
+  keep the older left/top write behavior. Optional measured bounds are
+  required when the existing constrained geometry cannot be inferred safely.
+- `resize-free {id,width,height,bounds?}` resizes an already-free child, keeping its
+  untransformed x/y and updating constraint offsets for the new dimensions. This
+  shifts a rotated visual centre; a drag handle that must keep a visual corner
+  fixed batches the corresponding position adjustment with the resize.
+- `set-free-rotation {id,degrees}` sets a finite signed angle in degrees, around
+  the child's centre. It preserves flips and constraint translation.
+- `set-free-flip {id,x?,y?}` sets horizontal/vertical local-axis flips; an omitted
+  axis keeps its prior value. It preserves rotation and constraint translation.
+- `set-free-constraints {id,h,v,bounds?}` converts geometry to horizontal
+  `left|right|left-right|center|scale` and vertical
+  `top|bottom|top-bottom|center|scale` constraints, preserving its visual position
+  at the measured frame size.
+
+Rotation and flip use one canonical CSS transform:
+`translate(tx, ty) rotate(degreesdeg) scale(sx, sy)`, with
+`transform-origin:50% 50%;transform-box:border-box`. tx/ty are `-50%` for a centred constraint on that axis,
+otherwise `0%`; sx/sy are -1 for a flipped axis, otherwise 1. Translation is applied
+in frame axes, rotation/flips around the element centre. W/H and x/y inputs refer
+to the untransformed border box; a browser's rotated axis-aligned bounding
+rectangle is not that box. Rotation does not rewrite width/height. A scale
+constraint changes CSS width/height proportionally; the transform's scale is only
+for flips.
+
+For one axis, let P be the frame's containing-block extent, x the child's
+untransformed leading coordinate, and w its border-box extent. Vertical rules use
+y/h instead:
+
+| Constraint | Leading inset | Trailing inset | Extent | Translation |
+|---|---|---|---|---|
+| left / top | x px | auto | w px | 0% |
+| right / bottom | auto | (P-x-w) px | w px | 0% |
+| left-right / top-bottom | x px | (P-x-w) px | auto | 0% |
+| center | calc(50% + (x+w/2-P/2) px) | auto | w px | -50% |
+| scale | (100*x/P)% | auto | (100*w/P)% | 0% |
+
+Thus resizing the frame keeps the chosen edges pinned, preserves a centre offset,
+stretches between two pinned edges, or scales position and size. Existing CSS
+min/max bounds still govern used dimensions. No separate constraint attributes or
+cached workspace geometry are stored; CSS is document truth. Moving or directly
+resizing a constrained child updates these declarations, preserving the inferred
+axis modes. Conversion back to flow clears constraint translation but retains
+rotation/flips; conversion to free left/top placement likewise clears any old
+centering translation.
+
+Measured `bounds` has `{x,y,width,height,frameWidth,frameHeight}` in local CSS
+pixels. Frame dimensions are its actual absolute-position containing-block
+padding-box extents, not its outer border box; account for scroll offsets and
+ancestor transforms. All numbers must be finite, child dimensions nonnegative,
+and frame dimensions positive. Callers should always measure for token-sized,
+flex/grid-sized, padded/bordered, constrained or otherwise ambiguous frames and
+children. Without bounds, inference is restricted to unambiguous canonical pixel
+boxes with `flex:none` on the frame and no nonzero padding/border, min/max,
+margin or other sizing ambiguity. Grid frames/placement and interaction-state
+styles require measured bounds. Constraint conversion resets grid-area, grid-row,
+grid-column and their placement longhands to auto so the child uses the full
+frame containing block. Raw inset shorthands/logical insets must first be
+normalized to physical offsets; these are refused even with bounds.
+Existing canonical percentage/centre/stretch
+geometry can then be resolved against that known frame.
+
+New transform/constraint operations accept no transform, a simple rotate(deg),
+unit flips, or the canonical transform above, with the default centre origin
+and border-box reference. Non-default transform-box values must be flattened first.
+Arbitrary transforms, non-centre origins and individual rotate/scale/translate
+properties are refused rather than flattened or discarded. Existing left/top
+move/resize and flow conversion keep unrelated legacy transforms intact, including
+canonical-looking legacy strings combined with a custom origin or individual
+transform properties. Constraint-preserving editing is limited to the supported
+canonical form. Calculated CSS retains finite native floating-point precision
+without snapping coordinates. These
+operations author the base style plane, not a forced interaction-state override.
 
 Geometry operations require an explicit, relatively positioned direct frame
 parent. Invalid numbers, missing nodes, or missing frame context reject the whole

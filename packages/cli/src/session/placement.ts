@@ -1,3 +1,4 @@
+import { canonicalTransform, constraintStyle, constraintsOf, effectiveStyle, freeBounds, freeTransform, hasStateStyles, transformStyle } from './free-geometry.js'
 import { applyPatch, indexNodes } from 'foundation-engine'
 import type { FdnDocument, PatchOp, PatchErrorCode } from 'foundation-engine'
 import type { PlacementOp } from 'foundation-protocol'
@@ -9,7 +10,7 @@ export class PlacementError extends Error {
 }
 
 export function expandPlacement(doc: FdnDocument, ops: Array<PatchOp | PlacementOp>): PatchOp[] {
-  if (ops.every((op): op is PatchOp => !['set-frame-mode', 'set-placement', 'set-free-position', 'resize-free'].includes(op.op))) return ops
+  if (ops.every((op): op is PatchOp => !['set-frame-mode', 'set-placement', 'set-free-position', 'resize-free', 'set-free-rotation', 'set-free-flip', 'set-free-constraints'].includes(op.op))) return ops
   let working = doc
   const expanded: PatchOp[] = []
   for (const op of ops) {
@@ -25,6 +26,9 @@ export function expandPlacement(doc: FdnDocument, ops: Array<PatchOp | Placement
       }
       case 'set-placement':
       case 'set-free-position':
+      case 'set-free-rotation':
+      case 'set-free-flip':
+      case 'set-free-constraints':
       case 'resize-free': {
         if (!node) throw new PlacementError('unknown-node', `unknown node "${op.id}"`)
         const parentId = index.get(op.id)?.parent
@@ -34,9 +38,40 @@ export function expandPlacement(doc: FdnDocument, ops: Array<PatchOp | Placement
         }
         if (op.op === 'set-placement' && op.mode === 'flow') {
           batch = style(op.id, { position: 'static', left: 'auto', top: 'auto', right: 'auto', bottom: 'auto' })
+          const currentStyle = effectiveStyle(working, node)
+          const transform = canonicalTransform(currentStyle)
+          if (transform) {
+            batch.push(...style(op.id, transformStyle({ ...transform, centerX: false, centerY: false })))
+          }
           break
         }
         if (op.op !== 'set-placement' && node.style.position !== 'absolute') throw new Error('convert this child to free placement first')
+        const effective = effectiveStyle(working, node)
+        const stateful = hasStateStyles(working, node) || hasStateStyles(working, parent)
+        if (op.op === 'set-free-rotation' || op.op === 'set-free-flip' || op.op === 'set-free-constraints') {
+          const transform = freeTransform(effective)
+          if (op.op === 'set-free-rotation') batch = style(op.id, transformStyle({ ...transform, degrees: op.degrees }))
+          else if (op.op === 'set-free-flip') batch = style(op.id, transformStyle({ ...transform, x: op.x ?? transform.x, y: op.y ?? transform.y }))
+          else {
+            if (Object.keys(effective).some((key) => key.startsWith('inset'))) throw new Error('normalize inset shorthands and logical insets to physical left/right/top/bottom before setting constraints')
+            batch = style(op.id, constraintStyle(freeBounds(effective, effectiveStyle(working, parent), op.bounds, stateful), op.h, op.v, transform))
+          }
+          break
+        }
+        if (op.op === 'set-free-position' || op.op === 'resize-free') {
+          const transform = canonicalTransform(effective)
+          const constraints = transform ? constraintsOf(effective, transform) : { h: 'left' as const, v: 'top' as const }
+          if (constraints.h !== 'left' || constraints.v !== 'top') {
+            const currentTransform = transform!
+            if (Object.keys(effective).some((key) => key.startsWith('inset'))) throw new Error('normalize inset shorthands and logical insets before editing constrained geometry')
+            const bounds = freeBounds(effective, effectiveStyle(working, parent), op.bounds, stateful)
+            if (op.op === 'set-free-position') { bounds.x = op.x; bounds.y = op.y }
+            else { bounds.width = op.width; bounds.height = op.height }
+            if (![bounds.x, bounds.y, bounds.width, bounds.height].every(Number.isFinite) || bounds.width < 0 || bounds.height < 0) throw new Error('free geometry must be finite with nonnegative dimensions')
+            batch = style(op.id, constraintStyle(bounds, constraints.h, constraints.v, currentTransform))
+            break
+          }
+        }
         if (op.op === 'resize-free') {
           if (![op.width, op.height].every((n) => Number.isFinite(n) && n >= 0)) throw new Error('width and height must be finite and nonnegative')
           batch = style(op.id, { width: `${op.width}px`, height: `${op.height}px`, 'box-sizing': 'border-box' })
@@ -47,6 +82,8 @@ export function expandPlacement(doc: FdnDocument, ops: Array<PatchOp | Placement
           if (op.op === 'set-placement') {
             if (!bounds || !('width' in bounds) || !('height' in bounds) || ![bounds.width, bounds.height].every((n) => typeof n === 'number' && Number.isFinite(n) && n >= 0)) throw new Error('conversion needs measured nonnegative width and height')
             batch.push(...style(op.id, { width: `${bounds.width}px`, height: `${bounds.height}px`, 'box-sizing': 'border-box' }))
+            const transform = canonicalTransform(effective)
+            if (transform) batch.push(...style(op.id, transformStyle({ ...transform, centerX: false, centerY: false })))
           }
         }
         break
