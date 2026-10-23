@@ -140,7 +140,7 @@ async function runChainAnchor(positionals: string[], io: CliIO): Promise<number>
     return 2
   }
 
-  chain.anchor(name)
+  chain.anchor(name, withWallTime({ author: defaultAuthor(), message: `Anchor ${name}` }))
   writeAtomic(chainPath, chain.save())
   io.stdout(`${chainPath}: anchored '${name}' at ${chain.head().hash.slice(0, 12)}`)
   return 0

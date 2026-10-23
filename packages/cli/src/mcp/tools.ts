@@ -690,7 +690,7 @@ async function toolChainAnchor(args: Record<string, unknown>): Promise<ToolResul
   }
   try {
     const chain = loadChain(readFileSync(chainPath))
-    chain.anchor(name)
+    chain.anchor(name, withWallTime({ author: defaultAuthor(), message: `Anchor ${name}` }))
     writeAtomic(chainPath, chain.save())
     return ok({ path, chainPath, anchor: name, head: chain.head() })
   } catch (err) {

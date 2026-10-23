@@ -383,7 +383,38 @@ class LoroChain implements FdnChain {
     if (!(other instanceof LoroChain)) throw new Error('merge: other chain is not a LoroChain instance')
     this.loro.import(other.loro.export({ mode: 'update' }))
     this.rebuildIndex()
-    for (const [name, frontier] of other.anchors) if (!this.anchors.has(name)) this.anchors.set(name, frontier)
+    for (const [name, frontier] of other.anchors) {
+      const current = this.anchors.get(name)
+      if (!current || this.compareAnchorFrontiers(current, frontier) < 0) this.anchors.set(name, frontier)
+    }
+  }
+
+  private compareAnchorFrontiers(a: Frontier, b: Frontier): number {
+    let causal: -1 | 0 | 1 | undefined
+    try {
+      causal = this.loro.cmpFrontiers(a, b)
+    } catch {
+      const known = (frontier: Frontier): boolean => {
+        try {
+          const version = this.loro.oplogVersion()
+          return frontier.every(point => (version.get(point.peer) ?? 0) > point.counter)
+        } catch {
+          return false
+        }
+      }
+      const leftKnown = known(a)
+      const rightKnown = known(b)
+      if (leftKnown !== rightKnown) return leftKnown ? 1 : -1
+    }
+    if (causal !== undefined) return causal
+    const sort = (frontier: Frontier): Frontier => [...frontier].sort((x, y) => comparePeerIds(x.peer, y.peer) || x.counter - y.counter)
+    const left = sort(a)
+    const right = sort(b)
+    for (let i = 0; i < Math.min(left.length, right.length); i++) {
+      const order = comparePeerIds(left[i]!.peer, right[i]!.peer) || left[i]!.counter - right[i]!.counter
+      if (order) return order
+    }
+    return left.length - right.length
   }
 
   save(): Uint8Array {
