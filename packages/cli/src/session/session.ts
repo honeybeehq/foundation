@@ -509,6 +509,12 @@ class DesignSession implements Session {
     if (failure) return this.reject(message.id, failure)
     this.undoStack.push(undoStep(label, patch.inverse, before, this.doc, patch.applied, history))
     this.redoStack = []
+    const upgrade = message.ops.find(op => op.op === 'upgrade-artboards')
+    if (upgrade?.op === 'upgrade-artboards') {
+      this.view.boards = this.view.boards.map(ref => ref.artboardId === null ? { ...ref, artboardId: upgrade.artboardId } : ref)
+      this.sentBakes.clear()
+      this.stateBakes.clear()
+    }
     this.accept(message.id, { kind: 'commit', id: message.id, author: this.author }, bakeImpact(this.doc, patch.applied, before), componentSwaps, componentDetaches)
   }
 
@@ -663,10 +669,9 @@ class DesignSession implements Session {
     for (const ref of this.view.boards) {
       const key = boardKey(ref)
       let geometry: ReturnType<typeof boardView>
-      try { geometry = boardView(doc, ref) } catch (err) {
+      try { geometry = boardView(doc, ref) } catch {
         this.stateBakes.delete(key)
         this.sentBakes.delete(key)
-        this.emit({ t: 'fault', code: 'not-found', message: `preview unavailable ${key}: ${String(err)}` })
         continue
       }
       if (impact.states && !impact.states.has(ref.state)) continue
