@@ -261,10 +261,17 @@ export type PatchOp =
   | { op: 'remove-named-style'; name: string }
   | { op: 'set-component'; component: FdnComponent; index?: number }
   | { op: 'remove-component'; name: string }
-  | { op: 'set-param'; param: FdnParam }
+  | { op: 'set-param'; param: FdnParam; index?: number }
+  | { op: 'remove-param'; name: string }
   | { op: 'set-lookup'; lookup: FdnLookup; index?: number }
   | { op: 'remove-lookup'; name: string }
-  | { op: 'set-state'; state: FdnState }
+  | { op: 'set-state'; state: FdnState; index?: number }
+  | { op: 'remove-state'; name: string }
+  | { op: 'set-data'; data: FdnDataSet; index?: number }
+  | { op: 'remove-data'; name: string }
+  | { op: 'set-viewport'; viewport: FdnViewport; index?: number }
+  | { op: 'remove-viewport'; name: string }
+  | { op: 'set-matrix'; cells: FdnDocument['matrix'] }
   | { op: 'annotate'; annotation: FdnAnnotation }
   | { op: 'set-annotation-status'; id: string; status: FdnAnnotation['status'] }
   | { op: 'remove-annotation'; id: string }

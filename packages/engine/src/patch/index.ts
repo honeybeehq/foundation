@@ -1,3 +1,4 @@
+import { isJsonValue } from '../data.js'
 import { validateTokenCollections } from '../tokens/index.js'
 import type { FdnDocument, FdnNode, NodeId, PatchOp, StateStyleKey } from '../types.js'
 import { indexNodes, invertOp, type NodeLocation } from '../chain/model.js'
@@ -131,6 +132,40 @@ function checkOp(op: PatchOp, doc: FdnDocument, index: Map<NodeId, NodeLocation>
       if (op.index === undefined) return op
       return { ...op, index: checkIndex(op.index, items.filter((item) => item.name !== op.collection.name).length, lenient, op.op) }
     }
+    case 'set-param': {
+      const items = doc.params
+      if (!op.param.name) throw new PatchFailure('invalid-op', 'param needs a non-empty name')
+      return op.index === undefined ? op : { ...op, index: checkIndex(op.index, items.filter((item) => item.name !== op.param.name).length, lenient, op.op) }
+    }
+    case 'remove-param':
+      if (!op.name) throw new PatchFailure('invalid-op', 'param needs a non-empty name')
+      return op
+    case 'set-state': {
+      const items = doc.states
+      if (!op.state.name) throw new PatchFailure('invalid-op', 'state needs a non-empty name')
+      return op.index === undefined ? op : { ...op, index: checkIndex(op.index, items.filter((item) => item.name !== op.state.name).length, lenient, op.op) }
+    }
+    case 'remove-state':
+      if (!op.name) throw new PatchFailure('invalid-op', 'state needs a non-empty name')
+      return op
+    case 'set-data': {
+      const items = doc.data
+      if (!op.data.name) throw new PatchFailure('invalid-op', 'data needs a non-empty name')
+      if (!op.data.items.every((item) => item !== null && typeof item === 'object' && !Array.isArray(item)) || !isJsonValue(op.data.items)) throw new PatchFailure('invalid-op', 'data items must contain finite JSON values')
+      return op.index === undefined ? op : { ...op, index: checkIndex(op.index, items.filter((item) => item.name !== op.data.name).length, lenient, op.op) }
+    }
+    case 'remove-data':
+      if (!op.name) throw new PatchFailure('invalid-op', 'data needs a non-empty name')
+      return op
+    case 'set-viewport': {
+      const items = doc.viewports
+      if (!op.viewport.name) throw new PatchFailure('invalid-op', 'viewport needs a non-empty name')
+      if (![op.viewport.width, op.viewport.height].every((value) => Number.isInteger(value) && value > 0)) throw new PatchFailure('invalid-op', 'viewport dimensions must be positive integers')
+      return op.index === undefined ? op : { ...op, index: checkIndex(op.index, items.filter((item) => item.name !== op.viewport.name).length, lenient, op.op) }
+    }
+    case 'remove-viewport':
+      if (!op.name) throw new PatchFailure('invalid-op', 'viewport needs a non-empty name')
+      return op
     case 'set-lookup':
     case 'set-component': {
       const items = op.op === 'set-lookup' ? doc.lookups : doc.components
@@ -235,7 +270,7 @@ function applyOp(doc: FdnDocument, op: PatchOp, index: Map<NodeId, NodeLocation>
       doc.components = doc.components.filter((c) => c.name !== op.name)
       return doc
     case 'set-param':
-      doc.params = upsertByName(doc.params, op.param)
+      doc.params = upsertByName(doc.params, op.param, op.index)
       return doc
     case 'set-lookup':
       doc.lookups = upsertByName(doc.lookups, op.lookup, op.index)
@@ -244,7 +279,28 @@ function applyOp(doc: FdnDocument, op: PatchOp, index: Map<NodeId, NodeLocation>
       doc.lookups = doc.lookups.filter((lookup) => lookup.name !== op.name)
       return doc
     case 'set-state':
-      doc.states = upsertByName(doc.states, op.state)
+      doc.states = upsertByName(doc.states, op.state, op.index)
+      return doc
+    case 'remove-param':
+      doc.params = doc.params.filter((item) => item.name !== op.name)
+      return doc
+    case 'remove-state':
+      doc.states = doc.states.filter((item) => item.name !== op.name)
+      return doc
+    case 'set-data':
+      doc.data = upsertByName(doc.data, op.data, op.index)
+      return doc
+    case 'remove-data':
+      doc.data = doc.data.filter((item) => item.name !== op.name)
+      return doc
+    case 'set-viewport':
+      doc.viewports = upsertByName(doc.viewports, op.viewport, op.index)
+      return doc
+    case 'remove-viewport':
+      doc.viewports = doc.viewports.filter((item) => item.name !== op.name)
+      return doc
+    case 'set-matrix':
+      doc.matrix = structuredClone(op.cells)
       return doc
     case 'annotate':
       doc.annotations = [...doc.annotations.filter((a) => a.id !== op.annotation.id), structuredClone(op.annotation)].sort((a, b) => a.id.localeCompare(b.id))
@@ -268,15 +324,17 @@ export function diffPatch(original: FdnDocument, target: FdnDocument): PatchOp[]
   const from = normalizeDocument(original)
   const to = normalizeDocument(target)
   if (from.specVersion !== to.specVersion) return null
-  if (!sameJson(from.data, to.data) || !sameJson(from.viewports, to.viewports) || !sameJson(from.matrix, to.matrix)) return null
   const ops: PatchOp[] = []
   if (from.title !== to.title) ops.push({ op: 'set-title', title: to.title ?? null })
-  if (!diffNamed(from.params, to.params, (param) => ({ op: 'set-param', param }), null, ops)) return null
+  if (!diffNamed(from.params, to.params, (param) => ({ op: 'set-param', param }), (name) => ({ op: 'remove-param', name }), ops)) return null
   if (!diffNamed(from.lookups, to.lookups, (lookup) => ({ op: 'set-lookup', lookup }), (name) => ({ op: 'remove-lookup', name }), ops)) return null
-  if (!diffNamed(from.states, to.states, (state) => ({ op: 'set-state', state }), null, ops)) return null
+  if (!diffNamed(from.states, to.states, (state) => ({ op: 'set-state', state }), (name) => ({ op: 'remove-state', name }), ops)) return null
   if (!diffNamed(from.namedStyles, to.namedStyles, (style) => ({ op: 'set-named-style', style }), (name) => ({ op: 'remove-named-style', name }), ops)) return null
   if (!diffNamed(from.components, to.components, (component) => ({ op: 'set-component', component }), (name) => ({ op: 'remove-component', name }), ops)) return null
   if (!diffNamed(from.tokenCollections ?? [], to.tokenCollections ?? [], (collection) => ({ op: 'set-token-collection', collection }), (name) => ({ op: 'remove-token-collection', name }), ops)) return null
+  if (!diffNamed(from.data, to.data, (data) => ({ op: 'set-data', data }), (name) => ({ op: 'remove-data', name }), ops)) return null
+  if (!diffNamed(from.viewports, to.viewports, (viewport) => ({ op: 'set-viewport', viewport }), (name) => ({ op: 'remove-viewport', name }), ops)) return null
+  if (!sameJson(from.matrix, to.matrix)) ops.push({ op: 'set-matrix', cells: to.matrix })
   diffRecord(from.tokens, to.tokens, (name, value) => ops.push({ op: 'set-token', name, value }))
   ops.push(...diffNodes(from.body, to.body))
   const beforeAnnotations = new Map(from.annotations.map((a) => [a.id, a]))

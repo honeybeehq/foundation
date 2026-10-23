@@ -47,7 +47,7 @@ function sortKeysDeep(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(sortKeysDeep)
   if (value !== null && typeof value === 'object') {
     const input = value as Record<string, unknown>
-    const sorted: Record<string, unknown> = {}
+    const sorted: Record<string, unknown> = Object.create(null)
     for (const key of Object.keys(input).sort()) sorted[key] = sortKeysDeep(input[key])
     return sorted
   }

@@ -1,3 +1,4 @@
+import { isJsonValue } from '../data.js'
 /**
  * foundation-engine — parse: `.fdn.html` text -> FdnDocument + NormalizationReport.
  *
@@ -751,14 +752,23 @@ function parseParams(fdnDoc: ElementNode): FdnParam[] {
   })
 }
 
-function parseDataSets(fdnDoc: ElementNode): FdnDataSet[] {
+function parseDataSets(fdnDoc: ElementNode, lines: ReportLine[]): FdnDataSet[] {
   return directChildrenByTag(fdnDoc, 'fdn-data').map((el) => {
     const name = attrsOf(el).name ?? ''
     const items = directChildrenByTag(el, 'fdn-item').map((itemEl) => {
       const a = attrsOf(itemEl)
-      const item: Record<string, unknown> = {}
-      for (const [k, v] of Object.entries(a)) item[k] = v
-      return item
+      if (Object.hasOwn(a, 'data-fdn-json')) {
+        try {
+          const value: unknown = JSON.parse(a['data-fdn-json']!)
+          if (value !== null && typeof value === 'object' && !Array.isArray(value) && isJsonValue(value)) {
+            const extras = Object.fromEntries(Object.entries(a).filter(([key]) => key !== 'data-fdn-json'))
+            if (Object.keys(extras).length > 0) lines.push({ code: 'data-json-extra-attrs', severity: 'warning', message: 'extra data item attributes merged under JSON fields' })
+            return { ...extras, ...value } as Record<string, unknown>
+          }
+        } catch {}
+        lines.push({ code: 'invalid-data-json', severity: 'warning', message: 'invalid data-fdn-json item retained as a literal attribute' })
+      }
+      return Object.fromEntries(Object.entries(a))
     })
     return { name, items }
   })
@@ -1009,7 +1019,7 @@ export function parseDocument(html: string): { doc: FdnDocument; report: Normali
       })
     if (a['data-fdn-title'] !== undefined) title = a['data-fdn-title']
     params = parseParams(fdnDoc)
-    data = parseDataSets(fdnDoc)
+    data = parseDataSets(fdnDoc, lines)
     lookups = parseLookups(fdnDoc)
     tokenCollections = parseTokenCollections(fdnDoc)
     states = parseStates(fdnDoc, params)

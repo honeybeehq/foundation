@@ -611,6 +611,33 @@ it preserves the current position or appends a new declaration. These verbs use
 the ordinary one-batch/one-undo protocol, never a whole-document inverse. Component
 prop declarations use `set-component`; instance prop bindings use `set-attr`.
 
+### Document declarations and matrix edits
+
+Session commits accept `set-param {param,index?}`, `remove-param {name}`,
+`set-state {state,index?}`, `remove-state {name}`, `set-data {data,index?}`,
+`remove-data {name}`, `set-viewport {viewport,index?}`, `remove-viewport {name}`,
+and `set-matrix {cells}`. Named sets replace the whole declaration with that name,
+keeping its slot or appending a new one; an explicit zero-based index moves it
+within the list after removing its previous slot. Viewport dimensions are positive
+integers. Matrix cells retain their supplied order and contain state/viewport names.
+
+Each commit is one undo step. Creating a declaration undoes with its remove op;
+replacement restores the previous declaration; removal restores it at its original
+index. Matrix undo restores only the previous matrix. No operation replaces the
+whole document. Removing a missing declaration succeeds without adding history.
+Removals do not cascade: callers update references and matrix cells in the same
+batch when renaming or deleting declarations. Existing reference diagnostics still
+apply. A view subscription must include a new state to receive its baked output.
+
+Data items are finite JSON records, including nested objects, arrays, booleans,
+numbers and null. Legacy string-only items keep their attribute representation.
+An item requiring JSON uses `<fdn-item data-fdn-json="…"></fdn-item>` with the
+whole record encoded as deterministic, HTML-attribute-escaped JSON. This reserved
+attribute preserves field case, types and control characters through projection.
+Malformed JSON is retained as a literal attribute and reported during ingestion;
+sessions preserve the source and block commits until repaired. Extra attributes
+on a JSON item merge underneath its JSON fields and produce a warning.
+
 ## 9. Sync & multiplayer — *skeleton*
 
 Intent: chains sync as append-only logs; local-first; any transport (filesystem, peer

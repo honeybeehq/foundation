@@ -223,14 +223,15 @@ class DesignSession implements Session {
       this.fault('unreadable', `could not read ${this.chainPath}: ${err instanceof Error ? err.message : String(err)}`, 1)
       return null
     }
-    const incoming = parseDocument(text).doc
+    const parsed = parseDocument(text)
+    const incoming = parsed.doc
     this.diskText = text
     this.diskTextCanonical = canonicalText(incoming)
     this.diskChain = chainBytes
     this.docId = this.chain?.docId() ?? readDocIdAttr(text)
-    const issue = validateTokenCollections(incoming)[0]
+    const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json') ?? validateTokenCollections(incoming)[0]
     if (issue) {
-      this.invalidExternalTokens = `external token metadata is invalid; source preserved and commits blocked until repaired: ${issue.message}`
+      this.invalidExternalTokens = `external metadata is invalid; source preserved and commits blocked until repaired: ${issue.message}`
       this.setDoc(this.chain ? this.chain.doc() : normalizeDocument(incoming))
       return false
     }
@@ -331,14 +332,15 @@ class DesignSession implements Session {
     }
     if (text !== null && text !== this.diskText) {
       const base = this.invalidExternalTokens || this.diskText === null ? this.doc : parseDocument(this.diskText).doc
-      const incoming = parseDocument(text).doc
+      const parsed = parseDocument(text)
+      const incoming = parsed.doc
       const incomingCanonical = canonicalText(incoming)
       const baseCanonical = this.diskTextCanonical
       this.diskText = text
       this.diskTextCanonical = incomingCanonical
-      const issue = validateTokenCollections(incoming)[0]
+      const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json') ?? validateTokenCollections(incoming)[0]
       if (issue) {
-        const message = `external token metadata is invalid; source preserved and commits blocked until repaired: ${issue.message}`
+        const message = `external metadata is invalid; source preserved and commits blocked until repaired: ${issue.message}`
         if (this.invalidExternalTokens !== message) this.fault('unreadable', message, null)
         this.invalidExternalTokens = message
       } else {
@@ -358,8 +360,12 @@ class DesignSession implements Session {
   }
 
   private ingest(base: FdnDocument, incoming: FdnDocument): boolean {
+    const declarations = applyPatch(incoming, [
+      ...incoming.data.map((data): PatchOp => ({ op: 'set-data', data })),
+      ...incoming.viewports.map((viewport): PatchOp => ({ op: 'set-viewport', viewport })),
+    ])
     const ops = diffPatch(base, incoming)
-    const patch = ops === null ? applyPatch(this.doc, [{ op: 'replace-document', doc: incoming }]) : applyPatch(this.doc, ops, { lenient: true })
+    const patch = !declarations.ok ? declarations : ops === null ? applyPatch(this.doc, [{ op: 'replace-document', doc: incoming }]) : applyPatch(this.doc, ops, { lenient: true })
     if (!patch.ok) {
       this.invalidExternalTokens = `external changes cannot be applied; source preserved and commits blocked until repaired: ${patch.error.message}`
       if (this.phase === 'open') this.fault('unreadable', this.invalidExternalTokens, null)
@@ -387,6 +393,10 @@ class DesignSession implements Session {
     }
     const patch = applyPatch(this.doc, ops)
     if (!patch.ok) return this.reject(message.id, patch.error)
+    if (patch.inverse.length === 0 && canonicalText(patch.doc) === this.docText) {
+      this.options.send({ t: 'result', id: message.id, ok: true, rev: this.rev })
+      return
+    }
     const label = message.label || 'Edit'
     const failure = this.record(patch.applied, label)
     if (failure) return this.reject(message.id, failure)

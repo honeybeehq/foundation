@@ -44,13 +44,6 @@
  *     other same-key concurrent write in this file.
  *
  * Contract findings (see final report for the full list):
- *   - No PatchOp touches `data`/`viewports`/`matrix` at all — only
- *     replace-document does. They still get real Loro containers per the
- *     task brief, so a future finer-grained op could reach them without a
- *     storage migration.
- *   - No remove-param/remove-state exists — undoing a
- *     first-time set-param/set-state has no typed inverse and
- *     falls back to a whole-document replace-document undo (model.ts).
  *   - (RESOLVED 2026-07-31, contract amendment) SemanticOp gained
  *     set-style-ref/set-when variants and a 'meta' section-changed section
  *     for title/specVersion — diff() now emits all of these (model.ts).
@@ -524,7 +517,7 @@ class LoroChain implements FdnChain {
         break
       }
       case 'set-param': {
-        this.setKeyed('params', this.params, op.param.name, op.param)
+        this.setKeyed('params', this.params, op.param.name, op.param, op.index)
         break
       }
       case 'set-lookup': {
@@ -536,7 +529,36 @@ class LoroChain implements FdnChain {
         break
       }
       case 'set-state': {
-        this.setKeyed('states', this.states, op.state.name, op.state)
+        this.setKeyed('states', this.states, op.state.name, op.state, op.index)
+        break
+      }
+      case 'remove-param': {
+        this.removeKeyed('params', this.params, op.name)
+        break
+      }
+      case 'remove-state': {
+        this.removeKeyed('states', this.states, op.name)
+        break
+      }
+      case 'set-data': {
+        this.setKeyed('data', this.data, op.data.name, op.data, op.index)
+        break
+      }
+      case 'remove-data': {
+        this.removeKeyed('data', this.data, op.name)
+        break
+      }
+      case 'set-viewport': {
+        this.setKeyed('viewports', this.viewports, op.viewport.name, op.viewport, op.index)
+        break
+      }
+      case 'remove-viewport': {
+        this.removeKeyed('viewports', this.viewports, op.name)
+        break
+      }
+      case 'set-matrix': {
+        if (this.matrix.length > 0) this.matrix.delete(0, this.matrix.length)
+        for (const cell of op.cells) this.matrix.push(stableStringify(cell))
         break
       }
       case 'annotate': {

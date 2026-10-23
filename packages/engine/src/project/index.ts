@@ -1,3 +1,5 @@
+import { needsJsonItem } from '../data.js'
+import { stableStringify } from '../chain/util.js'
 /**
  * foundation-engine — project: FdnDocument -> canonical text (API.md, deterministic).
  *
@@ -178,7 +180,7 @@ function emitFdnDoc(w: Writer, depth: number, doc: FdnDocument): void {
   for (const set of doc.data) {
     w.push(depth + 1, `<fdn-data name="${escapeAttr(set.name)}">`)
     for (const item of set.items) {
-      const a: [string, string][] = Object.keys(item)
+      const a: [string, string][] = needsJsonItem(item) ? [['data-fdn-json', stableStringify(item)]] : Object.keys(item)
         .sort((x, y) => (x === 'id' ? -1 : y === 'id' ? 1 : x.localeCompare(y)))
         .map((k) => [k, String(item[k])])
       emitElement(w, depth + 2, 'fdn-item', a, null)

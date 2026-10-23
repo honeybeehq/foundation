@@ -57,8 +57,6 @@ export function indexNodes(body: FdnNode[]): Map<NodeId, NodeLocation> {
  *     a single `replace-document` restoring the pre-batch snapshot instead.
  *
  * Findings (contract gaps discovered while writing this):
- *   - set-param/set-state have no remove-param/remove-state counterpart. Undoing a *first-time* set-param (etc.) has
- *     no typed inverse — 'fallback'.
  *   - set-text's `text` field is a non-nullable string, so a node that had
  *     no text before this batch has no way to be inverted back to
  *     "no text" — the closest legal inverse is `text: ''`.
@@ -140,8 +138,12 @@ export function invertOp(
       return prev ? { op: 'set-component', component: prev, index: beforeDoc.components.indexOf(prev) } : null
     }
     case 'set-param': {
-      const prev = beforeDoc.params.find((p) => p.name === op.param.name)
-      return prev ? { op: 'set-param', param: prev } : 'fallback'
+      const prev = beforeDoc.params.find((item) => item.name === op.param.name)
+      return prev ? { op: 'set-param', param: prev, ...(op.index === undefined ? {} : { index: beforeDoc.params.indexOf(prev) }) } : { op: 'remove-param', name: op.param.name }
+    }
+    case 'remove-param': {
+      const prev = beforeDoc.params.find((item) => item.name === op.name)
+      return prev ? { op: 'set-param', param: prev, index: beforeDoc.params.indexOf(prev) } : null
     }
     case 'set-lookup': {
       const prev = beforeDoc.lookups.find((l) => l.name === op.lookup.name)
@@ -152,9 +154,31 @@ export function invertOp(
       return prev ? { op: 'set-lookup', lookup: prev, index: beforeDoc.lookups.indexOf(prev) } : null
     }
     case 'set-state': {
-      const prev = beforeDoc.states.find((s) => s.name === op.state.name)
-      return prev ? { op: 'set-state', state: prev } : 'fallback'
+      const prev = beforeDoc.states.find((item) => item.name === op.state.name)
+      return prev ? { op: 'set-state', state: prev, ...(op.index === undefined ? {} : { index: beforeDoc.states.indexOf(prev) }) } : { op: 'remove-state', name: op.state.name }
     }
+    case 'remove-state': {
+      const prev = beforeDoc.states.find((item) => item.name === op.name)
+      return prev ? { op: 'set-state', state: prev, index: beforeDoc.states.indexOf(prev) } : null
+    }
+    case 'set-data': {
+      const prev = beforeDoc.data.find((item) => item.name === op.data.name)
+      return prev ? { op: 'set-data', data: prev, ...(op.index === undefined ? {} : { index: beforeDoc.data.indexOf(prev) }) } : { op: 'remove-data', name: op.data.name }
+    }
+    case 'remove-data': {
+      const prev = beforeDoc.data.find((item) => item.name === op.name)
+      return prev ? { op: 'set-data', data: prev, index: beforeDoc.data.indexOf(prev) } : null
+    }
+    case 'set-viewport': {
+      const prev = beforeDoc.viewports.find((item) => item.name === op.viewport.name)
+      return prev ? { op: 'set-viewport', viewport: prev, ...(op.index === undefined ? {} : { index: beforeDoc.viewports.indexOf(prev) }) } : { op: 'remove-viewport', name: op.viewport.name }
+    }
+    case 'remove-viewport': {
+      const prev = beforeDoc.viewports.find((item) => item.name === op.name)
+      return prev ? { op: 'set-viewport', viewport: prev, index: beforeDoc.viewports.indexOf(prev) } : null
+    }
+    case 'set-matrix':
+      return { op: 'set-matrix', cells: beforeDoc.matrix }
     case 'annotate': {
       const prev = beforeDoc.annotations.find((a) => a.id === op.annotation.id)
       return prev ? { op: 'annotate', annotation: prev } : { op: 'remove-annotation', id: op.annotation.id }
