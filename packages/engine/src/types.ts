@@ -91,6 +91,28 @@ export interface FdnProp {
 }
 
 export type ComponentSwapTarget = { component: string } | { componentSet: string; variants?: Record<string, string> }
+export interface InstanceSwapReport {
+  signature: string
+  instanceId: string
+  scope: string[]
+  component: string
+  componentSet?: string
+  values?: Record<string, string>
+  overrides: {
+    overrideId: string
+    fromName?: string
+    toName?: string
+    from: string[]
+    to?: string[]
+    status: 'exact' | 'retargeted-by-name' | 'dormant'
+    reason?: string
+    compatibleFields: string[]
+    inactiveFields: string[]
+  }[]
+  props: { name: string; status: 'kept' | 'inert' | 'reinterpreted' | 'invalid-for-target'; fromType?: FdnParamType; toType?: FdnParamType }[]
+  fills: { fillId: string; slot: string; status: 'kept' | 'inert' }[]
+}
+
 export interface InstanceOverridePatch {
   text?: string | null
   hidden?: boolean | null

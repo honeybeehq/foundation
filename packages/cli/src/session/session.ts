@@ -1,4 +1,5 @@
 import { PlacementError } from './placement.js'
+import { expandComponentOp } from './components.js'
 import { expandSessionOps } from './token-modes.js'
 import { randomUUID } from 'node:crypto'
 import { existsSync, mkdirSync, statSync, watch, type FSWatcher } from 'node:fs'
@@ -18,7 +19,7 @@ import {
   validateDocument,
   validateTokenCollections,
 } from 'foundation-engine'
-import type { EnvelopeRecord, FdnChain, FdnDocument, PatchOp, ReportLine } from 'foundation-engine'
+import type { EnvelopeRecord, FdnChain, FdnDocument, InstanceSwapReport, PatchOp, ReportLine } from 'foundation-engine'
 import { parseClientMessage, SESSION_PROTOCOL } from 'foundation-protocol'
 import type { Cause, ClientMessage, DocumentView, FaultCode, ResultCode, ServiceMessage } from 'foundation-protocol'
 import { withWallTime } from '../change-meta.js'
@@ -163,6 +164,16 @@ class DesignSession implements Session {
         this.view = { states: [...new Set(message.states)], components: message.components }
         this.sentBakes.clear()
         return this.sendBakes()
+      case 'preview-instance-swap': {
+        this.syncAndAnnounce()
+        try {
+          const reports: InstanceSwapReport[] = []
+          expandComponentOp(this.doc, { ...message.op, previewRev: undefined, previewSignature: undefined }, reports)
+          return this.options.send({ t: 'instance-swap-preview', id: message.id, rev: this.rev, report: reports[0]! })
+        } catch (err) {
+          return this.reject(message.id, { code: 'invalid-op', message: err instanceof Error ? err.message : String(err) })
+        }
+      }
       case 'commit':
         return this.commit(message)
       case 'anchor':
@@ -385,16 +396,18 @@ class DesignSession implements Session {
     this.syncAndAnnounce()
     if (message.ops.length === 0) return this.reject(message.id, { code: 'invalid-op', message: 'commit has no ops' })
     if (message.base > this.rev) return this.reject(message.id, { code: 'invalid-op', message: `base ${message.base} is ahead of rev ${this.rev}` })
+    const componentSwaps: InstanceSwapReport[] = []
+    for (const op of message.ops) if ('previewRev' in op && op.previewRev !== undefined && (op.previewRev > this.rev || op.previewRev < this.rev && !op.previewSignature)) return this.reject(message.id, { code: 'conflict', message: 'swap preview is stale; preview the swap again' })
     let ops: PatchOp[]
     try {
-      ops = expandSessionOps(this.doc, message.ops)
+      ops = expandSessionOps(this.doc, message.ops, componentSwaps)
     } catch (err) {
-      return this.reject(message.id, { code: err instanceof PlacementError ? err.code : 'invalid-op', message: err instanceof Error ? err.message : String(err) })
+      return this.reject(message.id, { code: err instanceof PlacementError ? err.code : err instanceof Error && err.message.startsWith('swap preview changed') ? 'conflict' : 'invalid-op', message: err instanceof Error ? err.message : String(err) })
     }
     const patch = applyPatch(this.doc, ops)
     if (!patch.ok) return this.reject(message.id, patch.error)
     if (patch.inverse.length === 0 && canonicalText(patch.doc) === this.docText) {
-      this.options.send({ t: 'result', id: message.id, ok: true, rev: this.rev })
+      this.options.send({ t: 'result', id: message.id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}) })
       return
     }
     const label = message.label || 'Edit'
@@ -402,7 +415,7 @@ class DesignSession implements Session {
     if (failure) return this.reject(message.id, failure)
     this.undoStack.push({ label, revert: patch.inverse, guard: this.guard(patch.inverse) })
     this.redoStack = []
-    this.accept(message.id, { kind: 'commit', id: message.id, author: this.author })
+    this.accept(message.id, { kind: 'commit', id: message.id, author: this.author }, componentSwaps)
   }
 
   private step(id: string, direction: 'undo' | 'redo'): void {
@@ -487,9 +500,9 @@ class DesignSession implements Session {
     if (this.docText !== before) this.announce({ kind: 'external', author: author ?? null })
   }
 
-  private accept(id: string, cause: Cause): void {
+  private accept(id: string, cause: Cause, componentSwaps: InstanceSwapReport[] = []): void {
     this.announce(cause)
-    this.options.send({ t: 'result', id, ok: true, rev: this.rev })
+    this.options.send({ t: 'result', id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}) })
   }
 
   private reject(id: string, failure: Failure): void {

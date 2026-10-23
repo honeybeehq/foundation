@@ -478,7 +478,7 @@ same definition/set use that register's last writer; instance attributes are per
 Documents without sets retain byte-identical bakes, projections and chain writes.
 Variant selections in this slice are literal; driving a nested variant through a
 parent prop expression is out of scope and reported as an invalid selection.
-Nested overrides, swap and detach are separate slices of the component contract.
+Per-use overrides and swaps are described below; detach is a separate slice.
 Slot authoring and richer list/record schemas remain outside these four slices.
 
 ### Per-use layer overrides
@@ -557,6 +557,59 @@ question 9 — the grammar spike found this more foundational than `when`/`each`
 are inert without a way into text and attribute values), and a bounded value-mapping
 primitive (open question 9; finding b.2: enum→style mapping via N `when` branches
 scales linearly and badly).
+
+
+### Instance swap and compatibility preview
+
+`swap-instance {id,target}` changes a source instance to `{component}` or
+`{componentSet,variants?}`. Its existing prop attributes, fills, styles and override
+payloads remain stored. Selection and target retargeting are one semantic batch,
+with exact per-attribute undo. `set-instance-variant` uses the same planner, as do
+nested swap overrides and resetting a nested swap. Sealed targets accept swaps;
+all interior overrides become dormant. A newly introduced structural component cycle is refused
+before any write, including a cycle hidden behind a current condition. Existing
+cycles do not block an unrelated swap or repair.
+
+The planner first matches an exact, unique definition identity at each path
+segment. Otherwise it tries `data-fdn-name`, case-sensitive and exact, with the
+same tag and the same chain of named ancestors. Names are nonempty strings;
+duplicates are legal but an ambiguous descriptor cannot match. Names are read
+from the current old definition, never copied onto override metadata. No text,
+position or sibling-order heuristic is used. Exact identity wins even when a
+layer name differs: renaming does not change identity. Unrelated definitions
+that reuse ids therefore count as shared identities; clients should highlight
+exact matches whose names differ in the preview. A target already missing in the old
+definition can reactivate by exact identity, but cannot match by name. Nested
+segments resolve through the selected member and any nested swap overrides.
+
+Only the override `target` attribute changes after a successful name match.
+Unmatched records stay stored and dormant; swapping back may revive them. If
+multiple distinct old targets would land on the same destination, or a name
+match would collide with an existing target, the name match stays dormant with
+`retarget-collision`. Existing duplicate records for the same old target move
+together, retaining their child-order precedence. A variant switch may retarget
+by name; going back can be ambiguous, so clients must show the returned plan.
+
+Results optionally include `componentSwaps`: each plan contains the selected
+component/set/values and, per override source id, its old/new target, outcome
+`exact`, `retargeted-by-name` or `dormant`, compatible and inactive field names,
+and a reason when unmatched. Compatibility describes structure, not whether a
+condition currently renders the layer. Props absent from the target are inert;
+changed types are reported `reinterpreted` and keep their raw binding; literal
+out-of-domain enum values are `invalid-for-target`. Fills absent from the new
+slot schema are inert. No payload is silently pruned.
+
+A read-only `preview-instance-swap {id,op}` accepts a `swap-instance` or
+`set-instance-variant` operation and returns
+`instance-swap-preview {id,rev,report}` without changing document, chain or
+history. The report includes a deterministic SHA-256 compatibility-plan
+signature. Both root operations accept optional `previewRev` and
+`previewSignature`: future revisions, stale revisions without a signature, or a
+changed signature are refused with `conflict`, asking the caller to preview
+again. An unchanged plan may proceed after an unrelated revision. A preview is
+a compatibility plan, not a frozen appearance snapshot. Batch reports follow
+operation order; a no-op selection returns its report without a history entry.
+
 
 ### 4a. Typed token collections and modes (2026-10-23)
 

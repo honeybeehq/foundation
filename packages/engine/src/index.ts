@@ -23,3 +23,4 @@ export { invertOp, indexNodes } from './chain/model.js'
 export { stableStringify } from './chain/util.js'
 
 export { validateTokenCollections } from './tokens/index.js'
+export { planInstanceSwap, assertInstanceAcyclic } from './components/swap.js'

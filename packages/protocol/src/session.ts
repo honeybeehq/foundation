@@ -1,4 +1,4 @@
-import type { ChainLogEntry, EnvelopeRecord, FdnDocument, InstanceOverridePatch, PatchOp, ReportLine } from './document.ts'
+import type { ChainLogEntry, EnvelopeRecord, FdnDocument, ComponentSwapTarget, InstanceSwapReport, InstanceOverridePatch, PatchOp, ReportLine } from './document.ts'
 
 export type { EnvelopeRecord, FdnDocument, FdnNode, PatchOp, ReportLine } from './document.ts'
 
@@ -46,8 +46,11 @@ export type TokenModeOp =
   | { op: 'set-mode-token'; collection: string; name: string; type?: import('./document.ts').FdnTokenType; mode: string; value: import('./document.ts').FdnTokenValue }
   | { op: 'set-collection-mode'; id: string; collection: string; mode: string | null }
 
+export interface SwapPreviewGuard { previewRev?: number; previewSignature?: string }
+
 export type ComponentOp =
-  | { op: 'set-instance-variant'; id: string; values: Record<string, string | null> | null }
+  | ({ op: 'set-instance-variant'; id: string; values: Record<string, string | null> | null } & SwapPreviewGuard)
+  | ({ op: 'swap-instance'; id: string; target: ComponentSwapTarget } & SwapPreviewGuard)
   | { op: 'set-instance-override'; id: string; target: string[]; values: InstanceOverridePatch }
   | { op: 'reset-instance-override'; id: string; target: string[] }
   | { op: 'reset-instance-overrides'; id: string }
@@ -58,6 +61,7 @@ export type ClientMessage =
   | { t: 'hello'; protocol: string; client: string; author: string }
   | { t: 'view'; states: Array<string | null>; components: boolean }
   | { t: 'commit'; id: string; base: number; ops: SessionOp[]; label: string }
+  | { t: 'preview-instance-swap'; id: string; op: Extract<ComponentOp, { op: 'swap-instance' | 'set-instance-variant' }> }
   | { t: 'anchor'; id: string; name: string }
   | { t: 'undo'; id: string }
   | { t: 'redo'; id: string }
@@ -68,7 +72,8 @@ export type ServiceMessage =
   | ({ t: 'doc'; cause: Cause } & DocumentView)
   | { t: 'baked'; rev: number; state: string | null; html: string; report: ReportLine[] }
   | { t: 'component'; rev: number; name: string; html: string; report: ReportLine[] }
-  | { t: 'result'; id: string; ok: true; rev: number }
+  | { t: 'instance-swap-preview'; id: string; rev: number; report: InstanceSwapReport }
+  | { t: 'result'; id: string; ok: true; rev: number; componentSwaps?: InstanceSwapReport[] }
   | { t: 'result'; id: string; ok: false; code: ResultCode; message: string }
   | { t: 'log'; id: string; entries: Array<EnvelopeRecord & Partial<Omit<ChainLogEntry, keyof EnvelopeRecord>>>; nextCursor?: string | null; latestCursor?: string | null; hasMore?: boolean }
   | { t: 'fault'; code: FaultCode; message: string }
@@ -226,7 +231,8 @@ const TOKEN_MODE_OPS: Record<TokenModeOp['op'], Check> = {
 const isSwapTarget: Check = (value) => isRecord(value) && ((typeof value.component === 'string' && value.componentSet === undefined && value.variants === undefined) || (typeof value.componentSet === 'string' && value.component === undefined && (value.variants === undefined || isStringMap(value.variants))))
 const isOverrideValues = shape({ text: optional(nullable(isString)), hidden: optional(nullable(isBoolean)), style: optional(recordOf(nullable(isString))), styleStates: optional(recordOf(recordOf(nullable(isString)))), swap: optional(nullable(isSwapTarget)) })
 const COMPONENT_OPS: Record<ComponentOp['op'], Check> = {
-  'set-instance-variant': shape({ id: isString, values: nullable(recordOf(nullable(isString))) }),
+  'set-instance-variant': shape({ id: isString, values: nullable(recordOf(nullable(isString))), previewRev: optional(isCount), previewSignature: optional(isString) }),
+  'swap-instance': shape({ id: isString, target: isSwapTarget, previewRev: optional(isCount), previewSignature: optional(isString) }),
   'set-instance-override': shape({ id: isString, target: arrayOf(isString), values: isOverrideValues }),
   'reset-instance-override': shape({ id: isString, target: arrayOf(isString) }),
   'reset-instance-overrides': shape({ id: isString }),
@@ -237,6 +243,7 @@ const isTokenModeOp: Check = (value) => isRecord(value) && typeof value.op === '
 const CLIENT_MESSAGES: Record<ClientMessage['t'], Check> = {
   hello: shape({ protocol: isString, client: isString, author: isString }),
   view: shape({ states: arrayOf(nullable(isString)), components: isBoolean }),
+  'preview-instance-swap': shape({ id: isString, op: (value) => isRecord(value) && ['swap-instance', 'set-instance-variant'].includes(String(value.op)) && isComponentOp(value) }),
   commit: shape({ id: isString, base: isCount, ops: arrayOf((value) => isPatchOp(value) || isPlacementOp(value) || isTokenModeOp(value) || isComponentOp(value)), label: isString }),
   anchor: shape({ id: isString, name: isString }),
   undo: shape({ id: isString }),
@@ -271,6 +278,7 @@ const SERVICE_MESSAGES: Record<ServiceMessage['t'], Check> = {
   doc: (value) => isView(value) && shape({ cause: isCause })(value),
   baked: shape({ rev: isCount, state: nullable(isString), html: isString, report: isReport }),
   component: shape({ rev: isCount, name: isString, html: isString, report: isReport }),
+  'instance-swap-preview': shape({ id: isString, rev: isCount, report: shape({ signature: isString, instanceId: isString, scope: arrayOf(isString), component: isString, overrides: arrayOf(isRecord), props: arrayOf(isRecord), fills: arrayOf(isRecord) }) }),
   result: (value) =>
     isRecord(value) && isString(value.id) && (value.ok === true ? isCount(value.rev) : value.ok === false && oneOf(RESULT_CODES)(value.code) && isString(value.message)),
   log: shape({ id: isString, entries: arrayOf(isLogEntry), nextCursor: optional(nullable(isString)), latestCursor: optional(nullable(isString)), hasMore: optional(isBoolean) }),

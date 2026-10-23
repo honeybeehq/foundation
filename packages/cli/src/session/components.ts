@@ -1,11 +1,49 @@
 import { randomUUID } from 'node:crypto'
-import { componentSelection, indexNodes, overrideTarget, resolveOverrideTarget, swapAttributes } from 'foundation-engine'
-import type { FdnDocument, FdnNode, PatchOp, StateStyleKey } from 'foundation-engine'
+import { applyPatch, planInstanceSwap, componentSelection, indexNodes, overrideTarget, resolveOverrideTarget, swapAttributes } from 'foundation-engine'
+import type { FdnDocument, FdnNode, InstanceSwapReport, PatchOp, StateStyleKey } from 'foundation-engine'
 import type { ComponentOp } from 'foundation-protocol'
 
-export function expandComponentOp(doc: FdnDocument, op: ComponentOp): PatchOp[] {
+export function expandComponentOp(doc: FdnDocument, op: ComponentOp, reports: InstanceSwapReport[] = []): PatchOp[] {
+  const ops = componentOps(doc, op)
+  const node = indexNodes(doc.body).get(op.id)?.node
+  if (!node) return ops
+  const scopes: string[][] = []
+  if (op.op === 'swap-instance' || op.op === 'set-instance-variant') scopes.push([])
+  if (op.op === 'set-instance-override' && op.values.swap !== undefined) scopes.push(op.target)
+  if (op.op === 'reset-instance-override' || op.op === 'reset-instance-overrides') {
+    for (const child of node.children) if (child.tag === 'fdn-override' && (child.attrs.component || child.attrs['component-set'])) {
+      const target = overrideTarget(child)
+      if (target && (op.op === 'reset-instance-overrides' || JSON.stringify(target) === JSON.stringify(op.target))) scopes.push(target)
+    }
+  }
+  if (!scopes.length) return ops
+  const patch = applyPatch(doc, ops, { validateTokens: false, validateComponents: false })
+  if (!patch.ok) throw new Error(patch.error.message)
+  let after = indexNodes(patch.doc.body).get(op.id)!.node
+  const retargets: PatchOp[] = []
+  for (const scope of scopes) {
+    if (scope.length && !resolveOverrideTarget(doc, after, scope)) continue
+    const plan = planInstanceSwap(doc, node, after, scope)
+    if ('previewSignature' in op && op.previewSignature !== undefined && op.previewSignature !== plan.report.signature) throw new Error('swap preview changed; preview the swap again')
+    reports.push(plan.report)
+    retargets.push(...plan.ops)
+    if (plan.ops.length) {
+      const changed = applyPatch({ ...doc, body: [after] }, plan.ops, { validateTokens: false, validateComponents: false })
+      if (!changed.ok) throw new Error(changed.error.message)
+      after = changed.doc.body[0]!
+    }
+  }
+  return [...ops, ...retargets]
+}
+
+function componentOps(doc: FdnDocument, op: ComponentOp): PatchOp[] {
   const node = indexNodes(doc.body).get(op.id)?.node
   if (!node || node.tag !== 'fdn-use') throw new Error(`"${op.id}" must be a component instance`)
+  if (op.op === 'swap-instance') {
+    const attrs = swapAttributes(node.attrs, op.target)
+    componentSelection(doc, { attrs })
+    return attrDiff(node, attrs)
+  }
   if (op.op === 'set-instance-variant') {
     if (!node.attrs['component-set']) throw new Error(`"${op.id}" must be a component set instance`)
     const attrs = { ...node.attrs }
