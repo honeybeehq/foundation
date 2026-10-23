@@ -229,7 +229,7 @@ class DesignSession implements Session {
     this.diskTextCanonical = canonicalText(incoming)
     this.diskChain = chainBytes
     this.docId = this.chain?.docId() ?? readDocIdAttr(text)
-    const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json' || line.code === 'malformed-component-set') ?? validateTokenCollections(incoming)[0]
+    const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json' || ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code)) ?? validateTokenCollections(incoming)[0]
     if (issue) {
       this.invalidExternalTokens = `external metadata is invalid; source preserved and commits blocked until repaired: ${issue.message}`
       this.setDoc(this.chain ? this.chain.doc() : normalizeDocument(incoming))
@@ -338,7 +338,7 @@ class DesignSession implements Session {
       const baseCanonical = this.diskTextCanonical
       this.diskText = text
       this.diskTextCanonical = incomingCanonical
-      const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json' || line.code === 'malformed-component-set') ?? validateTokenCollections(incoming)[0]
+      const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json' || ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code)) ?? validateTokenCollections(incoming)[0]
       if (issue) {
         const message = `external metadata is invalid; source preserved and commits blocked until repaired: ${issue.message}`
         if (this.invalidExternalTokens !== message) this.fault('unreadable', message, null)

@@ -4,7 +4,7 @@ import { expandComponentOp } from './components.js'
 import type { ComponentOp, PlacementOp, SessionOp, TokenModeOp } from 'foundation-protocol'
 import { expandPlacement, PlacementError } from './placement.js'
 
-const COMPONENT_OPS = new Set(['set-instance-variant'])
+const COMPONENT_OPS = new Set(['set-instance-variant', 'set-instance-override', 'reset-instance-override', 'reset-instance-overrides'])
 
 const MODE_OPS = new Set(['create-token-collection', 'add-token-mode', 'rename-token-mode', 'remove-token-mode', 'set-mode-token', 'set-collection-mode'])
 

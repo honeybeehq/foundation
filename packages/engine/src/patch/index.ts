@@ -1,3 +1,4 @@
+import { validateInstanceOverrides } from '../components/overrides.js'
 import { isJsonValue } from '../data.js'
 import { componentIssueKey, validateComponentSets } from '../components/variants.js'
 import { validateTokenCollections } from '../tokens/index.js'
@@ -51,8 +52,8 @@ export function applyPatch(doc: FdnDocument, ops: PatchOp[], opts?: { lenient?: 
     if (issue) return { ok: false, error: { code: 'invalid-op', message: issue.message } }
   }
   if (opts?.validateComponents !== false) {
-    const prior = new Set(validateComponentSets(doc).map(componentIssueKey))
-    const issue = validateComponentSets(working).find((item) => !prior.has(componentIssueKey(item)))
+    const prior = new Set([...validateComponentSets(doc), ...validateInstanceOverrides(doc).filter((item) => item.severity === 'error')].map(componentIssueKey))
+    const issue = [...validateComponentSets(working), ...validateInstanceOverrides(working).filter((item) => item.severity === 'error')].find((item) => !prior.has(componentIssueKey(item)))
     if (issue) return { ok: false, error: { code: 'invalid-op', message: issue.message } }
   }
   const inverse: PatchOp[] = fallback ? [{ op: 'replace-document', doc: structuredClone(doc) }] : inverses.reverse()

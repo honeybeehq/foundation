@@ -58,7 +58,7 @@ export async function runCopy(args: string[], io: CliIO): Promise<number> {
       throw new Error('source document and chain have different document ids')
     }
     const parsed = parseDocument(sourceText)
-    const malformedSet = parsed.report.lines.find((line) => line.code === 'malformed-component-set')
+    const malformedSet = parsed.report.lines.find((line) => ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code))
     if (malformedSet) throw new Error(malformedSet.message)
     const doc = normalizeDocument(parsed.doc)
     const source = {

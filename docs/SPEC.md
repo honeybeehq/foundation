@@ -481,6 +481,66 @@ parent prop expression is out of scope and reported as an invalid selection.
 Nested overrides, swap and detach are separate slices of the component contract.
 Slot authoring and richer list/record schemas remain outside these four slices.
 
+### Per-use layer overrides
+
+An instance may contain inert `<fdn-override data-fdn-id="…" target="…">`
+children alongside `fdn-fill` children. Projection encloses each record in a
+`<fdn-overrides hidden>` ancestor, with no model id, so metadata CSS cannot render
+in canonical HTML. Parsing flattens these wrappers without changing child order. `target` is a JSON array of stable layer
+ids: the first resolves uniquely anywhere in the selected definition, and each
+later segment crosses the preceding nested `fdn-use` into its selected definition.
+Ordinary ancestry does not enter the address; reordering or reparenting a layer
+inside one definition preserves its override. Names are not used for normal
+resolution. Repeated `each` occurrences share the same definition target and all
+receive the override. Fill content written in a definition belongs to that definition and is
+addressable by its stable id; fill content owned by a document use is edited
+directly, not through that definition; fallback children of a filled slot remain dormant.
+
+An override stores literal replacement text in its `text` attribute (including
+`text=""`), `hidden="true|false"`, ordinary style/state-plane bags, and optionally
+`component` or `component-set` plus variant attributes for a nested instance swap.
+There are no children, `when`, `each`, named-style reference or element text in
+this metadata. Text is literal and wins over prop interpolation; the bake reports
+that shadowing. Style/token values are literal CSS including `var(--token)`; template
+interpolation is refused in override style bags. Definition named style and own declarations resolve
+before the layer override; existing instance-root placement styles still apply
+last. Each interaction plane follows the same cascade rule.
+
+`hidden=true` omits the target subtree from derived output, so inline or
+interaction display values cannot reveal it. Hidden source layers remain available
+in Layers for reset. `hidden=false` removes only the definition's HTML hidden attribute; it never
+forces `when`, state scopes or `each` to produce content and does not remove a
+separate authored display:none. Reset removes the per-use value.
+
+Definitions remain independent from use-owned overrides. Missing, ambiguous,
+sealed, conditionally absent or filled-fallback targets keep their metadata and
+emit `override-dormant` reports with the override node id and owning instance.
+Conditional/state/filled-slot inactivity is informational; missing or incompatible
+targets are warnings. Context-dependent placement diagnostics are warnings so a
+master layout edit cannot be blocked by an existing per-use style.
+They reactivate when the target returns. Duplicate target records from concurrent
+first creation are warnings, never document gates: values merge per property in
+child order, later declarations winning. Semantic edits reuse the last record;
+clearing one property clears it across duplicates. No stored value is silently
+pruned. Override records are excluded from render trees and editor selection ids;
+editor bakes mark affected layers with `data-fdn-overrides` field names.
+
+Session `set-instance-override {id,target,values}` merges optional `text`, `hidden`,
+`style`, `styleStates`, and `swap`. Nullable text/hidden/swap reset those fields;
+null CSS property values reset that property. Swap is `{component}` or
+`{componentSet,variants?}`. New non-null edits require a resolvable compatible
+native layer; nested swaps require a use target. Reset remains available for dormant
+targets. `reset-instance-override {id,target}` removes all records for that target;
+`reset-instance-overrides {id}` removes all records on the use, preserving fills.
+Operations expand to child insertion/removal and per-key attribute/style patches,
+with one commit/undo step. Undo restores exact original record/fill order. New
+records get unique source identities once; redo reuses their recorded identity.
+
+The parser retains instance fills and overrides while collapsing derived baked
+children. Project→parse→project is a fixpoint for canonical fills/overrides. This
+also closes the earlier fill round-trip gap; slot authoring beyond that prerequisite
+remains a separate workflow. Ordinary documents without such children bake unchanged.
+
 ## 4. Tokens, params, conditionals, data — *skeleton*
 
 Intent: tokens are the preferred, audited value channel (D1 — raw values legal);

@@ -110,6 +110,14 @@ function nodeAttrPairs(node: FdnNode): [string, string][] {
 }
 
 function emitNode(w: Writer, depth: number, node: FdnNode): void {
+  if (node.tag === 'fdn-override') {
+    w.push(depth, '<fdn-overrides hidden>')
+    emitNodeContent(w, depth + 1, node)
+    w.push(depth, '</fdn-overrides>')
+  } else emitNodeContent(w, depth, node)
+}
+
+function emitNodeContent(w: Writer, depth: number, node: FdnNode): void {
   const attrs = nodeAttrPairs(node)
   const hasChildren = node.children.length > 0
   const hasText = node.text !== undefined && node.text !== ''

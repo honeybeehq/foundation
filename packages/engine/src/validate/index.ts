@@ -1,3 +1,5 @@
+import { validateInstanceOverrides } from '../components/overrides.js'
+import { validateStyleDeclarations } from './styles.js'
 /**
  * foundation-engine — validate: FdnDocument -> ValidationResult.
  *
@@ -8,12 +10,10 @@
 import { validateComponentSets } from '../components/variants.js'
 import { validateTokenCollections } from '../tokens/index.js'
 import {
-  excludedStylePropertyMessage,
   FDN_ELEMENTS,
   isExcludedAttr,
   isKnownTag,
   OVERLAY_ELEMENT,
-  OVERLAY_ONLY_POSITION_VALUES,
 } from '../grammar/schema.js'
 import { extractInterpolations, extractLookupRefs, extractRefs, findDisallowedConstructs, parseEachBinding } from '../grammar/expr.js'
 import type { FdnComponent, FdnDocument, FdnNamedStyle, FdnNode, FdnParam, ReportLine, ValidationResult } from '../types.js'
@@ -45,54 +45,8 @@ function push(ctx: ValidateCtx, line: ReportLine): void {
 // style declaration checks: exclusions, !important, embedded rules, overlay-only position
 // ——————————————————————————————————————————————————————————————————————————
 
-function checkDeclarations(
-  ctx: ValidateCtx,
-  decls: Record<string, string>,
-  opts: { nodeId?: string; allowOverlayPosition: boolean; allowFreePosition?: boolean; label: string },
-): void {
-  for (const [prop, value] of Object.entries(decls)) {
-    const excludedMsg = excludedStylePropertyMessage(prop)
-    if (excludedMsg) {
-      push(ctx, {
-        code: 'excluded-style-property',
-        severity: 'error',
-        message: excludedMsg,
-        ...(opts.nodeId ? { nodeId: opts.nodeId } : {}),
-        detail: { property: prop, value, on: opts.label },
-      })
-    }
-    if (/!important/i.test(value)) {
-      push(ctx, {
-        code: 'important-not-allowed',
-        severity: 'error',
-        message: `"${prop}: ${value}" uses !important — the subset's cascade is local and total, !important is not legal`,
-        ...(opts.nodeId ? { nodeId: opts.nodeId } : {}),
-        detail: { property: prop, value, on: opts.label },
-      })
-    }
-    // `{{ … }}` interpolation legitimately contains braces — only flag braces
-    // OUTSIDE interpolation spans as a possible embedded CSS rule/selector.
-    if (/[{}]/.test(value.replace(/\{\{[\s\S]*?\}\}/g, ''))) {
-      push(ctx, {
-        code: 'embedded-rule-not-allowed',
-        severity: 'error',
-        message: `"${prop}: ${value}" looks like it embeds a CSS rule/selector — declare a named style instead (no descendant selectors, no specificity games)`,
-        ...(opts.nodeId ? { nodeId: opts.nodeId } : {}),
-        detail: { property: prop, value, on: opts.label },
-      })
-    }
-    if (prop === 'position' && OVERLAY_ONLY_POSITION_VALUES.includes(value.trim())) {
-      if (!opts.allowOverlayPosition && !(opts.allowFreePosition && value.trim() === 'absolute')) {
-        push(ctx, {
-          code: 'position-outside-overlay',
-          severity: 'error',
-          message: `position:${value.trim()} needs a positioned frame parent for absolute placement, or <fdn-overlay> for absolute/fixed placement`,
-          ...(opts.nodeId ? { nodeId: opts.nodeId } : {}),
-          detail: { property: prop, value, on: opts.label },
-        })
-      }
-    }
-  }
+function checkDeclarations(ctx: ValidateCtx, decls: Record<string, string>, opts: { nodeId?: string; allowOverlayPosition: boolean; allowFreePosition?: boolean; label: string }): void {
+  ctx.issues.push(...validateStyleDeclarations(decls, opts))
 }
 
 // ——————————————————————————————————————————————————————————————————————————
@@ -290,6 +244,7 @@ function walkNode(ctx: ValidateCtx, node: FdnNode, scope: Scope, inOverlay: bool
     })
   }
 
+  if (node.tag === 'fdn-override') return
   const rule = FDN_ELEMENTS[node.tag]
   if (rule?.requiredAttrs) {
     for (const req of rule.requiredAttrs) {
@@ -449,7 +404,7 @@ function checkNamedStyle(ctx: ValidateCtx, style: FdnNamedStyle): void {
 
 export function validateDocument(doc: FdnDocument): ValidationResult {
   const ctx: ValidateCtx = {
-    issues: validateComponentSets(doc),
+    issues: [...validateComponentSets(doc), ...validateInstanceOverrides(doc)],
     doc,
     paramNames: new Set(doc.params.map((p) => p.name)),
     dataNames: new Set(doc.data.map((d) => d.name)),

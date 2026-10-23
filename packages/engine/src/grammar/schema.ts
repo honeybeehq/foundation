@@ -193,6 +193,8 @@ export const FDN_ELEMENTS: Record<string, FdnElementRule> = {
   'fdn-sealed-html': { metadata: true, allowsChildren: false },
   'fdn-sealed-css': { metadata: true, allowsChildren: false },
   'fdn-slot': { metadata: false, knownAttrs: ['name'], requiredAttrs: ['name'], allowsChildren: true },
+  'fdn-overrides': { metadata: true, knownAttrs: ['hidden'], allowsChildren: true },
+  'fdn-override': { metadata: false, knownAttrs: ['target', 'text', 'hidden', 'component', 'component-set'], requiredAttrs: ['target'], allowsChildren: false },
   'fdn-use': { metadata: false, knownAttrs: ['component', 'component-set'], requiredAttrs: ['component'], allowsChildren: true },
   'fdn-fill': { metadata: false, knownAttrs: ['slot'], requiredAttrs: ['slot'], allowsChildren: true },
 

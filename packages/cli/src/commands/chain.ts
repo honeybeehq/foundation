@@ -108,7 +108,7 @@ async function runChainInitCommand(positionals: string[], flags: Record<string, 
   const docId = stampedDocId ?? randomUUID()
 
   const { doc, report: sourceReport } = parseDocument(source)
-  const malformedSet = sourceReport.lines.find((line) => line.code === 'malformed-component-set')
+  const malformedSet = sourceReport.lines.find((line) => ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code))
   if (malformedSet) { io.stderr(malformedSet.message); return 1 }
   const author = flagString(flags, 'author') ?? defaultAuthor()
   const message = flagString(flags, 'm', 'message') ?? 'init'

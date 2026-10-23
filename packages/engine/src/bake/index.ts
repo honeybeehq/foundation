@@ -1,3 +1,5 @@
+import { ownOverrides, overrideTarget, prepareOverrides } from '../components/overrides.js'
+import type { OverrideOrigin, PreparedOverrides } from '../components/overrides.js'
 import { componentSelection, validateComponentSets } from '../components/variants.js'
 import { mapStyleValues, mergeStyles, styleEntries } from './styles.js'
 /**
@@ -53,6 +55,9 @@ interface BakeCtx extends ExprContext {
   selectedState: string | null
   componentStack: string[]
   invalidComponentSets: Set<string>
+  usedOverrides: Set<OverrideOrigin>
+  componentOverrides?: PreparedOverrides
+  instancePath: string[]
   slotFills?: Record<string, FdnNode[]>
   reports: ReportLine[]
   tokenValueIndex: Map<string, string[]>
@@ -206,6 +211,8 @@ function bakeTree(doc: FdnDocument, stateName: string | null, editor: boolean): 
     bindings: { prop: {}, param: params },
     lookups: doc.lookups,
     componentStack: [],
+    instancePath: [],
+    usedOverrides: new Set(),
     invalidComponentSets: new Set(validateComponentSets(doc, { instances: false }).map((issue) => (issue.detail as { componentSet: string }).componentSet)),
     reports,
     tokenValueIndex,
@@ -278,6 +285,8 @@ function matchesStateScope(node: FdnNode, state: string | null): boolean {
 
 function bakeNode(node: FdnNode, ctx: BakeCtx): FdnNode[] {
   if (!matchesStateScope(node, ctx.selectedState)) return []
+  if (node.tag === 'fdn-override') return []
+  if (ctx.componentOverrides?.suppressed.has(node.id)) { markOverrides(node, ctx); return [] }
   if (node.each) {
     return bakeEach(node, ctx)
   }
@@ -566,10 +575,18 @@ function buildRegularNode(node: FdnNode, ctx: BakeCtx): FdnNode {
     text = r.value
   }
 
+  const overrideMark = markOverrides(node, ctx)
+  if (ctx.componentOverrides?.literalText.has(node.id)) {
+    text = ctx.componentOverrides.literalText.get(node.id)
+    if (/\{\{\s*prop\./.test(node.text ?? '')) {
+      const record = ctx.componentOverrides.marks.get(node.id)?.records.find((entry) => Object.hasOwn(entry.origin.node.attrs, 'text'))
+      pushReport(ctx, { code: 'override-shadows-prop', severity: 'info', message: 'literal text override shadows the definition prop binding', nodeId: record?.origin.node.id ?? node.id })
+    }
+  }
   return {
     id: node.id,
     tag: node.tag,
-    attrs: ctx.editor ? { ...attrs, 'data-fdn-id': ctx.editor.idPrefix + node.id } : attrs,
+    attrs: ctx.editor ? { ...attrs, ...overrideMark, 'data-fdn-id': ctx.editor.idPrefix + node.id } : attrs,
     style,
     styleStates,
     text,
@@ -577,8 +594,15 @@ function buildRegularNode(node: FdnNode, ctx: BakeCtx): FdnNode {
   }
 }
 
+function markOverrides(node: FdnNode, ctx: BakeCtx): Record<string, string> {
+  const mark = ctx.componentOverrides?.marks.get(node.id)
+  if (!mark) return {}
+  for (const record of mark.records) ctx.usedOverrides.add(record.origin)
+  return ctx.editor ? { 'data-fdn-overrides': [...mark.fields].sort().join(',') } : {}
+}
+
 function editorIdentity(node: FdnNode, componentName: string, ctx: BakeCtx): Record<string, string> {
-  return ctx.editor ? { 'data-fdn-id': ctx.editor.idPrefix + node.id, 'data-fdn-component': componentName, ...(node.attrs['component-set'] ? { 'data-fdn-component-set': node.attrs['component-set'] } : {}) } : {}
+  return ctx.editor ? { ...markOverrides(node, ctx), 'data-fdn-id': ctx.editor.idPrefix + node.id, 'data-fdn-component': componentName, ...(node.attrs['component-set'] ? { 'data-fdn-component-set': node.attrs['component-set'] } : {}) } : {}
 }
 
 function withEditorIds(nodes: FdnNode[], prefix: string): FdnNode[] {
@@ -741,7 +765,32 @@ function instantiateComponent(node: FdnNode, ctx: BakeCtx): FdnNode[] {
     return []
   }
 
-  if (component.sealed) return instantiateSealedComponent(node, componentName, component.sealed, ctx)
+  markOverrides(node, ctx)
+  const owner = [...ctx.instancePath, node.id].join('::')
+  const owned = ownOverrides(node, owner)
+  const inherited = ctx.componentOverrides?.nested.get(node.id) ?? []
+  const records = [...owned, ...inherited]
+  const duplicateTargets = new Set<string>()
+  for (const record of owned) {
+    const target = JSON.stringify(record.target)
+    if (duplicateTargets.has(target)) pushReport(ctx, { code: 'duplicate-override-target', severity: 'warning', message: `multiple overrides target ${target} on "${owner}"; later child declarations win per property`, nodeId: record.origin.node.id })
+    duplicateTargets.add(target)
+  }
+  for (const metadata of node.children.filter((child) => child.tag === 'fdn-override')) {
+    if (!overrideTarget(metadata)) pushReport(ctx, { code: 'invalid-instance-override', severity: 'error', message: 'override target must be a nonempty JSON array of definition identities', nodeId: metadata.id })
+    for (const [prop, value] of Object.entries(metadata.style)) auditStyleValue(prop, value, ctx, metadata.id)
+    for (const plane of Object.values(metadata.styleStates)) if (plane) for (const [prop, value] of Object.entries(plane)) auditStyleValue(prop, value, ctx, metadata.id)
+  }
+  const reportDormant = () => {
+    for (const record of owned) if (!ctx.usedOverrides.has(record.origin)) pushReport(ctx, { code: 'override-dormant', severity: record.origin.reason === 'target is not rendered in the current state or slot content' ? 'info' : 'warning', message: `override ${JSON.stringify(record.origin.target)} on "${owner}" is dormant: ${record.origin.reason}`, nodeId: record.origin.node.id, detail: { instanceId: node.id, instancePath: owner, target: record.origin.target } })
+  }
+  if (component.sealed) {
+    for (const record of records) record.origin.reason = 'sealed components have no addressable inner layers'
+    reportDormant()
+    return instantiateSealedComponent(node, componentName, component.sealed, ctx)
+  }
+  const prepared = records.length ? prepareOverrides(component, records) : undefined
+  if (prepared) ctx.reports.push(...prepared.reports)
 
   const resolved = resolveNodeStyle(node, ctx)
   const instance: InstanceStyle | null = hasInstanceStyle(node) ? resolved : null
@@ -797,11 +846,14 @@ function instantiateComponent(node: FdnNode, ctx: BakeCtx): FdnNode[] {
     ...ctx,
     bindings: { prop: propsTyped, param: ctx.bindings['param'] ?? {} },
     componentStack: [...ctx.componentStack, componentName],
+    instancePath: [...ctx.instancePath, node.id],
+    componentOverrides: prepared,
     slotFills,
     ...(ctx.editor ? { editor: { idPrefix: `${ctx.editor.idPrefix}${node.id}::` } } : {}),
   }
 
-  const bakedBody = component.body.flatMap((n) => bakeNode(n, innerCtx))
+  const bakedBody = (prepared?.body ?? component.body).flatMap((n) => bakeNode(n, innerCtx))
+  reportDormant()
   const styledBody = instance ? applyInstanceStyle(node, componentName, bakedBody, instance, ctx) : bakedBody
   const namespacedBody = prefixIds(styledBody, node.id)
 

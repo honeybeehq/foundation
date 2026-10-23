@@ -1,4 +1,4 @@
-import type { ChainLogEntry, EnvelopeRecord, FdnDocument, PatchOp, ReportLine } from './document.ts'
+import type { ChainLogEntry, EnvelopeRecord, FdnDocument, InstanceOverridePatch, PatchOp, ReportLine } from './document.ts'
 
 export type { EnvelopeRecord, FdnDocument, FdnNode, PatchOp, ReportLine } from './document.ts'
 
@@ -46,7 +46,11 @@ export type TokenModeOp =
   | { op: 'set-mode-token'; collection: string; name: string; type?: import('./document.ts').FdnTokenType; mode: string; value: import('./document.ts').FdnTokenValue }
   | { op: 'set-collection-mode'; id: string; collection: string; mode: string | null }
 
-export type ComponentOp = { op: 'set-instance-variant'; id: string; values: Record<string, string | null> | null }
+export type ComponentOp =
+  | { op: 'set-instance-variant'; id: string; values: Record<string, string | null> | null }
+  | { op: 'set-instance-override'; id: string; target: string[]; values: InstanceOverridePatch }
+  | { op: 'reset-instance-override'; id: string; target: string[] }
+  | { op: 'reset-instance-overrides'; id: string }
 
 export type SessionOp = PatchOp | PlacementOp | TokenModeOp | ComponentOp
 
@@ -219,7 +223,15 @@ const TOKEN_MODE_OPS: Record<TokenModeOp['op'], Check> = {
   'set-mode-token': shape({ collection: isString, name: isString, type: optional(isTokenType), mode: isString, value: isTokenValue }),
   'set-collection-mode': shape({ id: isString, collection: isString, mode: nullable(isString) }),
 }
-const isComponentOp: Check = (value) => isRecord(value) && value.op === 'set-instance-variant' && shape({ id: isString, values: nullable(recordOf(nullable(isString))) })(value)
+const isSwapTarget: Check = (value) => isRecord(value) && ((typeof value.component === 'string' && value.componentSet === undefined && value.variants === undefined) || (typeof value.componentSet === 'string' && value.component === undefined && (value.variants === undefined || isStringMap(value.variants))))
+const isOverrideValues = shape({ text: optional(nullable(isString)), hidden: optional(nullable(isBoolean)), style: optional(recordOf(nullable(isString))), styleStates: optional(recordOf(recordOf(nullable(isString)))), swap: optional(nullable(isSwapTarget)) })
+const COMPONENT_OPS: Record<ComponentOp['op'], Check> = {
+  'set-instance-variant': shape({ id: isString, values: nullable(recordOf(nullable(isString))) }),
+  'set-instance-override': shape({ id: isString, target: arrayOf(isString), values: isOverrideValues }),
+  'reset-instance-override': shape({ id: isString, target: arrayOf(isString) }),
+  'reset-instance-overrides': shape({ id: isString }),
+}
+const isComponentOp: Check = (value) => isRecord(value) && typeof value.op === 'string' && Object.hasOwn(COMPONENT_OPS, value.op) && COMPONENT_OPS[value.op as ComponentOp['op']](value)
 const isTokenModeOp: Check = (value) => isRecord(value) && typeof value.op === 'string' && Object.hasOwn(TOKEN_MODE_OPS, value.op) && TOKEN_MODE_OPS[value.op as TokenModeOp['op']](value)
 
 const CLIENT_MESSAGES: Record<ClientMessage['t'], Check> = {

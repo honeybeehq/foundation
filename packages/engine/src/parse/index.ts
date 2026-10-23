@@ -278,6 +278,7 @@ function hasNonWhitespaceContent(el: ElementNode): boolean {
 
 function convertElement(el: ElementNode, ctx: ConvertCtx): FdnNode | null {
   const tag = el.tagName.toLowerCase()
+  if (tag === 'fdn-overrides') return null
 
   if (isExcludedElement(tag)) {
     ctx.lines.push({
@@ -448,17 +449,21 @@ function convertElement(el: ElementNode, ctx: ConvertCtx): FdnNode | null {
   if (each !== undefined) node.each = each
 
   if (tag === 'fdn-use') {
-    // SPEC Q10 / API.md: resolved <fdn-use> children are derived bake output, not
-    // canonical. Collapse back to template form: keep the instance + its prop
-    // bindings, drop any resolved subtree that came along in the source text.
-    if (hasNonWhitespaceContent(el)) {
-      ctx.lines.push({
-        code: 'resolved-instance-collapsed',
-        severity: 'info',
-        message: 'resolved <fdn-use> children are a derived bake artifact — collapsed to template form',
-        nodeId: id,
-      })
+    let collapsed = false
+    for (const child of el.childNodes) {
+      if (isElement(child) && child.tagName.toLowerCase() === 'fdn-overrides') {
+        for (const metadata of child.childNodes) {
+          if (isElement(metadata) && metadata.tagName.toLowerCase() === 'fdn-override') {
+            const converted = convertElement(metadata, ctx)
+            if (converted) node.children.push(converted)
+          } else if (isElement(metadata) || (isText(metadata) && metadata.value.trim())) ctx.lines.push({ code: 'malformed-instance-overrides', severity: 'error', message: 'override wrapper contains only override metadata' })
+        }
+      } else if (isElement(child) && ['fdn-fill', 'fdn-override'].includes(child.tagName.toLowerCase())) {
+        const converted = convertElement(child, ctx)
+        if (converted) node.children.push(converted)
+      } else if (isElement(child) || (isText(child) && child.value.trim() !== '')) collapsed = true
     }
+    if (collapsed) ctx.lines.push({ code: 'resolved-instance-collapsed', severity: 'info', message: 'derived instance children collapsed; slot fills and overrides retained', nodeId: id })
     return node
   }
 
@@ -994,6 +999,14 @@ export function parseDocument(html: string): { doc: FdnDocument; report: Normali
   const htmlEl = childElements(document).find((e) => e.tagName.toLowerCase() === 'html')
   const headEl = htmlEl ? directChildrenByTag(htmlEl, 'head')[0] : undefined
   const bodyEl = htmlEl ? directChildrenByTag(htmlEl, 'body')[0] : (findDeep(document, 'body') ?? undefined)
+
+  const checkOverrideWrappers = (parent: T5.ParentNode) => {
+    for (const child of childElements(parent)) {
+      if (child.tagName.toLowerCase() === 'fdn-overrides' && (!isElement(parent) || parent.tagName.toLowerCase() !== 'fdn-use')) lines.push({ code: 'misplaced-override-wrapper', severity: 'error', message: 'fdn-overrides wrapper is allowed only directly inside an instance' })
+      checkOverrideWrappers(child)
+    }
+  }
+  checkOverrideWrappers(document)
 
   const { tokens, classStyles } = parseStylesheet(headEl, lines)
 

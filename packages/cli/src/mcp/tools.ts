@@ -333,7 +333,7 @@ async function toolIngest(args: Record<string, unknown>): Promise<ToolResult> {
   }
 
   const { doc, report } = parseDocument(source)
-  const malformedSet = report.lines.find((line) => line.code === 'malformed-component-set')
+  const malformedSet = report.lines.find((line) => ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code))
   if (malformedSet) return fail(malformedSet.message)
   const canonical = projectDocument(doc)
   // Bug fix (friction §6): re-stamp data-fdn-doc-id off the ORIGINAL source
@@ -842,7 +842,7 @@ async function toolImport(args: Record<string, unknown>): Promise<ToolResult> {
   }
 
   const { doc, report: sourceReport } = parseDocument(read.source)
-  const malformedSet = sourceReport.lines.find((line) => line.code === 'malformed-component-set')
+  const malformedSet = sourceReport.lines.find((line) => ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code))
   if (malformedSet) return fail(malformedSet.message)
 
   const targetName = projected.component.name

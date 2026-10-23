@@ -69,6 +69,7 @@ export function validateComponentSets(doc: FdnDocument, opts?: { instances?: boo
   const invalidSets = new Set(issues.map((issue) => (issue.detail as { componentSet: string }).componentSet))
   const walk = (nodes: FdnNode[], scope: string) => {
     for (const node of nodes) {
+      if (node.tag === 'fdn-override') continue
       const setName = node.attrs['component-set'] ?? ''
       const fail = (message: string) => issues.push({ code: 'invalid-instance-variant', severity: 'error', message, nodeId: node.id, detail: { componentSet: setName, subject: `${scope}:${node.id}` } })
       if (Object.keys(node.attrs).some((key) => key.startsWith('data-fdn-variant-')) && (node.tag !== 'fdn-use' || !setName)) fail('variant selections require a component set instance')

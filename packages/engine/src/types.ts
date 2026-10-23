@@ -90,6 +90,15 @@ export interface FdnProp {
   default?: unknown
 }
 
+export type ComponentSwapTarget = { component: string } | { componentSet: string; variants?: Record<string, string> }
+export interface InstanceOverridePatch {
+  text?: string | null
+  hidden?: boolean | null
+  style?: Record<string, string | null>
+  styleStates?: Partial<Record<StateStyleKey, Record<string, string | null>>>
+  swap?: ComponentSwapTarget | null
+}
+
 export interface FdnComponentSet {
   name: string
   properties: Record<string, string[]>
