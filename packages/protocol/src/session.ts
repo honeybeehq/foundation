@@ -24,10 +24,17 @@ export interface DocumentView {
   issues: ReportLine[]
 }
 
+export type PlacementOp =
+  | { op: 'set-frame-mode'; id: string; mode: 'free' | 'flow' }
+  | { op: 'set-free-position'; id: string; x: number; y: number }
+  | { op: 'resize-free'; id: string; width: number; height: number }
+  | { op: 'set-placement'; id: string; mode: 'free'; bounds: { x: number; y: number; width: number; height: number } }
+  | { op: 'set-placement'; id: string; mode: 'flow' }
+
 export type ClientMessage =
   | { t: 'hello'; protocol: string; client: string; author: string }
   | { t: 'view'; states: Array<string | null>; components: boolean }
-  | { t: 'commit'; id: string; base: number; ops: PatchOp[]; label: string }
+  | { t: 'commit'; id: string; base: number; ops: Array<PatchOp | PlacementOp>; label: string }
   | { t: 'undo'; id: string }
   | { t: 'redo'; id: string }
   | { t: 'log'; id: string; limit: number }
@@ -150,12 +157,20 @@ const PATCH_OPS: Record<PatchOp['op'], Check> = {
   'replace-document': shape({ doc: isDocument }),
 }
 
+const PLACEMENT_OPS: Record<PlacementOp['op'], Check> = {
+  'set-frame-mode': shape({ id: isString, mode: oneOf(['free', 'flow']) }),
+  'set-free-position': shape({ id: isString, x: isNumber, y: isNumber }),
+  'resize-free': shape({ id: isString, width: isNumber, height: isNumber }),
+  'set-placement': (value) => shape({ id: isString, mode: oneOf(['free', 'flow']) })(value) && (isRecord(value) && (value.mode === 'flow' || shape({ bounds: shape({ x: isNumber, y: isNumber, width: isNumber, height: isNumber }) })(value))),
+}
+const isPlacementOp: Check = (value) => isRecord(value) && typeof value.op === 'string' && Object.hasOwn(PLACEMENT_OPS, value.op) && PLACEMENT_OPS[value.op as PlacementOp['op']](value)
+
 const isPatchOp: Check = (value) => isRecord(value) && typeof value.op === 'string' && Object.hasOwn(PATCH_OPS, value.op) && PATCH_OPS[value.op as PatchOp['op']](value)
 
 const CLIENT_MESSAGES: Record<ClientMessage['t'], Check> = {
   hello: shape({ protocol: isString, client: isString, author: isString }),
   view: shape({ states: arrayOf(nullable(isString)), components: isBoolean }),
-  commit: shape({ id: isString, base: isCount, ops: arrayOf(isPatchOp), label: isString }),
+  commit: shape({ id: isString, base: isCount, ops: arrayOf((value) => isPatchOp(value) || isPlacementOp(value)), label: isString }),
   undo: shape({ id: isString }),
   redo: shape({ id: isString }),
   log: shape({ id: isString, limit: isCount }),

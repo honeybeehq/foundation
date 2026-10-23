@@ -59,8 +59,9 @@ The grammar is spelled in real HTML wherever HTML has a word for the concept:
   attributes — §3). `fdn-*` custom elements exist only for semantics HTML lacks:
   component definitions, instances, slots, conditionals. Closure does its work in
   attributes, styling, and values, not in the tag list.
-- **Layout:** flex and grid composition only. No floats, no absolute positioning except
-  inside the one sanctioned overlay context, no magic-number geometry.
+- **Layout:** flex and grid composition, plus free placement inside explicit frames
+  (§3a). No floats. Absolute positioning requires a direct frame parent or the
+  sanctioned overlay context; fixed positioning still requires an overlay.
 - **Values:** arbitrary values are legal — `padding: 13px` is a valid document, not an
   error. Tokens (CSS custom properties, `padding: var(--space-4)`) are the preferred
   channel and the one the conformance plane audits against a design system: off-token
@@ -261,7 +262,7 @@ tables, definition lists, …) expressly included, and form controls included as
 event-handler attributes, live media behavior. On top: `fdn-*` elements for what HTML
 lacks — `fdn-component` (definition: props, slots, variants), `fdn-use` (instance
 with prop bindings), `fdn-slot` — and `when`/`each` attributes for declarative
-conditionals (§4), plus one sanctioned overlay context (open question 2). Everything
+conditionals (§4), plus explicit free-placement frames (§3a) and one sanctioned overlay context (open question 2). Everything
 outside the grammar is normalized in where mappable (D1) before validation rejects
 the remainder.
 
@@ -278,6 +279,69 @@ grammar (schema), node identity rules (stable ids for diff/anchoring/comments), 
 styles (see open question 12), component/variant declaration syntax, inheritance from
 design system documents (both boards duplicated their full token + component sets for
 lack of it — finding b.6).
+
+### 3a. Free placement inside frames (2026-10-23)
+
+A frame is an ordinary HTML container with `data-fdn-layout="free"` or
+`data-fdn-layout="flow"` and inline `position:relative`. Free mode also declares
+inline `display:block`; flow mode uses the container's flex/grid layout. These
+attributes and styles are document truth, not editor hints. Existing containers
+without this attribute retain their existing behavior. This is an additive grammar
+extension under the current spec version; no document migration is performed.
+
+A direct child may opt out of either frame's flow with inline `position:absolute`,
+`left:<x>px`, `top:<y>px`, `width:<w>px`, `height:<h>px`, and
+`box-sizing:border-box`. x/y are finite CSS pixels from the containing block's
+padding edge; width/height are nonnegative border-box CSS pixels. Negative x/y and
+fractional pixels are legal. Canonical editor operations clear right/bottom to auto
+and child margins to zero. The first slice pins left/top: changing the frame's size
+does not scale or center a free child. Width/height follow ordinary CSS min/max
+constraints if present. Frames should declare dimensions when their free children
+must define a visible canvas: absolute children do not contribute intrinsic size.
+
+Free children occupy no flow space; other children follow ordinary block, flex or
+grid layout in DOM order. Switching a frame mode changes its display only, keeping
+children's placement and DOM order. Overflow, clipping and stacking use standard
+CSS; the mode adds no automatic clipping or z-index. Nested frames each establish
+their own containing block. Overlay semantics remain unchanged; fixed positioning
+is not enabled by a frame. Position declarations in named styles remain prohibited
+because their containing context is unknown statically.
+
+Right/bottom, center and proportional scale constraints, rotation/flip authoring,
+and transform-aware conversion are later slices. Existing legal CSS transforms
+still render normally; this slice adds no transform or constraint metadata.
+Artboards, pages, sections, guides, selection, zoom/pan, snapping and editor window
+arrangement acquire no new document semantics here. Editor viewport measurements
+are inputs used to author CSS; they are not a second persisted geometry model.
+Bake/export preserve the authored CSS geometry with the existing cascade and
+component expansion, with no editor runtime needed.
+
+The session protocol accepts these semantic operations in a normal `commit.ops`
+batch alongside existing patch verbs:
+
+- `set-frame-mode {id, mode:"free"|"flow"}` sets the attribute and relative
+  positioning. Free chooses block display; flow retains inline flex/grid, otherwise
+  chooses flex. Children are unchanged.
+- `set-placement {id, mode:"free", bounds:{x,y,width,height}}` converts a direct
+  frame child using caller-measured, untransformed bounds relative to that frame's
+  padding edge, including scroll offset and excluding child margins. The caller
+  measures the chosen rendered instance/state before committing. It must account
+  for ancestor transforms; ambiguous transformed geometry is outside this slice.
+- `set-placement {id, mode:"flow"}` sets static positioning and auto offsets,
+  retaining size. Flow chooses its position by DOM order and layout, so retaining
+  arbitrary free x/y is not generally possible.
+- `set-free-position {id,x,y}` updates an already-free child's left/top.
+- `resize-free {id,width,height}` updates an already-free child's border-box size.
+
+Geometry operations require an explicit, relatively positioned direct frame
+parent. Invalid numbers, missing nodes, or missing frame context reject the whole
+commit without a revision or undo step. The session expands semantic operations
+against the sequential batch state into existing set-attr/set-style patches, then
+records one envelope and undo step for the entire commit. Chains store those
+primitive patches, not semantic requests. Undo/redo restore the exact previous
+attribute/style declarations through the existing guarded inverse machinery; no
+replace-document is used. Results and document/bake notifications retain the
+existing protocol shapes. Undo history remains session-local.
 
 ## 4. Tokens, params, conditionals, data — *skeleton*
 

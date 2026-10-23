@@ -1,3 +1,4 @@
+import { expandPlacement, PlacementError } from './placement.js'
 import { randomUUID } from 'node:crypto'
 import { existsSync, mkdirSync, statSync, watch, type FSWatcher } from 'node:fs'
 import { basename, dirname, resolve } from 'node:path'
@@ -345,7 +346,13 @@ class DesignSession implements Session {
     this.syncAndAnnounce()
     if (message.ops.length === 0) return this.reject(message.id, { code: 'invalid-op', message: 'commit has no ops' })
     if (message.base > this.rev) return this.reject(message.id, { code: 'invalid-op', message: `base ${message.base} is ahead of rev ${this.rev}` })
-    const patch = applyPatch(this.doc, message.ops)
+    let ops: PatchOp[]
+    try {
+      ops = expandPlacement(this.doc, message.ops)
+    } catch (err) {
+      return this.reject(message.id, { code: err instanceof PlacementError ? err.code : 'invalid-op', message: err instanceof Error ? err.message : String(err) })
+    }
+    const patch = applyPatch(this.doc, ops)
     if (!patch.ok) return this.reject(message.id, patch.error)
     const label = message.label || 'Edit'
     const failure = this.record(patch.applied, label)

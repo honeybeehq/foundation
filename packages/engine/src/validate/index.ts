@@ -46,7 +46,7 @@ function push(ctx: ValidateCtx, line: ReportLine): void {
 function checkDeclarations(
   ctx: ValidateCtx,
   decls: Record<string, string>,
-  opts: { nodeId?: string; allowOverlayPosition: boolean; label: string },
+  opts: { nodeId?: string; allowOverlayPosition: boolean; allowFreePosition?: boolean; label: string },
 ): void {
   for (const [prop, value] of Object.entries(decls)) {
     const excludedMsg = excludedStylePropertyMessage(prop)
@@ -80,11 +80,11 @@ function checkDeclarations(
       })
     }
     if (prop === 'position' && OVERLAY_ONLY_POSITION_VALUES.includes(value.trim())) {
-      if (!opts.allowOverlayPosition) {
+      if (!opts.allowOverlayPosition && !(opts.allowFreePosition && value.trim() === 'absolute')) {
         push(ctx, {
           code: 'position-outside-overlay',
           severity: 'error',
-          message: `position:${value.trim()} is only legal inside <fdn-overlay> — wrap this content in fdn-overlay, or use flex/grid layout instead`,
+          message: `position:${value.trim()} needs a positioned frame parent for absolute placement, or <fdn-overlay> for absolute/fixed placement`,
           ...(opts.nodeId ? { nodeId: opts.nodeId } : {}),
           detail: { property: prop, value, on: opts.label },
         })
@@ -277,7 +277,7 @@ function checkLowercaseName(ctx: ValidateCtx, kind: 'param' | 'prop', name: stri
 // node walk
 // ——————————————————————————————————————————————————————————————————————————
 
-function walkNode(ctx: ValidateCtx, node: FdnNode, scope: Scope, inOverlay: boolean): void {
+function walkNode(ctx: ValidateCtx, node: FdnNode, scope: Scope, inOverlay: boolean, parent?: FdnNode): void {
   if (!isKnownTag(node.tag)) {
     push(ctx, {
       code: 'unknown-element',
@@ -372,10 +372,15 @@ function walkNode(ctx: ValidateCtx, node: FdnNode, scope: Scope, inOverlay: bool
     })
   }
 
+  const layout = node.attrs['data-fdn-layout']
+  if (layout !== undefined && (!['free', 'flow'].includes(layout) || node.style.position !== 'relative' || (layout === 'free' ? node.style.display !== 'block' : !['flex', 'grid'].includes(node.style.display ?? '')))) {
+    push(ctx, { code: 'invalid-frame-layout', severity: 'error', message: 'frame layout must be free or flow with inline position:relative; free frames need display:block and flow frames need display:flex or grid', nodeId: node.id })
+  }
+  const allowFreePosition = parent !== undefined && ['free', 'flow'].includes(parent.attrs['data-fdn-layout'] ?? '') && parent.style.position === 'relative'
   const overlayHere = node.tag === OVERLAY_ELEMENT || inOverlay
-  checkDeclarations(ctx, node.style, { nodeId: node.id, allowOverlayPosition: overlayHere, label: 'style' })
+  checkDeclarations(ctx, node.style, { nodeId: node.id, allowOverlayPosition: overlayHere, allowFreePosition, label: 'style' })
   for (const decls of Object.values(node.styleStates)) {
-    if (decls) checkDeclarations(ctx, decls, { nodeId: node.id, allowOverlayPosition: overlayHere, label: 'styleState' })
+    if (decls) checkDeclarations(ctx, decls, { nodeId: node.id, allowOverlayPosition: overlayHere, allowFreePosition, label: 'styleState' })
   }
 
   // scope for THIS node's own each/when/attrs/text: include its own each alias.
@@ -407,7 +412,7 @@ function walkNode(ctx: ValidateCtx, node: FdnNode, scope: Scope, inOverlay: bool
     for (const expr of extractInterpolations(node.text)) checkExpr(ctx, expr, ownScope, node.id, 'text')
   }
 
-  for (const child of node.children) walkNode(ctx, child, ownScope, overlayHere)
+  for (const child of node.children) walkNode(ctx, child, ownScope, overlayHere, node)
 }
 
 function checkEnumValues(ctx: ValidateCtx, kind: 'param' | 'prop', declaration: { name: string; type: string; values?: string[] }, componentName: string | undefined): void {
