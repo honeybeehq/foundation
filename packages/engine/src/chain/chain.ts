@@ -285,7 +285,7 @@ class LoroChain implements FdnChain {
     const resolvedActor = actor ?? `loaded:${createHash('sha256').update(snapshotBytes).digest('hex')}`
     const chain = new LoroChain(resolvedActor, loro)
     chain.rebuildIndex()
-    assertFormatVersion(chain.doc())
+    assertFormatVersion({ specVersion: String(chain.meta.get('specVersion') ?? '') })
     for (const [name, frontier] of entries) chain.anchors.set(name, frontier)
     return chain
   }
@@ -483,7 +483,7 @@ class LoroChain implements FdnChain {
   }
 
   save(): Uint8Array {
-    assertFormatVersion(this.materialize())
+    assertFormatVersion({ specVersion: String(this.meta.get('specVersion') ?? '') })
     const snapshot = this.loro.export({ mode: 'snapshot' })
     const anchorsBytes = new TextEncoder().encode(JSON.stringify(Array.from(this.anchors.entries())))
     const header = new Uint8Array(4)
