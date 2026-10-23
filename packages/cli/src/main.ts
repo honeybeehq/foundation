@@ -9,6 +9,8 @@
  * exit code — main.ts's only jobs are picking the command and calling
  * process.exit with what it returns.
  */
+import { realpathSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { processIo } from './io.js'
 import { runNew } from './commands/new.js'
 import { runCopy } from './commands/copy.js'
@@ -116,8 +118,16 @@ export async function runCli(argv: string[], io: CliIO = processIo): Promise<num
   return handler(rest, io)
 }
 
-const isMain = process.argv[1] && import.meta.url === `file://${process.argv[1]}`
-if (isMain) {
+function isMainModule(): boolean {
+  if (!process.argv[1]) return false
+  try {
+    return realpathSync(fileURLToPath(import.meta.url)) === realpathSync(process.argv[1])
+  } catch {
+    return false
+  }
+}
+
+if (isMainModule()) {
   runCli(process.argv.slice(2)).then(
     (code) => process.exit(code),
     (err) => {
