@@ -5,7 +5,7 @@ import { createChain, loadChain, normalizeDocument, parseDocument } from 'founda
 import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
 import { readDocIdAttr } from '../docid.js'
-import { documentText, readBytesIfPresent } from '../disk.js'
+import { canonicalText, documentText, readBytesIfPresent } from '../disk.js'
 import { defaultAuthor } from '../identity.js'
 
 function writeCopy(path: string, text: string, bytes: Uint8Array): void {
@@ -56,12 +56,17 @@ export async function runCopy(args: string[], io: CliIO): Promise<number> {
     if (stampedId && chainId && stampedId !== chainId) {
       throw new Error('source document and chain have different document ids')
     }
-    const source = { path: sourcePath, docId: chainId ?? stampedId, head: sourceChain?.head().hash ?? null }
     const doc = normalizeDocument(parseDocument(sourceText).doc)
+    const source = {
+      path: sourcePath,
+      docId: chainId ?? stampedId,
+      head: sourceChain?.head().hash ?? null,
+      dirty: sourceChain !== null && canonicalText(doc) !== canonicalText(sourceChain.doc()),
+    }
     const title = flagString(flags, 'title')
     if (title !== undefined) doc.title = title
     const docId = randomUUID()
-    const message = `copied from ${source.docId ?? 'unidentified'}@${source.head ?? 'untracked'} (${sourcePath})`
+    const message = `copied from ${source.docId ?? 'unidentified'}@${source.head ?? 'untracked'}${source.dirty ? '+working' : ''} (${sourcePath})`
     const chain = createChain(doc, { author: defaultAuthor(), message }, { docId })
     writeCopy(path, documentText(doc, docId), chain.save())
     const result = { path, docId, chainPath, head: chain.head().hash, source }
