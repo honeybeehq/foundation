@@ -25,6 +25,7 @@ import type { EnvelopeRecord, FdnChain, FdnDocument, InstanceDetachReport, Insta
 import { parseClientMessage, SESSION_PROTOCOL } from 'foundation-protocol'
 import type { Cause, ClientMessage, DocumentView, FaultCode, ResultCode, ServiceMessage } from 'foundation-protocol'
 import { withWallTime } from '../change-meta.js'
+import { defaultAuthor } from '../identity.js'
 import { readDocIdAttr } from '../docid.js'
 import { skeletonDocumentEmpty, titleFromName } from '../commands/new.js'
 import { canonicalText, documentText, persistDocument, projectedText, projectionVersion, recoverDocument, sourceBase, readBytesIfPresent, readTextIfPresent, sameBytes, writeAtomic } from '../disk.js'
@@ -253,7 +254,7 @@ class DesignSession implements Session {
     if (message.protocol !== SESSION_PROTOCOL) {
       return this.fault('protocol', `protocol ${message.protocol} is not supported; this service speaks ${SESSION_PROTOCOL}`, 2)
     }
-    this.author = message.author || this.options.author || `user:${process.env.USER ?? 'unknown'}`
+    this.author = message.author || this.options.author || defaultAuthor()
     this.earlyResult = message.earlyResult === true
     const created = this.open()
     if (created === null) return

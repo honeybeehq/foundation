@@ -7,6 +7,7 @@ import type { FdnDocument, FdnNode } from 'foundation-engine'
 import type { ClientMessage, ServiceMessage } from 'foundation-protocol'
 import { createSession, type SessionOptions } from '../src/session/session.js'
 import { skeletonDocument } from '../src/commands/new.js'
+import { defaultAuthor } from '../src/identity.js'
 
 type Of<T extends ServiceMessage['t']> = Extract<ServiceMessage, { t: T }>
 
@@ -121,7 +122,7 @@ describe('foundation session', () => {
       expect(existsSync(`${file}.chain`)).toBe(false)
     })
 
-    it('resolves the author from hello, then --author, then $USER', () => {
+    it('resolves the author from hello, then --author, then the shared identity default', () => {
       writeDocument(file, skeletonDocument('Board'), true)
       const commit: ClientMessage = { t: 'commit', id: 'c', base: 1, ops: [{ op: 'set-text', id: 'n1', text: 'x' }], label: 'Text' }
       const fromFlag = start(file, { author: 'user:flag' })
@@ -132,7 +133,7 @@ describe('foundation session', () => {
       expect(only(fromHello.say(commit), 'doc')[0]?.cause).toMatchObject({ author: 'user:hello' })
       const fromEnv = start(file)
       fromEnv.open('')
-      expect(only(fromEnv.say(commit), 'doc')[0]?.cause).toMatchObject({ author: `user:${process.env.USER}` })
+      expect(only(fromEnv.say(commit), 'doc')[0]?.cause).toMatchObject({ author: defaultAuthor() })
     })
   })
 

@@ -9,14 +9,18 @@ import { defaultAuthor } from '../src/identity.js'
  */
 describe('defaultAuthor (SPEC 13a-ii)', () => {
   const originalHiveBee = process.env.HIVE_BEE
+  const originalHiveBeeId = process.env.HIVE_BEE_ID
 
   beforeEach(() => {
     delete process.env.HIVE_BEE
+    delete process.env.HIVE_BEE_ID
   })
 
   afterEach(() => {
     if (originalHiveBee === undefined) delete process.env.HIVE_BEE
     else process.env.HIVE_BEE = originalHiveBee
+    if (originalHiveBeeId === undefined) delete process.env.HIVE_BEE_ID
+    else process.env.HIVE_BEE_ID = originalHiveBeeId
   })
 
   it('defaults to user:<os-username>@<hostname> when HIVE_BEE is unset', () => {

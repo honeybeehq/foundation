@@ -12,7 +12,7 @@
 import { hostname, userInfo } from 'node:os'
 
 export function defaultAuthor(): string {
-  const bee = process.env.HIVE_BEE
+  const bee = process.env.HIVE_BEE_ID || process.env.HIVE_BEE
   if (bee) return `agent:${bee}`
   return `user:${userInfo().username}@${hostname()}`
 }

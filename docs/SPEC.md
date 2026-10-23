@@ -1157,8 +1157,12 @@ To fill: the fixtures.
     header element and in the chain's metadata, immutable for the document's life;
     peers and relays pair chains by it. (ii) **Author identity**: CLI defaults to
     `user:<os-username>@<hostname>`, never a shared literal (peer ids derive from
-    author strings; shared defaults collide — proven). Hive identity overrides when
-    present. (iii) **Project manifest**: a `foundation.json` in the project
+    author strings; shared defaults collide — proven). A nonempty `HIVE_BEE_ID`
+    overrides this with `agent:<canonical bee UUID>`, then `HIVE_BEE` supplies the
+    legacy name fallback. CLI/MCP mutations and a session with no explicit author
+    share that default; explicit flag/hello authors keep their existing precedence.
+    Existing history is not rewritten. (iii) **Project manifest**: a
+    `foundation.json` in the project
     directory — `{ schema, id, name, documents: [{ path, docId }], designSystem?:
     <path>, viewports?: defaults }`; the filesystem stays the database, the
     manifest is the index. Design-system *inheritance semantics* remain §3 to-fill.
