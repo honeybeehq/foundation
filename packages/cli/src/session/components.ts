@@ -1,9 +1,14 @@
 import { randomUUID } from 'node:crypto'
-import { applyPatch, planInstanceSwap, componentSelection, indexNodes, overrideTarget, resolveOverrideTarget, swapAttributes } from 'foundation-engine'
-import type { FdnDocument, FdnNode, InstanceSwapReport, PatchOp, StateStyleKey } from 'foundation-engine'
+import { detachInstance, applyPatch, planInstanceSwap, componentSelection, indexNodes, overrideTarget, resolveOverrideTarget, swapAttributes } from 'foundation-engine'
+import type { FdnDocument, FdnNode, InstanceDetachReport, InstanceSwapReport, PatchOp, StateStyleKey } from 'foundation-engine'
 import type { ComponentOp } from 'foundation-protocol'
 
-export function expandComponentOp(doc: FdnDocument, op: ComponentOp, reports: InstanceSwapReport[] = []): PatchOp[] {
+export function expandComponentOp(doc: FdnDocument, op: ComponentOp, reports: InstanceSwapReport[] = [], detaches: InstanceDetachReport[] = []): PatchOp[] {
+  if (op.op === 'detach-instance') {
+    const plan = detachInstance(doc, op.id, op.state)
+    detaches.push(plan.report)
+    return plan.ops
+  }
   const ops = componentOps(doc, op)
   const node = indexNodes(doc.body).get(op.id)?.node
   if (!node) return ops
@@ -36,7 +41,7 @@ export function expandComponentOp(doc: FdnDocument, op: ComponentOp, reports: In
   return [...ops, ...retargets]
 }
 
-function componentOps(doc: FdnDocument, op: ComponentOp): PatchOp[] {
+function componentOps(doc: FdnDocument, op: Exclude<ComponentOp, { op: 'detach-instance' }>): PatchOp[] {
   const node = indexNodes(doc.body).get(op.id)?.node
   if (!node || node.tag !== 'fdn-use') throw new Error(`"${op.id}" must be a component instance`)
   if (op.op === 'swap-instance') {

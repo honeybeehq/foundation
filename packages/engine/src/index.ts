@@ -24,3 +24,5 @@ export { stableStringify } from './chain/util.js'
 
 export { validateTokenCollections } from './tokens/index.js'
 export { planInstanceSwap, assertInstanceAcyclic } from './components/swap.js'
+
+export { detachInstance } from './components/detach.js'

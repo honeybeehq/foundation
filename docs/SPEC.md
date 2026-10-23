@@ -682,6 +682,65 @@ a compatibility plan, not a frozen appearance snapshot. Batch reports follow
 operation order; a no-op selection returns its report without a history entry.
 
 
+### One-level chosen-state detach
+
+`detach-instance {id,state:string|null}` replaces a source native instance with
+its current content in the explicit chosen state. `null` uses parameter defaults
+and is refused when the target, its ancestors, authored fills or outer definition
+contain state scopes: choose a named state instead. Unknown states, inactive
+instances, sealed targets and instances inside an enclosing `each` are refused
+before writes. The selected variant, outer props, conditionals, iteration and
+slot content are resolved now. Content belonging only to other outer states is
+intentionally not retained. This is a snapshot, not an all-state equivalence.
+
+Nested instances remain linked, with only their authored bindings resolved in
+the caller scope. Unbound nested props stay unbound, so later default and body
+changes propagate. Their own definition logic continues to run normally.
+Inherited overrides into those instances are forwarded with their target prefix
+removed; literal payloads are never reinterpreted as expressions. Overrides
+consumed into native layers disappear; dormant records are discarded with their
+source ids listed in the result. Tokens stay as live `var(--token)` references.
+Native layer and retained nested-instance named-style links stay live; resolved
+own and override declarations remain above them. Named styles with dynamic
+expressions, or a source instance-level placement style link that cannot be
+combined with the native links, are refused in this bounded slice.
+
+A single native root takes the original instance id when no semantic wrapper
+or preserved fill-root identity is needed. Otherwise an inert `div` with
+`display:contents` carries that id, with native children underneath. Its
+meaningful wrapper attrs are retained. Such a group is an identity/annotation
+carrier; canvas selection must use its rendered descendants' bounds, since it
+has no box of its own. Instance root styles apply to the materialized roots,
+including interaction planes; free single-root placement retains its box.
+Free multi-root/semantic-wrapper cases requiring a positioned group are refused.
+Caller-fill rendered children keep their ids where unique; the consumed fill
+container has no rendered layer to retain. Expanded occurrences get deterministic
+instance-derived ids, checked against document and definition identities.
+
+The native format normalizes text and style declaration order. Detach quotes
+literal braces and normalization-sensitive ASCII space runs using existing
+constant expressions, leaving ordinary single interior spaces plain. Tabs,
+line breaks and other non-ASCII whitespace that would be lost are refused with
+a readable reason. CSS shorthand/longhand overlap that cannot safely survive
+canonical storage is refused, in base and interaction planes. These refusals
+avoid silent appearance changes; a broader native-literal/ordered-style format
+is a future slice. No new serialized escape marker is introduced.
+
+Expansion uses one remove/insert batch at the same parent/index, with no
+replace-document. Undo restores the exact instance, fills and overrides; redo
+reuses its stored ids. Later edits outside the subtree remain independent;
+later conflicting edits inside it skip Undo or Redo with a conflict rather than
+discarding peer values. Same-id replacement snapshots are checked before either
+direction; same-parent sibling reorders stay at their current position, while
+cross-parent moves are obstructions. Earlier selector Undo/Redo refuses a target
+that is no longer an instance. Ordinary insertion Undo retains its existing
+foreign-child reparenting. Successful
+results optionally contain `componentDetaches` entries with `instanceId`,
+`state`, `snapshot:"chosen-state"`, `rootId`, `createdIds`, `preservedIds` and
+`dormantOverridesDropped`. The snapshot flag lets the editor warn that other
+outer-state content was not retained. No standalone editor is part of this op.
+
+
 ### 4a. Typed token collections and modes (2026-10-23)
 
 Flat `doc.tokens` remain unchanged. A document may additionally declare
@@ -809,6 +868,10 @@ reports also reflect state and slot inactivity. Token-use audits
 also reflect only included content; a token used only in another scope can be
 reported unused. Document validation and canonical projection remain unfiltered;
 changing the previewed state does not mutate the document or chain.
+
+A chosen-state detach consumes the outer scopes into an unscoped native snapshot,
+subject to any unchanged ancestor scope. Retained nested definitions keep their
+state logic and run in the later render state.
 
 ## 5. Render contract — *skeleton*
 

@@ -1,20 +1,20 @@
 import { applyPatch, indexNodes } from 'foundation-engine'
-import type { FdnDocument, FdnNode, InstanceSwapReport, PatchOp } from 'foundation-engine'
+import type { FdnDocument, FdnNode, InstanceDetachReport, InstanceSwapReport, PatchOp } from 'foundation-engine'
 import { expandComponentOp } from './components.js'
 import type { ComponentOp, PlacementOp, SessionOp, TokenModeOp } from 'foundation-protocol'
 import { expandPlacement, PlacementError } from './placement.js'
 
-const COMPONENT_OPS = new Set(['swap-instance', 'set-instance-variant', 'set-instance-override', 'reset-instance-override', 'reset-instance-overrides'])
+const COMPONENT_OPS = new Set(['detach-instance', 'swap-instance', 'set-instance-variant', 'set-instance-override', 'reset-instance-override', 'reset-instance-overrides'])
 
 const MODE_OPS = new Set(['create-token-collection', 'add-token-mode', 'rename-token-mode', 'remove-token-mode', 'set-mode-token', 'set-collection-mode'])
 
-export function expandSessionOps(doc: FdnDocument, ops: SessionOp[], reports: InstanceSwapReport[] = []): PatchOp[] {
+export function expandSessionOps(doc: FdnDocument, ops: SessionOp[], reports: InstanceSwapReport[] = [], detaches: InstanceDetachReport[] = []): PatchOp[] {
   if (ops.every((op): op is PatchOp | PlacementOp => !MODE_OPS.has(op.op) && !COMPONENT_OPS.has(op.op))) return expandPlacement(doc, ops)
   let working = doc
   const expanded: PatchOp[] = []
   for (const [position, op] of ops.entries()) {
     let batch: PatchOp[]
-    if (COMPONENT_OPS.has(op.op)) batch = expandComponentOp(working, op as ComponentOp, reports)
+    if (COMPONENT_OPS.has(op.op)) batch = expandComponentOp(working, op as ComponentOp, reports, detaches)
     else if (!MODE_OPS.has(op.op)) batch = expandPlacement(working, [op as PatchOp | PlacementOp])
     else batch = modeOps(working, op as TokenModeOp)
     if (position === ops.length - 1) {

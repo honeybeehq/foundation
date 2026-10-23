@@ -91,6 +91,16 @@ export interface FdnProp {
 }
 
 export type ComponentSwapTarget = { component: string } | { componentSet: string; variants?: Record<string, string> }
+export interface InstanceDetachReport {
+  instanceId: string
+  state: string | null
+  rootId: string
+  createdIds: string[]
+  preservedIds: string[]
+  dormantOverridesDropped: string[]
+  snapshot: 'chosen-state'
+}
+
 export interface InstanceSwapReport {
   signature: string
   instanceId: string

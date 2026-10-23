@@ -1,4 +1,4 @@
-import { ownOverrides, overrideTarget, prepareOverrides } from '../components/overrides.js'
+import { ownOverrides, overrideTarget, prepareOverrides, resolveOverrideTarget } from '../components/overrides.js'
 import type { OverrideOrigin, PreparedOverrides } from '../components/overrides.js'
 import { componentSelection, validateComponentSets } from '../components/variants.js'
 import { mapStyleValues, mergeStyles, styleEntries } from './styles.js'
@@ -50,7 +50,16 @@ export { capsuleClassName, parseSealedFragment, scopeCss } from './capsule.js'
 
 const STATE_STYLE_KEYS: StateStyleKey[] = ['hover', 'focus', 'active', 'disabled']
 
+interface Materialization {
+  mode: 'one-level' | 'preserve-uses'
+  state: string | null
+  preserved: Set<FdnNode>
+  dropped: Set<string>
+}
+
 interface BakeCtx extends ExprContext {
+  materialization?: Materialization
+  preserveSourceIds?: boolean
   doc: FdnDocument
   selectedState: string | null
   componentStack: string[]
@@ -167,7 +176,7 @@ function sampleValue(prop: FdnProp, body: FdnNode[]): string | undefined {
   }
 }
 
-function bakeTree(doc: FdnDocument, stateName: string | null, editor: boolean): { tree: FdnNode[]; capsuleCss: Map<string, string>; report: ConformanceReport } {
+function bakeTree(doc: FdnDocument, stateName: string | null, editor: boolean, materialization?: Materialization): { tree: FdnNode[]; capsuleCss: Map<string, string>; report: ConformanceReport } {
   const reports: ReportLine[] = []
 
   let state: FdnState | undefined
@@ -208,6 +217,7 @@ function bakeTree(doc: FdnDocument, stateName: string | null, editor: boolean): 
   const ctx: BakeCtx = {
     doc,
     selectedState: stateName,
+    ...(materialization ? { materialization } : {}),
     bindings: { prop: {}, param: params },
     lookups: doc.lookups,
     componentStack: [],
@@ -377,13 +387,17 @@ function bakeEach(node: FdnNode, ctx: BakeCtx): FdnNode[] {
     const childCtx: BakeCtx = { ...ctx, bindings: childBindings }
     const baked = bakeSingle(stripped, childCtx)
     const indexed = ctx.editor ? baked.map((n) => ({ ...n, attrs: { ...n.attrs, 'data-fdn-index': String(i) } })) : baked
-    out.push(...prefixIds(indexed, `${node.id}#${i}`))
+    out.push(...prefixIds(indexed, `${node.id}#${i}`, ctx.materialization?.preserved))
   })
   return out
 }
 
-function prefixIds(nodes: FdnNode[], prefix: string): FdnNode[] {
-  return nodes.map((n) => ({ ...n, id: `${prefix}::${n.id}`, children: prefixIds(n.children, prefix) }))
+function prefixIds(nodes: FdnNode[], prefix: string, preserved?: Set<FdnNode>): FdnNode[] {
+  return nodes.map((n) => {
+    const next = { ...n, id: preserved?.has(n) ? n.id : `${prefix}::${n.id}`, children: prefixIds(n.children, prefix, preserved) }
+    if (preserved?.has(n)) preserved.add(next)
+    return next
+  })
 }
 
 function bakeSingle(node: FdnNode, ctx: BakeCtx): FdnNode[] {
@@ -403,7 +417,7 @@ function bakeSingle(node: FdnNode, ctx: BakeCtx): FdnNode[] {
     if (!value) return []
   }
 
-  if (node.tag === 'fdn-use') return instantiateComponent(node, ctx)
+  if (node.tag === 'fdn-use') return ctx.materialization?.mode === 'preserve-uses' ? preserveInstance(node, ctx) : instantiateComponent(node, ctx)
   if (node.tag === 'fdn-slot') return resolveSlot(node, ctx)
   return [buildRegularNode(node, ctx)]
 }
@@ -562,6 +576,11 @@ function resolveNodeStyle(node: FdnNode, ctx: BakeCtx): ResolvedStyle {
     attrs[`style-${key}`] = parts.join(';')
   }
 
+  if (ctx.materialization && node.styleRef && namedStyle) {
+    if ([...Object.values(namedStyle.style), ...Object.values(namedStyle.styleStates).flatMap((plane) => Object.values(plane ?? {}))].some((value) => value.includes('{{'))) throw new Error("Can't detach: this named style has dynamic values that cannot stay linked while freezing the outer state")
+    const own = (plane: Record<string, string>) => mapStyleValues(plane, (_prop, raw) => interpolateString(raw, ctx, node.id).value)
+    return { attrs, style: own(node.style), styleStates: Object.fromEntries(Object.entries(node.styleStates).filter(([, plane]) => plane).map(([key, plane]) => [key, own(plane!)])) }
+  }
   return { attrs, style, styleStates }
 }
 
@@ -584,7 +603,8 @@ function buildRegularNode(node: FdnNode, ctx: BakeCtx): FdnNode {
       pushReport(ctx, { code: 'override-shadows-prop', severity: 'info', message: 'literal text override shadows the definition prop binding', nodeId: record?.origin.node.id ?? node.id })
     }
   }
-  return {
+  const built: FdnNode = {
+    ...(ctx.materialization && node.styleRef ? { styleRef: node.styleRef } : {}),
     id: node.id,
     tag: node.tag,
     attrs: ctx.editor ? { ...attrs, ...overrideMark, 'data-fdn-id': ctx.editor.idPrefix + node.id } : attrs,
@@ -593,6 +613,8 @@ function buildRegularNode(node: FdnNode, ctx: BakeCtx): FdnNode {
     text,
     children,
   }
+  if (ctx.preserveSourceIds) ctx.materialization?.preserved.add(built)
+  return built
 }
 
 function markOverrides(node: FdnNode, ctx: BakeCtx): Record<string, string> {
@@ -699,8 +721,8 @@ function hasInstanceStyle(node: FdnNode): boolean {
   return Boolean(node.styleRef) || Object.keys(node.style).length > 0 || Object.values(node.styleStates).some((plane) => plane && Object.keys(plane).length > 0)
 }
 
-function withInstanceStyle(root: FdnNode, instance: InstanceStyle): FdnNode {
-  if (root.tag === 'fdn-use') {
+function withInstanceStyle(root: FdnNode, instance: InstanceStyle, preserveUses = false): FdnNode {
+  if (root.tag === 'fdn-use' && !preserveUses) {
     return { ...root, style: { display: 'contents' }, children: root.children.map((child) => withInstanceStyle(child, instance)) }
   }
   const attrs = { ...root.attrs }
@@ -732,7 +754,11 @@ function applyInstanceStyle(node: FdnNode, componentName: string, roots: FdnNode
       detail: { roots: roots.length },
     })
   }
-  return roots.map((root) => withInstanceStyle(root, instance))
+  return roots.map((root) => {
+    const next = withInstanceStyle(root, instance, ctx.materialization?.mode === 'one-level')
+    if (ctx.materialization?.preserved.has(root)) ctx.materialization.preserved.add(next)
+    return next
+  })
 }
 
 function instantiateComponent(node: FdnNode, ctx: BakeCtx): FdnNode[] {
@@ -786,6 +812,7 @@ function instantiateComponent(node: FdnNode, ctx: BakeCtx): FdnNode[] {
     for (const record of owned) if (!ctx.usedOverrides.has(record.origin)) pushReport(ctx, { code: 'override-dormant', severity: record.origin.reason === 'target is not rendered in the current state or slot content' ? 'info' : 'warning', message: `override ${JSON.stringify(record.origin.target)} on "${owner}" is dormant: ${record.origin.reason}`, nodeId: record.origin.node.id, detail: { instanceId: node.id, instancePath: owner, target: record.origin.target } })
   }
   if (component.sealed) {
+    if (ctx.materialization) throw new Error("Can't detach: sealed components have no editable native layers")
     for (const record of records) record.origin.reason = 'sealed components have no addressable inner layers'
     reportDormant()
     return instantiateSealedComponent(node, componentName, component.sealed, ctx)
@@ -834,17 +861,20 @@ function instantiateComponent(node: FdnNode, ctx: BakeCtx): FdnNode[] {
     finalAttrs[`data-fdn-prop-${propDef.name}`] = stringifyPropValue(propsTyped[propDef.name], propDef.type)
   }
 
+  const nestedMaterialization = ctx.materialization ? { ...ctx.materialization, mode: 'preserve-uses' as const } : undefined
+  const fillCtx = nestedMaterialization ? { ...ctx, materialization: nestedMaterialization, preserveSourceIds: true } : ctx
   const slotFills: Record<string, FdnNode[]> = {}
   for (const child of node.children) {
     if (child.tag === 'fdn-fill' && matchesStateScope(child, ctx.selectedState)) {
       const slotName = child.attrs['slot'] ?? 'default'
-      const baked = child.children.flatMap((c) => bakeNode(c, ctx))
+      const baked = child.children.flatMap((c) => bakeNode(c, fillCtx))
       slotFills[slotName] = (slotFills[slotName] ?? []).concat(baked)
     }
   }
 
   const innerCtx: BakeCtx = {
     ...ctx,
+    ...(nestedMaterialization ? { materialization: nestedMaterialization, preserveSourceIds: false } : {}),
     bindings: { prop: propsTyped, param: ctx.bindings['param'] ?? {} },
     componentStack: [...ctx.componentStack, componentName],
     instancePath: [...ctx.instancePath, node.id],
@@ -856,7 +886,7 @@ function instantiateComponent(node: FdnNode, ctx: BakeCtx): FdnNode[] {
   const bakedBody = (prepared?.body ?? component.body).flatMap((n) => bakeNode(n, innerCtx))
   reportDormant()
   const styledBody = instance ? applyInstanceStyle(node, componentName, bakedBody, instance, ctx) : bakedBody
-  const namespacedBody = prefixIds(styledBody, node.id)
+  const namespacedBody = prefixIds(styledBody, node.id, ctx.materialization?.preserved)
 
   return [
     {
@@ -876,4 +906,49 @@ function resolveSlot(node: FdnNode, ctx: BakeCtx): FdnNode[] {
   const fill = ctx.slotFills?.[name]
   if (fill && fill.length > 0) return fill
   return node.children.flatMap((c) => bakeNode(c, ctx))
+}
+
+function preserveInstance(node: FdnNode, ctx: BakeCtx): FdnNode[] {
+  componentSelection(ctx.doc, node)
+  markOverrides(node, ctx)
+  const resolved = resolveNodeStyle(node, ctx)
+  const attrs = Object.fromEntries(Object.entries(resolved.attrs).filter(([key]) => key !== 'data-fdn-style' && !key.startsWith('style-')))
+  componentSelection(ctx.doc, { attrs })
+  for (const [key, value] of Object.entries(node.attrs)) if (key === 'component' || key === 'component-set' || key.startsWith('data-fdn-variant-')) attrs[key] = value
+  const inherited = ctx.componentOverrides?.nested.get(node.id) ?? []
+  const owned = node.children.filter((child) => child.tag === 'fdn-override')
+  const metadata = [...owned, ...inherited.map((record) => ({ ...record.origin.node, attrs: { ...record.origin.node.attrs, target: JSON.stringify(record.target) } }))]
+  const template: FdnNode = { id: node.id, tag: 'fdn-use', ...(node.styleRef ? { styleRef: node.styleRef } : {}), attrs, style: resolved.style, styleStates: resolved.styleStates, children: metadata }
+  const kept = metadata.filter((record) => {
+    const target = overrideTarget(record)
+    const exists = target && resolveOverrideTarget(ctx.doc, template, target)
+    if (!exists) ctx.materialization?.dropped.add(record.id)
+    return !!exists
+  })
+  for (const record of inherited) if (kept.some((entry) => entry.id === record.origin.node.id)) ctx.usedOverrides.add(record.origin)
+  const fills = node.children.filter((child) => child.tag === 'fdn-fill').flatMap((child) => {
+    if (!matchesStateScope(child, ctx.selectedState)) return []
+    const fill: FdnNode = { ...child, attrs: { ...child.attrs }, children: child.children.flatMap((item) => bakeNode(item, ctx)) }
+    if (ctx.preserveSourceIds) ctx.materialization?.preserved.add(fill)
+    return [fill]
+  })
+  const result = { ...template, children: [...fills, ...kept] }
+  if (ctx.preserveSourceIds) ctx.materialization?.preserved.add(result)
+  return [result]
+}
+
+export function materializeInstanceTree(doc: FdnDocument, instance: FdnNode, state: string | null): { tree: FdnNode[]; report: ConformanceReport; preservedIds: Set<string>; droppedOverrides: string[] } {
+  if (state !== null && !doc.states.some((item) => item.name === state)) throw new Error(`Can't detach: state "${state}" is not declared`)
+  const selected = componentSelection(doc, instance).component
+  if (selected.sealed) throw new Error("Can't detach: sealed components have no editable native layers")
+  const materialization: Materialization = { mode: 'one-level', state, preserved: new Set(), dropped: new Set() }
+  const { tree, report } = bakeTree({ ...doc, body: [instance] }, state, false, materialization)
+  const error = report.lines.find((line) => line.severity === 'error')
+  if (error) throw new Error(`Can't detach: ${error.message}`)
+  if (!tree.length || tree.every((node) => node.tag === 'fdn-use' && !node.children.length)) throw new Error("Can't detach: this instance has no active content in the selected state")
+  for (const line of report.lines) if (line.code === 'override-dormant' && line.nodeId) materialization.dropped.add(line.nodeId)
+  const preservedIds = new Set<string>()
+  const walk = (nodes: FdnNode[]) => { for (const node of nodes) { if (materialization.preserved.has(node)) preservedIds.add(node.id); walk(node.children) } }
+  walk(tree)
+  return { tree, report, preservedIds, droppedOverrides: [...materialization.dropped] }
 }

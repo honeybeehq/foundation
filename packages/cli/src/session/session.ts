@@ -20,7 +20,7 @@ import {
   validateDocument,
   validateTokenCollections,
 } from 'foundation-engine'
-import type { EnvelopeRecord, FdnChain, FdnDocument, InstanceSwapReport, PatchOp, ReportLine } from 'foundation-engine'
+import type { EnvelopeRecord, FdnChain, FdnDocument, InstanceDetachReport, InstanceSwapReport, PatchOp, ReportLine } from 'foundation-engine'
 import { parseClientMessage, SESSION_PROTOCOL } from 'foundation-protocol'
 import type { Cause, ClientMessage, DocumentView, FaultCode, ResultCode, ServiceMessage } from 'foundation-protocol'
 import { withWallTime } from '../change-meta.js'
@@ -469,6 +469,7 @@ class DesignSession implements Session {
     if (message.ops.length === 0) return this.reject(message.id, { code: 'invalid-op', message: 'commit has no ops' })
     if (message.base > this.rev) return this.reject(message.id, { code: 'invalid-op', message: `base ${message.base} is ahead of rev ${this.rev}` })
     const componentSwaps: InstanceSwapReport[] = []
+    const componentDetaches: InstanceDetachReport[] = []
     for (const op of message.ops) if ('previewRev' in op && op.previewRev !== undefined && (op.previewRev > this.rev || op.previewRev < this.rev && !op.previewSignature)) return this.reject(message.id, { code: 'conflict', message: 'swap preview is stale; preview the swap again' })
     let ops: PatchOp[]
     let singlePatch: ReturnType<typeof applyPatch> | undefined
@@ -478,7 +479,7 @@ class DesignSession implements Session {
       for (const op of message.ops) {
         const expanded = op.op === 'replace-document' ? diffPatch(target, op.doc) : [op]
         if (expanded === null) throw new Error('edit cannot be expressed as granular changes')
-        const checked = applyPatch(target, expandSessionOps(target, expanded, componentSwaps), { validateComponents: message.ops.length === 1 })
+        const checked = applyPatch(target, expandSessionOps(target, expanded, componentSwaps, componentDetaches), { validateComponents: message.ops.length === 1 })
         if (!checked.ok) throw new PlacementError(checked.error.code, checked.error.message)
         primitive.push(...checked.applied)
         singlePatch = checked
@@ -491,7 +492,7 @@ class DesignSession implements Session {
     const patch = message.ops.length === 1 && singlePatch ? singlePatch : applyPatch(this.doc, ops)
     if (!patch.ok) return this.reject(message.id, patch.error)
     if (patch.inverse.length === 0 && canonicalText(patch.doc) === this.docText) {
-      this.emit({ t: 'result', id: message.id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}) })
+      this.emit({ t: 'result', id: message.id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}), ...(componentDetaches.length ? { componentDetaches } : {}) })
       return
     }
     const before = this.doc
@@ -500,7 +501,7 @@ class DesignSession implements Session {
     if (failure) return this.reject(message.id, failure)
     this.undoStack.push(undoStep(label, patch.inverse, before, this.doc, patch.applied))
     this.redoStack = []
-    this.accept(message.id, { kind: 'commit', id: message.id, author: this.author }, bakeImpact(this.doc, patch.applied), componentSwaps)
+    this.accept(message.id, { kind: 'commit', id: message.id, author: this.author }, bakeImpact(this.doc, patch.applied), componentSwaps, componentDetaches)
   }
 
   private step(id: string, direction: 'undo' | 'redo'): void {
@@ -586,16 +587,16 @@ class DesignSession implements Session {
     if (this.docText !== before) this.announce({ kind: 'external', author: author ?? null })
   }
 
-  private accept(id: string, cause: Cause, impact: BakeImpact, componentSwaps: InstanceSwapReport[] = []): void {
+  private accept(id: string, cause: Cause, impact: BakeImpact, componentSwaps: InstanceSwapReport[] = [], componentDetaches: InstanceDetachReport[] = []): void {
     if (this.earlyResult) {
       this.rev++
       this.emit({ t: 'doc', cause, ...this.documentView() })
-      this.emit({ t: 'result', id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}) })
+      this.emit({ t: 'result', id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}), ...(componentDetaches.length ? { componentDetaches } : {}) })
       this.sendBakes(impact)
       return
     }
     this.announce(cause, impact)
-    this.emit({ t: 'result', id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}) })
+    this.emit({ t: 'result', id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}), ...(componentDetaches.length ? { componentDetaches } : {}) })
   }
 
   private reject(id: string, failure: Failure): void {

@@ -1,4 +1,4 @@
-import type { ChainLogEntry, EnvelopeRecord, FdnDocument, ComponentSwapTarget, InstanceSwapReport, InstanceOverridePatch, PatchOp, ReportLine } from './document.ts'
+import type { ChainLogEntry, EnvelopeRecord, FdnDocument, ComponentSwapTarget, InstanceDetachReport, InstanceSwapReport, InstanceOverridePatch, PatchOp, ReportLine } from './document.ts'
 
 export type { EnvelopeRecord, FdnDocument, FdnNode, PatchOp, ReportLine } from './document.ts'
 
@@ -49,6 +49,7 @@ export type TokenModeOp =
 export interface SwapPreviewGuard { previewRev?: number; previewSignature?: string }
 
 export type ComponentOp =
+  | { op: 'detach-instance'; id: string; state: string | null }
   | ({ op: 'set-instance-variant'; id: string; values: Record<string, string | null> | null } & SwapPreviewGuard)
   | ({ op: 'swap-instance'; id: string; target: ComponentSwapTarget } & SwapPreviewGuard)
   | { op: 'set-instance-override'; id: string; target: string[]; values: InstanceOverridePatch }
@@ -74,7 +75,7 @@ export type ServiceMessage =
   | { t: 'baked-diff'; rev: number; state: string | null; baseRev: number; start: number; deleteCount: number; insert: string; report: ReportLine[] }
   | { t: 'component'; rev: number; name: string; html: string; report: ReportLine[] }
   | { t: 'instance-swap-preview'; id: string; rev: number; report: InstanceSwapReport }
-  | { t: 'result'; id: string; ok: true; rev: number; componentSwaps?: InstanceSwapReport[] }
+  | { t: 'result'; id: string; ok: true; rev: number; componentSwaps?: InstanceSwapReport[]; componentDetaches?: InstanceDetachReport[] }
   | { t: 'result'; id: string; ok: false; code: ResultCode; message: string }
   | { t: 'log'; id: string; entries: Array<EnvelopeRecord & Partial<Omit<ChainLogEntry, keyof EnvelopeRecord>>>; nextCursor?: string | null; latestCursor?: string | null; hasMore?: boolean }
   | { t: 'fault'; code: FaultCode; message: string }
@@ -233,6 +234,7 @@ const TOKEN_MODE_OPS: Record<TokenModeOp['op'], Check> = {
 const isSwapTarget: Check = (value) => isRecord(value) && ((typeof value.component === 'string' && value.componentSet === undefined && value.variants === undefined) || (typeof value.componentSet === 'string' && value.component === undefined && (value.variants === undefined || isStringMap(value.variants))))
 const isOverrideValues = shape({ text: optional(nullable(isString)), hidden: optional(nullable(isBoolean)), style: optional(recordOf(nullable(isString))), styleStates: optional(recordOf(recordOf(nullable(isString)))), swap: optional(nullable(isSwapTarget)) })
 const COMPONENT_OPS: Record<ComponentOp['op'], Check> = {
+  'detach-instance': shape({ id: isString, state: nullable(isString) }),
   'set-instance-variant': shape({ id: isString, values: nullable(recordOf(nullable(isString))), previewRev: optional(isCount), previewSignature: optional(isString) }),
   'swap-instance': shape({ id: isString, target: isSwapTarget, previewRev: optional(isCount), previewSignature: optional(isString) }),
   'set-instance-override': shape({ id: isString, target: arrayOf(isString), values: isOverrideValues }),

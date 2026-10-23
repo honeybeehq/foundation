@@ -13,6 +13,8 @@ export interface UndoStep {
   repeatPlacements: UndoStep['placements']
   createdOverrides: Map<string, FdnNode>
   retargetedOverrides: Set<string>
+  selectorTargets: Set<string>
+  replacedSubtrees: Map<string, string>
 }
 
 export function undoStep(label: string, revert: PatchOp[], before: FdnDocument, after: FdnDocument, repeat: PatchOp[]): UndoStep {
@@ -43,17 +45,28 @@ export function undoStep(label: string, revert: PatchOp[], before: FdnDocument, 
   for (const op of repeat) if (op.op === 'insert-node' && op.node.tag === 'fdn-override') createdOverrides.set(op.node.id, structuredClone(op.node))
   const retargetedOverrides = new Set<string>()
   for (const op of repeat) if (op.op === 'set-attr' && op.key === 'target' && (oldIndex.get(op.id)?.node.tag === 'fdn-override' || newIndex.get(op.id)?.node.tag === 'fdn-override')) retargetedOverrides.add(op.id)
-  return { label, revert, repeat, created, placements, removedFrom, expected, repeatExpected, repeatPlacements, createdOverrides, retargetedOverrides }
+  const selectorTargets = new Set<string>()
+  for (const op of repeat) if (op.op === 'set-attr' && isSelectorKey(op.key) && (oldIndex.get(op.id)?.node.tag === 'fdn-use' || newIndex.get(op.id)?.node.tag === 'fdn-use')) selectorTargets.add(op.id)
+  const removed = new Set(repeat.filter(op => op.op === 'remove-node').map(op => op.id))
+  const replacedSubtrees = new Map<string, string>()
+  for (const op of repeat) if (op.op === 'insert-node' && removed.has(op.node.id) && oldIndex.has(op.node.id)) {
+    const replacement = newIndex.get(op.node.id)
+    if (replacement) replacedSubtrees.set(op.node.id, stableStringify(replacement.node))
+  }
+  return { label, revert, repeat, created, placements, removedFrom, expected, repeatExpected, repeatPlacements, createdOverrides, retargetedOverrides, selectorTargets, replacedSubtrees }
 }
 
 export function oppositeStep(step: UndoStep, before: FdnDocument, after: FdnDocument): UndoStep {
-  return { ...undoStep(step.label, step.repeat, before, after, step.revert), expected: step.repeatExpected, repeatExpected: step.expected, placements: step.repeatPlacements, repeatPlacements: step.placements, createdOverrides: step.createdOverrides, retargetedOverrides: step.retargetedOverrides }
+  return { ...undoStep(step.label, step.repeat, before, after, step.revert), expected: step.repeatExpected, repeatExpected: step.expected, placements: step.repeatPlacements, repeatPlacements: step.placements, createdOverrides: step.createdOverrides, retargetedOverrides: step.retargetedOverrides, selectorTargets: step.selectorTargets }
+}
+
+function isSelectorKey(key: string): boolean {
+  return key === 'component' || key === 'component-set' || key.startsWith('data-fdn-variant-')
 }
 
 function overrideFieldOps(owned: FdnNode, current: FdnNode, restore: boolean): PatchOp[] {
-  const swapKey = (key: string) => key === 'component' || key === 'component-set' || key.startsWith('data-fdn-variant-')
   const attrs = new Set(Object.keys(owned.attrs).filter(key => key !== 'target'))
-  if ([...attrs].some(swapKey)) for (const key of Object.keys(current.attrs)) if (swapKey(key)) attrs.add(key)
+  if ([...attrs].some(isSelectorKey)) for (const key of Object.keys(current.attrs)) if (isSelectorKey(key)) attrs.add(key)
   const ops: PatchOp[] = [...attrs].map(key => ({ op: 'set-attr', id: current.id, key, value: restore ? owned.attrs[key] ?? null : null }))
   for (const prop of Object.keys(owned.style)) ops.push({ op: 'set-style', id: current.id, prop, value: restore ? owned.style[prop]! : null })
   for (const state of ['hover', 'focus', 'active', 'disabled'] as const) {
@@ -111,7 +124,17 @@ function rebaseValue(op: PatchOp, expected: PatchOp | null | undefined, current:
 }
 
 export function undoOps(step: UndoStep, doc: FdnDocument): PatchOp[] {
-  if (step.retargetedOverrides.size === 0 && step.revert.every(op => ['set-attr', 'set-style', 'set-style-ref', 'set-text', 'set-when'].includes(op.op))) return step.revert
+  const replacementPlacements = new Map<string, UndoStep['placements'][string]>()
+  if (step.replacedSubtrees.size) {
+    const index = indexNodes(doc.body)
+    for (const [id, expected] of step.replacedSubtrees) {
+      const loc = index.get(id)
+      if (!loc || stableStringify(loc.node) !== expected) throw new Error('replacement subtree changed since this edit')
+      const siblings = loc.parent === null ? doc.body : index.get(loc.parent)!.node.children
+      replacementPlacements.set(id, { parent: loc.parent, previous: siblings[loc.index - 1]?.id ?? null })
+    }
+  }
+  if (step.retargetedOverrides.size === 0 && step.selectorTargets.size === 0 && step.revert.every(op => ['set-attr', 'set-style', 'set-style-ref', 'set-text', 'set-when'].includes(op.op))) return step.revert
   const created = new Set(step.created)
   let current = doc
   const out: PatchOp[] = []
@@ -126,6 +149,7 @@ export function undoOps(step: UndoStep, doc: FdnDocument): PatchOp[] {
     let op = rebaseValue(original, step.expected[position], current)
     if (op.op === 'replace-document') throw new Error('whole-document undo is not safe across writers')
     const index = indexNodes(current.body)
+    if (op.op === 'set-attr' && isSelectorKey(op.key) && step.selectorTargets.has(op.id) && index.get(op.id)?.node.tag !== 'fdn-use') throw new Error('component instance was detached or replaced by another writer')
     if (op.op === 'set-attr' && op.key === 'target' && step.retargetedOverrides.has(op.id) && !index.has(op.id)) {
       skippedRetarget = true
       continue
@@ -159,9 +183,9 @@ export function undoOps(step: UndoStep, doc: FdnDocument): PatchOp[] {
           continue
         }
       }
-      const placement = step.placements[op.op === 'insert-node' ? op.node.id : op.id]
+      const id = op.op === 'insert-node' ? op.node.id : op.id
+      const placement = replacementPlacements.get(id) ?? step.placements[id]
       if (placement) {
-        const id = op.op === 'insert-node' ? op.node.id : op.id
         const siblings = (placement.parent === null ? current.body : index.get(placement.parent)?.node.children ?? []).filter(node => node.id !== id)
         const previous = siblings.findIndex(node => node.id === placement.previous)
         op = { ...op, index: placement.previous === null ? 0 : previous < 0 ? siblings.length : previous + 1 }
