@@ -219,7 +219,7 @@ const isEnvelope = shape({ hash: isString, prevHash: nullable(isString), author:
 const isLogEntry: Check = (value) => isEnvelope(value) && shape({
   cursor: optional(isString),
   time: optional(shape({ kind: oneOf(['logical']), value: isNumber })),
-  wallTime: optional(oneOf([null])),
+  wallTime: optional(nullable(isString)),
   nodeIds: optional(arrayOf(isString)),
   nodes: optional(shape({ inserted: arrayOf(isString), removed: arrayOf(isString), changed: arrayOf(isString) })),
   sections: optional(arrayOf(shape({ section: oneOf(['tokens', 'params', 'data', 'lookups', 'states', 'viewports', 'matrix', 'namedStyles', 'components', 'annotations', 'meta']), names: arrayOf(isString) }))),
