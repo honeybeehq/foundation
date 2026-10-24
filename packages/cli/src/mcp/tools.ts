@@ -1,3 +1,4 @@
+import { parseForWrite } from '../parse-write.js'
 import { editDocument } from '../edit.js'
 import type { SessionOp } from 'foundation-protocol'
 /**
@@ -55,13 +56,12 @@ import { injectDocIdAttr, readDocIdAttr } from '../docid.js'
 // doc): calling it is what pulls in esbuild/react/tailwindcss, so it must
 // only happen inside toolImport's handler, never at this file's top level.
 import {
-  docMaxMintedId,
   formatStructuredError,
   harnessErrorCode,
   loadImporterModule,
   mergeLookups,
   mergeTokens,
-  remintComponentIds,
+  prepareImportedComponent,
   type ProjectResult,
   type RenderArtifact,
 } from '../commands/import.js'
@@ -342,7 +342,7 @@ async function toolIngest(args: Record<string, unknown>): Promise<ToolResult> {
     source = read.source
   }
 
-  const { doc, report } = parseDocument(source)
+  const { doc, report } = parseForWrite(source)
   const malformedSet = report.lines.find((line) => ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code))
   if (malformedSet) return fail(malformedSet.message)
   const canonical = projectDocument(doc)
@@ -861,19 +861,15 @@ async function toolImport(args: Record<string, unknown>): Promise<ToolResult> {
     return fail(`foundation_import: ${formatStructuredError('project', err)}`, harnessErrorCode(err))
   }
 
-  const { doc, report: sourceReport } = parseDocument(read.source)
+  const { doc, report: sourceReport } = parseForWrite(read.source)
   const malformedSet = sourceReport.lines.find((line) => ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code))
   if (malformedSet) return fail(malformedSet.message)
 
   const targetName = projected.component.name
   const existingIndex = doc.components.findIndex((c) => c.name === targetName)
-  const maxId = docMaxMintedId(doc, targetName)
-  const component: FdnComponent = {
-    ...projected.component,
-    body: remintComponentIds(projected.component.body, { n: maxId }),
-  }
+  const { component, extraLookups } = prepareImportedComponent(doc, projected)
 
-  const lookupResult = mergeLookups(doc.lookups, projected.extraLookups)
+  const lookupResult = mergeLookups(doc.lookups, extraLookups)
   if ('error' in lookupResult) return fail(`foundation_import: ${lookupResult.error}`)
 
   const tokenResult = mergeTokens(doc.tokens, projected.extraTokens)

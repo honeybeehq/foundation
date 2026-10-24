@@ -101,15 +101,16 @@ describe('foundation_import (MCP tool)', () => {
     expect(chain.doc().components.find((c) => c.name === 'Badge')).toBeDefined()
   })
 
-  it('a lookup name collision fails cleanly with a hint, matching the CLI', async () => {
+  it('generated lookup ids avoid existing names, matching the CLI', async () => {
     const { doc } = parseDocument(readFileSync(file, 'utf8'))
     doc.lookups.push({ name: 'BadgeLookup1', entries: { bogus: 'entry' } })
     writeFileSync(file, projectDocument(doc), 'utf8')
 
     const result = await callTool('foundation_import', { source: fixture('badge.tsx'), into: file })
-    expect(result.isError).toBe(true)
-    expect(result.content[0]?.text).toContain('lookup name collision')
-    expect(result.content[0]?.text).toContain('BadgeLookup1')
+    expect(result.isError).not.toBe(true)
+    const after = parseDocument(readFileSync(file, 'utf8')).doc
+    expect(after.lookups).toHaveLength(3)
+    expect(after.lookups.find(item => item.name === 'BadgeLookup1')?.entries).toEqual({ bogus: 'entry' })
   })
 
   it('regression (dogfood cycle 3, friction §6): preserves the target document\'s data-fdn-doc-id, same as the CLI', async () => {

@@ -1,6 +1,6 @@
 import { runtimeVersion } from '../runtime-version.js'
 import { legacyMessage, legacyBoardRef, legacyArtboardReason, legacyArtboardOpReason } from './legacy.js'
-import { ArtboardError, validateArtboards, explicitArtboards, artboardPages, boardViews, boardView, boardKey } from 'foundation-engine'
+import { ArtboardError, validateArtboards, explicitArtboards, artboardPages, boardViews, boardView, boardKey, mintNodeId } from 'foundation-engine'
 import type { BoardRef } from 'foundation-engine'
 import { bakeImpact, mergeBakeImpact, type BakeImpact } from './bake-impact.js'
 import { PlacementError } from './placement.js'
@@ -330,7 +330,7 @@ class DesignSession implements Session {
       this.fault('unreadable', `could not read ${this.chainPath}: ${err instanceof Error ? err.message : String(err)}`, 1)
       return null
     }
-    const parsed = parseDocument(text)
+    const parsed = parseDocument(text, this.chain ? { mintNodeId } : undefined)
     const incoming = parsed.doc
     this.diskText = text
     this.diskTextCanonical = canonicalText(incoming)
@@ -459,7 +459,7 @@ class DesignSession implements Session {
       const previousText = this.diskText
       const wasBlocked = this.invalidExternalTokens
       let parsed: ReturnType<typeof parseDocument>
-      try { parsed = parseDocument(text) } catch (err) {
+      try { parsed = parseDocument(text, this.chain ? { mintNodeId } : undefined) } catch (err) {
         this.diskText = text
         this.diskTextCanonical = null
         this.blockExternal(err)

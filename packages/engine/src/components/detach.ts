@@ -1,3 +1,4 @@
+import { mintNodeId } from '../node-id.js'
 import type { FdnDocument, FdnNode, InstanceDetachReport, PatchOp } from '../types.js'
 import { indexNodes } from '../chain/model.js'
 import { materializeInstanceTree, bakeEditorDocument } from '../bake/index.js'
@@ -56,12 +57,8 @@ export function detachInstance(doc: FdnDocument, id: string, state: string | nul
   const semanticWrapper = Object.keys(wrapperAttrs).some((key) => key !== 'data-fdn-name')
   const single = roots.length === 1 && roots[0]!.tag !== 'fdn-use' && !materialized.preservedIds.has(roots[0]!.id) && !semanticWrapper
   if (!single && roots.some((node) => node.style.position === 'absolute')) throw new Error("Can't detach: a free instance with multiple roots or wrapper attributes needs a positioned group")
-  const reserved = new Set(index.keys())
-  const collect = (nodes: FdnNode[]) => { for (const node of nodes) { reserved.add(node.id); collect(node.children) } }
-  for (const component of doc.components) collect(component.body)
   const createdIds: string[] = [], preservedIds: string[] = []
-  let serial = 0
-  const allocate = () => { const base = `${id}-detached-${++serial}`; let next = base, suffix = 0; while (reserved.has(next)) next = `${base}-${++suffix}`; reserved.add(next); createdIds.push(next); return next }
+  const allocate = () => { const next = mintNodeId(); createdIds.push(next); return next }
   const clean = (node: FdnNode, root = false): FdnNode => {
     const keep = materialized.preservedIds.has(node.id) && !preservedIds.includes(node.id)
     const nextId = root ? id : keep ? node.id : allocate()
