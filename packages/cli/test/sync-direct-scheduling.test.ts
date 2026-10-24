@@ -3,12 +3,33 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { expect, it } from 'vitest'
 import { createChain, loadChain } from 'foundation-engine'
-import { importChangeBlobs } from '../../engine/src/chain/blob.js'
+import { encodeBlob, importChangeBlobs } from '../../engine/src/chain/blob.js'
 import { skeletonDocument } from '../src/commands/new.js'
 import { materializeDocument, updateDocument } from '../src/disk.js'
 import { registerDesign } from '../src/sync-store.js'
-import { serveSync } from '../src/sync/daemon.js'
+import { publishablePrefix, serveSync } from '../src/sync/daemon.js'
 import { DirectChanges } from '../src/sync/direct.js'
+
+it('keeps a held direct parent before its descendants so independent followers never block', () => {
+  const base = createChain(skeletonDocument('Causal'), { author: 'seed', message: 'init' }, { docId: 'causal' })
+  const a = base.fork('a'), b = base.fork('b'), c = base.fork('c')
+  a.apply({ author: 'a', message: 'held parent' }, [{ op: 'set-text', id: 'n1', text: 'parent' }])
+  const parent = a.changes().at(-1)!
+  b.merge(a)
+  b.apply({ author: 'b', message: 'child' }, [{ op: 'set-text', id: 'n2', text: 'child' }])
+  const known = new Set(base.changes().map(change => change.envelope.hash))
+  const unshared = b.changes().filter(change => !known.has(change.envelope.hash)), held = new Map([[parent.envelope.hash, 100]])
+  expect(publishablePrefix(unshared, held, 99)).toEqual([])
+  // This was the unsafe filter: a fresh follower cannot import the child first.
+  expect(() => importChangeBlobs(c, unshared.slice(1).map(change => encodeBlob(change.envelope, change.bytes)))).toThrow()
+  const fallback = publishablePrefix(unshared, held, 100)
+  for (const follower of [a, c]) for (const change of fallback) expect(() => importChangeBlobs(follower, [encodeBlob(change.envelope, change.bytes)])).not.toThrow()
+  expect(c.head().hash).toBe(b.head().hash)
+  // If the sender acknowledges first, its parent is already shared; only the child uploads.
+  known.add(parent.envelope.hash)
+  const afterAck = publishablePrefix(b.changes().filter(change => !known.has(change.envelope.hash)), held, 99)
+  expect(afterAck.map(change => change.envelope.message)).toEqual(['child'])
+})
 
 it('dispatches successive saved changes while a prior Comb append is still awaiting its receipt', async () => {
   const root = mkdtempSync(join(tmpdir(), 'direct-scheduling-')), previous = process.env.FOUNDATION_REPLICA_STORE

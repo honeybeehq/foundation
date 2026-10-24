@@ -120,3 +120,10 @@ opt-in stage traces. All hints may be disabled by omitting `direct`.
 Duplicate Comb delivery still validates every frame and hash, but skips candidate
 replay when no new hash exists. Existing v1 stores undergo the normal one-time v2
 storage upgrade; subsequent duplicate pages do not rewrite either document file.
+
+Direct dispatch uses its own file-event wakeup and stat-gated 250 ms fallback,
+so an earlier Comb append cannot hold up a later direct send. Durable publication
+uses a prefix of Lamport-ordered changes and stops before the first direct-received
+hash still in its grace period. This deliberately holds later local changes too:
+a descendant must never enter the feed before its full native causal history.
+Once the parent arrives through Comb (or grace expires), publication resumes.
