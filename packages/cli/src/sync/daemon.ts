@@ -132,7 +132,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
           const context = side === 'receive' ? `receive cursor ${state.cursor}` : publishingHash ? `publish change ${publishingHash}` : 'connection'
           updateError(side, `${context}: ${err instanceof Error ? err.message : String(err)}`)
           log(`${feedName(design)}: ${state.lastError}`)
-          await delay(retry[side]); retry[side] = Math.min(retry[side] * 2, 10000)
+          await delay(Math.round(retry[side] * (0.5 + Math.random() / 2))); retry[side] = Math.min(retry[side] * 2, 5000)
         }
       }
     } finally { watcher?.close(); signal.removeEventListener('abort', stop) }
