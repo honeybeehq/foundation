@@ -1,6 +1,6 @@
 import type { EnvelopeRecord } from '../types.js'
 import { computeEnvelopeHash } from './envelope.js'
-import { loadChain, type FdnChain } from './chain.js'
+import { chainFromUpdates, loadChain, type FdnChain } from './chain.js'
 
 export function encodeBlob(envelope: EnvelopeRecord, bytes: Uint8Array): Uint8Array {
   // Fixed key order — deterministic bytes for a logically-identical envelope
@@ -52,4 +52,19 @@ export function importChangeBlobs(chain: FdnChain, blobs: Uint8Array[]): number 
   if (!scratch.verify().ok) throw new Error('candidate chain failed history verification')
   for (const c of missing) chain.importUpdate(c.bytes)
   return new Set(missing.map(c => c.envelope.hash)).size
+}
+
+/** Restore only complete, self-consistent history for the requested document. */
+export function restoreChangeBlobs(blobs: Uint8Array[], docId: string): FdnChain {
+  const decoded = blobs.map(decodeBlob)
+  const unique = new Map(decoded.map(change => [change.envelope.hash, change]))
+  const changes = [...unique.values()]
+  if (changes.filter(change => change.envelope.prevHash === null).length !== 1) throw new Error('history must contain exactly one genesis')
+  if (changes.some(change => change.envelope.prevHash !== null && !unique.has(change.envelope.prevHash))) throw new Error('missing causal history')
+  const chain = chainFromUpdates(changes.map(change => change.bytes))
+  if (chain.docId() !== docId) throw new Error('document identity mismatch')
+  const actual = chain.changes()
+  if (actual.length !== unique.size || actual.some(change => !unique.has(change.envelope.hash))) throw new Error('incomplete causal history or envelope mismatch')
+  if (!chain.verify().ok) throw new Error('restored chain failed history verification')
+  return chain
 }

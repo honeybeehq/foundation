@@ -53,3 +53,25 @@ Each local path owns a persistent replica ID and increasing generation. Records 
 Only heads whose document envelopes are already shared are advertised. A durable catalogue outbox saves the generation before append, using SHA256(record bytes) as stable key. Restart and lost acknowledgements retry the same generation/key. Catalogue delivery runs separately from document publication, with one writer per workspace and bounded exponential retry. It keeps one in-flight durable generation and the latest queued snapshot per replica, collapsing intervening saves. A hung metadata RPC may delay that workspace's catalogue updates until the35s RPC timeout/lease recovery, but cannot block document uploads.
 
 Closing a registration is not deletion and does not publish a tombstone. Catalogue entries mean “last advertised replica”, not “currently online”; readers must retain staleness/disconnection separately. Moving/deleting a file does not currently retract its old record. A corrupted catalogue checkpoint is surfaced in status; stop the daemon, back up/remove its `replicas/catalogue/<copy-key>.json`, then restart to create a new replica ID. The previous advisory record remains until a later lifecycle/tombstone implementation removes it.
+
+## Recover a design into a fresh checkout
+
+Create or select an existing Product checkout root, then replay a design directly from the retained Comb feed:
+
+```sh
+foundation sync materialize DOC_ID boards/design.fdn.html \
+  --workspace WORKSPACE --product PRODUCT --repo-root /local/product \
+  --comb-config /private/foundation-comb.json --json
+```
+
+Omit the target to use a deterministic live catalogue replica's confined `repoRelativePath`. `--source-replica ID` chooses a specific advertised replica. Alternatively pass `--entry catalogue-entry.json`, which accepts the catalogue's workspaceId/productId/docId/replicaId/repoRelativePath/headHash fields. `materialise` is an alias.
+
+`--expected-head HASH` requires that change to be present in the replayed history; a later head is merged rather than refused. `--request-key KEY` is echoed in the settled result for callers. Repeating the request is safe: a matching local design merges into its latest locked state and preserves local edits. The command returns `state:"ready"`, DesignRef, local `path`/`repoPath`, `headHash`, and `requestKey`; with `--json`, known refusals return `state:"refused"`, `code`, and `message` with exit1. Codes include path-conflict, product-unavailable, history-unavailable, deleted-source, invalid-history and invalid-path.
+
+The command captures the feed head, reads bounded pages from cursor1, validates framing and envelope hashes, restores the original update bytes, checks docId/causal completeness and full `candidate.verify()`, then saves through the G16 lock and normal pending-save receipt. It registers the recovered path live. Incoming edits beyond the captured head arrive through the daemon after registration. No source file is needed, no replacement genesis is authored, and no Git repository is implicitly cloned.
+
+Targets must remain within the checkout root, including existing symlinks. A foreign docId, unrelated genesis or untracked existing file is refused without overwrite. Missing/truncated/corrupt history produces no target document. Catalogue records are advisory; paths are confined again locally, and document identity comes from verified history. The CLI settles after network replay; an apiaryd/Waggle caller should return its own accepted/materialising state immediately and invoke this command in the background.
+
+Only envelope history is transported. Local named anchors are not published by the design feed, so they cannot be recreated on a fresh replica; byte equality with a source's `.chain` requires equivalent anchors and encoder version. The real drill uses designs without local-only anchors.
+
+Reproduce fresh-directory recovery and subsequent bidirectional editing with `pnpm exec tsx packages/cli/scripts/materialize-proof.ts /path/to/comb-bridge`.
