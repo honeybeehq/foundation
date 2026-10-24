@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process'
+import { randomUUID } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync, lstatSync, readlinkSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
@@ -79,8 +80,9 @@ export function activateInstall(target: string, home: string, previous: string |
   const rollbackPath = join(base, 'rollback.json')
   const unchanged = readLinkIsOurs(current, target) && readLinkIsOurs(bin, join(current, 'foundation'))
     && readGatewayRegistry(registry)?.shim.command === bin && readGatewayRegistry(registry)?.shim.args.join(' ') === 'mcp'
+  let snapshot: ActivationSnapshot | undefined
   if (!unchanged) {
-    const snapshot: ActivationSnapshot = { target, registry, paths: activationPaths(home).map(path => capturePath(path)) }
+    snapshot = { target, registry, paths: activationPaths(home).map(path => capturePath(path)) }
     mkdirSync(base, { recursive: true })
     const temp = `${rollbackPath}.${process.pid}.tmp`
     writeFileSync(temp, JSON.stringify(snapshot), { mode: 0o600 })
@@ -100,7 +102,17 @@ export function activateInstall(target: string, home: string, previous: string |
   if (entry?.shim.command !== bin || entry.shim.args.join(' ') !== 'mcp') {
     writeGatewayRegistry(registry, { name: 'foundation', protocol: 'mcp', shim: { command: bin, args: ['mcp'] }, env: entry?.env || {}, startedAt: new Date().toISOString(), gatewayRev: 1, stateless: true })
   }
-  io.stdout(JSON.stringify({ installed: target, sourceSha: sha, previous: previous || null, rollback: `${shellQuote(join(target, 'foundation'))} install --rollback` }))
+  if (snapshot) {
+    snapshot.shell = writeRollbackShell(home, snapshot)
+    const temp = `${rollbackPath}.${process.pid}.tmp`
+    writeFileSync(temp, JSON.stringify(snapshot), { mode: 0o600 })
+    renameSync(temp, rollbackPath)
+  } else {
+    try { snapshot = JSON.parse(readFileSync(rollbackPath, 'utf8')) } catch {}
+  }
+  io.stdout(JSON.stringify({ installed: target, sourceSha: sha, previous: previous || null,
+    rollback: snapshot?.shell ? `/bin/sh ${shellQuote(snapshot.shell)}` : null,
+    rollbackCommand: `${shellQuote(join(target, 'foundation'))} install --rollback` }))
   return 0
 }
 function readLinkIsOurs(path: string, target: string): boolean {
@@ -108,7 +120,7 @@ function readLinkIsOurs(path: string, target: string): boolean {
 }
 
 type SavedPath = { kind: 'absent' } | { kind: 'link'; target: string } | { kind: 'file'; data: string; mode: number }
-interface ActivationSnapshot { target: string; registry: string; paths: SavedPath[] }
+interface ActivationSnapshot { target: string; registry: string; paths: SavedPath[]; shell?: string }
 
 function registryPath(home: string): string {
   return gatewayRegistryPath({ ...process.env, FOUNDATION_GATEWAY_DIR: process.env.FOUNDATION_GATEWAY_DIR || join(home, '.hive/gateways') })
@@ -136,8 +148,8 @@ function installPlan(target: string, home: string, sha: string, previous: string
       after: i === 0 ? { kind: 'link', target } : i === 1 ? previous && previous !== sha ? { kind: 'link', target: join(home, '.local/share/foundation/versions', previous) } : 'unchanged'
         : i === 2 ? { kind: 'link', target: join(current, 'foundation') } : { command: paths[2], args: ['mcp'], env: 'preserved' } })),
     rollbackSnapshot: join(home, '.local/share/foundation/rollback.json'),
-    originalExecutableBackup: `${paths[2]}.before-foundation-install`,
-    rollback: `${shellQuote(join(target, 'foundation'))} install --rollback`,
+    originalExecutableBackup: { path: `${paths[2]}.before-foundation-install`, action: pathExists(paths[2]!) && !pathExists(`${paths[2]}.before-foundation-install`) && !readLinkIsOurs(paths[2]!, join(current, 'foundation')) ? 'rename existing executable here' : 'unchanged' },
+    rollback: 'A runtime-independent /bin/sh command is printed after activation; --rollback restores the same snapshot.',
     sessionPolicy: 'Drain writers before activation; running processes retain the previous runtime.',
   }
 }
@@ -153,15 +165,23 @@ function rollbackInstall(home: string, dryRun: boolean, io: CliIO): number {
       || (state.kind === 'file' && typeof state.data === 'string' && Number.isInteger(state.mode))))) {
     io.stderr('Invalid rollback snapshot; refusing changes.'); return 1
   }
-  if (!readLinkIsOurs(paths[0]!, snapshot.target)) { io.stderr('Current release changed since this activation; refusing rollback.'); return 1 }
   if (dryRun) { io.stdout(JSON.stringify({ dryRun: true, rollback: snapshot.target, restores: paths.map((path, i) => ({ path, kind: snapshot.paths[i]!.kind })) })); return 0 }
+  if (snapshot.shell) {
+    try { io.stdout(execFileSync('/bin/sh', [snapshot.shell], { encoding: 'utf8' }).trim()); return 0 }
+    catch (error) { io.stderr(`Rollback failed; its snapshot is retained for retry: ${String(error)}`); return 1 }
+  }
+  const originalCurrent = snapshot.paths[0]!
+  if (!readLinkIsOurs(paths[0]!, snapshot.target) && JSON.stringify(capturePath(paths[0]!)) !== JSON.stringify(originalCurrent)) {
+    io.stderr('Current release changed since this activation; refusing rollback.'); return 1
+  }
   const lock = join(base, 'install.lock')
   try { mkdirSync(lock) } catch { io.stderr(`Another install may be active; inspect ${lock} before retrying.`); return 1 }
   try {
-    if (readFileSync(snapshotPath, 'utf8') !== JSON.stringify(snapshot) || !readLinkIsOurs(paths[0]!, snapshot.target)) {
+    if (readFileSync(snapshotPath, 'utf8') !== JSON.stringify(snapshot)) {
       io.stderr('Activation changed during rollback planning; rerun rollback.'); return 1
     }
-    for (const [i, path] of paths.entries()) {
+    for (const i of [1, 2, 3, 0]) {
+      const path = paths[i]!
       const state = snapshot.paths[i]!
       if (state.kind === 'absent') { rmSync(path, { force: true }); continue }
       mkdirSync(dirname(path), { recursive: true })
@@ -175,6 +195,36 @@ function rollbackInstall(home: string, dryRun: boolean, io: CliIO): number {
     io.stdout(JSON.stringify({ rolledBack: snapshot.target, restored: paths }))
     return 0
   } finally { rmSync(lock, { recursive: true, force: true }) }
+}
+
+function writeRollbackShell(home: string, snapshot: ActivationSnapshot): string {
+  const base = join(home, '.local/share/foundation')
+  const token = randomUUID()
+  const backupRoot = join(base, 'rollbacks', token)
+  mkdirSync(backupRoot, { recursive: true, mode: 0o700 })
+  const paths = activationPaths(home)
+  const expected = paths.map(path => capturePath(path))
+  const prepare = (states: SavedPath[], prefix: string) => states.forEach((state, i) => {
+    if (state.kind === 'file') writeFileSync(join(backupRoot, `${prefix}${i}`), Buffer.from(state.data, 'base64'), { mode: 0o600 })
+  })
+  prepare(snapshot.paths, 'before'); prepare(expected, 'after')
+  const matches = (path: string, state: SavedPath, file: string) => state.kind === 'absent'
+    ? `[ ! -e ${shellQuote(path)} ] && [ ! -L ${shellQuote(path)} ]`
+    : state.kind === 'link' ? `[ -L ${shellQuote(path)} ] && [ "$(readlink ${shellQuote(path)})" = ${shellQuote(state.target)} ]`
+      : `[ -f ${shellQuote(path)} ] && [ ! -L ${shellQuote(path)} ] && cmp -s ${shellQuote(path)} ${shellQuote(file)}`
+  const checks = paths.map((path, i) => `if ! { ${matches(path, expected[i]!, join(backupRoot, `after${i}`))}; } && ! { ${matches(path, snapshot.paths[i]!, join(backupRoot, `before${i}`))}; }; then echo ${shellQuote(`Refusing rollback: ${path} changed after activation`)} >&2; exit 1; fi`)
+  const restores = [1, 2, 3, 0].map(i => {
+    const path = paths[i]!, state = snapshot.paths[i]!
+    if (state.kind === 'absent') return `rm -f ${shellQuote(path)}`
+    const make = state.kind === 'link' ? `ln -s ${shellQuote(state.target)} "$temp"`
+      : `cp ${shellQuote(join(backupRoot, `before${i}`))} "$temp"\nchmod ${state.mode.toString(8)} "$temp"`
+    return `temp=${shellQuote(path)}."$$".rollback-tmp\nrm -f "$temp"\n${make}\nif [ "$(uname -s)" = Darwin ]; then mv -fh "$temp" ${shellQuote(path)}; else mv -fT "$temp" ${shellQuote(path)}; fi`
+  })
+  const marker = join(base, 'rollback-active')
+  const script = join(backupRoot, 'restore.sh')
+  writeFileSync(script, `#!/bin/sh\nset -eu\nlock=${shellQuote(join(base, 'install.lock'))}\nif ! mkdir "$lock"; then echo 'Install or rollback lock unavailable; inspect it before retrying.' >&2; exit 1; fi\ntrap 'rmdir "$lock"' 0\nif [ "$(cat ${shellQuote(marker)} 2>/dev/null)" != ${shellQuote(token)} ]; then echo 'This rollback is no longer active.' >&2; exit 1; fi\n${checks.join('\n')}\n${restores.join('\n')}\nmv -f ${shellQuote(join(base, 'rollback.json'))} ${shellQuote(join(base, 'rollback-restored.json'))}\nrm -f ${shellQuote(marker)}\necho ${shellQuote(JSON.stringify({ rolledBack: snapshot.target, restored: paths }))}\n`, { mode: 0o700 })
+  writeFileSync(marker, token, { mode: 0o600 })
+  return script
 }
 
 function shellQuote(value: string): string {
