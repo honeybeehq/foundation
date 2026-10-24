@@ -1,6 +1,7 @@
 import { mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
+import { LoroDoc } from 'loro-crdt'
 import { expect, it } from 'vitest'
 import { loadChain, mergeChains, exportBlobs, importBlobs } from 'foundation-engine'
 import { runImport } from '../src/commands/import.js'
@@ -30,4 +31,15 @@ it('saves identical bytes after opposite import, exchange and merge orders witho
  persistDocument(file,loadChain(readFileSync(file+'.chain')))
  expect(['','.chain','.chain.projection'].map(s=>statSync(file+s).mtimeMs)).toEqual(before)
  } finally { rmSync(dir,{recursive:true,force:true}) }
+})
+
+it('canonical snapshots preserve every operation in a legacy design and remain readable by fromSnapshot', () => {
+ const before = readFileSync(resolve('boards/tracks-pane.fdn.html.chain'))
+ const after = loadChain(before).save()
+ function raw(bytes: Uint8Array) {
+  const header = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(0, true)
+  return LoroDoc.fromSnapshot(bytes.subarray(4 + header))
+ }
+ expect(raw(after).oplogVersion().compare(raw(before).oplogVersion())).toBe(0)
+ expect(Buffer.from(loadChain(after).save())).toEqual(Buffer.from(after))
 })
