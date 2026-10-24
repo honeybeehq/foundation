@@ -1,15 +1,25 @@
-import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, expect, it } from 'vitest'
 import { createChain } from 'foundation-engine'
 import { skeletonDocument } from '../src/commands/new.js'
-import { encodeBlob, restoreChangeBlobs } from '../../engine/src/chain/blob.js'
-import { materializeDocument } from '../src/disk.js'
+import { encodeBlob, importChangeBlobs, restoreChangeBlobs } from '../../engine/src/chain/blob.js'
+import { materializeDocument, updateDocument } from '../src/disk.js'
 import { materializePath } from '../src/sync/materialize.js'
 let root: string | undefined
 afterEach(() => { if (root) rmSync(root, { recursive: true, force: true }) })
 const seed = () => createChain(skeletonDocument('Restore'), { author: 'seed', message: 'init' }, { docId: 'restore' })
+it('does not rewrite either file when a validated duplicate page arrives under the save lock', () => {
+  root = mkdtempSync(join(tmpdir(), 'sync-duplicate-')); const file = join(root, 'board.fdn.html'), chain = seed()
+  chain.upgradeStorage()
+  materializeDocument(file, chain)
+  const paths = [file, `${file}.chain`]
+  const before = paths.map(path => ({ bytes: readFileSync(path), mtime: statSync(path).mtimeMs }))
+  const blobs = chain.changes().map(change => encodeBlob(change.envelope, change.bytes))
+  updateDocument(file, current => { expect(importChangeBlobs(current, blobs)).toBe(0) }, true)
+  expect(paths.map(path => ({ bytes: readFileSync(path), mtime: statSync(path).mtimeMs }))).toEqual(before)
+})
 it('restores exact bytes after divergent history without creating a new genesis', () => {
   const a = seed(), b = a.fork('b')
   a.apply({ author: 'a', message: 'a' }, [{ op: 'set-text', id: 'n1', text: 'A' }])

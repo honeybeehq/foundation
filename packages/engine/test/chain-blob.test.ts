@@ -19,10 +19,16 @@ describe('shared change wire boundary', () => {
     a.apply({ author: 'a', message: 'local' }, [{ op: 'set-text', id: 'n1', text: 'A' }])
     b.apply({ author: 'b', message: 'remote' }, [{ op: 'set-text', id: 'n2', text: 'B' }])
     const blobs = b.changes().map(c => encodeBlob(c.envelope, c.bytes))
-    expect(importChangeBlobs(a, blobs)).toBe(1)
+    const importedStages: string[] = []
+    expect(importChangeBlobs(a, blobs, stage => importedStages.push(stage))).toBe(1)
+    expect(importedStages).toContain('verify')
     const saved = a.save()
-    expect(importChangeBlobs(a, blobs)).toBe(0)
+    const stages: string[] = []
+    expect(importChangeBlobs(a, blobs, stage => stages.push(stage))).toBe(0)
+    expect(stages).toEqual(['decode'])
     expect(a.save()).toEqual(saved)
+    const corrupt = blobs[0]!.slice(); corrupt[corrupt.length - 1] = corrupt[corrupt.length - 1]! ^ 1
+    expect(() => importChangeBlobs(a, [corrupt])).toThrow('hash mismatch')
   })
   it('rejects missing history and foreign document without changing the live chain', () => {
     const a = seed(), b = a.fork('remote')
