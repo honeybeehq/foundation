@@ -1,9 +1,10 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { copyFileSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { loadChain, parseDocument } from 'foundation-engine'
 import { captureIo } from '../src/io.js'
+import { runChain } from '../src/commands/chain.js'
 import { runNew } from '../src/commands/new.js'
 import { runAnnotate, runAnnotations } from '../src/commands/annotate.js'
 
@@ -71,11 +72,23 @@ describe('foundation annotate / foundation annotations', () => {
     expect(code).toBe(2)
   })
 
-  it('two annotations mint sequential ids', async () => {
-    await runAnnotate([file, '--text', 'first', '--node', 'n1'], captureIo())
-    await runAnnotate([file, '--text', 'second', '--node', 'n1'], captureIo())
-    const chain = loadChain(readFileSync(chainPath))
-    expect(chain.doc().annotations.map((a) => a.id).sort()).toEqual(['a1', 'a2'])
+  it('two offline copies mint through CLI and keep both comments after directory sync', async () => {
+    const other = join(dir, 'other.fdn.html')
+    copyFileSync(file, other)
+    copyFileSync(chainPath, `${other}.chain`)
+    expect(await runAnnotate([file, '--text', 'first', '--node', 'n1', '--author', 'user:alice'], captureIo())).toBe(0)
+    expect(await runAnnotate([other, '--text', 'second', '--node', 'n1', '--author', 'user:bob'], captureIo())).toBe(0)
+    const firstId = loadChain(readFileSync(chainPath)).doc().annotations[0]!.id
+    const secondId = loadChain(readFileSync(`${other}.chain`)).doc().annotations[0]!.id
+    expect(firstId).not.toBe(secondId)
+    const exchange = join(dir, 'exchange')
+    for (const path of [file, other, file]) expect(await runChain(['sync', path, exchange], captureIo())).toBe(0)
+    const a = loadChain(readFileSync(chainPath))
+    const b = loadChain(readFileSync(`${other}.chain`))
+    expect(a.doc().annotations.map(item => item.text).sort()).toEqual(['first', 'second'])
+    expect(a.doc()).toEqual(b.doc())
+    expect(a.verify()).toEqual({ ok: true })
+    expect(b.verify()).toEqual({ ok: true })
   })
 
   it('--resolve <id> marks an annotation resolved', async () => {

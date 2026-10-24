@@ -2,10 +2,11 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'no
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { loadChain } from 'foundation-engine'
+import { createChain, loadChain } from 'foundation-engine'
 import { captureIo } from '../src/io.js'
 import { defaultAuthor } from '../src/identity.js'
-import { runNew } from '../src/commands/new.js'
+import { originNode } from '../src/change-meta.js'
+import { runNew, skeletonDocument } from '../src/commands/new.js'
 import { runIngest } from '../src/commands/ingest.js'
 import { runChain } from '../src/commands/chain.js'
 
@@ -40,6 +41,15 @@ describe('chain wired into the authoring loop', () => {
 
   afterEach(() => {
     rmSync(dir, { recursive: true, force: true })
+  })
+
+  it('legacy text history has no origin suffix', async () => {
+    const chain = createChain(skeletonDocument('Legacy'), { author: 'user:legacy', message: 'seed' })
+    writeFileSync(chainPath, chain.save())
+    const io = captureIo()
+    expect(await runChain([file, 'log'], io)).toBe(0)
+    expect(io.out).toEqual([`${chain.head().hash.slice(0, 12)}  user:legacy  seed`])
+    expect(io.out[0]).not.toContain('@')
   })
 
   describe('chain init', () => {
@@ -133,8 +143,8 @@ describe('chain wired into the authoring loop', () => {
       expect(await runChain([file, 'log'], logIo)).toBe(0)
       expect(logIo.out).toHaveLength(2)
       expect(logIo.out[1]).toContain('rename card label')
-      // hash[0..12], author, message per line.
-      expect(logIo.out[1]).toMatch(new RegExp(`^[0-9a-f]{12}\\s+${escapeRegExp(defaultAuthor())}\\s+rename card label$`))
+      // hash[0..12], author, origin, message per line.
+      expect(logIo.out[1]).toMatch(new RegExp(`^[0-9a-f]{12}\\s+${escapeRegExp(defaultAuthor())}\\s+@${escapeRegExp(originNode())}\\s+rename card label$`))
     })
 
     it('skips the commit when the parsed doc canonically matches the chain head (no-op)', async () => {

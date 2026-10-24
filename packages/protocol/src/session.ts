@@ -313,6 +313,7 @@ const isLogEntry: Check = (value) => isEnvelope(value) && shape({
   anchor: optional(shape({ name: isString, targetHash: nullable(isString) })),
   time: optional(shape({ kind: oneOf(['logical']), value: isNumber })),
   wallTime: optional(nullable(isString)),
+  originNode: optional(nullable(isString)),
   nodeIds: optional(arrayOf(isString)),
   artboardIds: optional(arrayOf(isString)),
   pageIds: optional(arrayOf(isString)),

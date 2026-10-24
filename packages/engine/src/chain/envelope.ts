@@ -31,6 +31,7 @@
 import { createHash } from 'node:crypto'
 
 export interface PackedEnvelope {
+  originNode?: string
   wallTime?: string
   author: string
   message: string
@@ -63,6 +64,7 @@ export function decodeEnvelope(raw: string | undefined): PackedEnvelope {
       specVersion: typeof parsed.specVersion === 'string' ? parsed.specVersion : '',
       prevHash: typeof parsed.prevHash === 'string' ? parsed.prevHash : null,
       ...(wallTime !== undefined ? { wallTime } : {}),
+      ...(typeof parsed.originNode === 'string' ? { originNode: parsed.originNode } : {}),
     }
   } catch {
     return { author: 'unknown', message: raw, specVersion: '', prevHash: null }

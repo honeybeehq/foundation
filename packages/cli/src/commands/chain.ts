@@ -236,7 +236,7 @@ async function runChainLogVerify(file: string, subcommand: string, io: CliIO, fl
     }
     // oldest first, newest last (log() already returns changes in that order).
     for (const entry of entries) {
-      io.stdout(`${entry.hash.slice(0, 12)}  ${entry.author}  ${entry.message}`)
+      io.stdout(`${entry.hash.slice(0, 12)}  ${entry.author}${entry.originNode ? `  @${entry.originNode}` : ''}  ${entry.message}`)
     }
     return 0
   }
