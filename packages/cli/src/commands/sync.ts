@@ -16,14 +16,17 @@ export async function runSync(args: string[], io: CliIO): Promise<number> {
       }
       case 'close': {
         if (!positionals[1]) throw new Error('sync close requires a file')
-        closeDesign(positionals[1]); io.stdout('closed for sync'); return 0
+        closeDesign(positionals[1]); io.stdout('closed for sync; with automatic registration enabled, the next open or edit registers it again'); return 0
       }
       case 'status': {
         const rows = liveDesigns().map(design => {
-          const state = readSyncState(copyKey(design))
+          let state
+          try { state = readSyncState(copyKey(design)) } catch (err) {
+            return { ...design, feed: feedName(design), status: 'saved locally', pending: null, cursor: null, lastError: `replica state: ${String(err)}`, lastErrorAt: null, updatedAt: '' }
+          }
           let pending: number | null = null, localError: string | null = null
           try { const known = new Set(state.published); pending = loadChain(readFileSync(`${design.file}.chain`)).changes().filter(c => !known.has(c.envelope.hash)).length } catch (err) { localError = String(err) }
-          return { ...design, feed: feedName(design), status: pending === 0 ? 'shared' : state.updatedAt ? 'waiting to upload' : 'saved locally', pending, cursor: state.cursor, lastError: localError ?? state.lastError, updatedAt: state.updatedAt }
+          return { ...design, feed: feedName(design), status: (localError ?? state.lastError) && pending === 0 ? 'blocked' : pending === 0 ? 'shared' : state.updatedAt ? 'waiting to upload' : 'saved locally', pending, cursor: state.cursor, lastError: localError ?? state.lastError, lastErrorAt: state.lastErrorAt ?? null, updatedAt: state.updatedAt }
         })
         io.stdout(flags.json ? JSON.stringify(rows) : rows.map(row => `${row.file}: ${row.status} (${row.pending ?? '?'} waiting)${row.lastError ? ` — ${row.lastError}` : ''}`).join('\n'))
         return 0

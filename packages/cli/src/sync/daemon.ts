@@ -38,6 +38,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
     try {
       try { watcher = watch(dirname(design.file), (_event, name) => { if (name === null || design.file.endsWith(`/${name}`) || `${design.file}.chain`.endsWith(`/${name}`)) wake?.() }); watcher.on('error', () => watcher?.close()) } catch { /* Poll remains active on unsupported filesystems. */ }
       while (!signal.aborted) {
+        let receiveError: unknown, publishingHash: string | undefined
         try {
           bridge = new CombBridge(config.binary, config.args); await bridge.hello()
           const active = bridge
@@ -52,35 +53,46 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
                   if (chain.docId() !== design.docId) throw new Error('live path now holds another design')
                   importChangeBlobs(chain, incoming.blobs)
                 }, true)
+                // Delivery itself proves durable sharing, even when the append acknowledgement was lost.
+                const shared = new Set(state.published)
+                for (const blob of incoming.blobs) shared.add(decodeBlob(blob).envelope.hash)
+                state.published = [...shared]
                 state.cursor = incoming.next; state.updatedAt = new Date().toISOString(); writeSyncState(key, state)
               }
+              // A healthy follower must not erase an unresolved publisher failure.
+              if (state.pending === 0) {
+                backoff = 250
+                if (state.lastError !== null) { state.lastError = null; writeSyncState(key, state) }
+              }
             }
-          })().catch(err => { failed = err; active.close(); wake?.() })
+          })().catch(err => { failed = err; receiveError = err; active.close(); wake?.() })
           try {
             while (!signal.aborted && !failed) {
               const chain = loadChain(readFileSync(`${design.file}.chain`))
               if (chain.docId() !== design.docId) throw new Error('live path now holds another design')
               const published = new Set(state.published)
               const pending = chain.changes().filter(c => !published.has(c.envelope.hash))
-              state.pending = pending.length; writeSyncState(key, state)
+              if (state.pending !== pending.length) { state.pending = pending.length; writeSyncState(key, state) }
               if (pending.length) {
                 // A persistent bridge renews exclusive feed ownership. Bound each writer
                 // batch and send clean EOF, so other nodes can publish through the same log.
+                publishingHash = pending[0]!.envelope.hash
                 const writer = new CombBridge(config.binary, config.args)
                 try {
                   await writer.hello()
                   for (const change of pending.slice(0, 16)) {
                     if (signal.aborted) break
+                    publishingHash = change.envelope.hash
                     const bytes = encodeBlob(change.envelope, change.bytes)
-                    if (bytes.length > 491520) throw new Error('change exceeds Comb append limit')
+                    if (bytes.length > 491520) throw new Error(`change ${change.envelope.hash} exceeds Comb append limit (491520 bytes)`)
                     const receipt = await writer.request('append', { log: feed, idempotency_key: change.envelope.hash, payload_hex: Buffer.from(bytes).toString('hex') })
                     if (receipt.log !== feed || typeof receipt.first !== 'string' || !/^[1-9][0-9]*$/.test(receipt.first) || receipt.last !== receipt.first || receipt.cursor !== String(BigInt(receipt.first) + 1n)) throw new Error('invalid Comb append receipt')
-                    state.published.push(change.envelope.hash); state.pending--; state.updatedAt = new Date().toISOString(); state.lastError = null; writeSyncState(key, state)
+                    if (!state.published.includes(change.envelope.hash)) state.published.push(change.envelope.hash)
+                    state.pending = Math.max(0, state.pending - 1); state.updatedAt = new Date().toISOString(); state.lastError = null; backoff = 250; writeSyncState(key, state)
                   }
                 } finally { await writer.finish() }
+                publishingHash = undefined
               }
-              backoff = 250
-              state.lastError = null; writeSyncState(key, state)
               await new Promise<void>(resolve => { const timer = setTimeout(done, 250); function done(): void { clearTimeout(timer); wake = undefined; resolve() }; wake = done })
             }
             if (failed) throw failed
@@ -88,7 +100,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
         } catch (err) {
           bridge?.close()
           if (signal.aborted) break
-          state.lastError = err instanceof Error ? err.message : String(err); writeSyncState(key, state)
+          state.lastError = `${err === receiveError ? `receive cursor ${state.cursor}` : publishingHash ? `publish change ${publishingHash}` : 'connection'}: ${err instanceof Error ? err.message : String(err)}`; state.lastErrorAt = new Date().toISOString(); writeSyncState(key, state)
           log(`${feedName(design)}: ${state.lastError}`)
           await delay(backoff); backoff = Math.min(backoff * 2, 10000)
         }
@@ -97,13 +109,16 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
   }
   try {
     while (!signal.aborted) {
-      const designs = liveDesigns(), liveKeys = new Set(designs.map(copyKey))
-      for (const [key, worker] of workers) if (!liveKeys.has(key)) worker.controller.abort()
+      const designs = liveDesigns(log), liveKeys = new Set(designs.map(copyKey))
+      for (const [key, worker] of workers) if (!liveKeys.has(key) && !worker.controller.signal.aborted) {
+        worker.controller.abort()
+        void worker.done.finally(() => workers.delete(key))
+      }
       for (const design of designs) {
         const key = copyKey(design)
         if (!workers.has(key)) {
           const controller = new AbortController()
-          const done = run(design, AbortSignal.any([signal, controller.signal])).catch(err => log(String(err))).finally(() => workers.delete(key))
+          const done = run(design, AbortSignal.any([signal, controller.signal])).catch(err => log(String(err)))
           workers.set(key, { controller, done })
         }
       }

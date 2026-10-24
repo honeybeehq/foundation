@@ -144,7 +144,8 @@ export async function runCli(argv: string[], io: CliIO = processIo): Promise<num
   }
   const code = await handler(rest, io)
   // Commands with a document first argument include CLI and MCP-independent edits.
-  if (code === 0 && command !== 'sync' && rest[0]?.endsWith('.fdn.html')) autoOpenDesign(rest[0], io.stderr)
+  const editedFile = command === 'copy' ? rest[1] : ['new', 'edit', 'annotate', 'ingest'].includes(command) ? rest[0] : undefined
+  if (code === 0 && editedFile?.endsWith('.fdn.html')) autoOpenDesign(editedFile, io.stderr)
   return code
 }
 
