@@ -32,6 +32,7 @@ import { runAnnotate, runAnnotations } from './commands/annotate.js'
 import { runFreeze } from './commands/freeze.js'
 import { runMcp } from './commands/mcp.js'
 import { runGateway } from './commands/gateway.js'
+import { runGit } from './commands/git.js'
 import { runGitMergeDriver } from './commands/git-merge-driver.js'
 import { runProject } from './commands/project.js'
 import { runSession } from './commands/session.js'
@@ -57,6 +58,7 @@ const COMMANDS: Record<string, (args: string[], io: CliIO) => Promise<number>> =
   freeze: runFreeze,
   mcp: runMcp,
   gateway: runGateway,
+  git: runGit,
   'git-merge-driver': runGitMergeDriver,
   project: runProject,
   session: runSession,
@@ -119,6 +121,7 @@ commands:
                                               long-lived editing session speaking the JSON-lines
                                               session protocol on stdin/stdout (packages/protocol)
   gateway install|uninstall|status           publish/withdraw the operator-gateway registry entry
+  git setup                                 configure chain-aware Git merges
   git-merge-driver <ancestor> <ours> <theirs>   git merge driver (see docs/GIT-INTEGRATION.md)
 `
 
