@@ -1,0 +1,26 @@
+import { execFileSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+export interface RuntimeVersion {
+  sourceSha: string
+  dirty: boolean | null
+  packageVersion: string
+  sessionProtocols: string[]
+  documentFormats: string[]
+  artboardWriteSafe: boolean
+}
+export const sourceRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
+export function runtimeVersion(root = process.env.FDN_ROOT || sourceRoot): RuntimeVersion {
+  try { return JSON.parse(readFileSync(resolve(root, 'foundation-install.json'), 'utf8')).runtime } catch {}
+  let sourceSha = 'unknown'
+  let dirty: boolean | null = null
+  try {
+    sourceSha = execFileSync('git', ['-C', root, 'rev-parse', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
+    dirty = !!execFileSync('git', ['-C', root, 'status', '--porcelain'], { encoding: 'utf8' }).trim()
+  } catch {}
+  let packageVersion = 'unknown'
+  try { packageVersion = JSON.parse(readFileSync(resolve(root, 'packages/cli/package.json'), 'utf8')).version } catch {}
+  return { sourceSha, dirty, packageVersion, sessionProtocols: ['0.2', '0.1'], documentFormats: ['0.1.0-artboards', '0.1.0'], artboardWriteSafe: true }
+}

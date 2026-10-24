@@ -1,3 +1,4 @@
+import { runtimeVersion } from '../runtime-version.js'
 /**
  * foundation MCP server — wires `./tools.ts`'s tool registry into the MCP
  * wire protocol over stdio.
@@ -31,8 +32,9 @@ import type { ServerResult } from '@modelcontextprotocol/sdk/types.js'
 import { callTool, TOOLS } from './tools.js'
 
 export function createFoundationMcpServer(): Server {
+  const info = { name: 'foundation', version: `${runtimeVersion().packageVersion}+${runtimeVersion().sourceSha}`, _meta: { runtime: { ...runtimeVersion() } } }
   const server = new Server(
-    { name: 'foundation', version: '0.1.0' },
+    info,
     { capabilities: { tools: {} } },
   )
 
