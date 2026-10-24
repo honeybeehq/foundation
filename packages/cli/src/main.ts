@@ -1,4 +1,5 @@
 #!/usr/bin/env -S npx tsx
+import { runDoctor } from './commands/doctor.js'
 /**
  * foundation-cli — entry point (API.md "CLI (packages/cli)"). Zero-dependency
  * argv parsing; bin name `foundation`; tsx is the runtime (this file is the
@@ -36,6 +37,7 @@ import { runSession } from './commands/session.js'
 import type { CliIO } from './io.js'
 
 const COMMANDS: Record<string, (args: string[], io: CliIO) => Promise<number>> = {
+  doctor: runDoctor,
   install: runInstall,
   version: async (_args, io) => { io.stdout(JSON.stringify(runtimeVersion())); return 0 },
   new: runNew,
