@@ -104,12 +104,16 @@ export function recoverDocument(file: string): void {
 
 export function persistDocument(file: string, chain: FdnChain, text = projectedText(chain, chain.docId() ?? readDocIdAttr(readTextIfPresent(file) ?? '')), protectedProjection = true): Uint8Array {
   const bytes = chain.save()
-  if (sameBytes(readBytesIfPresent(`${file}.chain`), bytes) && readTextIfPresent(file) === text) return bytes
+  const receipt = JSON.stringify({ version: projectionVersion(text), protected: protectedProjection })
+  if (sameBytes(readBytesIfPresent(`${file}.chain`), bytes) && readTextIfPresent(file) === text) {
+    writeAtomic(`${file}.chain.projection`, receipt)
+    return bytes
+  }
   const pendingPath = `${file}.chain.pending`
   writeAtomic(pendingPath, JSON.stringify({ before: readTextIfPresent(file), after: text, chainHash: createHash('sha256').update(bytes).digest('hex'), protected: protectedProjection }))
   writeAtomic(`${file}.chain`, bytes)
   writeAtomic(file, text)
-  writeAtomic(`${file}.chain.projection`, JSON.stringify({ version: projectionVersion(text), protected: protectedProjection }))
+  writeAtomic(`${file}.chain.projection`, receipt)
   unlinkSync(pendingPath)
   return bytes
 }

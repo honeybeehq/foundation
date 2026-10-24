@@ -1,8 +1,9 @@
 import { mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
 import { expect, it } from 'vitest'
 import { loadChain, mergeChains, exportBlobs, importBlobs } from 'foundation-engine'
+import { runImport } from '../src/commands/import.js'
 import { runNew } from '../src/commands/new.js'
 import { captureIo } from '../src/io.js'
 import { persistDocument } from '../src/disk.js'
@@ -11,10 +12,11 @@ it('saves identical bytes after opposite import, exchange and merge orders witho
  const dir = mkdtempSync(join(tmpdir(), 'fdn-bytes-'))
  try {
  await runNew([join(dir,'base')], captureIo())
+ expect(await runImport([resolve('packages/importer/fixtures/badge.tsx'),'--into',join(dir,'base.fdn.html')],captureIo())).toBe(0)
  const base = readFileSync(join(dir,'base.fdn.html.chain'))
  const a = loadChain(base,{actor:'a'}), b = loadChain(base,{actor:'b'})
- a.apply({author:'a',message:'a'},[{op:'set-token',name:'a',value:'red'}])
- b.apply({author:'b',message:'b'},[{op:'set-token',name:'b',value:'blue'}])
+ a.apply({author:'a',message:'a'},[{op:'set-token',name:'a',value:'red'},{op:'move-node',id:'n2',parent:null,index:0}])
+ b.apply({author:'b',message:'b'},[{op:'set-token',name:'b',value:'blue'},{op:'set-text',id:'n1',text:'A concurrent heading'}])
  const left = loadChain(base), right = loadChain(base)
  for (const c of [...a.changes(),...b.changes()]) left.importUpdate(c.bytes)
  for (const c of [...b.changes(),...a.changes()]) right.importUpdate(c.bytes)
