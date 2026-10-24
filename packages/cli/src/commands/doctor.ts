@@ -71,6 +71,11 @@ function configCommands(value: unknown, foundation = false): string[] {
   const record = value as Record<string, unknown>
   const named = foundation || record.name === 'foundation'
   const found = named && typeof record.command === 'string' ? [record.command] : []
+  if (named && Array.isArray(record.args)) {
+    for (const arg of record.args) {
+      if (typeof arg === 'string' && isAbsolute(arg)) found.push(arg)
+    }
+  }
   for (const [key, child] of Object.entries(record)) {
     if (child && typeof child === 'object') found.push(...configCommands(child, named || key === 'foundation'))
   }
@@ -113,17 +118,25 @@ export async function runDoctor(args: string[], io: CliIO): Promise<number> {
   entries.push(inspect(join(home, '.local', 'bin', 'foundation'), 'local-bin'))
   const registry = join(process.env.FOUNDATION_GATEWAY_DIR || join(home, '.hive', 'gateways'), 'foundation.json')
   const configs = new Set([registry])
-  // Only known config locations are inspected: never recurse into Cell checkouts.
+  // Read configuration files only, including the repository root one level
+  // below each Cell. Never descend into source trees or follow directory links.
+  const names = ['.mcp.json', 'mcp.json', 'gateways.json', '.claude.json', '.claude/settings.json', '.claude/settings.local.json', '.codex/config.toml']
+  const addConfigs = (root: string) => { for (const name of names) configs.add(join(root, name)) }
+  const directories = (root: string): string[] => {
+    try { return readdirSync(root, { withFileTypes: true }).filter(item => item.isDirectory()).map(item => join(root, item.name)) } catch { return [] }
+  }
   const cells = join(home, '.hive', 'v2', 'cells')
-  let cellCoverage = 'known config paths at immediate Cell roots only; checkout contents excluded'
+  let cellCoverage = 'known MCP/gateway configs at Cell roots and immediate repository roots; source files excluded'
   try {
-    for (const cell of readdirSync(cells, { withFileTypes: true })) {
-      if (!cell.isDirectory()) continue
-      for (const name of ['.mcp.json', 'mcp.json', 'gateways.json', '.claude/settings.json', '.codex/config.toml']) {
-        configs.add(join(cells, cell.name, name))
-      }
+    accessSync(cells, constants.R_OK)
+    for (const cell of directories(cells)) {
+      addConfigs(cell)
+      for (const repo of directories(cell)) addConfigs(repo)
     }
   } catch { cellCoverage = 'Cell directory missing or unreadable; Cell config coverage unavailable' }
+  addConfigs(home)
+  const accountHomes = join(home, '.hive', 'homes')
+  for (const account of directories(accountHomes)) addConfigs(account)
   const configInventory: { path: string; status: string }[] = []
   for (const path of configs) {
     const raw = readable(path)
@@ -144,10 +157,10 @@ export async function runDoctor(args: string[], io: CliIO): Promise<number> {
       for (const candidate of candidates) {
         try { accessSync(candidate, constants.X_OK); target = candidate; break } catch { /* next PATH entry */ }
       }
-      if (target) entries.push(inspect(target, path === registry ? 'gateway-registry' : `cell-config:${path}`))
+      if (target) entries.push(inspect(target, path === registry ? 'gateway-registry' : `config:${path}`))
       else configInventory.push({ path, status: 'relative command cannot be resolved without config cwd' })
     }
   }
-  io.stdout(JSON.stringify({ inventoryVersion: 1, readOnly: true, coverage: { cells: cellCoverage, commandsExecuted: false, metadata: 'install stamp claims only; unstamped runtime metadata is unknown' }, entries, configs: configInventory }, null, 2))
+  io.stdout(JSON.stringify({ inventoryVersion: 1, readOnly: true, coverage: { cells: cellCoverage, harnessHomes: 'known MCP configs in HOME and immediate ~/.hive/homes account directories', commandsExecuted: false, metadata: 'install stamp claims only; unstamped runtime metadata is unknown' }, entries, configs: configInventory }, null, 2))
   return 0
 }
