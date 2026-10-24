@@ -53,6 +53,9 @@ export async function runInstall(args: string[], io: CliIO): Promise<number> {
       if (!existsSync(join(stage, 'packages/cli/src/runtime-version.ts'))) throw new Error('This revision predates runtime attestation; choose a revision supporting foundation version.')
       execFileSync('pnpm', ['install', '--frozen-lockfile'], { cwd: stage, stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 16 * 1024 * 1024 })
       execFileSync(process.execPath, ['--input-type=module', '-e', `import {build} from 'esbuild'; await build({entryPoints:['src/session/bin.ts'],bundle:true,platform:'node',format:'esm',target:'node22',external:['loro-crdt'],outfile:'dist/session.mjs'})`], { cwd: join(stage, 'packages/cli') })
+      if (existsSync(join(stage, 'packages/cli/src/capabilities-bin.ts'))) {
+        execFileSync(process.execPath, ['--input-type=module', '-e', `import {build} from 'esbuild'; await build({entryPoints:['src/capabilities-bin.ts'],bundle:true,platform:'node',format:'esm',target:'node22',outfile:'dist/capabilities.mjs'})`], { cwd: join(stage, 'packages/cli') })
+      }
       // Ask the target revision, never the installer's constants.
       const runtime = JSON.parse(execFileSync(process.execPath, [join(stage, 'node_modules/tsx/dist/cli.mjs'), '-e', "import {runtimeVersion} from './packages/cli/src/runtime-version.ts'; console.log(JSON.stringify(runtimeVersion(process.cwd())))"], { cwd: stage, encoding: 'utf8' }))
       runtime.sourceSha = sha
@@ -62,6 +65,11 @@ export async function runInstall(args: string[], io: CliIO): Promise<number> {
 FDN_ROOT=${shellQuote(target)}
 export FDN_ROOT
 if [ "$1" = session ]; then exec ${shellQuote(process.execPath)} "$FDN_ROOT/packages/cli/bin/session.mjs" "$@"; fi
+if [ "$1" = doctor ] && [ -f "$FDN_ROOT/packages/cli/dist/capabilities.mjs" ]; then
+  for arg in "$@"; do
+    if [ "$arg" = --capabilities ]; then shift; exec ${shellQuote(process.execPath)} "$FDN_ROOT/packages/cli/dist/capabilities.mjs" "$@"; fi
+  done
+fi
 exec ${shellQuote(process.execPath)} "$FDN_ROOT/node_modules/tsx/dist/cli.mjs" "$FDN_ROOT/packages/cli/src/main.ts" "$@"
 `, { mode: 0o755 })
       renameSync(stage, target)
