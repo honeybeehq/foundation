@@ -31,6 +31,8 @@ export function sameBytes(a: Uint8Array | null, b: Uint8Array | null): boolean {
 }
 
 export function writeAtomic(path: string, data: string | Uint8Array): void {
+  const bytes = typeof data === 'string' ? Buffer.from(data) : data
+  if (sameBytes(readBytesIfPresent(path), bytes)) return
   const temp = join(dirname(path), `.${basename(path)}.${process.pid}.${randomUUID().slice(0, 8)}.tmp`)
   try {
     writeFileSync(temp, data)
@@ -102,6 +104,7 @@ export function recoverDocument(file: string): void {
 
 export function persistDocument(file: string, chain: FdnChain, text = projectedText(chain, chain.docId() ?? readDocIdAttr(readTextIfPresent(file) ?? '')), protectedProjection = true): Uint8Array {
   const bytes = chain.save()
+  if (sameBytes(readBytesIfPresent(`${file}.chain`), bytes) && readTextIfPresent(file) === text) return bytes
   const pendingPath = `${file}.chain.pending`
   writeAtomic(pendingPath, JSON.stringify({ before: readTextIfPresent(file), after: text, chainHash: createHash('sha256').update(bytes).digest('hex'), protected: protectedProjection }))
   writeAtomic(`${file}.chain`, bytes)
