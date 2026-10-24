@@ -1,0 +1,160 @@
+{
+  "sha": "a1cb80613f1ea85cfa8b18d023d9bda8bdd5ad7f",
+  "scope": "5 profiled samples/direction, attribution only; not p95 acceptance",
+  "clockOffsetIntersectionMs": {
+    "lo": 40.037841796875,
+    "hi": 100.899169921875
+  },
+  "rows": [
+    {
+      "writer": "a",
+      "hash": "e505ab5177afbc0fd419280997615273a37208e0363ab301c0bba3b2e22b1b9b",
+      "savedToPendingMs": 138.85107421875,
+      "savedToAppendStartMs": 171.667236328125,
+      "appendMs": 1064.183875,
+      "targetReadMs": 34.957251,
+      "lockedImportMs": 153.867667,
+      "verifyMs": 24.89853000000585,
+      "importEndToSessionMs": 176,
+      "totalIntervalMs": [
+        1582.951904296875,
+        1643.813232421875
+      ]
+    },
+    {
+      "writer": "b",
+      "hash": "ce31e7d50e9f2607834c9de3d411303ce8c6ec6aa8422466ac8414c8617144b7",
+      "savedToPendingMs": 53.71435546875,
+      "savedToAppendStartMs": 127.6640625,
+      "appendMs": 236.05022,
+      "targetReadMs": 206.996625,
+      "lockedImportMs": 67.40725,
+      "verifyMs": 7.935415999992983,
+      "importEndToSessionMs": 244,
+      "totalIntervalMs": [
+        960.752197265625,
+        1021.613525390625
+      ]
+    },
+    {
+      "writer": "a",
+      "hash": "01a726fc80d628ee01e1c29b40ab2217209cf9055a50fcd76b2768777978339b",
+      "savedToPendingMs": 141.212890625,
+      "savedToAppendStartMs": 164.290771484375,
+      "appendMs": 1036.922083,
+      "targetReadMs": 31.6884,
+      "lockedImportMs": 124.586152,
+      "verifyMs": 19.469513000003644,
+      "importEndToSessionMs": 156,
+      "totalIntervalMs": [
+        1583.313720703125,
+        1644.175048828125
+      ]
+    },
+    {
+      "writer": "b",
+      "hash": "c1bc78ac6da777c6c7d4a016b5162182cbf0b93bfce6b0e12e2a004c1c218bfa",
+      "savedToPendingMs": 52.542724609375,
+      "savedToAppendStartMs": 125.183349609375,
+      "appendMs": 226.359254,
+      "targetReadMs": 187.868042,
+      "lockedImportMs": 72.517,
+      "verifyMs": 6.987042000022484,
+      "importEndToSessionMs": 286,
+      "totalIntervalMs": [
+        911.58056640625,
+        972.44189453125
+      ]
+    },
+    {
+      "writer": "a",
+      "hash": "3236d1ae392c323ad3221420e304c5bbcb1a09ffb77a4b9080a673cdf52b6847",
+      "savedToPendingMs": 261.381591796875,
+      "savedToAppendStartMs": 290.1376953125,
+      "appendMs": 1071.243875,
+      "targetReadMs": 30.214598,
+      "lockedImportMs": 122.81464,
+      "verifyMs": 19.558023999998113,
+      "importEndToSessionMs": 182,
+      "totalIntervalMs": [
+        1711.482421875,
+        1772.34375
+      ]
+    },
+    {
+      "writer": "b",
+      "hash": "6bc47e7224eab8bef4766dd7bd76c6a31953f3325d26031f99495ad1610ccfce",
+      "savedToPendingMs": 50.36279296875,
+      "savedToAppendStartMs": 124.698486328125,
+      "appendMs": 195.664213,
+      "targetReadMs": 266.055667,
+      "lockedImportMs": 64.997209,
+      "verifyMs": 7.20516700000735,
+      "importEndToSessionMs": 247,
+      "totalIntervalMs": [
+        1014.400634765625,
+        1075.261962890625
+      ]
+    },
+    {
+      "writer": "a",
+      "hash": "b4e1d21e0c4f92f9621b91ce1dc7519aa8c6be22208f2f18981c2f9f9104b57f",
+      "savedToPendingMs": 162.978759765625,
+      "savedToAppendStartMs": 185.641845703125,
+      "appendMs": 963.336959,
+      "targetReadMs": 30.86954,
+      "lockedImportMs": 124.469094,
+      "verifyMs": 19.686084000000847,
+      "importEndToSessionMs": 123,
+      "totalIntervalMs": [
+        1426.07958984375,
+        1486.94091796875
+      ]
+    },
+    {
+      "writer": "b",
+      "hash": "1ef114c6614a30ae15bb6e8f1d42555e4bb0e8a50ca00001fa05f19f010ecad7",
+      "savedToPendingMs": 53.19091796875,
+      "savedToAppendStartMs": 127.523681640625,
+      "appendMs": 211.667141,
+      "targetReadMs": 224.01925,
+      "lockedImportMs": 81.738583,
+      "verifyMs": 8.636624999984633,
+      "importEndToSessionMs": 833,
+      "totalIntervalMs": [
+        1631.228759765625,
+        1692.090087890625
+      ]
+    },
+    {
+      "writer": "a",
+      "hash": "a9db28e8b1c95ee04481b54f0532aec362aa21e0834e8e291e6ad9d42d2d09b9",
+      "savedToPendingMs": 158.86083984375,
+      "savedToAppendStartMs": 181.7021484375,
+      "appendMs": 1028.158709,
+      "targetReadMs": 30.712544,
+      "lockedImportMs": 118.499166,
+      "verifyMs": 19.30621500000416,
+      "importEndToSessionMs": 151,
+      "totalIntervalMs": [
+        1480.961669921875,
+        1541.822998046875
+      ]
+    },
+    {
+      "writer": "b",
+      "hash": "74f0398c28a12535614b021612bdb0f3b0c2a235afbee89976d76ee5fc0be8a1",
+      "savedToPendingMs": 51.983154296875,
+      "savedToAppendStartMs": 126.243408203125,
+      "appendMs": 189.739674,
+      "targetReadMs": 189.048917,
+      "lockedImportMs": 45.218167,
+      "verifyMs": 8.469833000010112,
+      "importEndToSessionMs": 347,
+      "totalIntervalMs": [
+        946.02099609375,
+        1006.88232421875
+      ]
+    }
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "gaps": [
+    {
+      "key": "entry:packages/cli/src/session/bake-impact.ts:bakeImpact",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/bake-impact.ts:mergeBakeImpact",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/bin.ts:main",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/components.ts:expandComponentOp",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/free-geometry.ts:canonicalTransform",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/free-geometry.ts:constraintStyle",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/free-geometry.ts:constraintsOf",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/free-geometry.ts:effectiveStyle",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/free-geometry.ts:freeBounds",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/free-geometry.ts:freeTransform",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/free-geometry.ts:hasStateStyles",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/free-geometry.ts:isCanonicalTransform",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/free-geometry.ts:transformStyle",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/legacy.ts:legacyBoardRef",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/legacy.ts:legacyMessage",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/placement.ts:expandPlacement",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/token-modes.ts:expandSessionOps",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/token-modes.ts:isArtboardOperation",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/undo.ts:oppositeStep",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/undo.ts:placementHistory",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/undo.ts:undoOps",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/undo.ts:undoStep",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/sync/catalogue.ts:catalogueBytes",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/sync/catalogue.ts:catalogueHash",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/sync/catalogue.ts:catalogueLog",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/sync/catalogue.ts:catalogueRecord",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/sync/catalogue.ts:confinedRelativePath",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/sync/materialize.ts:materialize",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/sync/materialize.ts:materializePath",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "poll:packages/cli/src/sync/catalogue.ts#1",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "rpc:packages/cli/src/sync/catalogue.ts:append",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "rpc:packages/cli/src/sync/materialize.ts:head",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "rpc:packages/cli/src/sync/materialize.ts:read",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    }
+  ]
+}
