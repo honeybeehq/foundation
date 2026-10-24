@@ -1,13 +1,18 @@
 import { randomUUID } from 'node:crypto'
 import { closeSync, openSync, readFileSync, realpathSync, statSync, unlinkSync, writeFileSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
-import { hostname } from 'node:os'
+import { currentLockOwner, staleLockOwner, type LockOwner } from './lock-owner.js'
 
 const held = new Set<string>()
 const sleeper = new Int32Array(new SharedArrayBuffer(4))
 
 export class DocumentBusyError extends Error {
-  constructor(file: string) { super(`document is busy: ${file}; retry the edit`) }
+  constructor(file: string, path: string) {
+    let owner = 'unreadable owner'
+    try { owner = readFileSync(path, 'utf8') } catch { /* The owner may have just released. */ }
+    const quoted = "'" + path.replaceAll("'", "'\\''") + "'"
+    super(`document is busy: ${file}; lock ${path}; recorded owner: ${owner}. Retry the edit. Only after confirming the owner is stopped, remove the stale lock: rm -- ${quoted}`)
+  }
 }
 
 function lockPath(file: string): string {
@@ -22,7 +27,7 @@ export function documentPath(file: string): string {
   try { return realpathSync(file) } catch { return resolve(file) }
 }
 
-function reapLock(path: string): void {
+function reapLock(path: string, local: LockOwner): void {
   const guard = `${path}.reap`
   let fd: number
   try { fd = openSync(guard, 'wx') } catch (err) {
@@ -39,10 +44,7 @@ function reapLock(path: string): void {
     const source = readFileSync(path, 'utf8')
     let stale = false
     try {
-      const owner = JSON.parse(source) as { pid?: unknown; host?: unknown }
-      if (owner.host === hostname() && typeof owner.pid === 'number' && Number.isInteger(owner.pid) && owner.pid > 0) {
-        try { process.kill(owner.pid, 0) } catch (err) { stale = (err as NodeJS.ErrnoException).code === 'ESRCH' }
-      }
+      stale = staleLockOwner(JSON.parse(source) as Partial<LockOwner>, local)
     } catch {
       stale = Date.now() - statSync(path).mtimeMs > 30000
     }
@@ -54,8 +56,9 @@ function reapLock(path: string): void {
 
 export function acquireDocumentLock(file: string, timeoutMs = 5000): () => void {
   const path = lockPath(file)
-  if (held.has(path)) throw new DocumentBusyError(file)
-  const owner = JSON.stringify({ pid: process.pid, host: hostname(), created: new Date().toISOString(), token: randomUUID() })
+  if (held.has(path)) throw new DocumentBusyError(file, path)
+  const local = currentLockOwner()
+  const owner = JSON.stringify({ ...local, created: new Date().toISOString(), token: randomUUID() })
   const deadline = performance.now() + timeoutMs
   for (;;) {
     try {
@@ -73,8 +76,8 @@ export function acquireDocumentLock(file: string, timeoutMs = 5000): () => void 
     } catch (err) {
       if ((err as NodeJS.ErrnoException).code !== 'EEXIST') throw err
     }
-    reapLock(path)
-    if (performance.now() >= deadline) throw new DocumentBusyError(file)
+    reapLock(path, local)
+    if (performance.now() >= deadline) throw new DocumentBusyError(file, path)
     Atomics.wait(sleeper, 0, 0, 5)
   }
 }
