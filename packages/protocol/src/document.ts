@@ -398,6 +398,7 @@ export interface BoardView extends BoardRef {
   overflow: 'clip' | 'visible'
   sizeOverride: boolean
   padding: ArtboardPadding
+  frame: 'legacy' | 'standard'
 }
 
 export interface ArtboardPage {
@@ -416,6 +417,7 @@ export type ArtboardOp =
   | { op: 'rename-artboard'; id: string; name: string }
   | { op: 'move-artboard'; id: string; x: number; y: number }
   | { op: 'resize-artboard'; id: string; width: number; height: number }
+  | { op: 'standardize-artboard'; id: string }
   | { op: 'set-artboard-padding'; id: string; top?: number; right?: number; bottom?: number; left?: number }
   | { op: 'move-artboard-view'; id: string; artboardId: string; state: string | null; viewport: string | null; x: number; y: number }
   | { op: 'set-artboard-view-visible'; id: string; artboardId: string; state: string | null; viewport: string | null; visible: boolean }

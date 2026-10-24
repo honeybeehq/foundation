@@ -39,7 +39,7 @@ export function bakeImpact(doc: FdnDocument, ops: PatchOp[], before = doc): Bake
       }
       case 'set-attr': case 'set-style': case 'set-style-ref': case 'set-text': case 'set-when': {
         const loc = newIndex.get(op.id) ?? oldIndex.get(op.id)
-        if (op.op === 'set-attr' && ((loc?.node.tag === 'fdn-artboard' && (op.key.startsWith('data-fdn-padding-') || op.key === 'data-fdn-height')) || (loc?.node.tag === 'fdn-artboard-view' && ['data-fdn-height', 'data-fdn-view-state', 'data-fdn-view-viewport'].includes(op.key)))) impact = mergeBakeImpact(impact, scope(newIndex.has(op.id) ? newIndex : oldIndex, op.id))
+        if (op.op === 'set-attr' && ((loc?.node.tag === 'fdn-artboard' && (op.key.startsWith('data-fdn-padding-') || ['data-fdn-height', 'data-fdn-frame'].includes(op.key))) || (loc?.node.tag === 'fdn-artboard-view' && ['data-fdn-height', 'data-fdn-view-state', 'data-fdn-view-viewport'].includes(op.key)))) impact = mergeBakeImpact(impact, scope(newIndex.has(op.id) ? newIndex : oldIndex, op.id))
         if (loc && ['fdn-page', 'fdn-artboard', 'fdn-artboard-view'].includes(loc.node.tag)) break
         if (op.op === 'set-attr' && op.key === 'data-fdn-state') impact = mergeBakeImpact(impact, { states: null, artboards: scope(newIndex.has(op.id) ? newIndex : oldIndex, op.id).artboards, components: false })
         else impact = mergeBakeImpact(impact, scope(newIndex.has(op.id) ? newIndex : oldIndex, op.id))

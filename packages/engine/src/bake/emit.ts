@@ -74,9 +74,9 @@ function renderNode(node: FdnNode, depth: number, includeNodeIds = false): strin
  * collected into the baked document's style block", singular). Sorted by
  * capsule class name for the same determinism guarantee as the token block.
  */
-export function emitHtml(doc: FdnDocument, tree: FdnNode[], capsuleCss?: Map<string, string>, artboard?: Pick<BoardView, 'height' | 'padding'>, includeNodeIds = false): string {
+export function emitHtml(doc: FdnDocument, tree: FdnNode[], capsuleCss?: Map<string, string>, artboard?: Pick<BoardView, 'height' | 'padding' | 'frame'>, includeNodeIds = false): string {
   const lines: string[] = []
-  if (artboard) lines.push('<!doctype html>')
+  if (artboard && artboard.frame !== 'legacy') lines.push('<!doctype html>')
   lines.push('<!-- baked by foundation-engine — derived artifact, do not edit -->')
   lines.push(...styleBlock(doc, capsuleCss, artboard))
 
@@ -91,7 +91,7 @@ export function emitHtml(doc: FdnDocument, tree: FdnNode[], capsuleCss?: Map<str
   return lines.join('\n') + '\n'
 }
 
-export function emitEditorHtml(doc: FdnDocument, tree: FdnNode[], capsuleCss?: Map<string, string>, artboard?: Pick<BoardView, 'height' | 'padding'>): string {
+export function emitEditorHtml(doc: FdnDocument, tree: FdnNode[], capsuleCss?: Map<string, string>, artboard?: Pick<BoardView, 'height' | 'padding' | 'frame'>): string {
   const lines: string[] = ['<!doctype html>', '<html>', '<head>', '<meta charset="utf-8">']
   if (doc.title) lines.push(`<title>${escapeText(doc.title)}</title>`)
   lines.push(...styleBlock(doc, capsuleCss, artboard), '</head>', '<body>')
@@ -100,11 +100,12 @@ export function emitEditorHtml(doc: FdnDocument, tree: FdnNode[], capsuleCss?: M
   return lines.join('\n') + '\n'
 }
 
-function styleBlock(doc: FdnDocument, capsuleCss?: Map<string, string>, artboard?: Pick<BoardView, 'height' | 'padding'>): string[] {
+function styleBlock(doc: FdnDocument, capsuleCss?: Map<string, string>, artboard?: Pick<BoardView, 'height' | 'padding' | 'frame'>): string[] {
   const lines: string[] = []
   const tokenNames = Object.keys(doc.tokens).sort()
   const capsuleNames = capsuleCss ? [...capsuleCss.keys()].sort() : []
-  if (!artboard && tokenNames.length === 0 && capsuleNames.length === 0 && !doc.tokenCollections?.length) return lines
+  const hasFrame = artboard && (artboard.frame !== 'legacy' || Object.values(artboard.padding).some(value => value !== 0))
+  if (!hasFrame && tokenNames.length === 0 && capsuleNames.length === 0 && !doc.tokenCollections?.length) return lines
   lines.push('<style>')
   if (tokenNames.length > 0) {
     lines.push(':root {')
@@ -117,9 +118,10 @@ function styleBlock(doc: FdnDocument, capsuleCss?: Map<string, string>, artboard
   for (const name of capsuleNames) {
     lines.push(capsuleCss?.get(name) as string)
   }
-  if (artboard) {
+  if (hasFrame) {
     const { height, padding } = artboard
-    lines.push(`body { margin:0;box-sizing:border-box;height:${height}px;padding:${padding.top}px ${padding.right}px ${padding.bottom}px ${padding.left}px; }`)
+    const frame = artboard.frame !== 'legacy' ? `margin:0;box-sizing:border-box;height:${height}px;` : ''
+    lines.push(`body { ${frame}padding:${padding.top}px ${padding.right}px ${padding.bottom}px ${padding.left}px; }`)
   }
   lines.push('</style>')
   return lines

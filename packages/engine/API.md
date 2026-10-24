@@ -306,3 +306,19 @@ an attribute, and equal nonzero numeric values are no-ops. `BoardView.padding`
 always contains all four numbers. Height owners now invalidate baked bodies;
 width-only geometry does not. A legacy upgrade deliberately normalizes margin,
 height and mode under the explicit artboard format.
+
+
+Legacy upgrades write `data-fdn-frame="legacy"` and retain their old per-output
+layout mode, auto body height and body margins (normally UA 8px), with actual
+artboard padding zero. Board descriptors carry `frame: 'legacy' | 'standard'`.
+Nonzero padding on legacy frames adds to that retained margin without fixing
+body height. Fresh artboards omit the marker and use the standard source-owned
+frame. `standardize-artboard {id}` removes the marker as one undoable edit; on
+a standard board it is a no-op. Legacy frame output intentionally keeps its
+old normal/editor mode difference. Client height forcing remains applicable
+to legacy frames; standard frames own their literal body height in the bake.
+
+The vendored BoardView descriptor requires frame. Direct untyped callers of
+emitHtml/emitEditorHtml that still pass the older {height,padding} frame
+argument retain standard-frame behavior; only explicit frame:legacy selects
+the compatibility policy.

@@ -339,7 +339,8 @@ export async function renderDocument(
     const editor = opts?.clipToViewport || cell.clipToBounds
     const bake = editor ? bakeEditorDocument : bakeDocument
     const baked = bake(doc, { ...(cell.state !== null ? { state: cell.state } : {}), ...(cell.artboardId === undefined ? {} : { artboardId: cell.artboardId, viewport: cell.viewportSelector ?? null, includeNodeIds: !editor }) })
-    const html = editor || cell.artboardId !== undefined ? baked.html : emitHtml(doc, injectFdnIds(baked.tree))
+    const view = cell.artboardId === undefined ? undefined : boardView(doc, { artboardId: cell.artboardId, state: cell.state, viewport: cell.viewportSelector ?? null })
+    const html = editor || view?.frame === 'standard' ? baked.html : emitHtml(doc, injectFdnIds(baked.tree), undefined, view)
     const fontLines = detectSystemFontStackLines(doc, baked.tree, html)
     // eslint-disable-next-line no-await-in-loop -- see above
     const capture = await captureHtml(browser, html, {

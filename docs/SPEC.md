@@ -1301,7 +1301,7 @@ stored zero attribute too. Board descriptors carry all four numeric `padding` va
 for every occurrence. Protocol remains 0.2; 0.1 retains its existing artboard
 write refusal and legacy document behavior.
 
-Explicit artboards share a standards-mode normal/editor bake and render/export
+Standard-frame artboards share a standards-mode normal/editor bake and render/export
 body rule: `margin:0;box-sizing:border-box;height:HEIGHTpx;padding:TOPpx RIGHTpx
 BOTTOMpx LEFTpx`. HEIGHT is the source-owned effective `BoardView.height` for
 the selected artboard/state/viewport occurrence, including saved size overrides;
@@ -1328,5 +1328,27 @@ the editor path.
 Legacy documents retain byte-identical normal/editor bakes and their existing
 render modes and body margins. The artboard-only mode gate is deliberate:
 the T97 corpus and T103 Fill probes show legacy layout changes under a global
-standards-mode conversion. Upgrading a legacy document now deliberately
-normalizes the artboard body margin and height; its rendered layout can change.
+standards-mode conversion. Upgrade writes `data-fdn-frame="legacy"` on its created artboard and preserves
+the old output policy: normal/visible exports retain their existing no-doctype
+mode, editor/clip output retains standards mode, and body height and margins
+are untouched. The normal/editor mode difference is intentionally preserved.
+The descriptor reports `frame: 'legacy'` and actual padding zero; the usual
+UA 8px body margin remains an inset in addition to any user padding. Real 8px
+padding cannot replace that margin without changing margin collapsing.
+Padding edits on a legacy frame add true padding without resetting margins or
+fixing body height; bottom padding follows the content. Existing body CSS keeps
+its normal cascade. Legacy visible export also retains its prior re-emission
+path, including its pre-existing sealed-capsule CSS limitation.
+
+Only upgrade automatically writes the legacy marker. New artboards omit it
+and report `frame: 'standard'`; duplicate artboards preserve the source frame.
+The marker accepts only `legacy` on an artboard. `standardize-artboard {id}`
+removes it, explicitly opting into zero margin, standards mode and the
+source-owned fixed-height frame. One Undo restores the marker while leaving
+peer padding edits intact. A standard frame is a no-op with no history entry.
+Frame edits invalidate only that artboard's subscribed occurrences.
+The descriptor always carries `frame: 'legacy' | 'standard'`, including
+unupgraded legacy previews. T103's client height forcing still applies to
+legacy frames because Foundation does not emit a body height there; it must
+step aside for standard frames. Upgrades preserve the measured pre-upgrade
+pixels, while standardization is an explicit visible layout change.

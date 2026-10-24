@@ -88,7 +88,7 @@ export function bakeDocument(doc: FdnDocument, opts?: { state?: string; artboard
   if (issue) throw new Error(issue.message)
   let selected: ReturnType<typeof selectArtboard>
   try { selected = selectArtboard(doc, opts?.artboardId, opts) } catch (err) {
-    return { html: '', tree: [], state: opts?.state ?? null, artboardId: opts?.artboardId ?? null, report: { lines: [{ code: String(err).match(/ambiguous-artboard|unknown-artboard|unknown-viewport|invalid-artboard-geometry|invalid-artboard-padding/)?.[0] ?? 'invalid-artboard', severity: 'error', message: String(err) }] } }
+    return { html: '', tree: [], state: opts?.state ?? null, artboardId: opts?.artboardId ?? null, report: { lines: [{ code: String(err).match(/ambiguous-artboard|unknown-artboard|unknown-viewport|invalid-artboard-geometry|invalid-artboard-padding|invalid-artboard-frame/)?.[0] ?? 'invalid-artboard', severity: 'error', message: String(err) }] } }
   }
   doc = selected.doc
   const stateName = opts?.state ?? null
@@ -101,7 +101,7 @@ export function bakeEditorDocument(doc: FdnDocument, opts?: { state?: string; ar
   if (issue) throw new Error(issue.message)
   let selected: ReturnType<typeof selectArtboard>
   try { selected = selectArtboard(doc, opts?.artboardId, opts) } catch (err) {
-    return { html: '', tree: [], state: opts?.state ?? null, artboardId: opts?.artboardId ?? null, report: { lines: [{ code: String(err).match(/ambiguous-artboard|unknown-artboard|unknown-viewport|invalid-artboard-geometry|invalid-artboard-padding/)?.[0] ?? 'invalid-artboard', severity: 'error', message: String(err) }] } }
+    return { html: '', tree: [], state: opts?.state ?? null, artboardId: opts?.artboardId ?? null, report: { lines: [{ code: String(err).match(/ambiguous-artboard|unknown-artboard|unknown-viewport|invalid-artboard-geometry|invalid-artboard-padding|invalid-artboard-frame/)?.[0] ?? 'invalid-artboard', severity: 'error', message: String(err) }] } }
   }
   doc = selected.doc
   const stateName = opts?.state ?? null

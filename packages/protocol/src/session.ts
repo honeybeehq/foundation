@@ -272,7 +272,7 @@ const isTokenModeOp: Check = (value) => isRecord(value) && typeof value.op === '
 const isBoardRef = shape({ artboardId: nullable(isString), state: nullable(isString), viewport: nullable(isString) })
 const isPaddingLength: Check = value => typeof value === 'number' && Number.isFinite(value) && value >= 0
 const paddingFields = { top: isPaddingLength, right: isPaddingLength, bottom: isPaddingLength, left: isPaddingLength }
-const isBoardView = (value: unknown) => isBoardRef(value) && shape({ pageId: nullable(isString), name: isString, x: isNumber, y: isNumber, width: isNumber, height: isNumber, visible: isBoolean, overflow: oneOf(['clip', 'visible']), sizeOverride: isBoolean, padding: shape(paddingFields) })(value)
+const isBoardView = (value: unknown) => isBoardRef(value) && shape({ pageId: nullable(isString), name: isString, x: isNumber, y: isNumber, width: isNumber, height: isNumber, visible: isBoolean, overflow: oneOf(['clip', 'visible']), sizeOverride: isBoolean, padding: shape(paddingFields), frame: oneOf(['legacy', 'standard']) })(value)
 const placementFields = { id: isString, artboardId: isString, state: nullable(isString), viewport: nullable(isString) }
 const sizeFields = { width: isNumber, height: isNumber }
 const ARTBOARD_OPS: Record<ArtboardOp['op'], Check> = {
@@ -285,6 +285,7 @@ const ARTBOARD_OPS: Record<ArtboardOp['op'], Check> = {
   'rename-artboard': shape({ id: isString, name: isString }),
   'move-artboard': shape({ id: isString, x: isNumber, y: isNumber }),
   'resize-artboard': shape({ id: isString, ...sizeFields }),
+  'standardize-artboard': shape({ id: isString }),
   'set-artboard-padding': value => shape({ id: isString })(value) && isRecord(value) && Object.entries(paddingFields).every(([side, check]) => !Object.hasOwn(value, side) || check(value[side])),
   'move-artboard-view': shape({ ...placementFields, x: isNumber, y: isNumber }),
   'set-artboard-view-visible': shape({ ...placementFields, visible: isBoolean }),
