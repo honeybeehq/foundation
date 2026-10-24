@@ -50,10 +50,13 @@ describe('doctor inventory', () => {
     put(join(home, '.hive/v2/cells/cell/.mcp.json'), JSON.stringify({ mcpServers: { foundation: { command: binary } } }))
     // A checkout nested in the Cell is deliberately outside config inventory.
     put(join(home, '.hive/v2/cells/cell/repo/.mcp.json'), '{"secret":"not-read"}')
+    put(join(home, '.hive/v2/cells/cell/.codex/config.toml'), `[mcp_servers.foundation]\ncommand = '${binary}'\n[mcp_servers.other]\ncommand = '/not-found'\n`)
     const io = captureIo()
     await runDoctor(['--inventory', '--json'], io)
     const result = JSON.parse(io.out[0]!)
     expect(result.entries).toContainEqual(expect.objectContaining({ realpath: binary, sourceSha: sha, artboardWriteSafe: true }))
+    expect(result.entries.filter((entry: { sourceSha: string }) => entry.sourceSha === sha)).toHaveLength(2)
+    expect(result.coverage.commandsExecuted).toBe(false)
     expect(result.configs.some((config: { path: string }) => config.path.includes('/repo/'))).toBe(false)
   })
 
