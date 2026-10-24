@@ -6,7 +6,7 @@ Each workload is a `<id>.json` record (machine-readable, schema in `record.schem
 
 | Workload | Lane | Processes | gap | recipe-only | measured | stale | gated | Unmeasured states | Readiness |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- | --- |
-| [Shared-store save to remote session event](./sync-save-to-session.md) | streaming | main, helper, node-remote | 0 | 0 | 4 | 0 | 0 | idle, scale, release, recovery | Matched61→107 unprofiled series collected; four ruled latency budgets pass. Final outage proof pending separately. |
+| [Shared-store save to remote session event](./sync-save-to-session.md) | streaming | main, helper, node-remote | 0 | 0 | 4 | 0 | 0 | idle, scale, release, recovery | Same-build on/off61→107 series complete; direct lane passes all four ruled limits. Durable-only bidirectional and outages pass; cold drain attribution is a separate accepted follow-up. |
 
 ## Accounted gaps (33)
 

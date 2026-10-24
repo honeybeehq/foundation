@@ -1,0 +1,483 @@
+{
+  "sourceSha": "30bea85f5634b20d4e7bf552e40e4809eccac3a6",
+  "finalHashes": {
+    "sourceSha": "30bea85f5634b20d4e7bf552e40e4809eccac3a6",
+    "combSourceSha": "b73e9bb3ff5e8850a77f36a95df40428fc722891",
+    "workspace": "s5-final",
+    "docId": "6c291ec0-31b8-4f78-8eb2-78fdd8fbc4bb",
+    "capturedAt": "2026-10-24T10:04:50Z",
+    "Studio": {
+      "html": "4ecdae1f9fe9728535b69d5d0e423ffa606867cab6dfa166adde2a40257fccfb",
+      "chain": "db09a0796bc66d7e06ec905cc1d9ebe4defe79b5d1bc0ba5ca5e75ace2f024d2",
+      "gitHead": "b72f45b0cffb570810e610fff52c3e4fabd60e85",
+      "gitStatus": ""
+    },
+    "metal3": {
+      "html": "4ecdae1f9fe9728535b69d5d0e423ffa606867cab6dfa166adde2a40257fccfb",
+      "chain": "db09a0796bc66d7e06ec905cc1d9ebe4defe79b5d1bc0ba5ca5e75ace2f024d2",
+      "gitHead": "b72f45b0cffb570810e610fff52c3e4fabd60e85",
+      "gitStatus": ""
+    },
+    "runtime": {
+      "a": {
+        "sourceSha": "30bea85f5634b20d4e7bf552e40e4809eccac3a6",
+        "dirty": false,
+        "packageVersion": "0.1.0",
+        "sessionProtocols": [
+          "0.2",
+          "0.1"
+        ],
+        "documentFormats": [
+          "0.1.0-artboards",
+          "0.0.1-draft",
+          "0.1.0",
+          "0.2.0"
+        ],
+        "artboardWriteSafe": true,
+        "chainFormats": [
+          1,
+          2
+        ],
+        "defaultChainFormat": 1
+      },
+      "b": {
+        "sourceSha": "30bea85f5634b20d4e7bf552e40e4809eccac3a6",
+        "dirty": false,
+        "packageVersion": "0.1.0",
+        "sessionProtocols": [
+          "0.2",
+          "0.1"
+        ],
+        "documentFormats": [
+          "0.1.0-artboards",
+          "0.0.1-draft",
+          "0.1.0",
+          "0.2.0"
+        ],
+        "artboardWriteSafe": true,
+        "chainFormats": [
+          1,
+          2
+        ],
+        "defaultChainFormat": 1
+      }
+    },
+    "bytesCompared": true,
+    "historyChanges": 109
+  },
+  "steps": {
+    "live": "CLI save\u2192other session raw573.5ms Studio\u2192metal3 and435.3ms reverse; two explicit authored annotations; exact bytes",
+    "conflict": "same-property winner identical, disjoint edits retained, authors/origins in real CLI history",
+    "undo": "both directions own edit reverted, other writer later disjoint edit survived",
+    "offline": "daemon-offline plus strict both-daemons-live B503 check with peer disabled; A healthy/Bwaiting; reconnect exact durable merge",
+    "storeOutage": "local editing continued, peer copies converged but both waiting-to-upload until durable ack",
+    "restart": "Studio daemon restarted with store stopped for another5s; safe recovery",
+    "freshRecovery": "empty metal3 ownstore, no seed, normal CLI materialize1424ms; durable-only bidirectional editing; all3exact",
+    "git": "supported pull both directions clean; divergent merge committed bytes/texts verified before sync restarted; no3s ping-pong; final clean shared Githead"
+  },
+  "cleanDurability": {
+    "storeStartRequestAt": 1792836056458.121,
+    "bothSharedObservedAt": 1792836075622.169,
+    "upperObservedRecoveryMs": 19164.0478515625,
+    "meaning": "from cold store-start request, not backend-ready; cause unknown, no worst-case bound claimed",
+    "samples": [
+      {
+        "observedAt": 1792836057717.377,
+        "rows": {
+          "a": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:00:55.305Z",
+            "updatedAt": "2026-10-24T09:59:42.860Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          },
+          "b": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:00:56.810Z",
+            "updatedAt": "2026-10-24T09:59:42.665Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          }
+        }
+      },
+      {
+        "observedAt": 1792836059213.948,
+        "rows": {
+          "a": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:00:56.943Z",
+            "updatedAt": "2026-10-24T09:59:42.860Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          },
+          "b": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:00:58.634Z",
+            "updatedAt": "2026-10-24T09:59:42.665Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          }
+        }
+      },
+      {
+        "observedAt": 1792836060671.8909,
+        "rows": {
+          "a": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:00:58.576Z",
+            "updatedAt": "2026-10-24T09:59:42.860Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          },
+          "b": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:01:00.294Z",
+            "updatedAt": "2026-10-24T09:59:42.665Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          }
+        }
+      },
+      {
+        "observedAt": 1792836062177.269,
+        "rows": {
+          "a": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:00:58.576Z",
+            "updatedAt": "2026-10-24T09:59:42.860Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          },
+          "b": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:01:00.294Z",
+            "updatedAt": "2026-10-24T09:59:42.665Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          }
+        }
+      },
+      {
+        "observedAt": 1792836063648.401,
+        "rows": {
+          "a": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:00:58.576Z",
+            "updatedAt": "2026-10-24T09:59:42.860Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          },
+          "b": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:01:00.294Z",
+            "updatedAt": "2026-10-24T09:59:42.665Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          }
+        }
+      },
+      {
+        "observedAt": 1792836065174.9492,
+        "rows": {
+          "a": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:01:03.049Z",
+            "updatedAt": "2026-10-24T09:59:42.860Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          },
+          "b": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:01:00.294Z",
+            "updatedAt": "2026-10-24T09:59:42.665Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          }
+        }
+      },
+      {
+        "observedAt": 1792836066666.2148,
+        "rows": {
+          "a": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:01:03.049Z",
+            "updatedAt": "2026-10-24T09:59:42.860Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          },
+          "b": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:01:06.540Z",
+            "updatedAt": "2026-10-24T09:59:42.665Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          }
+        }
+      },
+      {
+        "observedAt": 1792836068178.586,
+        "rows": {
+          "a": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:01:03.049Z",
+            "updatedAt": "2026-10-24T09:59:42.860Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          },
+          "b": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:01:06.540Z",
+            "updatedAt": "2026-10-24T09:59:42.665Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          }
+        }
+      },
+      {
+        "observedAt": 1792836069650.379,
+        "rows": {
+          "a": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:01:07.485Z",
+            "updatedAt": "2026-10-24T09:59:42.860Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          },
+          "b": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:01:06.540Z",
+            "updatedAt": "2026-10-24T09:59:42.665Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          }
+        }
+      },
+      {
+        "observedAt": 1792836071127.3247,
+        "rows": {
+          "a": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:01:07.485Z",
+            "updatedAt": "2026-10-24T09:59:42.860Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          },
+          "b": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:01:06.540Z",
+            "updatedAt": "2026-10-24T09:59:42.665Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          }
+        }
+      },
+      {
+        "observedAt": 1792836072612.782,
+        "rows": {
+          "a": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:01:07.485Z",
+            "updatedAt": "2026-10-24T09:59:42.860Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          },
+          "b": {
+            "status": "waiting to upload",
+            "pending": 2,
+            "cursor": "108",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:01:06.540Z",
+            "updatedAt": "2026-10-24T09:59:42.665Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          }
+        }
+      },
+      {
+        "observedAt": 1792836074119.3071,
+        "rows": {
+          "a": {
+            "status": "waiting to upload",
+            "pending": 1,
+            "cursor": "109",
+            "lastError": null,
+            "lastErrorAt": "2026-10-24T10:01:07.485Z",
+            "updatedAt": "2026-10-24T10:01:13.163Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          },
+          "b": {
+            "status": "blocked",
+            "pending": 0,
+            "cursor": "110",
+            "lastError": "publish change 15b32cf3f95b6855fbd419d25506773a84a04e0b1aee5389efdc389c9013508d: Comb: {\"code\":\"backend_unavailable\",\"message\":\"log backend unavailable\"}",
+            "lastErrorAt": "2026-10-24T10:01:06.540Z",
+            "updatedAt": "2026-10-24T10:01:13.767Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          }
+        }
+      },
+      {
+        "observedAt": 1792836075622.16,
+        "rows": {
+          "a": {
+            "status": "shared",
+            "pending": 0,
+            "cursor": "110",
+            "lastError": null,
+            "lastErrorAt": "2026-10-24T10:01:07.485Z",
+            "updatedAt": "2026-10-24T10:01:13.823Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          },
+          "b": {
+            "status": "shared",
+            "pending": 0,
+            "cursor": "110",
+            "lastError": null,
+            "lastErrorAt": "2026-10-24T10:01:06.540Z",
+            "updatedAt": "2026-10-24T10:01:14.266Z",
+            "direct": {
+              "state": "enabled",
+              "reason": null
+            }
+          }
+        }
+      }
+    ],
+    "hashes": {
+      "html": "4ecdae1f9fe9728535b69d5d0e423ffa606867cab6dfa166adde2a40257fccfb",
+      "chain": "db09a0796bc66d7e06ec905cc1d9ebe4defe79b5d1bc0ba5ca5e75ace2f024d2"
+    }
+  },
+  "failedAttemptsRetained": [
+    {
+      "kind": "startup warmups",
+      "why": "legacy daemon lock retained changed display hostname; moved only proven-dead exact lock after report; S1d fixed identity for new locks"
+    },
+    {
+      "kind": "fresh materialize35s timeout",
+      "why": "helper spawnSync self-blocked its own S3 proxy; async harness fix, same binary and credentials; normal empty retry passed"
+    },
+    {
+      "kind": "third equality assertion",
+      "why": "two old main copies agreed before outside third edit arrived; then waited expected value/hash, no edit repeated"
+    }
+  ],
+  "sourceProjectFile": "research/S5-final-outcomes.json",
+  "recordings": "S5 retains the two-host recordings for the themed batch"
+}
