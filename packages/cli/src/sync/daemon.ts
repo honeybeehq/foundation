@@ -16,6 +16,11 @@ export function feedName(design: LiveDesign): string { return `foundation/${desi
 // Comb's supported log names exclude '/'. Keep the logical address and map it without collisions.
 export function combLog(design: LiveDesign): string { return `foundation-${createHash('sha256').update(feedName(design)).digest('hex')}` }
 export function copyKey(design: LiveDesign): string { return createHash('sha256').update(JSON.stringify([feedName(design), design.file])).digest('hex') }
+/** Input is changes() Lamport order, including every native dependency. */
+export function publishablePrefix<T extends { envelope: { hash: string } }>(unshared: T[], received: ReadonlyMap<string, number> | undefined, now = Date.now()): T[] {
+  const waitingParent = unshared.findIndex(change => (received?.get(change.envelope.hash) ?? 0) > now)
+  return waitingParent < 0 ? unshared : unshared.slice(0, waitingParent)
+}
 const delay = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms))
 function page(frame: Frame, cursor: string): { blobs: Uint8Array[]; next: string } {
   if (!Array.isArray(frame.events) || typeof frame.next_cursor !== 'string' || !/^[1-9][0-9]*$/.test(frame.next_cursor)) throw new Error('invalid Comb page')
@@ -145,7 +150,8 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
               if (state.pending !== unshared.length) { state.pending = unshared.length; writeSyncState(key, state) }
               // Let the originating node finish its append; recover durability if it disappears.
               const received = directReceived.get(key)
-              const pending = unshared.filter(change => (received?.get(change.envelope.hash) ?? 0) <= Date.now())
+              // changes() is in Lamport order: never publish a descendant past a held parent.
+              const pending = publishablePrefix(unshared, received)
               if (pending.length) {
                 syncTrace('publish.pending', () => ({ docId: design.docId, hashes: pending.map(change => change.envelope.hash) }))
                 // A persistent bridge renews exclusive feed ownership. Bound each writer
