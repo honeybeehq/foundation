@@ -149,6 +149,8 @@ try {
     for (let index = 1; index < records.length; index++) assert.ok(records[index]!.generation > records[index - 1]!.generation)
   }
   assert.ok(catalogue.every(record => !record.deleted)); log('CATALOGUE RECOVERY: generations survive restart, both latest heads advertised; close is not deletion')
+  cli(sb, 'edit', b, '--ops', JSON.stringify([{ op: 'set-text', id: 'n2', text: 'B continues after offline merge' }]), '--author', 'proof-B')
+  await until(() => text(a, 'n2') === 'B continues after offline merge', 'new edit by B after merged offline history reaches A')
 
   const poison = join(root, 'blocked.fdn.html')
   cli(sa, 'new', poison); cli(sa, 'sync', 'open', poison, '--workspace', 'proof', '--product', 'foundation')
