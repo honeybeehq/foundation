@@ -50,11 +50,8 @@ import { artboardActivity, explicitArtboards, assertFormatVersion } from '../art
  *     for title/specVersion — diff() now emits all of these (model.ts).
  *   - (RESOLVED 2026-07-31, contract amendment) loadChain(bytes, opts?)
  *     now takes an optional `{actor?: string}`, matching createChain. When
- *     omitted, the peer id for the loaded chain's future local edits still
- *     falls back to a hash of the snapshot bytes (documented below), which
- *     remains collision-prone for two independent loads of the same bytes
- *     that both edit locally before merging — callers that anticipate that
- *     scenario should pass distinct actors explicitly.
+ *     omitted, each create/load gets a fresh random writer identity. Explicit
+ *     actors must be unique per concurrently writable replica.
  *   - (Wave 3, contract amendment) SPEC 13a-i mints a document id at
  *     creation and wants it "carried ... in the chain's metadata". types.ts
  *     (FdnDocument) has no field for it and is off-limits, so it does NOT
@@ -118,7 +115,7 @@ import { structuralDiff } from './model.js'
 import { applyPatch, diffNodes } from '../patch/index.js'
 import { comparePeerIds, derivePeerId, DeterministicClock, stableStringify } from './util.js'
 import { ChainActivity } from './activity.js'
-import { createHash } from 'node:crypto'
+import { createHash, randomUUID } from 'node:crypto'
 
 const STATE_KEYS: StateStyleKey[] = ['hover', 'focus', 'active', 'disabled']
 const compareChanges = (a: Change, b: Change): number => a.lamport - b.lamport || comparePeerIds(a.peer, b.peer) || a.counter - b.counter
@@ -174,7 +171,7 @@ export interface FdnChain {
 }
 
 export function createChain(doc: FdnDocument, meta: ChangeMeta, opts?: { actor?: string; docId?: string }): FdnChain {
-  return LoroChain.create(doc, meta, opts?.actor ?? meta.author, opts?.docId)
+  return LoroChain.create(doc, meta, opts?.actor ?? randomUUID(), opts?.docId)
 }
 
 export function prepareChain(doc: FdnDocument, opts: { actor: string; docId: string }): (meta: ChangeMeta) => FdnChain {
@@ -283,13 +280,8 @@ class LoroChain implements FdnChain {
     const snapshotBytes = bytes.subarray(4 + anchorsLen)
     const entries = JSON.parse(new TextDecoder().decode(anchorsBytes)) as [string, Frontier][]
     const loro = LoroDoc.fromSnapshot(snapshotBytes)
-    // Explicit actor (contract amendment 2026-07-31) always wins. Falling
-    // back to a hash of the snapshot bytes keeps behavior deterministic (no
-    // Date.now/Math.random) for callers that don't supply one, but remains
-    // collision-prone: two independent loadChain(sameBytes) calls with no
-    // actor derive the SAME peer id, which is only safe if at most one of
-    // them ever commits locally before any merge.
-    const resolvedActor = actor ?? `loaded:${createHash('sha256').update(snapshotBytes).digest('hex')}`
+    // Loading a snapshot opens an independent writer, never reuses its peer identity.
+    const resolvedActor = actor ?? randomUUID()
     const chain = new LoroChain(resolvedActor, loro)
     chain.rebuildIndex()
     assertFormatVersion({ specVersion: String(chain.meta.get('specVersion') ?? '') })
@@ -463,7 +455,7 @@ class LoroChain implements FdnChain {
       const bytes = this.bytesForSpan(c.peer, c.counter, c.length)
       const hash = computeEnvelopeHash(decoded.prevHash, decoded.author, decoded.message, decoded.specVersion, bytes)
       out.push({
-        envelope: { hash, prevHash: decoded.prevHash, author: decoded.author, message: decoded.message, specVersion: decoded.specVersion, wallTime: decoded.wallTime ?? null },
+        envelope: { hash, prevHash: decoded.prevHash, author: decoded.author, message: decoded.message, specVersion: decoded.specVersion, wallTime: decoded.wallTime ?? null, originNode: decoded.originNode ?? null },
         bytes,
       })
     }
@@ -571,18 +563,18 @@ class LoroChain implements FdnChain {
     const decoded = decodeEnvelope(change.message)
     const bytes = this.bytesForSpan(change.peer, change.counter, change.length)
     const hash = computeEnvelopeHash(decoded.prevHash, decoded.author, decoded.message, decoded.specVersion, bytes)
-    return { hash, prevHash: decoded.prevHash, author: decoded.author, message: decoded.message, specVersion: decoded.specVersion, wallTime: decoded.wallTime ?? null }
+    return { hash, prevHash: decoded.prevHash, author: decoded.author, message: decoded.message, specVersion: decoded.specVersion, wallTime: decoded.wallTime ?? null, originNode: decoded.originNode ?? null }
   }
 
   private commitEnvelope(meta: ChangeMeta, startCounter: number, prevHash: string | null): EnvelopeRecord {
     const specVersion = (this.meta.get('specVersion') as string | undefined) ?? ''
-    const packed: PackedEnvelope = { author: meta.author, message: meta.message, specVersion, prevHash, ...(meta.wallTime !== undefined ? { wallTime: meta.wallTime } : {}) }
+    const packed: PackedEnvelope = { author: meta.author, message: meta.message, specVersion, prevHash, ...(meta.wallTime !== undefined ? { wallTime: meta.wallTime } : {}), ...(meta.originNode !== undefined ? { originNode: meta.originNode } : {}) }
     this.loro.commit({ message: encodeEnvelope(packed), timestamp: this.clock.next() })
     const endCounter = this.loro.version().get(this.peerIdStr) ?? 0
     const len = endCounter - startCounter
     const bytes = this.bytesForSpan(this.peerIdStr, startCounter, len)
     const hash = computeEnvelopeHash(prevHash, meta.author, meta.message, specVersion, bytes)
-    return { hash, prevHash, author: meta.author, message: meta.message, specVersion, wallTime: meta.wallTime ?? null }
+    return { hash, prevHash, author: meta.author, message: meta.message, specVersion, wallTime: meta.wallTime ?? null, originNode: meta.originNode ?? null }
   }
 
   private bytesForSpan(peer: PeerID, counter: number, len: number): Uint8Array {

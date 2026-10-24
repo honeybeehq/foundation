@@ -73,29 +73,25 @@ describe('chain save/load — full roundtrip', () => {
 })
 
 describe('chain save/load — loadChain actor (contract amendment 2026-07-31)', () => {
-  it('two loads of the same snapshot with NO actor derive the same peer id, and silently fail to converge on merge', () => {
-    // This is the collision the module's original findings flagged: without
-    // an explicit actor, loadChain derives the peer id from a hash of the
-    // snapshot bytes, so two independent loads of the SAME bytes get the
-    // SAME peer id. Each then makes a local edit — both edits land at the
-    // identical (peer, counter) op id. When merged, each side sees the
-    // other's op as one it "already has" (same id) and drops it: the merge
-    // does not throw, it just silently fails to converge.
+  it('two default writers of the same snapshot keep both independent edits', () => {
     const original = createChain(baseDocument(), AUTHOR)
     const bytes = original.save()
+    const a = loadChain(bytes)
+    const b = loadChain(bytes)
+    a.apply(M('A'), [{ op: 'set-token', name: 'from-a', value: 'A' }])
+    b.apply(M('B'), [{ op: 'set-token', name: 'from-b', value: 'B' }])
+    a.merge(b)
+    b.merge(a)
+    expect(a.doc().tokens).toMatchObject({ 'from-a': 'A', 'from-b': 'B' })
+    expect(a.doc()).toEqual(b.doc())
+    expect(a.log()).toEqual(b.log())
+    expect(a.verify()).toEqual({ ok: true })
+  })
 
-    const loadA = loadChain(bytes)
-    const loadB = loadChain(bytes)
-    loadA.apply(M('edit from A'), [{ op: 'set-attr', id: 'n-child-2', key: 'from', value: 'A' }])
-    loadB.apply({ author: 'user:other', message: 'edit from B' }, [{ op: 'set-attr', id: 'n-child-2', key: 'from', value: 'B' }])
-
-    loadA.merge(loadB)
-    loadB.merge(loadA)
-
-    // proof of the collision: they do NOT converge, each only sees its own edit.
-    expect(loadA.doc().body[0]?.children[1]?.attrs.from).toBe('A')
-    expect(loadB.doc().body[0]?.children[1]?.attrs.from).toBe('B')
-    expect(loadA.doc()).not.toEqual(loadB.doc())
+  it('independent creates with the same author get different writer identities', () => {
+    const a = createChain(baseDocument(), AUTHOR)
+    const b = createChain(baseDocument(), AUTHOR)
+    expect(a.head().hash).not.toBe(b.head().hash)
   })
 
   it('two loads of the same snapshot with DISTINCT explicit actors converge cleanly on merge', () => {

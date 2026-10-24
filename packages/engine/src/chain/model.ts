@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 /**
  * Pure, Loro-free helpers over the FdnDocument/PatchOp/SemanticOp vocabulary:
  * node-location indexing (used by both undo-inversion and diff), PatchOp
@@ -344,16 +345,7 @@ export function documentsEqual(a: FdnDocument, b: FdnDocument): boolean {
 //      scheme so an id minted through any surface never collides with one
 //      minted through another) ———
 
-const MINTED_ANNOTATION_ID_RE = /^a(\d+)$/
-
-/** Mints the next `a<N>` id from a document's current annotations —
- *  deterministic "scan max, mint max+1" scheme, same shape as parse/index.ts's
- *  node-id IdMinter (never Date.now()/Math.random(), per SPEC D2). */
-export function mintAnnotationId(existing: FdnAnnotation[]): string {
-  let max = 0
-  for (const a of existing) {
-    const m = MINTED_ANNOTATION_ID_RE.exec(a.id)
-    if (m?.[1] !== undefined) max = Math.max(max, Number(m[1]))
-  }
-  return `a${max + 1}`
+/** Collision-resistant across offline replicas; existing ids (including aN) stay opaque. */
+export function mintAnnotationId(_existing: FdnAnnotation[]): string {
+  return `a-${randomUUID()}`
 }

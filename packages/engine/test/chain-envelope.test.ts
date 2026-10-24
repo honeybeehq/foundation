@@ -33,6 +33,22 @@ describe('chain envelope — hash chain', () => {
     expect(reloaded.verify()).toEqual({ ok: true })
   })
 
+  it('origin is hashed, survives save/load, and old envelopes report null', () => {
+    const chain = createChain(baseDocument(), AUTHOR, { actor: 'fixed' })
+    expect(chain.head().originNode).toBeNull()
+    expect(chain.logPage().entries[0]?.originNode).toBeNull()
+    const meta = { ...M('edit'), originNode: 'metal-3', wallTime: '2026-10-24T10:00:00.000Z' }
+    chain.apply(meta, [{ op: 'set-token', name: 't', value: '1' }])
+    const loaded = loadChain(chain.save())
+    expect(loaded.head()).toMatchObject(meta)
+    expect(loaded.logPage().entries[0]).toMatchObject(meta)
+    expect(loaded.changes().at(-1)?.envelope.originNode).toBe('metal-3')
+    expect(loaded.verify()).toEqual({ ok: true })
+    const other = createChain(baseDocument(), AUTHOR, { actor: 'fixed' })
+    other.apply({ ...meta, originNode: 'Studio' }, [{ op: 'set-token', name: 't', value: '1' }])
+    expect(other.head().hash).not.toBe(chain.head().hash)
+  })
+
   it('verify() catches a broken chain: a forged prevHash does not resolve', () => {
     // Two things independently established while writing this test (see
     // final report): (1) Loro's snapshot format carries its own checksum and
