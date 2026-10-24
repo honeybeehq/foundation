@@ -34,7 +34,8 @@ possibly stale working-tree sibling. It considers index stages 2/3, HEAD,
 MERGE_HEAD, REBASE_HEAD, CHERRY_PICK_HEAD, FETCH_HEAD and incoming commit IDs
 Git exposes through GITHEAD_<sha> environment keys. MERGE_HEAD is often not
 yet written while Git invokes drivers, so the incoming commit IDs matter.
-Each candidate must match the temporary HTML side's document identity,
+Local reference tips are also candidates, covering a single cherry-pick before
+CHERRY_PICK_HEAD exists. Each candidate must match the temporary HTML side's document identity,
 frontier and complete projected text exactly. It then merges those two
 chains and regenerates the HTML including identity and version markers.
 
@@ -48,8 +49,15 @@ from its chain, the driver returns nonzero and Git reports a conflict. It
 never keeps ours and claims success. Renames where Git cannot find matching
 sibling objects, older projections without frontier markers, and unusual
 Git invocations without accessible side references may require manual
-resolution. Merge binary chains with `foundation chain merge <file>
+resolution. In particular, stash apply/pop, apply-backend rebases, git am -3,
+and cherry-picks of non-tip commits may fail visibly. Criss-cross merges
+with virtual ancestors are not verified. Merge binary chains with `foundation chain merge <file>
 <theirs.chain>`, inspect the regenerated projection, then stage both files.
+
+Do not use `git revert` to undo design edits: the binary driver unions history
+and does not create inverse changes. A revert may either restore an earlier
+file trivially or retain later history when the merge driver runs. Use
+Foundation session undo or explicit semantic edits instead.
 
 ## Stable saves
 
@@ -57,7 +65,9 @@ Simple Loro snapshot measurements were byte-identical, but broader tests found
 encoding changes after loading or materializing complex documents. Saved chains
 now use full-history Loro updates and sorted anchor metadata, preserving every
 change while avoiding materialized snapshot state. Legacy snapshot chains
-continue to load. New saves agree across opposite import orders, blob exchange
+continue to load. Older CLIs using Loro fromSnapshot cannot load the new update
+encoding; upgrade all writers before sharing newly saved chains. Loading updates
+replays full history rather than using a materialized snapshot. New saves agree across opposite import orders, blob exchange
 and both merge directions. Projection output is deterministic too. Unchanged
 saves compare bytes before writing, preserving chain, HTML and receipt mtimes.
 

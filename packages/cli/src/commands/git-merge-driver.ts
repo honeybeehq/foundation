@@ -27,11 +27,19 @@ function sideChain(html: Buffer, path: string): Uint8Array {
     activePick = /^(?:pick|p|reword|r|edit|e|squash|s|fixup|f) ([0-9a-f]{7,64})\b/.exec(line ?? '')?.[1]
   } catch { /* no active merge-backend rebase */ }
   const refs = [activePick, ':2', ':3', 'HEAD', 'MERGE_HEAD', 'REBASE_HEAD', 'CHERRY_PICK_HEAD', 'FETCH_HEAD', 'ORIG_HEAD', ...incoming].filter((ref): ref is string => !!ref)
-  for (const ref of refs) {
+  // A single cherry-pick can invoke the driver before CHERRY_PICK_HEAD
+  // exists. Local branch tips are additional candidates, never trusted
+  // without exact frontier and projection matching.
+  try {
+    refs.push(...execFileSync('git', ['for-each-ref', '--format=%(objectname)'], { encoding: 'utf8' }).trim().split('\n').filter(Boolean))
+  } catch { /* unavailable refs leave a visible conflict below */ }
+  for (const ref of new Set(refs)) {
     const bytes = gitBytes(`${ref}:${path}.chain`)
     if (!bytes) continue
-    const chain = loadChain(bytes)
-    if (chain.docId() === readDocIdAttr(text) && chain.versionRef() === projectionVersion(text) && projectedText(chain) === text) return bytes
+    try {
+      const chain = loadChain(bytes)
+      if (chain.docId() === readDocIdAttr(text) && chain.versionRef() === projectionVersion(text) && projectedText(chain) === text) return bytes
+    } catch { /* a stale or unrelated candidate must not mask a valid side */ }
   }
   throw new Error(`cannot identify the chain matching ${path}; resolve the chain and regenerate the projection manually`)
 }
