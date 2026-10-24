@@ -134,3 +134,8 @@ Once the parent arrives through Comb (or grace expires), publication resumes.
 Performance receipts and the CLI-local workload map are in `packages/cli/performance/`
 and `packages/cli/.claude/skills/perf-foundation-sync/`. The latency target measures
 save-to-other-session visibility; durable Comb acknowledgement is reported separately.
+
+Worker startup failures are retried with jittered backoff capped at5s and appear
+as connection errors in status. The saved cursor and published set are preserved.
+A corrupt checkpoint remains unchanged until explicitly repaired; status reports
+its parse/read error. Startup retry sleep can delay shutdown by up to5s.
