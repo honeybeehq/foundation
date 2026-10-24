@@ -1,3 +1,4 @@
+import { syncTrace, syncTraceEnabled, syncTraceSpan } from '../sync-trace.js'
 import { watch, readFileSync, mkdirSync, type FSWatcher } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { createHash } from 'node:crypto'
@@ -56,7 +57,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
     const stop = (): void => { bridge?.close(); wake?.() }
     signal.addEventListener('abort', stop)
     try {
-      try { watcher = watch(dirname(design.file), (_event, name) => { if (name === null || design.file.endsWith(`/${name}`) || `${design.file}.chain`.endsWith(`/${name}`)) wake?.() }); watcher.on('error', () => watcher?.close()) } catch { /* Poll remains active on unsupported filesystems. */ }
+      try { watcher = watch(dirname(design.file), (_event, name) => { if (name === null || design.file.endsWith(`/${name}`) || `${design.file}.chain`.endsWith(`/${name}`)) { syncTrace('daemon.notice', () => ({ docId: design.docId, chain: name === null || String(name).endsWith('.chain') })); wake?.() } }); watcher.on('error', () => watcher?.close()) } catch { /* Poll remains active on unsupported filesystems. */ }
       while (!signal.aborted) {
         let receiveError: unknown, publishingHash: string | undefined
         try {
@@ -67,12 +68,15 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
             while (!signal.aborted) {
               const response = await active.request('read', { log: feed, cursor: state.cursor, max_events: 128, max_bytes: 491520 })
               if (response.log !== feed) throw new Error('Comb response feed mismatch')
-              const incoming = page(response, state.cursor)
+              const decode = syncTraceSpan('receive.page', () => ({ docId: design.docId, cursor: state.cursor }))
+              const incoming = page(response, state.cursor); decode({ count: incoming.blobs.length })
               if (incoming.blobs.length) {
-                updateDocument(design.file, chain => {
+                const done = syncTraceSpan('receive.locked-import', () => ({ docId: design.docId, cursor: state.cursor, hashes: incoming.blobs.map(blob => decodeBlob(blob).envelope.hash) }))
+                let imported = 0, ok = false
+                try { updateDocument(design.file, chain => {
                   if (chain.docId() !== design.docId) throw new Error('live path now holds another design')
-                  importChangeBlobs(chain, incoming.blobs)
-                }, true)
+                  imported = importChangeBlobs(chain, incoming.blobs, syncTraceEnabled ? (stage, durationMs) => syncTrace(`receive.${stage}`, () => ({ docId: design.docId, durationMs })) : undefined)
+                }, true); ok = true } finally { done({ imported, ok }) }
                 // Delivery itself proves durable sharing, even when the append acknowledgement was lost.
                 const shared = new Set(state.published)
                 for (const blob of incoming.blobs) shared.add(decodeBlob(blob).envelope.hash)
@@ -91,6 +95,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
               const pending = chain.changes().filter(c => !published.has(c.envelope.hash))
               if (state.pending !== pending.length) { state.pending = pending.length; writeSyncState(key, state) }
               if (pending.length) {
+                syncTrace('publish.pending', () => ({ docId: design.docId, hashes: pending.map(change => change.envelope.hash) }))
                 // A persistent bridge renews exclusive feed ownership. Bound each writer
                 // batch and send clean EOF, so other nodes can publish through the same log.
                 publishingHash = pending[0]!.envelope.hash
