@@ -130,7 +130,7 @@ function ingestCurrentSource(file: string, chain: FdnChain, source: string): boo
   return ops.length > 0
 }
 
-export function updateDocument<T>(file: string, mutate: (chain: FdnChain) => T): T {
+export function updateDocument<T>(file: string, mutate: (chain: FdnChain) => T, onlyIfChanged = false): T {
   file = documentPath(file)
   return withDocumentLock(file, () => {
     recoverDocument(file)
@@ -139,8 +139,9 @@ export function updateDocument<T>(file: string, mutate: (chain: FdnChain) => T):
     if (source !== null) {
       ingestCurrentSource(file, chain, source)
     }
+    const before = chain.versionRef()
     const result = mutate(chain)
-    persistDocument(file, chain)
+    if (!onlyIfChanged || chain.versionRef() !== before || (source !== null && projectedText(chain) !== source)) persistDocument(file, chain)
     return result
   })
 }

@@ -1,5 +1,6 @@
 #!/usr/bin/env -S npx tsx
 import { runDoctor } from './commands/doctor.js'
+import { autoOpenDesign } from './sync-store.js'
 /**
  * foundation-cli — entry point (API.md "CLI (packages/cli)"). Zero-dependency
  * argv parsing; bin name `foundation`; tsx is the runtime (this file is the
@@ -12,6 +13,7 @@ import { runDoctor } from './commands/doctor.js'
  */
 import { runInstall } from './commands/install.js'
 import { runtimeVersion } from './runtime-version.js'
+import { runSync } from './commands/sync.js'
 import { runEdit } from './commands/edit.js'
 import { realpathSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -41,6 +43,7 @@ const COMMANDS: Record<string, (args: string[], io: CliIO) => Promise<number>> =
   doctor: runDoctor,
   install: runInstall,
   version: async (_args, io) => { io.stdout(JSON.stringify(runtimeVersion())); return 0 },
+  sync: runSync,
   new: runNew,
   copy: runCopy,
   inspect: runInspect,
@@ -72,6 +75,7 @@ commands:
   version [--json]                          report source revision and compatibility
   install [--from CHECKOUT] [--sha SHA] [--force]  install a node-level committed copy
   doctor --inventory --json                  inventory executable copies without changing them
+  sync open|serve|status                    register live designs, sync through Comb, inspect local/upload state
   new <name> [--no-chain]                    write a minimal .fdn.html skeleton (chain-inits it too)
   copy <src> <dest> [--title T] [--json]      create an independent document with a fresh identity and chain
   inspect <file>                             summarize a document
@@ -132,7 +136,10 @@ export async function runCli(argv: string[], io: CliIO = processIo): Promise<num
     io.stdout(USAGE)
     return 2
   }
-  return handler(rest, io)
+  const code = await handler(rest, io)
+  // Commands with a document first argument include CLI and MCP-independent edits.
+  if (code === 0 && command !== 'sync' && rest[0]?.endsWith('.fdn.html')) autoOpenDesign(rest[0], io.stderr)
+  return code
 }
 
 function isMainModule(): boolean {

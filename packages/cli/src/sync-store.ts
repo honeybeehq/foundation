@@ -1,0 +1,49 @@
+import { mkdirSync, readFileSync, readdirSync, realpathSync, unlinkSync } from 'node:fs'
+import { join } from 'node:path'
+import { homedir } from 'node:os'
+import { createHash } from 'node:crypto'
+import { loadChain } from 'foundation-engine'
+import { writeAtomic } from './disk.js'
+
+export interface LiveDesign { docId: string; file: string; workspace: string; product: string }
+export interface SyncState { cursor: string; published: string[]; lastError: string | null; updatedAt: string; pending: number }
+export function replicaRoot(): string { return process.env.FOUNDATION_REPLICA_STORE ?? join(homedir(), '.foundation', 'replicas') }
+export function replicaKey(design: LiveDesign): string { return createHash('sha256').update(JSON.stringify([design.workspace, design.product, design.docId])).digest('hex') }
+export function registerDesign(file: string, workspace = process.env.FOUNDATION_WORKSPACE ?? 'default', product = process.env.FOUNDATION_PRODUCT ?? 'default'): LiveDesign {
+  file = realpathSync(file)
+  const docId = loadChain(readFileSync(`${file}.chain`)).docId()
+  if (!docId) throw new Error('sync requires a tracked design with a document id')
+  for (const part of [workspace, product, docId]) if (!/^[A-Za-z0-9._-]+$/.test(part)) throw new Error('invalid sync address component')
+  const design = { docId, file, workspace, product }
+  const dir = join(replicaRoot(), 'live'); mkdirSync(dir, { recursive: true })
+  // Each registration owns a path record; opening another copy never overwrites it.
+  const key = createHash('sha256').update(JSON.stringify(design)).digest('hex')
+  writeAtomic(join(dir, `${key}.json`), JSON.stringify(design))
+  return design
+}
+export function liveDesigns(): LiveDesign[] {
+  const dir = join(replicaRoot(), 'live')
+  try { return readdirSync(dir).filter(f => f.endsWith('.json')).map(f => JSON.parse(readFileSync(join(dir, f), 'utf8')) as LiveDesign) }
+  catch (err) { if ((err as NodeJS.ErrnoException).code === 'ENOENT') return []; throw err }
+}
+export function statePath(key: string): string { return join(replicaRoot(), `${key}.json`) }
+export function readSyncState(key: string): SyncState {
+  try { return JSON.parse(readFileSync(statePath(key), 'utf8')) as SyncState }
+  catch (err) { if ((err as NodeJS.ErrnoException).code !== 'ENOENT') throw err; return { cursor: '1', published: [], lastError: null, updatedAt: '', pending: 0 } }
+}
+export function writeSyncState(key: string, state: SyncState): void { mkdirSync(replicaRoot(), { recursive: true }); writeAtomic(statePath(key), JSON.stringify(state)) }
+
+export function closeDesign(file: string): void {
+  file = realpathSync(file)
+  const dir = join(replicaRoot(), 'live')
+  try {
+    for (const entry of readdirSync(dir).filter(f => f.endsWith('.json'))) {
+      if ((JSON.parse(readFileSync(join(dir, entry), 'utf8')) as LiveDesign).file === file) unlinkSync(join(dir, entry))
+    }
+  } catch (err) { if ((err as NodeJS.ErrnoException).code !== 'ENOENT') throw err }
+}
+/** Opt-in node installation hook; sync registration must never prevent local editing. */
+export function autoOpenDesign(file: string, log: (message: string) => void): void {
+  if (process.env.FOUNDATION_SYNC_AUTO_OPEN !== '1') return
+  try { registerDesign(file) } catch (err) { log(`sync registration: ${String(err)}`) }
+}
