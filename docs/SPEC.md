@@ -1109,6 +1109,15 @@ to upload and shared (acknowledged by Comb, not by every peer). Full feed histor
 must be retained for replay. Backend location is configured by file and does not
 change this contract. Setup, hooks and real-process verification: `packages/cli/SYNC.md`.
 
+A separate workspace catalogue (`foundation/<workspace>/catalogue`, same log mapping)
+advertises versioned per-replica metadata after referenced envelopes are shared.
+Each local path owns a durable replica ID and increasing generation; stable append
+keys hash the record bytes. Records carry confined repo-relative paths, never remote
+absolute paths. Closing a registration is not deletion. Catalogue delivery is advisory
+and runs separately from document uploads; its failure must not delay local editing
+or document publication. Claimed node/authorship fields are not authenticated by a
+content hash or shared backend access; trusted presence requires a separate binding.
+
 ## 10. Conformance — *skeleton*
 
 Intent: three implementable levels so others can build partial systems on the format —
