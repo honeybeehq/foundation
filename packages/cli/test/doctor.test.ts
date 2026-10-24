@@ -48,8 +48,8 @@ describe('doctor inventory', () => {
     const sha = 'a'.repeat(40)
     put(join(root, 'foundation-install.json'), JSON.stringify({ runtime: { sourceSha: sha, artboardWriteSafe: true } }))
     put(join(home, '.hive/v2/cells/cell/.mcp.json'), JSON.stringify({ mcpServers: { foundation: { command: binary } } }))
-    // A checkout nested in the Cell is deliberately outside config inventory.
-    put(join(home, '.hive/v2/cells/cell/repo/.mcp.json'), '{"secret":"not-read"}')
+    // Source trees below the repository root are outside config inventory.
+    put(join(home, '.hive/v2/cells/cell/repo/src/.mcp.json'), '{"secret":"not-read"}')
     put(join(home, '.hive/v2/cells/cell/.codex/config.toml'), `[mcp_servers.foundation]\ncommand = '${binary}'\n[mcp_servers.other]\ncommand = '/not-found'\n`)
     const io = captureIo()
     await runDoctor(['--inventory', '--json'], io)
@@ -57,7 +57,7 @@ describe('doctor inventory', () => {
     expect(result.entries).toContainEqual(expect.objectContaining({ realpath: binary, sourceSha: sha, artboardWriteSafe: true }))
     expect(result.entries.filter((entry: { sourceSha: string }) => entry.sourceSha === sha)).toHaveLength(2)
     expect(result.coverage.commandsExecuted).toBe(false)
-    expect(result.configs.some((config: { path: string }) => config.path.includes('/repo/'))).toBe(false)
+    expect(result.configs.some((config: { path: string }) => config.path.includes('/src/'))).toBe(false)
   })
 
   it('reports missing and malformed inputs without changing them', async () => {
@@ -76,4 +76,23 @@ describe('doctor inventory', () => {
     expect(await runDoctor([], io)).toBe(2)
     expect(io.out).toEqual([])
   })
+})
+
+it('finds account harness configs and repository-root Cell configs without reading source trees', async () => {
+  const binary = join(home, 'bin/foundation')
+  put(binary, '#!/bin/sh\nexit 99\n')
+  chmodSync(binary, 0o755)
+  const cellConfig = join(home, '.hive/v2/cells/cell/repo/.mcp.json')
+  const accountConfig = join(home, '.hive/homes/account/.claude.json')
+  const config = JSON.stringify({ mcpServers: { foundation: { command: binary } } })
+  put(cellConfig, config)
+  put(accountConfig, config)
+  put(join(home, '.hive/v2/cells/cell/repo/src/.mcp.json'), config)
+  const io = captureIo()
+  expect(await runDoctor(['--inventory', '--json'], io)).toBe(0)
+  const result = JSON.parse(io.out[0]!)
+  expect(result.configs.map((c: { path: string }) => c.path)).toContain(cellConfig)
+  expect(result.configs.map((c: { path: string }) => c.path)).toContain(accountConfig)
+  expect(result.configs.some((c: { path: string }) => c.path.includes('/src/'))).toBe(false)
+  expect(result.entries.filter((e: { path: string }) => e.path === binary)).toHaveLength(3)
 })
