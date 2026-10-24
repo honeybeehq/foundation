@@ -1,120 +1,60 @@
-/**
- * `foundation git-merge-driver <ancestor> <ours> <theirs>` — a git custom
- * merge driver (gitattributes(5) `%O %A %B` convention). See
- * docs/GIT-INTEGRATION.md for the .gitattributes/`git config` wiring this
- * expects, and for an honest account of what this can and can't do.
- *
- * Contract: git always invokes drivers with THREE temp-file paths (%O the
- * common ancestor, %A "ours" — also the file the driver must overwrite with
- * the result, %B "theirs"); none of the three is guaranteed to be, or be
- * named like, the real repo path. That rules out any reliable way to derive
- * a sibling file's path from these three alone (see mergeFdnHtmlFile below).
- * Exit 0 always: this driver either resolves the merge itself (chain: real
- * CRDT merge; .fdn.html with a usable sibling chain: that chain's
- * projection) or falls back to keeping "ours" with a loud warning — the
- * task brief frames that fallback as a valid, if unsatisfying, "handled"
- * outcome (git shows no conflict markers), not a hard failure.
- */
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
-import { loadChain, mergeChains, parseDocument, projectDocument } from 'foundation-engine'
+/** Git passes temporary paths; %P identifies the sibling chains in Git objects. */
+import { execFileSync } from 'node:child_process'
+import { readFileSync, writeFileSync } from 'node:fs'
+import { loadChain, mergeChains } from 'foundation-engine'
 import type { CliIO } from '../io.js'
-import { injectDocIdAttr } from '../docid.js'
+import { projectedText, projectionVersion } from '../disk.js'
+import { readDocIdAttr } from '../docid.js'
 
-/** Best-effort file-type sniff: git's temp files don't reliably preserve the
- *  original extension across every git version/platform, so extension AND
- *  content are both checked. `.chain` snapshots are Loro binary (never valid
- *  UTF-8 HTML); `.fdn.html` text always contains `<fdn-doc`. */
-function looksLikeChainSnapshot(path: string, bytes: Buffer): boolean {
-  if (path.endsWith('.chain')) return true
-  if (path.endsWith('.fdn.html') || path.endsWith('.html')) return false
-  try {
-    const text = new TextDecoder('utf-8', { fatal: true }).decode(bytes)
-    return !text.includes('<fdn-doc') && !/^\s*<!DOCTYPE/i.test(text)
-  } catch {
-    return true // not valid UTF-8 at all — definitely not our text format
-  }
+function gitBytes(object: string): Buffer | null {
+  try { return execFileSync('git', ['show', object], { maxBuffer: 128 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] }) }
+  catch { return null }
 }
 
-function mergeChainFile(oursPath: string, oursBytes: Buffer, theirsBytes: Buffer, io: CliIO): number {
+/** Match object chains to the actual temporary HTML sides, never to labels
+ * alone. During a merge MERGE_HEAD may not exist yet; Git passes incoming
+ * commit IDs as GITHEAD_<sha> environment keys. Operation heads and index
+ * stages cover rebase/cherry-pick; every candidate must match the HTML. */
+function sideChain(html: Buffer, path: string): Uint8Array {
+  const text = html.toString('utf8')
+  const incoming = Object.keys(process.env).filter(key => /^GITHEAD_[0-9a-f]{40,64}$/.test(key)).map(key => key.slice(8))
+  // Rebase writes the active pick to done before invoking the merge driver,
+  // but may not create REBASE_HEAD until a conflict has already occurred.
+  let activePick: string | undefined
   try {
-    const { merged, overlaps } = mergeChains(oursBytes, theirsBytes)
-    writeFileSync(oursPath, merged)
-    io.stderr(`git-merge-driver: merged chain (${overlaps.lines.length} concurrent-overlap line(s))`)
-    for (const line of overlaps.lines) io.stderr(`  concurrent-overlap: ${line.message}`)
-  } catch (err) {
-    io.stderr(
-      `git-merge-driver: chain merge failed (${err instanceof Error ? err.message : String(err)}) — keeping "ours" unchanged`,
-    )
+    const donePath = execFileSync('git', ['rev-parse', '--git-path', 'rebase-merge/done'], { encoding: 'utf8' }).trim()
+    const line = readFileSync(donePath, 'utf8').trim().split('\n').at(-1)
+    activePick = /^(?:pick|p|reword|r|edit|e|squash|s|fixup|f) ([0-9a-f]{7,64})\b/.exec(line ?? '')?.[1]
+  } catch { /* no active merge-backend rebase */ }
+  const refs = [activePick, ':2', ':3', 'HEAD', 'MERGE_HEAD', 'REBASE_HEAD', 'CHERRY_PICK_HEAD', 'FETCH_HEAD', 'ORIG_HEAD', ...incoming].filter((ref): ref is string => !!ref)
+  for (const ref of refs) {
+    const bytes = gitBytes(`${ref}:${path}.chain`)
+    if (!bytes) continue
+    const chain = loadChain(bytes)
+    if (chain.docId() === readDocIdAttr(text) && chain.versionRef() === projectionVersion(text) && projectedText(chain) === text) return bytes
   }
-  return 0
-}
-
-/**
- * .fdn.html text merge. There is no real structural 3-way merge implemented
- * here — see the module doc for why "find the sibling .chain" can't be made
- * reliable from git's own invocation alone. When a sibling `<oursPath>.chain`
- * DOES happen to exist (e.g. a caller invokes this driver directly with real
- * repo paths, or a future `%P`-aware git config passes them), its projection
- * is used, since that's the actual merged truth. Otherwise: keep "ours" and
- * warn loudly — documented honestly rather than pretending a fake 3-way
- * text merge would be meaningful for a hash-linked-chain document format
- * whose real truth lives in the .chain file, not the text.
- */
-function mergeFdnHtmlFile(oursPath: string, theirsPath: string, io: CliIO): number {
-  const siblingChainPath = `${oursPath}.chain`
-  if (existsSync(siblingChainPath)) {
-    try {
-      const chain = loadChain(readFileSync(siblingChainPath))
-      let text = projectDocument(chain.doc())
-      const docId = chain.docId()
-      if (docId) text = injectDocIdAttr(text, docId)
-      writeFileSync(oursPath, text, 'utf8')
-      io.stderr(`git-merge-driver: used sibling merged chain ${siblingChainPath} for the projection`)
-      return 0
-    } catch (err) {
-      io.stderr(
-        `git-merge-driver: sibling chain ${siblingChainPath} unusable (${err instanceof Error ? err.message : String(err)}) — falling back`,
-      )
-    }
-  }
-
-  try {
-    parseDocument(readFileSync(oursPath, 'utf8')) // sanity check "ours" is still a legal document; report ignored
-  } catch {
-    // even parsing "ours" failed — proceed anyway, there's nothing better to fall back to.
-  }
-  try {
-    readFileSync(theirsPath, 'utf8')
-  } catch {
-    // "theirs" unreadable — irrelevant to the fallback, "ours" is already on disk.
-  }
-  io.stderr(
-    `git-merge-driver: no usable sibling merged .chain for ${oursPath} — no structural 3-way text merge is ` +
-      'implemented (see docs/GIT-INTEGRATION.md), falling back to "ours" unchanged. Run `foundation chain merge` ' +
-      'on the .chain files first (or resolve by hand) for a real merge.',
-  )
-  return 0
+  throw new Error(`cannot identify the chain matching ${path}; resolve the chain and regenerate the projection manually`)
 }
 
 export async function runGitMergeDriver(args: string[], io: CliIO): Promise<number> {
-  const [ancestorPath, oursPath, theirsPath] = args
-  if (!ancestorPath || !oursPath || !theirsPath) {
-    io.stderr('usage: foundation git-merge-driver <ancestor> <ours> <theirs>')
+  const [ancestor, ours, theirs, repoPath] = args
+  if (!ancestor || !ours || !theirs) {
+    io.stderr('usage: foundation git-merge-driver <ancestor> <ours> <theirs> [repo-path]')
     return 2
   }
-
-  let oursBytes: Buffer
-  let theirsBytes: Buffer
   try {
-    oursBytes = readFileSync(oursPath)
-    theirsBytes = readFileSync(theirsPath)
-  } catch (err) {
-    io.stderr(`git-merge-driver: ${err instanceof Error ? err.message : String(err)}`)
-    return 2
+    const a = readFileSync(ours), b = readFileSync(theirs)
+    const html = repoPath ? repoPath.endsWith('.fdn.html') : a.toString('utf8').includes('<fdn-doc')
+    if (html && !repoPath) throw new Error('HTML merge requires Git %P; run foundation git setup')
+    const left = html ? sideChain(a, repoPath!) : a
+    const right = html ? sideChain(b, repoPath!) : b
+    if (loadChain(left).docId() !== loadChain(right).docId()) throw new Error('cannot merge different document identities')
+    const { merged, overlaps } = mergeChains(left, right)
+    writeFileSync(ours, html ? projectedText(loadChain(merged)) : merged)
+    for (const line of overlaps.lines) io.stderr(`concurrent-overlap: ${line.message}`)
+    return 0
+  } catch (error) {
+    io.stderr(`git-merge-driver: ${error instanceof Error ? error.message : String(error)}`)
+    return 1
   }
-
-  if (looksLikeChainSnapshot(oursPath, oursBytes)) {
-    return mergeChainFile(oursPath, oursBytes, theirsBytes, io)
-  }
-  return mergeFdnHtmlFile(oursPath, theirsPath, io)
 }
