@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { createChain, loadChain } from '../src/chain/chain.js'
 import { encodeBlob, decodeBlob, importChangeBlobs } from '../src/chain/blob.js'
@@ -46,6 +47,28 @@ describe('shared change wire boundary', () => {
     const before = base.save()
     expect(() => importChangeBlobs(base, [encodeBlob(final.envelope, final.bytes)])).toThrow('incomplete causal')
     expect(base.save()).toEqual(before)
+  })
+
+  it('keeps blob bytes and hashes identical on both replicas after each makes a post-merge change', () => {
+    const fixtures = JSON.parse(readFileSync(new URL('./fixtures/envelope-drift.json', import.meta.url), 'utf8')) as { a: string; b: string }
+    let a = loadChain(Buffer.from(fixtures.a, 'base64')), b = loadChain(Buffer.from(fixtures.b, 'base64'))
+    importChangeBlobs(b, a.changes().map(change => encodeBlob(change.envelope, change.bytes)))
+    a = a.fork('blob-post-merge-a'); b = b.fork('blob-post-merge-b')
+    a.apply({ author: 'a', message: 'after merge A' }, [{ op: 'set-text', id: 'n1', text: 'A after merge' }])
+    b.apply({ author: 'b', message: 'after merge B' }, [{ op: 'set-text', id: 'n2', text: 'B after merge' }])
+    const fromA = a.changes().map(change => encodeBlob(change.envelope, change.bytes))
+    const fromB = b.changes().map(change => encodeBlob(change.envelope, change.bytes))
+    importChangeBlobs(a, fromB); importChangeBlobs(b, fromA)
+    a = loadChain(a.save()); b = loadChain(b.save())
+    expect(a.changes()).toEqual(b.changes())
+    for (const change of a.changes()) {
+      const encoded = encodeBlob(change.envelope, change.bytes), decoded = decodeBlob(encoded)
+      expect(decoded.envelope.hash).toBe(change.envelope.hash)
+      expect(decoded.bytes).toEqual(change.bytes)
+      expect(encodeBlob(decoded.envelope, decoded.bytes)).toEqual(encoded)
+      const peer = b.changes().find(other => other.envelope.hash === change.envelope.hash)!
+      expect(encodeBlob(peer.envelope, peer.bytes)).toEqual(encoded)
+    }
   })
 
 })
