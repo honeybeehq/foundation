@@ -242,7 +242,7 @@ policy. `boardKey(ref)` is the stable tuple cache key. `selectArtboard(doc,id)`
 selects one design body; `validateArtboards(doc)` reports structural issues.
 Legacy bodies use `artboardId:null`. Explicit IDs always identify source nodes.
 
-`bakeDocument` and `bakeEditorDocument` accept `{artboardId?,state?}` and return
+`bakeDocument` and `bakeEditorDocument` accept `{artboardId?,state?,viewport?}` and return
 `artboardId` alongside existing output. With several artboards an omitted ID
 reports `ambiguous-artboard` and emits no content. `renderDocument` additionally
 accepts `{artboardId?,pageId?,matrix?}`. Explicit designs default to each selected
@@ -273,7 +273,7 @@ writes. All new operations work through `foundation edit FILE --ops JSON` or
 These one-shot writers have no persistent Undo stack; live sessions retain
 writer-local Undo/Redo.
 
-CLI bake accepts `--artboard ID`. Render accepts `--artboard ID`, `--page ID`,
+CLI bake accepts `--artboard ID` and `--viewport V`. Render accepts `--artboard ID`, `--page ID`,
 `--matrix`, existing state/viewport/scale selectors and output forms. Single-PNG
 JSON adds `artboardId` for explicit boards. Directory exports use encoded stable
 IDs and write a manifest. MCP bake/render use `artboardId`/`pageId`/`matrix`.
@@ -288,3 +288,21 @@ repair can create history without discarding content. Subsequent authored edits
 use the introduced-issue guard; unsupported format versions always refuse.
 
 For negotiated `0.1`, `view.states` and state-keyed bakes retain the legacy wire shape; `welcome.protocol` is `0.1`. Legacy documents retain normal content editing and Undo/Redo without an upgrade. Artboard semantic operations and `set-spec-version` are refused, and final-patch validation also refuses primitive attempts to introduce artboards. An explicit document is projected to its first artboard in page/document order for viewing only, with a warning and disabled Undo/Redo; all commits, anchors and Undo/Redo are refused. The canonical source is never flattened or saved by this projection. Peer upgrades switch an existing old connection to the same read-only view; its state subscriptions follow that first board. Protocol `0.2` retains complete canonical documents and tuple subscriptions. This adapter does not make old CLI/MCP binaries or old Cell engines safe: their separate writer-rollout gate remains open.
+
+
+Explicit artboards emit a shared standards-mode body frame with margin 0,
+border-box sizing, literal effective occurrence height in px, and the artboard
+padding. The height is resolved from native geometry or the selected
+state/viewport size override, never the iframe's measured height. Flow percentage
+heights therefore remain fixed when visible overflow expands a canvas iframe.
+Body width is automatic. `bakeDocument` supports `includeNodeIds:true` for
+rendered layout reports without editor metadata; explicit visible exports use
+this path and keep normal instance IDs and sealed CSS. Clip exports retain
+the editor path. Legacy HTML, margins and rendering modes remain unchanged.
+
+`set-artboard-padding {id,top?,right?,bottom?,left?}` sets only supplied sides
+as finite nonnegative px values; at least one side is required. Zero removes
+an attribute, and equal nonzero numeric values are no-ops. `BoardView.padding`
+always contains all four numbers. Height owners now invalidate baked bodies;
+width-only geometry does not. A legacy upgrade deliberately normalizes margin,
+height and mode under the explicit artboard format.

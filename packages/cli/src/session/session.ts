@@ -1,5 +1,5 @@
 import { legacyMessage, legacyBoardRef, legacyArtboardReason, legacyArtboardOpReason } from './legacy.js'
-import { ArtboardError, explicitArtboards, artboardPages, boardViews, boardView, boardKey } from 'foundation-engine'
+import { ArtboardError, validateArtboards, explicitArtboards, artboardPages, boardViews, boardView, boardKey } from 'foundation-engine'
 import type { BoardRef } from 'foundation-engine'
 import { bakeImpact, mergeBakeImpact, type BakeImpact } from './bake-impact.js'
 import { PlacementError } from './placement.js'
@@ -334,7 +334,7 @@ class DesignSession implements Session {
     this.diskTextCanonical = canonicalText(incoming)
     this.diskChain = chainBytes
     this.docId = this.chain?.docId() ?? readDocIdAttr(text)
-    const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json' || ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code)) ?? validateTokenCollections(incoming)[0] ?? validateStateStyles(incoming)[0]
+    const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json' || ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code)) ?? validateTokenCollections(incoming)[0] ?? validateStateStyles(incoming)[0] ?? validateArtboards(incoming).find(line => line.code === 'artboard-padding')
     if (issue) {
       this.invalidExternalTokens = `external metadata is invalid; source preserved and commits blocked until repaired: ${issue.message}`
       this.setDoc(this.chain ? this.chain.doc() : normalizeDocument(incoming))
@@ -468,7 +468,7 @@ class DesignSession implements Session {
       const baseCanonical = this.diskTextCanonical
       this.diskText = text
       this.diskTextCanonical = incomingCanonical
-      const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json' || ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code)) ?? validateTokenCollections(incoming)[0] ?? validateStateStyles(incoming)[0]
+      const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json' || ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code)) ?? validateTokenCollections(incoming)[0] ?? validateStateStyles(incoming)[0] ?? validateArtboards(incoming).find(line => line.code === 'artboard-padding')
       if (issue) {
         const message = `external metadata is invalid; source preserved and commits blocked until repaired: ${issue.message}`
         if (this.invalidExternalTokens !== message) this.fault('unreadable', message, null)
@@ -733,7 +733,7 @@ class DesignSession implements Session {
       }
       if (impact.states && !impact.states.has(ref.state)) continue
       if (impact.artboards && !impact.artboards.has(ref.artboardId)) continue
-      const baked = this.bake(() => bakeEditorDocument(doc, { ...(ref.state === null ? {} : { state: ref.state }), artboardId: ref.artboardId }))
+      const baked = this.bake(() => bakeEditorDocument(doc, { ...(ref.state === null ? {} : { state: ref.state }), artboardId: ref.artboardId, viewport: ref.viewport }))
       if (!this.changed(key, baked)) continue
       const previous = this.stateBakes.get(key)
       this.stateBakes.set(key, { rev, html: baked.html })

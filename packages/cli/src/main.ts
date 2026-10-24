@@ -70,7 +70,7 @@ commands:
                                               harvest a React component and merge it into <file>
                                               (chain-committed when a chain exists)
   edit <file> --ops JSON | --ops-file FILE   one atomic semantic edit batch
-  bake <file> [--artboard ID] [--state S] [-o out]           bake a state to HTML
+  bake <file> [--artboard ID] [--state S] [--viewport V] [-o out]           bake a state to HTML
   render <file> [--state S] [--viewport V] [--scale 1..4] [-o dir | --out file.png] [--json]
   diff <a.html> <b.html>                     structural (+ visual, when available) diff
   serve <file> [--port N]                    live-reload dev server

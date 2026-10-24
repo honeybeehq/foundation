@@ -69,7 +69,10 @@ export function applyPatch(doc: FdnDocument, ops: PatchOp[], opts?: { lenient?: 
   }
   if (opts?.validateArtboards !== false) {
     try { assertFormatVersion(working) } catch (err) { return { ok: false, error: { code: 'invalid-op', message: String(err) } } }
-    const key = (issue: { code: string; nodeId?: string }) => `${issue.code}:${issue.nodeId ?? ''}`
+    const key = (issue: { code: string; nodeId?: string; detail?: unknown }) => {
+      const base = `${issue.code}:${issue.nodeId ?? ''}`
+      return issue.code === 'artboard-padding' && issue.detail && typeof issue.detail === 'object' && 'attr' in issue.detail ? `${base}:${String(issue.detail.attr)}` : base
+    }
     const prior = new Set(validateArtboards(doc).map(key))
     const issue = validateArtboards(working).find(issue => !prior.has(key(issue)))
     if (issue) return { ok: false, error: { code: 'invalid-op', message: issue.message } }

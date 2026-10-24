@@ -400,10 +400,11 @@ async function toolBake(args: Record<string, unknown>): Promise<ToolResult> {
   const path = requireString(args, 'path')
   const state = optionalString(args, 'state')
   const artboardId = optionalString(args, 'artboardId')
+  const viewport = optionalString(args, 'viewport')
   const read = readSource(path)
   if (!read.ok) return read.result
   const { doc } = parseDocument(read.source)
-  const baked = bakeDocument(doc, { ...(state !== undefined ? { state } : {}), ...(artboardId !== undefined ? { artboardId } : {}) })
+  const baked = bakeDocument(doc, { ...(state !== undefined ? { state } : {}), ...(artboardId !== undefined ? { artboardId } : {}), ...(viewport !== undefined ? { viewport } : {}) })
   return ok({
     path,
     state: baked.state,
@@ -1016,6 +1017,7 @@ export const TOOLS: ToolDefinition[] = [
       properties: {
         path: { type: 'string', description: 'Path to a .fdn.html file' },
         artboardId: { type: 'string', description: 'Stable artboard ID; required when several artboards exist' },
+        viewport: { type: 'string', description: 'Named viewport occurrence for explicit artboard body geometry' },
         state: { type: 'string', description: 'Named state to bake (see the document\'s states list via foundation_inspect); omitted = default/empty state' },
       },
       required: ['path'],

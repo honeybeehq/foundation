@@ -6,7 +6,7 @@ import { expandComponentOp } from './components.js'
 import type { ComponentOp, PlacementOp, SessionOp, TokenModeOp } from 'foundation-protocol'
 import { expandPlacement, PlacementError } from './placement.js'
 
-const ARTBOARD_OPS = new Set(['create-page', 'rename-page', 'reorder-page', 'duplicate-page', 'delete-page', 'create-artboard', 'rename-artboard', 'move-artboard', 'resize-artboard', 'move-artboard-view', 'set-artboard-view-visible', 'set-artboard-view-size', 'separate-artboard-view', 'rename-viewport', 'rename-state', 'resize-viewport', 'duplicate-artboard', 'reorder-artboard', 'delete-artboard', 'upgrade-artboards'])
+const ARTBOARD_OPS = new Set(['create-page', 'rename-page', 'reorder-page', 'duplicate-page', 'delete-page', 'create-artboard', 'rename-artboard', 'move-artboard', 'resize-artboard', 'set-artboard-padding', 'move-artboard-view', 'set-artboard-view-visible', 'set-artboard-view-size', 'separate-artboard-view', 'rename-viewport', 'rename-state', 'resize-viewport', 'duplicate-artboard', 'reorder-artboard', 'delete-artboard', 'upgrade-artboards'])
 
 const COMPONENT_OPS = new Set(['detach-instance', 'swap-instance', 'set-instance-variant', 'set-instance-override', 'reset-instance-override', 'reset-instance-overrides'])
 

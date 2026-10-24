@@ -154,6 +154,7 @@ interface Cell {
    *  undeclared viewport name) — merged into the cell's report alongside
    *  the bake's own ConformanceReport. */
   artboardId?: string
+  viewportSelector?: string | null
   clipToBounds?: boolean
   preReport?: ReportLine[]
 }
@@ -192,16 +193,6 @@ function resolveCells(doc: FdnDocument, opts?: { state?: string; viewport?: stri
     .map((v): Cell => ({ state: stateName, viewport: v }))
 }
 
-// bake/index.ts's emitHtml does not serialize `data-fdn-id` on baked
-// elements — only project/index.ts's canonical .fdn.html serializer does
-// (API.md: "Stable node ids serialize as data-fdn-id" is a project-module
-// rule). renderDocument needs that attribute for the layout report's key, so
-// it re-serializes the already-baked tree through bake's own *unmodified*
-// exported emitHtml() after injecting the attribute onto a clone — this
-// composes bake's output rather than duplicating/reimplementing the
-// serializer. Reported as a finding: bake's derived HTML arguably should
-// carry data-fdn-id itself (useful beyond render, e.g. browser devtools on a
-// bake preview), but src/bake/ is out of this module's scope to edit.
 function injectFdnIds(nodes: FdnNode[]): FdnNode[] {
   return nodes.map((n) => ({
     ...n,
@@ -324,7 +315,7 @@ export async function renderDocument(
     const refs = opts?.matrix ? resolveCells(doc, opts).map(cell => ({ state: cell.state || null, viewport: cell.viewport.name })) : [{ state: opts?.state ?? null, viewport: opts?.viewport ?? null }]
     cells = ids.flatMap(artboardId => refs.map(ref => {
       const view = boardView(doc, { artboardId, ...ref })
-      return { artboardId, state: ref.state, viewport: { name: ref.viewport ?? 'native', width: view.width, height: view.height }, clipToBounds: view.overflow === 'clip' }
+      return { artboardId, viewportSelector: ref.viewport, state: ref.state, viewport: { name: ref.viewport ?? 'native', width: view.width, height: view.height }, clipToBounds: view.overflow === 'clip' }
     }))
   } else {
     if (opts?.artboardId !== undefined || opts?.pageId !== undefined) throw new Error('legacy document has no explicit artboard/page selector')
@@ -347,8 +338,8 @@ export async function renderDocument(
     // eslint-disable-next-line no-await-in-loop -- intentional: one shared browser, sequential contexts
     const editor = opts?.clipToViewport || cell.clipToBounds
     const bake = editor ? bakeEditorDocument : bakeDocument
-    const baked = bake(doc, { ...(cell.state !== null ? { state: cell.state } : {}), ...(cell.artboardId === undefined ? {} : { artboardId: cell.artboardId }) })
-    const html = editor ? baked.html : emitHtml(doc, injectFdnIds(baked.tree))
+    const baked = bake(doc, { ...(cell.state !== null ? { state: cell.state } : {}), ...(cell.artboardId === undefined ? {} : { artboardId: cell.artboardId, viewport: cell.viewportSelector ?? null, includeNodeIds: !editor }) })
+    const html = editor || cell.artboardId !== undefined ? baked.html : emitHtml(doc, injectFdnIds(baked.tree))
     const fontLines = detectSystemFontStackLines(doc, baked.tree, html)
     // eslint-disable-next-line no-await-in-loop -- see above
     const capture = await captureHtml(browser, html, {
@@ -358,7 +349,7 @@ export async function renderDocument(
       clipToBounds: cell.clipToBounds,
     })
     results.push({
-      ...(cell.artboardId === undefined ? {} : { artboardId: cell.artboardId }),
+      ...(cell.artboardId === undefined ? {} : { artboardId: cell.artboardId, viewport: cell.viewportSelector ?? null, includeNodeIds: !editor }),
       state: cell.state,
       viewport: cell.viewport,
       png: capture.png,

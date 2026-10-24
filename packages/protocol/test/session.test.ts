@@ -18,7 +18,7 @@ const doc: FdnDocument = {
   body: [{ ...node, children: [{ ...node, id: 'n2', text: 'hi', children: [] }] }],
   annotations: [{ id: 'a1', nodeId: 'n1', text: 'look', status: 'open' }],
 }
-const geometry = { artboardId: null, state: null, viewport: null, pageId: null, name: 'T', x: 0, y: 0, width: 1440, height: 900, visible: true, overflow: 'visible', sizeOverride: false }
+const geometry = { artboardId: null, state: null, viewport: null, pageId: null, name: 'T', x: 0, y: 0, width: 1440, height: 900, visible: true, overflow: 'visible', sizeOverride: false, padding: { top: 0, right: 0, bottom: 0, left: 0 } }
 const view = { pages: [], boards: [geometry], rev: 3, doc, head: { hash: 'h', prevHash: null, author: 'user:a', message: 'm', specVersion: '0.0.1-draft' }, history: { canUndo: true, canRedo: false, undoLabel: 'Move', redoLabel: null }, issues: [{ code: 'x', severity: 'warning', message: 'm', nodeId: 'n1' }] }
 const line = (value: unknown): string => JSON.stringify(value)
 

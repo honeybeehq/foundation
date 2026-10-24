@@ -11,7 +11,7 @@ export async function runBake(args: string[], io: CliIO): Promise<number> {
   const { positionals, flags } = parseArgs(args)
   const file = positionals[0]
   if (!file) {
-    io.stderr('usage: foundation bake <file> [--state S] [-o out]')
+    io.stderr('usage: foundation bake <file> [--state S] [--viewport V] [-o out]')
     return 2
   }
 
@@ -25,16 +25,17 @@ export async function runBake(args: string[], io: CliIO): Promise<number> {
 
   const state = flagString(flags, 'state')
   const artboardId = flagString(flags, 'artboard')
+  const viewport = flagString(flags, 'viewport')
   const out = flagString(flags, 'o', 'out', 'output')
 
   const { doc } = parseDocument(source)
-  const baked = bakeDocument(doc, { ...(state !== undefined ? { state } : {}), ...(artboardId !== undefined ? { artboardId } : {}) })
+  const baked = bakeDocument(doc, { ...(state !== undefined ? { state } : {}), ...(artboardId !== undefined ? { artboardId } : {}), ...(viewport !== undefined ? { viewport } : {}) })
 
   for (const line of baked.report.lines) {
     io.stderr(`${line.severity} ${line.code}: ${line.message}`)
   }
 
-  if (baked.report.lines.some(line => ['ambiguous-artboard', 'unknown-artboard'].includes(line.code))) return 2
+  if (baked.report.lines.some(line => ['ambiguous-artboard', 'unknown-artboard', 'unknown-viewport', 'invalid-artboard-geometry', 'invalid-artboard-padding'].includes(line.code))) return 2
 
   if (out) {
     writeFileSync(out, baked.html, 'utf8')

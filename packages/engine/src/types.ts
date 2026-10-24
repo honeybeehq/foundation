@@ -380,6 +380,13 @@ export interface BoardRef {
   viewport: string | null
 }
 
+export interface ArtboardPadding {
+  top: number
+  right: number
+  bottom: number
+  left: number
+}
+
 export interface BoardView extends BoardRef {
   pageId: string | null
   name: string
@@ -390,6 +397,7 @@ export interface BoardView extends BoardRef {
   visible: boolean
   overflow: 'clip' | 'visible'
   sizeOverride: boolean
+  padding: ArtboardPadding
 }
 
 export interface ArtboardPage {
@@ -408,6 +416,7 @@ export type ArtboardOp =
   | { op: 'rename-artboard'; id: string; name: string }
   | { op: 'move-artboard'; id: string; x: number; y: number }
   | { op: 'resize-artboard'; id: string; width: number; height: number }
+  | { op: 'set-artboard-padding'; id: string; top?: number; right?: number; bottom?: number; left?: number }
   | { op: 'move-artboard-view'; id: string; artboardId: string; state: string | null; viewport: string | null; x: number; y: number }
   | { op: 'set-artboard-view-visible'; id: string; artboardId: string; state: string | null; viewport: string | null; visible: boolean }
   | { op: 'set-artboard-view-size'; id: string; artboardId: string; state: string | null; viewport: string | null; width: number | null; height: number | null }

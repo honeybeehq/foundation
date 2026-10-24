@@ -1277,3 +1277,56 @@ HTML IDs and CSS/attribute `url(#fragment)` references refuse duplication until
 an unambiguous rewrite is supported; no heuristic string substitution runs.
 Annotations/comments are not duplicated. Redo reuses the original copied IDs
 and content, even after the original artboard changes.
+
+
+### Artboard padding
+
+An artboard accepts optional `data-fdn-padding-top`, `-right`, `-bottom` and
+`-left` attributes: finite, non-negative decimal CSS-pixel numbers without
+units or expressions. Fractions are allowed, with no additional upper bound.
+Absence means zero. Padding attributes on pages/views, unknown padding sides,
+negative values and CSS/bindings remain invalid; the wrapper-style refusal is
+unchanged.
+
+`set-artboard-padding {id,top?,right?,bottom?,left?}` requires an existing
+artboard and at least one supplied side. It expands only changed supplied
+sides to granular attributes under the existing writer lock; zero removes the
+attribute. A linked four-side edit explicitly sets all four, including any
+stale values, using the usual last-edit-wins semantics. One batch gives one
+Undo; other writers' untouched sides survive. Undo restores exact prior
+attribute strings/presence. Empty/invalid-target requests return `invalid-op`;
+malformed wire values retain the protocol fault behavior. Identical nonzero numeric
+values and absent zero values are no-ops; setting zero removes an explicitly
+stored zero attribute too. Board descriptors carry all four numeric `padding` values
+for every occurrence. Protocol remains 0.2; 0.1 retains its existing artboard
+write refusal and legacy document behavior.
+
+Explicit artboards share a standards-mode normal/editor bake and render/export
+body rule: `margin:0;box-sizing:border-box;height:HEIGHTpx;padding:TOPpx RIGHTpx
+BOTTOMpx LEFTpx`. HEIGHT is the source-owned effective `BoardView.height` for
+the selected artboard/state/viewport occurrence, including saved size overrides;
+`bakeDocument`/`bakeEditorDocument` and CLI/MCP bake accept the viewport selector.
+It is never derived from a grown iframe or vh units, so overflowing content
+cannot stretch a percentage-height Fill child on another measurement pass.
+Body width is automatic at the selected viewport width; no width is emitted.
+Flow starts at padding; percentage sizes resolve against the fixed content box,
+and Free absolute offsets keep their containing-block origin. Bottom padding
+is an inset within the declared board height. Overflow remains visible when
+requested and exports use the established scroll-height capture policy.
+
+The body rule is last in Foundation's style block, winning earlier body rules
+of equal specificity. External CSS follows the normal cascade. No content
+wrapper is added. Native/view/viewport height changes invalidate affected
+occurrences' baked HTML; viewport declaration edits conservatively rebake all
+subscribed boards, without masters. Width-only geometry changes update the
+iframe without a new body-height bake. Padding invalidates only its artboard's
+subscribed states. Explicit exports share the frame rule and standards mode while retaining
+each export's capture bounds. Visible exports use normal bake with
+`includeNodeIds`, preserving normal instance layout IDs; clip exports keep
+the editor path.
+
+Legacy documents retain byte-identical normal/editor bakes and their existing
+render modes and body margins. The artboard-only mode gate is deliberate:
+the T97 corpus and T103 Fill probes show legacy layout changes under a global
+standards-mode conversion. Upgrading a legacy document now deliberately
+normalizes the artboard body margin and height; its rendered layout can change.

@@ -83,30 +83,30 @@ function pushReport(ctx: BakeCtx, line: ReportLine): void {
   ctx.reports.push(line)
 }
 
-export function bakeDocument(doc: FdnDocument, opts?: { state?: string; artboardId?: string | null }): { html: string; tree: FdnNode[]; state: string | null; artboardId: string | null; report: ConformanceReport } {
+export function bakeDocument(doc: FdnDocument, opts?: { state?: string; artboardId?: string | null; viewport?: string | null; includeNodeIds?: boolean }): { html: string; tree: FdnNode[]; state: string | null; artboardId: string | null; report: ConformanceReport } {
   const issue = validateTokenCollections(doc)[0]
   if (issue) throw new Error(issue.message)
   let selected: ReturnType<typeof selectArtboard>
-  try { selected = selectArtboard(doc, opts?.artboardId) } catch (err) {
-    return { html: '', tree: [], state: opts?.state ?? null, artboardId: opts?.artboardId ?? null, report: { lines: [{ code: String(err).includes('ambiguous-artboard') ? 'ambiguous-artboard' : 'unknown-artboard', severity: 'error', message: String(err) }] } }
+  try { selected = selectArtboard(doc, opts?.artboardId, opts) } catch (err) {
+    return { html: '', tree: [], state: opts?.state ?? null, artboardId: opts?.artboardId ?? null, report: { lines: [{ code: String(err).match(/ambiguous-artboard|unknown-artboard|unknown-viewport|invalid-artboard-geometry|invalid-artboard-padding/)?.[0] ?? 'invalid-artboard', severity: 'error', message: String(err) }] } }
   }
   doc = selected.doc
   const stateName = opts?.state ?? null
   const { tree, capsuleCss, report } = bakeTree(doc, stateName, false)
-  return { html: emitHtml(doc, tree, capsuleCss), tree, state: stateName, artboardId: selected.artboardId, report }
+  return { html: emitHtml(doc, tree, capsuleCss, selected.view, opts?.includeNodeIds), tree, state: stateName, artboardId: selected.artboardId, report }
 }
 
-export function bakeEditorDocument(doc: FdnDocument, opts?: { state?: string; artboardId?: string | null }): { html: string; tree: FdnNode[]; state: string | null; artboardId: string | null; report: ConformanceReport } {
+export function bakeEditorDocument(doc: FdnDocument, opts?: { state?: string; artboardId?: string | null; viewport?: string | null }): { html: string; tree: FdnNode[]; state: string | null; artboardId: string | null; report: ConformanceReport } {
   const issue = validateTokenCollections(doc)[0]
   if (issue) throw new Error(issue.message)
   let selected: ReturnType<typeof selectArtboard>
-  try { selected = selectArtboard(doc, opts?.artboardId) } catch (err) {
-    return { html: '', tree: [], state: opts?.state ?? null, artboardId: opts?.artboardId ?? null, report: { lines: [{ code: String(err).includes('ambiguous-artboard') ? 'ambiguous-artboard' : 'unknown-artboard', severity: 'error', message: String(err) }] } }
+  try { selected = selectArtboard(doc, opts?.artboardId, opts) } catch (err) {
+    return { html: '', tree: [], state: opts?.state ?? null, artboardId: opts?.artboardId ?? null, report: { lines: [{ code: String(err).match(/ambiguous-artboard|unknown-artboard|unknown-viewport|invalid-artboard-geometry|invalid-artboard-padding/)?.[0] ?? 'invalid-artboard', severity: 'error', message: String(err) }] } }
   }
   doc = selected.doc
   const stateName = opts?.state ?? null
   const { tree, capsuleCss, report } = bakeTree(doc, stateName, true)
-  return { html: emitEditorHtml(doc, tree, capsuleCss), tree, state: stateName, artboardId: selected.artboardId, report }
+  return { html: emitEditorHtml(doc, tree, capsuleCss, selected.view), tree, state: stateName, artboardId: selected.artboardId, report }
 }
 
 export function bakeEditorComponent(doc: FdnDocument, name: string): { html: string; tree: FdnNode[]; report: ConformanceReport } {
