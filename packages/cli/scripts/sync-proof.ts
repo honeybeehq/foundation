@@ -6,6 +6,7 @@ import { join, resolve } from 'node:path'
 import assert from 'node:assert/strict'
 import { loadChain } from 'foundation-engine'
 import { encodeBlob } from '../../engine/src/chain/blob.js'
+import { catalogueLog, catalogueHash, catalogueBytes, type CatalogueRecord } from '../src/sync/catalogue.js'
 import { CombBridge } from '../src/sync/bridge.js'
 
 const root = mkdtempSync(resolve('.audit/sync-run-'))
@@ -32,8 +33,8 @@ const sa = join(root, 'store-a'), sb = join(root, 'store-b'), objects = join(roo
 mkdirSync(configDir); mkdirSync(objects)
 writeFileSync(join(configDir, 'config.toml'), `tenant = "foundation-proof"\ndigest_key = "${randomBytes(32).toString('hex')}"\n[backend]\nkind = "local"\nroot = "${objects}"\n`)
 const config = join(root, 'bridge.json'); writeFileSync(config, JSON.stringify({ binary, args: ['--dir', configDir] }))
-function daemon(store: string): ChildProcess {
-  const child = spawn(process.execPath, ['--import', 'tsx', main, 'sync', 'serve', '--comb-config', config], { env: { ...process.env, FOUNDATION_REPLICA_STORE: store }, stdio: ['ignore', 'pipe', 'pipe'] }); children.push(child)
+function daemon(store: string, configFile = config): ChildProcess {
+  const child = spawn(process.execPath, ['--import', 'tsx', main, 'sync', 'serve', '--comb-config', configFile], { env: { ...process.env, FOUNDATION_REPLICA_STORE: store, FOUNDATION_NODE_ID: store === sa ? 'owner-A' : 'owner-B', FOUNDATION_NODE_NAME: store === sa ? 'Node A' : 'Node B' }, stdio: ['ignore', 'pipe', 'pipe'] }); children.push(child)
   child.stderr!.on('data', bytes => log(`daemon ${store === sa ? 'A' : 'B'}: ${String(bytes).trim()}`)); return child
 }
 function session(file: string): { events: Record<string, unknown>[] } {
@@ -66,11 +67,42 @@ try {
   cli(sb, 'edit', b, '--ops', JSON.stringify([{ op: 'set-text', id: 'n2', text: 'from B' }]), '--author', 'proof-B')
   await until(() => text(a, 'n2') === 'from B', 'B save imported by A')
   assert.deepEqual(chain(a).doc(), chain(b).doc()); log('CONVERGED both directions through real CLI')
+  async function catalogueRows(): Promise<CatalogueRecord[]> {
+    const reader = new CombBridge(binary, ['--dir', configDir]); const records: CatalogueRecord[] = []
+    try {
+      await reader.hello(); let cursor = '1'
+      for (;;) {
+        const frame = await reader.request('read', { log: catalogueLog('proof'), cursor, max_events: 128, max_bytes: 491520 })
+        for (const event of frame.events as { payload_hex: string }[]) records.push(JSON.parse(Buffer.from(event.payload_hex, 'hex').toString()))
+        if (frame.at_head) return records
+        cursor = frame.next_cursor as string
+      }
+    } finally { reader.close() }
+  }
+  let catalogue: CatalogueRecord[] = []
+  for (let attempt = 0; attempt < 100; attempt++) {
+    catalogue = await catalogueRows()
+    if (new Set(catalogue.filter(record => record.docId === chain(a).docId()).map(record => record.replicaId)).size === 2) break
+    await wait(50)
+  }
+  assert.equal(new Set(catalogue.map(record => record.replicaId)).size, 2)
+  assert.deepEqual(new Set(catalogue.map(record => record.originNode.id)), new Set(['owner-A', 'owner-B']))
+  for (const record of catalogue) {
+    assert.equal(record.version, 1); assert.ok(!record.repoRelativePath.startsWith('/') && !record.repoRelativePath.split('/').includes('..'))
+    assert.ok(!JSON.stringify(record).includes(root)); assert.equal(record.lastAgentEdit, null)
+  }
+  const initialReplicas = new Set(catalogue.map(record => record.replicaId))
+  log(`CATALOGUE: ${catalogue.length} records advertise two replicas, confined relative paths and distinct owner nodes`)
+
   const bridge = new CombBridge(binary, ['--dir', configDir]); await bridge.hello()
   const status = JSON.parse(cliQuiet(sa, 'sync', 'status', '--json'))[0]
   const { combLog, copyKey } = await import('../src/sync/daemon.js')
   const change = chain(a).changes().at(-1)!
   const append = { log: combLog(status), idempotency_key: change.envelope.hash, payload_hex: Buffer.from(encodeBlob(change.envelope, change.bytes)).toString('hex') }
+  const record = catalogue.at(-1)!
+  const catalogueAppend = { log: catalogueLog('proof'), idempotency_key: catalogueHash(record), payload_hex: Buffer.from(catalogueBytes(record)).toString('hex') }
+  const catFirst = await bridge.request('append', catalogueAppend), catAgain = await bridge.request('append', catalogueAppend)
+  assert.equal(catFirst.first, catAgain.first); log(`CATALOGUE DUPLICATE: stable record sequence ${catFirst.first}`)
   const first = await bridge.request('append', append), again = await bridge.request('append', append)
   assert.equal(first.first, again.first); assert.equal(first.cursor, again.cursor); log(`DUPLICATE stable append original sequence=${first.first}, repeated sequence=${again.first}`); await bridge.finish()
   await wait(700)
@@ -104,6 +136,20 @@ try {
   log('PASS convergence, duplicate append, outage saves, restart recovery, untouched idle copy')
   log(`FINAL STATUS A ${cliQuiet(sa, 'sync', 'status', '--json').trim()}`)
   log(`FINAL STATUS B ${cliQuiet(sb, 'sync', 'status', '--json').trim()}`)
+  for (let attempt = 0; attempt < 100; attempt++) {
+    catalogue = await catalogueRows()
+    const current = new Map<string, CatalogueRecord>()
+    for (const record of catalogue) if (initialReplicas.has(record.replicaId)) current.set(record.replicaId, record)
+    if (current.size === 2 && [...current.values()].every(record => record.headHash === chain(a).head().hash)) break
+    await wait(50)
+  }
+  for (const replicaId of initialReplicas) {
+    const records = catalogue.filter(record => record.replicaId === replicaId)
+    assert.equal(records.at(-1)!.headHash, chain(a).head().hash)
+    for (let index = 1; index < records.length; index++) assert.ok(records[index]!.generation > records[index - 1]!.generation)
+  }
+  assert.ok(catalogue.every(record => !record.deleted)); log('CATALOGUE RECOVERY: generations survive restart, both latest heads advertised; close is not deletion')
+
   const poison = join(root, 'blocked.fdn.html')
   cli(sa, 'new', poison); cli(sa, 'sync', 'open', poison, '--workspace', 'proof', '--product', 'foundation')
   await until(() => JSON.parse(cliQuiet(sa, 'sync', 'status', '--json')).some((row: any) => row.file === poison && row.status === 'shared'), 'second design ready')
@@ -122,6 +168,34 @@ try {
   await contender.request('append', { log: 'foundation-lease-crash-probe', idempotency_key: '02', payload_hex: '02' })
   log(`WRITER CRASH: next writer acquired after ${Math.round(performance.now() - takeover)}ms with 3s lease`); await contender.finish()
   log('PASS extra checks: invalid feed isolated; abrupt writer crash recovers after lease expiry')
+  cli(sa, 'sync', 'close', poison)
+  da.kill('SIGKILL'); await new Promise(resolve => da.once('exit', resolve))
+  const wrapper = join(root, 'hung-catalogue.mjs'), marker = join(root, 'catalogue-request-held'), releaseCatalogue = join(root, 'release-catalogue'), wrappedConfig = join(root, 'hung-config.json')
+  writeFileSync(wrapper, `import{spawn}from'node:child_process';import{createInterface}from'node:readline';import{writeFileSync,existsSync}from'node:fs';const child=spawn(${JSON.stringify(binary)},process.argv.slice(2),{stdio:'pipe'});child.stdout.pipe(process.stdout);child.stderr.pipe(process.stderr);const held=[];const release=${JSON.stringify(releaseCatalogue)};const timer=setInterval(()=>{if(existsSync(release))for(const line of held.splice(0))child.stdin.write(line+'\\n')},25);const lines=createInterface({input:process.stdin});lines.on('line',line=>{const request=JSON.parse(line);if(request.op==='append'&&request.log===${JSON.stringify(catalogueLog('proof'))}&&!existsSync(release)){held.push(line);writeFileSync(${JSON.stringify(marker)},'held')}else child.stdin.write(line+'\\n')});lines.on('close',()=>{clearInterval(timer);child.stdin.end()});`)
+
+  writeFileSync(wrappedConfig, JSON.stringify({ binary: process.execPath, args: [wrapper, '--dir', configDir] }))
+  da = daemon(sa, wrappedConfig)
+  cli(sa, 'edit', a, '--ops', JSON.stringify([{ op: 'set-text', id: 'n1', text: 'catalogue request will hang' }]))
+  await until(() => existsSync(marker), 'catalogue append deliberately held without response')
+  cli(sa, 'edit', a, '--ops', JSON.stringify([{ op: 'set-text', id: 'n2', text: 'document still uploads' }]))
+  const unaffected = await until(() => text(b, 'n2') === 'document still uploads', 'document import while catalogue append is hung')
+  assert.ok(unaffected < 1500); log('PASS catalogue append cannot stall document publication')
+  const queued = join(root, 'queued.fdn.html'); cli(sa, 'new', queued); cli(sa, 'sync', 'open', queued, '--workspace', 'proof', '--product', 'foundation')
+  await until(() => JSON.parse(cliQuiet(sa, 'sync', 'status', '--json')).some((row: any) => row.file === queued && row.status === 'shared'), 'another design uploads while catalogue writer is held')
+  writeFileSync(releaseCatalogue, 'release')
+  for (let attempt = 0; attempt < 100; attempt++) {
+    catalogue = await catalogueRows()
+    const latestA = catalogue.filter(record => record.replicaId === [...initialReplicas].find(id => catalogue.some(row => row.replicaId === id && row.originNode.id === 'owner-A'))).at(-1)
+    if (catalogue.some(record => record.docId === chain(queued).docId()) && latestA?.headHash === chain(a).head().hash) break
+    await wait(50)
+  }
+  assert.ok(catalogue.some(record => record.docId === chain(queued).docId()))
+  const ownerA = catalogue.filter(record => record.docId === chain(a).docId() && record.originNode.id === 'owner-A').at(-1)!
+  assert.equal(ownerA.headHash, chain(a).head().hash)
+  log('PASS released catalogue writer publishes latest queued heads and another design')
+
+  da.kill('SIGKILL')
+
 
 } finally {
   chmodSync(objects, 0o755)

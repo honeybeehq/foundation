@@ -67,3 +67,7 @@ export class CombBridge {
     if (frame.protocol !== 1 || caps?.durable_idempotency !== true || caps.bounded_memory_read !== true) throw new Error('Comb bridge lacks required capabilities')
   }
 }
+
+export function validateAppendReceipt(receipt: Frame, log: string): void {
+  if (receipt.log !== log || typeof receipt.first !== 'string' || !/^[1-9][0-9]*$/.test(receipt.first) || receipt.last !== receipt.first || receipt.cursor !== String(BigInt(receipt.first) + 1n)) throw new Error('invalid Comb append receipt')
+}
