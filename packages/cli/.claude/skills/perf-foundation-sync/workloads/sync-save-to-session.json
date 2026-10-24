@@ -9,7 +9,7 @@
     "node-remote"
   ],
   "owners": [
-    "packages/cli/src/sync/daemon.ts@8c002dd1a230b2d337e8f6a8524fbf460af6ce22",
+    "packages/cli/src/sync/daemon.ts@c8f0697a54f59abca7e9bf1002a94a44b5b7710c",
     "packages/cli/src/sync/bridge.ts@3596e7c7002abd338a9ea597d3162d1a4be45245",
     "packages/cli/src/sync/direct.ts@2883981752375fa7a9b031eb20b42178ddf1e7da",
     "packages/cli/src/session/session.ts@9e0d61ffea0058d1eef5e614f024d81dc0aecfe3",
@@ -32,7 +32,8 @@
     "exclusions": [
       "renderer paint",
       "metadata catalogue latency",
-      "CLI process startup"
+      "CLI process startup",
+      "startup failure/retry latency (separately tested)"
     ]
   },
   "accounts": [
@@ -511,9 +512,10 @@
   "linked": [],
   "gaps": [
     "Catalogue retention/large-history scaling are separate costs",
-    "Synchronous inbound concurrency and diagnostic PID reuse remain unmeasured"
+    "Synchronous inbound concurrency and diagnostic PID reuse remain unmeasured",
+    "Startup wrapper changed after timing; repeated worker source equivalence is recorded in packages/cli/performance/S3c-runtime-scope.json, with failure recovery tested separately"
   ],
   "updatedAt": "2026-10-24",
   "updatedBy": "S3c worker",
-  "readiness": "Same-build on/off61\u2192107 series complete; direct lane passes all four ruled limits. Durable-only bidirectional and outages pass; cold drain attribution is a separate accepted follow-up."
+  "readiness": "Same-build30bea85 on/off visibility data passes direct budgets. Later125cdeb startup-error wrapper is independently tested/reviewed; repeated worker body and5transport files are byte-identical (runtime-scope receipt). No startup-failure latency claim."
 }

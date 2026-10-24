@@ -1,0 +1,15 @@
+{
+  "measuredRuntime": "30bea85f5634b20d4e7bf552e40e4809eccac3a6",
+  "startupFix": "125cdebf963a596a77545fd60a7d61b8763004e2",
+  "scope": "repeated save-to-session path after successful worker initialization; startup failures excluded from timing lane and separately tested",
+  "workerBodySha256": "399ab5e154b721fe06bc709a49097b974cc12f3294fd4a025fa4c45ca716c49d",
+  "workerBodyIdentical": true,
+  "identicalWholeFileSha256": {
+    "packages/cli/src/sync/direct.ts": "a0a09ad9e249e81c48b145b5374a156af50b796066fc409c7bc4821f9dc2ec86",
+    "packages/cli/src/sync/bridge.ts": "5a7d74e2e7aa38ece2ff362aed67d1fe0322aae5a63dd3014f3359bf04ca6f12",
+    "packages/engine/src/chain/blob.ts": "cb4254c8fede7abcb0ba73a686667f6c29e4e7758e3c99c705294ed56e5c8723",
+    "packages/cli/src/disk.ts": "d5ba6b866c164565f742f179b7f65b91b74d275fba10d58318e679f872a2a4fe",
+    "packages/cli/src/session/session.ts": "e67beb67cc99b37f7ffbc3d67705441b0af0c90486330efdfcee0eab8c106f0f"
+  },
+  "changedPath": "supervisor catch/retry wrapper only; no transport/verification/save/session hot-path changes"
+}

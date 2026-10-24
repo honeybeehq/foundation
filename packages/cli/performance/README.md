@@ -61,3 +61,9 @@ Same-build direct-off control: `S3c-off-control-samples.json` and its recomputed
 host,3warmups+20measured/direction, traceoff and proxy19344. The feature-on lane
 is the ruled fast-path budget; off-mode proves delivery and supplies the control,
 not an assertion that storage-only visibility always meets that budget.
+
+Final startup-only correction125cdeb is later than the measured30bea85 runtime.
+`S3c-runtime-scope.json` hashes the exact unchanged repeated-worker body and five
+transport/save/session files. The supervisor retry path was independently reviewed
+and tested with a busy lock and corrupt checkpoint, plus a new real local-backend
+two-process CLI run. Two-host performance numbers remain explicitly attributed to30.

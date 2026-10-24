@@ -37,8 +37,11 @@ Both use all retained before/after RTT brackets plus the 2ms quantization guard.
 An earlier pre-feature timing reference at a1cb806 is retained as historical
 context in S3c-baseline*.json, including failed startup warmups; it is not the
 same-build control in the table above. The exact measured source includes S1d.
-Later local changes harden tests, record evidence and clarify documentation;
-CLI/engine runtime source matches the measured 30bea85 build.
+A later startup-error fix at 125cdeb wraps the supervisor retry/error path.
+The complete repeated-worker body and five transport/save/session files remain
+byte-identical to 30bea85 (`S3c-runtime-scope.json`). Startup-failure behavior was
+separately tested with two regressions and a real two-process Comb run; no new
+two-machine timing is claimed for that failure path.
 
 ## Why the path became faster
 
@@ -144,3 +147,21 @@ Attention: reviewed by claude-opus-5-5 (source and result framing only; no indep
 runtime execution by that reviewer). Cold durable-drain attribution remains a
 follow-up accepted by the orchestrator. The true simultaneous-conflict chapter
 belongs to the separately resealed S5 proof, not this latency claim.
+
+## Final startup recovery correction
+
+An exact final-source review found a Medium: startup document/checkpoint failures
+left the worker stopped in the supervisor map, possibly retaining a stale shared
+status. Commit 125cdeb retries that initialization with jittered exponential
+backoff capped at 5s and records connectionError/lastErrorAt without resetting
+cursors or published hashes. Corrupt checkpoints are preserved and reported.
+The same daemon resumes after lock release or explicit checkpoint repair.
+
+Two regressions cover the held G16 lock and corrupt-checkpoint cases;25 focused
+tests across 9 files and pnpm typecheck pass. A new real local-backend run used two
+processes and real CLI edits: save→session 262ms, reverse import 265ms, stable
+duplicate append, outage/restart recovery, post-merge byte identity and catalogue
+isolation passed (single-machine scope, not another two-machine timing series).
+The source reviewer read the actual final direct/daemon/blob code, identified
+this Medium, then reviewed the actual correction hunk and passed it without
+running tests. A Low remains: startup retry sleep can delay shutdown by up to 5s.
