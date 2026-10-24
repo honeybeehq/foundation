@@ -68,7 +68,7 @@ export class CataloguePublisher {
       this.state = { replicaId: randomUUID(), generation: 0, pending: null, acknowledged: null }; this.save()
     }
   }
-  private save(): void { writeAtomic(this.path, JSON.stringify(this.state)) }
+  private save(next = this.state): void { writeAtomic(this.path, JSON.stringify(next)); this.state = next }
   private async publishPending(): Promise<void> {
     const record = this.state.pending
     if (!record) return
@@ -80,7 +80,7 @@ export class CataloguePublisher {
       const log = catalogueLog(this.design.workspace)
       const receipt = await writer.request('append', { log, idempotency_key: hash, payload_hex: Buffer.from(catalogueBytes(record)).toString('hex') })
       validateAppendReceipt(receipt, log)
-      this.state.acknowledged = hash; this.save()
+      this.save({ ...this.state, acknowledged: hash })
     } finally { await writer.finish() }
   }
   async update(chain: FdnChain): Promise<void> {
@@ -89,8 +89,8 @@ export class CataloguePublisher {
     const candidate = catalogueRecord(this.design, chain, this.state.replicaId, this.state.generation, this.config.node)
     if (this.state.pending && catalogueHash(candidate) === catalogueHash(this.state.pending)) return
     if (this.state.generation === Number.MAX_SAFE_INTEGER) throw new Error('catalogue generation exhausted')
-    this.state.generation++; candidate.generation = this.state.generation
-    this.state.pending = candidate; this.save()
+    candidate.generation = this.state.generation + 1
+    this.save({ ...this.state, generation: candidate.generation, pending: candidate })
     await this.publishPending()
   }
 }
