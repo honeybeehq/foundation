@@ -49,6 +49,12 @@ describe('foundation mcp (real stdio child process)', () => {
   it('completes the MCP initialize handshake and advertises the tool capability', () => {
     const capabilities = client.getServerCapabilities()
     expect(capabilities?.tools).toBeDefined()
+    const info = client.getServerVersion()
+    expect(info?.version).toMatch(/^0\.1\.0\+/)
+    const runtime = JSON.parse(info?.description || '{}')
+    expect(runtime.sessionProtocols).toEqual(['0.2', '0.1'])
+    expect(runtime.documentFormats).toContain('0.1.0-artboards')
+    expect(runtime.artboardWriteSafe).toBe(true)
   })
 
   it('lists the fixed foundation_* tool set with non-empty descriptions and object input schemas', async () => {

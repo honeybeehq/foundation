@@ -120,7 +120,7 @@ export async function runDoctor(args: string[], io: CliIO): Promise<number> {
   const configs = new Set([registry])
   // Read configuration files only, including the repository root one level
   // below each Cell. Never descend into source trees or follow directory links.
-  const names = ['.mcp.json', 'mcp.json', 'gateways.json', '.claude.json', '.claude/settings.json', '.claude/settings.local.json', '.codex/config.toml']
+  const names = ['.mcp.json', 'mcp.json', 'gateways.json', '.hive-gateways.json', '.claude.json', '.claude/settings.json', '.claude/settings.local.json', '.codex/config.toml']
   const addConfigs = (root: string) => { for (const name of names) configs.add(join(root, name)) }
   const directories = (root: string): string[] => {
     try { return readdirSync(root, { withFileTypes: true }).filter(item => item.isDirectory()).map(item => join(root, item.name)) } catch { return [] }
