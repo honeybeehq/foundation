@@ -202,6 +202,19 @@ preserves existing identities. Reading/parsing existing files stays deterministi
 Explicit operation ids and duplicate id maps remain client-owned; clients mint
 UUIDs for new objects. Token/style/component names are semantic keys, not minted ids.
 
+**Local writer locks:** document writers and the sync daemon singleton record a
+stable hashed OS machine identity (or explicit `FOUNDATION_NODE_ID`), boot identity
+where available, Linux PID namespace, and display hostname. Only the same machine
+and namespace may reclaim a dead PID or a previous-boot owner. Without an OS
+identity, an atomically persisted `~/.foundation/machine-id` fallback additionally
+requires the same hostname and boot; a rename then needs manual recovery. Explicit
+node ids must be unique per machine: sharing an override defeats this distinction.
+Legacy owners without a machine id are reclaimed only for the same hostname and a
+dead PID; a foreign hostname remains blocked even on a local filesystem. Busy
+errors show the lock path, recorded owner and manual removal command; stop and
+confirm the owner before removing it. A live reused PID conservatively remains
+busy until manual recovery; no process-start-time inference is made.
+
 **Chain-format cutover (2026-10-24):** new and local-only writers keep the v1
 array header. Existing v2 files never downgrade. Sync registration (including
 `foundation sync open`), explicit exchange, automatic sync, or
