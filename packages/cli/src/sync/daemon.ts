@@ -34,7 +34,20 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
   async function run(design: LiveDesign, signal: AbortSignal): Promise<void> {
     const key = copyKey(design), state = readSyncState(key), feed = combLog(design)
     let bridge: CombBridge | undefined, watcher: FSWatcher | undefined, wake: (() => void) | undefined
-    let backoff = 250
+    const retry = { receive: 250, publish: 250, connection: 250 }
+    if (state.lastError && !state.receiveError && !state.publishError && !state.connectionError) state.connectionError = state.lastError
+    const updateError = (side: 'receive' | 'publish' | 'connection', error: string | null): void => {
+      const field = `${side}Error` as const
+      const previous = state.lastError
+      state[field] = error
+      if (error) state.lastErrorAt = new Date().toISOString()
+      state.lastError = [state.receiveError, state.publishError, state.connectionError].filter(Boolean).join('; ') || null
+      if (state.lastError !== previous || error) writeSyncState(key, state)
+    }
+    const succeeded = (side: 'receive' | 'publish'): void => {
+      retry[side] = 250; retry.connection = 250
+      updateError('connection', null); updateError(side, null)
+    }
     let catalogueHead: string | undefined
     const stop = (): void => { bridge?.close(); wake?.() }
     signal.addEventListener('abort', stop)
@@ -62,11 +75,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
                 state.published = [...shared]
                 state.cursor = incoming.next; state.updatedAt = new Date().toISOString(); writeSyncState(key, state)
               }
-              // A healthy follower must not erase an unresolved publisher failure.
-              if (state.pending === 0) {
-                backoff = 250
-                if (state.lastError !== null) { state.lastError = null; writeSyncState(key, state) }
-              }
+              succeeded('receive')
             }
           })().catch(err => { failed = err; receiveError = err; active.close(); wake?.() })
           try {
@@ -91,7 +100,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
                     const receipt = await writer.request('append', { log: feed, idempotency_key: change.envelope.hash, payload_hex: Buffer.from(bytes).toString('hex') })
                     validateAppendReceipt(receipt, feed)
                     if (!state.published.includes(change.envelope.hash)) state.published.push(change.envelope.hash)
-                    state.pending = Math.max(0, state.pending - 1); state.updatedAt = new Date().toISOString(); state.lastError = null; backoff = 250; writeSyncState(key, state)
+                    state.pending = Math.max(0, state.pending - 1); state.updatedAt = new Date().toISOString(); succeeded('publish'); writeSyncState(key, state)
                   }
                 } finally { await writer.finish() }
                 publishingHash = undefined
@@ -114,9 +123,11 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
         } catch (err) {
           bridge?.close()
           if (signal.aborted) break
-          state.lastError = `${err === receiveError ? `receive cursor ${state.cursor}` : publishingHash ? `publish change ${publishingHash}` : 'connection'}: ${err instanceof Error ? err.message : String(err)}`; state.lastErrorAt = new Date().toISOString(); writeSyncState(key, state)
+          const side = err === receiveError ? 'receive' : publishingHash ? 'publish' : 'connection'
+          const context = side === 'receive' ? `receive cursor ${state.cursor}` : publishingHash ? `publish change ${publishingHash}` : 'connection'
+          updateError(side, `${context}: ${err instanceof Error ? err.message : String(err)}`)
           log(`${feedName(design)}: ${state.lastError}`)
-          await delay(backoff); backoff = Math.min(backoff * 2, 10000)
+          await delay(retry[side]); retry[side] = Math.min(retry[side] * 2, 10000)
         }
       }
     } finally { watcher?.close(); signal.removeEventListener('abort', stop) }
