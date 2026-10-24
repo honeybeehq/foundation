@@ -1,3 +1,4 @@
+export { mintNodeId, mintAnnotationId } from './ids.js'
 import type { ArtboardOp, BoardRef, BoardView, ArtboardPage } from './document.ts'
 import type { ChainLogEntry, EnvelopeRecord, FdnDocument, ComponentSwapTarget, InstanceDetachReport, InstanceSwapReport, InstanceOverridePatch, PatchOp, ReportLine } from './document.ts'
 

@@ -82,7 +82,8 @@ describe('foundation import', () => {
     const badge = doc.components.find((c) => c.name === 'Badge')
     expect(badge).toBeDefined()
     expect(badge?.sealed).toBeUndefined()
-    expect(doc.lookups.map((l) => l.name).sort()).toEqual(['BadgeLookup1', 'BadgeLookup2'])
+    expect(doc.lookups).toHaveLength(2)
+    expect(doc.lookups.every(item => /^lookup_[a-f0-9_]+$/.test(item.name))).toBe(true)
 
     const result = validateDocument(doc)
     expect(result.issues).toStrictEqual([])
@@ -174,7 +175,7 @@ describe('foundation import', () => {
     expect(after2).toBe(after1)
   })
 
-  it('a genuine lookup name collision (same generated name, different entries) errors with a hint (exit 1)', async () => {
+  it('new generated lookups do not collide with a legacy counter name', async () => {
     // Hand-seed a conflicting lookup under the exact name the importer would
     // generate for Badge's first lookup, so the merge step has to detect it.
     const { doc } = parseDocument(readFileSync(file, 'utf8'))
@@ -183,11 +184,10 @@ describe('foundation import', () => {
 
     const io = captureIo()
     const code = await runImport([fixture('badge.tsx'), '--into', file], io)
-    expect(code).toBe(1)
-    expect(io.err.some((l) => l.includes('lookup name collision') && l.includes('BadgeLookup1'))).toBe(true)
-    // refused entirely — the document must be untouched
+    expect(code).toBe(0)
     const { doc: after } = parseDocument(readFileSync(file, 'utf8'))
-    expect(after.components.find((c) => c.name === 'Badge')).toBeUndefined()
+    expect(after.components.find((c) => c.name === 'Badge')).toBeDefined()
+    expect(after.lookups.find(item => item.name === 'BadgeLookup1')?.entries).toEqual({ bogus: 'entry' })
   })
 
   it('chain-commits with the documented message shape and default author when a chain exists', async () => {
