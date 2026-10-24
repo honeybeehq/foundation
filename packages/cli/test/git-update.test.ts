@@ -32,6 +32,10 @@ it.each(['synced', 'local-chain', 'local-text', 'blocked', 'command-fails', 'kil
    git(b,'fetch');const target=git(b,'rev-parse','origin/main')
    const script=mode==='killed-update' ? 'process.kill(process.ppid,"SIGKILL")' : `require('node:child_process').execFileSync('git',['merge','--ff-only',${JSON.stringify(target)}]);process.exit(7)`
    expect(run(b,process.execPath,[tsx,main,'git','prepare-update',target,'--',process.execPath,'-e',script],false).status).not.toBe(0)
+   if(mode==='head-moved') {
+     expect(loadChain(readFileSync(join(b,'board.fdn.html.chain'))).doc().tokens['local-b']).toBe('blue')
+     expect(readFileSync(join(b,'board.fdn.html'),'utf8')).toContain('Local uncommitted text')
+   }
    const journal=join(b,'.git','foundation-updates',readdirSync(join(b,'.git','foundation-updates'))[0]!)
    cli(b,'git','recover-update',journal)
    const recovered=readFileSync(join(b,'board.fdn.html')),recoveredChain=readFileSync(join(b,'board.fdn.html.chain'))
