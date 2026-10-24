@@ -47,11 +47,14 @@ checkout edits are excluded. Releases live in
 `~/.local/share/foundation/versions/<sha>`; `~/.local/bin/foundation` follows the
 `current` release and the Hive MCP gateway uses that stable executable.
 Installed sessions never rebuild from source mtimes. Use `--from` when upgrading
-from an installed copy; the source must contain the requested commit.
+from an installed copy; the source must contain the requested commit. Revisions
+that predate runtime attestation are refused rather than stamped with guessed
+compatibility.
 
 `foundation --version` and `foundation version --json` report the source SHA,
 dirty state, package version, supported session protocols and document formats.
-The session welcome and MCP server information carry the same runtime identity.
+The session welcome and MCP server information carry the same runtime identity
+(MCP version contains the SHA; description contains the complete JSON report).
 `foundation doctor --inventory --json` reads executable/configuration candidates
 on the current node without running or changing discovered copies; unknown
 revision or format safety stays unknown.
