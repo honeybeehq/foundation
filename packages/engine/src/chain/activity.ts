@@ -13,7 +13,7 @@ export class ChainActivity {
   private owners = new Map<ContainerID, string | null>()
   private entries = new Map<string, ChainLogEntry>()
 
-  constructor(private readonly doc: LoroDoc) {}
+  constructor(private readonly doc: LoroDoc, private readonly originalBytes: (change: Change) => Uint8Array) {}
 
   page(opts: ChainLogOptions = {}, anchors: ReadonlyMap<string, readonly { peer: string; counter: number }[]> = new Map()): ChainLogPage {
     const requested = opts.limit ?? 50
@@ -145,7 +145,7 @@ export class ChainActivity {
     for (const id of inserted) changed.delete(id)
     for (const id of removed) changed.delete(id)
     const decoded = decodeEnvelope(change.message)
-    const bytes = this.doc.export({ mode: 'updates-in-range', spans: [{ id: { peer: change.peer, counter: change.counter }, len: change.length }] })
+    const bytes = this.originalBytes(change)
     const entry: ChainLogEntry = {
       hash: computeEnvelopeHash(decoded.prevHash, decoded.author, decoded.message, decoded.specVersion, bytes),
       ...decoded,

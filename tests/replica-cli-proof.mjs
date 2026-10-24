@@ -44,6 +44,13 @@ try {
   }
   assert.equal(new Set(insertedIds).size, 2, 'offline writers must mint distinct node ids')
   for (const [file, origin] of [[a, 'Studio'], [b, 'metal-3'], [a, 'Studio']]) run(origin, 'chain', 'sync', file, shared)
+  // Changes authored after a multi-peer merge must keep the same identity on every hop.
+  for (const [file, origin, author] of [[a, 'Studio', 'user:alice'], [b, 'metal-3', 'user:bob']]) {
+    run(origin, 'edit', file, '--author', author, '--label', `${origin} after offline merge`,
+      '--ops', JSON.stringify([{ op: 'set-token', name: `post-merge-${origin}`, value: 'shared' }]))
+    for (const [path, node] of [[file, origin], [file === a ? b : a, file === a ? 'metal-3' : 'Studio'], [file, origin]]) run(node, 'chain', 'sync', path, shared)
+  }
+  const heads = []
   for (const [file, origin] of [[a, 'Studio'], [b, 'metal-3']]) {
     const annotations = run(origin, 'annotations', file).trim().split('\n')
     assert.equal(annotations.length, 2)
@@ -57,6 +64,7 @@ try {
     console.log(`CLI-generated source on ${origin} after sync:`)
     for (const match of inserted) console.log(match[0])
     const page = JSON.parse(run(origin, 'chain', file, 'log', '--json'))
+    heads.push(page.entries[0].hash)
     for (const [author, node] of [['user:alice', 'Studio'], ['user:bob', 'metal-3']]) {
       assert(page.entries.some(entry => entry.author === author && entry.originNode === node && entry.message.includes('independent edit')))
       assert(page.entries.some(entry => entry.author === author && entry.originNode === node && entry.message.includes('annotate')))
@@ -65,6 +73,9 @@ try {
     run(origin, 'chain', file, 'log')
     run(origin, 'chain', file, 'verify')
   }
+  assert.equal(heads[0], heads[1], 'post-merge head identities must match')
+  assert(readFileSync(`${a}.chain`).equals(readFileSync(`${b}.chain`)), 'same-frontier chain bytes must match')
+  console.log(`Same post-merge head on both copies: ${heads[0]}`)
   console.log('PASS: both offline nodes and both comments survive on both copies; history shows both authors and origins.')
 } finally {
   rmSync(dir, { recursive: true, force: true })

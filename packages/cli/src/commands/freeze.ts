@@ -1,3 +1,4 @@
+import { loadChain } from '../chain-cache.js'
 /**
  * `foundation freeze <file> -o <dest> [--author A] [-m msg]` — crystallize a
  * document into a lock-headered frozen text file (SPEC D4, PRD §4 "Freeze /
@@ -15,7 +16,7 @@
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import { loadChain, parseDocument, validateDocument } from 'foundation-engine'
+import { parseDocument, validateDocument } from 'foundation-engine'
 import { freezeDocument, verifyFrozen } from 'foundation-engine/src/freeze/index.js'
 import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'

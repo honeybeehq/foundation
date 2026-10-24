@@ -1,3 +1,4 @@
+import { loadChain } from '../chain-cache.js'
 import { mintNodeId } from 'foundation-engine'
 import { parseForWrite } from '../parse-write.js'
 /**
@@ -21,7 +22,7 @@ import { parseForWrite } from '../parse-write.js'
  * for unchanged subtrees, so unchanged imports remain a no-op.
  */
 import { existsSync, readFileSync } from 'node:fs'
-import { loadChain, parseDocument, projectDocument } from 'foundation-engine'
+import { parseDocument, projectDocument } from 'foundation-engine'
 import type { FdnComponent, FdnDocument, FdnLookup, FdnNode, FdnProp } from 'foundation-engine'
 import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
