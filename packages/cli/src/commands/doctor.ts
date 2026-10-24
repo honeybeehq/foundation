@@ -1,3 +1,4 @@
+import { defaultChainFormat } from '../chain-format.js'
 /** Read-only runtime inventory. Discovered commands are data, never executed. */
 import { accessSync, constants, readFileSync, readdirSync, realpathSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
@@ -16,6 +17,8 @@ interface InventoryEntry {
   dirty: boolean | null
   sessionProtocols: string[] | null
   documentFormats: string[] | null
+  chainFormats: number[] | null
+  defaultChainFormat: number | null
   artboardWriteSafe: boolean | 'unknown'
   error?: string
 }
@@ -30,7 +33,7 @@ function readable(path: string): string | null {
 }
 
 function inspect(path: string, source: string): InventoryEntry {
-  const entry: InventoryEntry = { source, path, realpath: null, executable: false, sourceSha: null, stampPath: null, packageVersion: null, dirty: null, sessionProtocols: null, documentFormats: null, artboardWriteSafe: 'unknown' }
+  const entry: InventoryEntry = { source, path, realpath: null, executable: false, sourceSha: null, stampPath: null, packageVersion: null, dirty: null, sessionProtocols: null, documentFormats: null, chainFormats: null, defaultChainFormat: null, artboardWriteSafe: 'unknown' }
   try { entry.realpath = realpathSync(path) } catch { entry.error = 'missing or inaccessible'; return entry }
   try { accessSync(path, constants.X_OK); entry.executable = statSync(path).isFile() } catch { /* not executable */ }
   // Only an explicit stamp is evidence of a build SHA; a nearby checkout HEAD
@@ -48,6 +51,8 @@ function inspect(path: string, source: string): InventoryEntry {
           if ('packageVersion' in runtime && typeof runtime.packageVersion === 'string') entry.packageVersion = runtime.packageVersion
           if ('dirty' in runtime && typeof runtime.dirty === 'boolean') entry.dirty = runtime.dirty
           if ('sessionProtocols' in runtime && Array.isArray(runtime.sessionProtocols) && runtime.sessionProtocols.every((v: unknown) => typeof v === 'string')) entry.sessionProtocols = runtime.sessionProtocols
+          if ('chainFormats' in runtime && Array.isArray(runtime.chainFormats) && runtime.chainFormats.every((v: unknown) => v === 1 || v === 2)) entry.chainFormats = runtime.chainFormats
+          if ('defaultChainFormat' in runtime && (runtime.defaultChainFormat === 1 || runtime.defaultChainFormat === 2)) entry.defaultChainFormat = runtime.defaultChainFormat
           if ('documentFormats' in runtime && Array.isArray(runtime.documentFormats) && runtime.documentFormats.every((v: unknown) => typeof v === 'string')) entry.documentFormats = runtime.documentFormats
           if ('sourceSha' in runtime && typeof runtime.sourceSha === 'string'
               && /^[a-f0-9]{40,64}$/i.test(runtime.sourceSha)) entry.sourceSha = runtime.sourceSha
@@ -161,6 +166,6 @@ export async function runDoctor(args: string[], io: CliIO): Promise<number> {
       else configInventory.push({ path, status: 'relative command cannot be resolved without config cwd' })
     }
   }
-  io.stdout(JSON.stringify({ inventoryVersion: 1, readOnly: true, coverage: { cells: cellCoverage, harnessHomes: 'known MCP configs in HOME and immediate ~/.hive/homes account directories', commandsExecuted: false, metadata: 'install stamp claims only; unstamped runtime metadata is unknown' }, entries, configs: configInventory }, null, 2))
+  io.stdout(JSON.stringify({ inventoryVersion: 1, readOnly: true, chainFormats: [1, 2], defaultChainFormat: defaultChainFormat(), coverage: { cells: cellCoverage, harnessHomes: 'known MCP configs in HOME and immediate ~/.hive/homes account directories', commandsExecuted: false, metadata: 'install stamp claims only; unstamped runtime metadata is unknown' }, entries, configs: configInventory }, null, 2))
   return 0
 }

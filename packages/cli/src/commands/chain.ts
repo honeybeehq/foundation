@@ -1,3 +1,4 @@
+import { chainFormatUpgradeWarning } from '../chain-format.js'
 import { loadChain } from '../chain-cache.js'
 /**
  * `foundation chain ...` — CLI surface over `<file>.chain` (Loro-backed
@@ -296,7 +297,10 @@ async function runChainPush(positionals: string[], io: CliIO): Promise<number> {
   const chain = requireChain(file, io)
   if (!chain) return 0
   try {
-    const { written } = await exportBlobs(chain, dir)
+    let upgraded = false
+    const enabled = updateDocument(file, latest => { upgraded = latest.storageFormat() === 1; latest.upgradeStorage(); return latest }, true)
+    if (upgraded) io.stderr(chainFormatUpgradeWarning(file))
+    const { written } = await exportBlobs(enabled, dir)
     io.stdout(`${chainPathFor(file)}: pushed ${written} blob(s) to ${dir}/${chain.docId()}`)
     return 0
   } catch (err) {
@@ -315,7 +319,9 @@ async function runChainPull(positionals: string[], io: CliIO): Promise<number> {
   if (!chain) return 0
   try {
     const { imported, overlaps } = await importBlobs(chain, dir)
-    if (imported > 0) updateDocument(file, latest => { latest.merge(chain) })
+    let upgraded = false
+    updateDocument(file, latest => { upgraded = latest.storageFormat() === 1; latest.upgradeStorage(); if (imported > 0) latest.merge(chain) }, true)
+    if (upgraded) io.stderr(chainFormatUpgradeWarning(file))
     io.stdout(`${chainPathFor(file)}: pulled ${imported} blob(s) from ${dir}/${chain.docId()}`)
     printOverlaps(overlaps, io)
     if (imported > 0) io.stdout(`updated ${file} from merged chain`)
@@ -337,7 +343,9 @@ async function runChainSync(positionals: string[], io: CliIO): Promise<number> {
   try {
     const { imported, overlaps } = await importBlobs(chain, dir)
     const importedChain = chain
-    chain = updateDocument(file, latest => { latest.merge(importedChain); return latest })
+    let upgraded = false
+    chain = updateDocument(file, latest => { upgraded = latest.storageFormat() === 1; latest.upgradeStorage(); latest.merge(importedChain); return latest })
+    if (upgraded) io.stderr(chainFormatUpgradeWarning(file))
     const { written } = await exportBlobs(chain, dir)
     io.stdout(`${chainPathFor(file)}: synced with ${dir}/${chain.docId()} — pulled ${imported}, pushed ${written}`)
     printOverlaps(overlaps, io)
@@ -381,7 +389,9 @@ async function runChainMerge(positionals: string[], io: CliIO): Promise<number> 
 
   const { overlaps } = mergeChains(ours, theirs)
   const mergedChain = loadChain(theirs)
-  updateDocument(file, chain => { chain.merge(mergedChain) })
+  let upgraded = false
+  updateDocument(file, chain => { upgraded = chain.storageFormat() === 1; chain.upgradeStorage(); chain.merge(mergedChain) })
+  if (upgraded) io.stderr(chainFormatUpgradeWarning(file))
   io.stdout(`${chainPath}: merged with ${theirsPath} — rewrote ${file}`)
   printOverlaps(overlaps, io)
   return 0

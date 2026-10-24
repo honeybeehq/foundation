@@ -1,3 +1,4 @@
+import { selectedChainFormat } from '../chain-format.js'
 import { runtimeVersion } from '../runtime-version.js'
 import { loadChain } from '../chain-cache.js'
 import { autoOpenDesign } from '../sync-store.js'
@@ -80,6 +81,7 @@ class DesignSession implements Session {
   private author = ''
   private protocol: SessionProtocol = SESSION_PROTOCOL
   private earlyResult = false
+  private clientChainFormats: Array<1 | 2> | undefined
   private actor = `session:${randomUUID()}`
   private chain: FdnChain | null = null
   private readonly activityIdentity = randomUUID()
@@ -185,8 +187,9 @@ class DesignSession implements Session {
     if (this.pendingSync) clearTimeout(this.pendingSync)
     this.pendingSync = null
     const before = this.docText
+    const beforeFormat = this.chain?.storageFormat()
     const author = this.syncFromDisk()
-    if (this.docText !== before) this.announce({ kind: 'external', author: author ?? null })
+    if (this.docText !== before || this.chain?.storageFormat() !== beforeFormat) this.announce({ kind: 'external', author: author ?? null })
   }
 
   close(): void {
@@ -291,13 +294,22 @@ class DesignSession implements Session {
     this.protocol = message.protocol
     this.author = message.author || this.options.author || defaultAuthor()
     this.earlyResult = message.earlyResult === true
+    this.clientChainFormats = message.chainFormats
     const created = this.open()
     if (created === null) return
     if (this.earlyResult && !this.chain && !this.invalidExternalTokens && this.docId) {
       this.preparedChain = { text: this.docText, actor: this.actor, docId: this.docId, finish: prepareChain(this.doc, { actor: this.actor, docId: this.docId }) }
     }
     this.phase = 'open'
-    if (this.chain) autoOpenDesign(this.path, message => this.log(message))
+    if (this.chain) {
+      autoOpenDesign(this.path, message => this.log(message))
+      const bytes = readBytesIfPresent(this.chainPath)
+      if (bytes && !sameBytes(bytes, this.diskChain)) {
+        this.chain = loadChain(bytes, { actor: this.actor })
+        this.diskChain = bytes
+        this.setDoc(this.chain.doc())
+      }
+    }
     this.rev = 1
     this.emit({
       t: 'welcome',
@@ -527,6 +539,8 @@ class DesignSession implements Session {
 
   private commit(message: Extract<WireClientMessage, { t: 'commit' }>): void {
     this.syncAndAnnounce()
+    const formatError = this.chainFormatError()
+    if (formatError) return this.reject(message.id, { code: 'invalid-op', message: formatError })
     if (this.protocol === LEGACY_SESSION_PROTOCOL && (explicitArtboards(this.doc) || message.ops.some(op => isArtboardOperation(op) || op.op === 'set-spec-version'))) return this.reject(message.id, { code: 'invalid-op', message: explicitArtboards(this.doc) ? legacyArtboardReason : legacyArtboardOpReason })
     if (this.invalidExternalTokens) return this.reject(message.id, { code: 'invalid-op', message: this.invalidExternalTokens })
     if (message.ops.length === 0) return this.reject(message.id, { code: 'invalid-op', message: 'commit has no ops' })
@@ -574,6 +588,8 @@ class DesignSession implements Session {
 
   private step(id: string, direction: 'undo' | 'redo'): void {
     this.syncAndAnnounce()
+    const formatError = this.chainFormatError()
+    if (formatError) return this.reject(id, { code: 'invalid-op', message: formatError })
     if (this.protocol === LEGACY_SESSION_PROTOCOL && explicitArtboards(this.doc)) return this.reject(id, { code: 'invalid-op', message: legacyArtboardReason })
     if (this.invalidExternalTokens) return this.reject(id, { code: 'invalid-op', message: this.invalidExternalTokens })
     const from = direction === 'undo' ? this.undoStack : this.redoStack
@@ -616,6 +632,8 @@ class DesignSession implements Session {
   }
 
   private transact(mutate: (chain: FdnChain) => void): Failure | null {
+    const formatError = this.chainFormatError()
+    if (formatError) return { code: 'invalid-op', message: formatError }
     if (this.invalidExternalTokens) return { code: 'invalid-op', message: this.invalidExternalTokens }
     const snapshot = this.chain?.save() ?? null
     const previous = { doc: this.doc, docId: this.docId }
@@ -653,8 +671,9 @@ class DesignSession implements Session {
 
   private syncAndAnnounce(): void {
     const before = this.docText
+    const beforeFormat = this.chain?.storageFormat()
     const author = this.syncFromDisk()
-    if (this.docText !== before) this.announce({ kind: 'external', author: author ?? null })
+    if (this.docText !== before || this.chain?.storageFormat() !== beforeFormat) this.announce({ kind: 'external', author: author ?? null })
   }
 
   private accept(id: string, cause: Cause, impact: BakeImpact, componentSwaps: InstanceSwapReport[] = [], componentDetaches: InstanceDetachReport[] = []): void {
@@ -683,14 +702,24 @@ class DesignSession implements Session {
     return this.view.boards.filter(ref => { try { boardView(this.doc, ref); return false } catch { return true } })
   }
 
+  private chainFormatError(): string | null {
+    const format = selectedChainFormat(this.path, this.chain?.storageFormat())
+    return this.clientChainFormats && !this.clientChainFormats.includes(format)
+      ? `This connection cannot write chain format ${format}. Reconnect with a client that supports it.` : null
+  }
+
   private documentView(): DocumentView {
     const top = (stack: UndoStep[]): string | null => stack.at(-1)?.label ?? null
+    const formatError = this.chainFormatError()
     return {
+      chainFormat: this.chain?.storageFormat() ?? null,
+      writeChainFormat: selectedChainFormat(this.path, this.chain?.storageFormat()),
+      chainReadOnly: formatError !== null,
       rev: this.rev,
       doc: this.doc,
       head: this.head(),
-      history: { canUndo: this.undoStack.length > 0, canRedo: this.redoStack.length > 0, undoLabel: top(this.undoStack), redoLabel: top(this.redoStack) },
-      issues: this.issues,
+      history: { canUndo: !formatError && this.undoStack.length > 0, canRedo: !formatError && this.redoStack.length > 0, undoLabel: top(this.undoStack), redoLabel: top(this.redoStack) },
+      issues: formatError ? [...this.issues, { code: 'chain-format-read-only', severity: 'warning', message: formatError }] : this.issues,
       pages: artboardPages(this.doc),
       boards: boardViews(this.doc),
       unavailableBoards: this.unavailableBoards(),

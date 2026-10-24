@@ -1,23 +1,32 @@
+import { chainFormatUpgradeWarning } from './chain-format.js'
 import { mkdirSync, readFileSync, readdirSync, realpathSync, unlinkSync } from 'node:fs'
 import { join } from 'node:path'
 import { homedir } from 'node:os'
 import { createHash } from 'node:crypto'
 import { loadChain } from 'foundation-engine'
-import { writeAtomic } from './disk.js'
+import { updateDocument, writeAtomic } from './disk.js'
 
 export interface LiveDesign { docId: string; file: string; workspace: string; product: string; repoRoot?: string }
 export interface SyncState { cursor: string; published: string[]; lastError: string | null; lastErrorAt?: string; receiveError?: string | null; publishError?: string | null; connectionError?: string | null; catalogueError?: string | null; updatedAt: string; pending: number }
 export function replicaRoot(): string { return process.env.FOUNDATION_REPLICA_STORE ?? join(homedir(), '.foundation', 'replicas') }
-export function registerDesign(file: string, workspace = process.env.FOUNDATION_WORKSPACE ?? 'default', product = process.env.FOUNDATION_PRODUCT ?? 'default', repoRoot?: string): LiveDesign {
+export function registerDesign(file: string, workspace = process.env.FOUNDATION_WORKSPACE ?? 'default', product = process.env.FOUNDATION_PRODUCT ?? 'default', repoRoot?: string, onUpgrade?: (message: string) => void): LiveDesign {
   file = realpathSync(file)
   const docId = loadChain(readFileSync(`${file}.chain`)).docId()
   if (!docId) throw new Error('sync requires a tracked design with a document id')
   for (const part of [workspace, product, docId]) if (!/^[A-Za-z0-9._-]+$/.test(part)) throw new Error('invalid sync address component')
   const design = { docId, file, workspace, product, ...(repoRoot ? { repoRoot: realpathSync(repoRoot) } : {}) }
+  let upgraded = false
+  // Upgrade under the ordinary document lock before a daemon can publish it.
+  updateDocument(file, chain => {
+    if (chain.docId() !== docId) throw new Error('design identity changed while opening sync')
+    upgraded = chain.storageFormat() === 1
+    chain.upgradeStorage()
+  })
   const dir = join(replicaRoot(), 'live'); mkdirSync(dir, { recursive: true })
   // Each registration owns a path record; opening another copy never overwrites it.
   const key = createHash('sha256').update(JSON.stringify({ docId, file, workspace, product })).digest('hex')
   writeAtomic(join(dir, `${key}.json`), JSON.stringify(design))
+  if (upgraded) onUpgrade?.(chainFormatUpgradeWarning(file))
   return design
 }
 export function liveDesigns(log: (message: string) => void = () => {}): LiveDesign[] {
@@ -59,6 +68,6 @@ export function autoOpenDesign(file: string, log: (message: string) => void): vo
   try {
     const canonical = realpathSync(file)
     if (liveDesigns().some(design => design.file === canonical)) return
-    registerDesign(canonical)
+    registerDesign(canonical, undefined, undefined, undefined, log)
   } catch (err) { log(`sync registration: ${String(err)}`) }
 }

@@ -201,6 +201,25 @@ preserves existing identities. Reading/parsing existing files stays deterministi
 Explicit operation ids and duplicate id maps remain client-owned; clients mint
 UUIDs for new objects. Token/style/component names are semantic keys, not minted ids.
 
+**Chain-format cutover (2026-10-24):** new and local-only writers keep the v1
+array header. Existing v2 files never downgrade. Sync registration (including
+`foundation sync open`), explicit exchange, automatic sync, or
+`FOUNDATION_CHAIN_FORMAT=2` opt in to the v2 archive; registration upgrades under
+the document lock in one save before publication, without a history change.
+Canonical v1 saves verify that reloaded native exports retain every original change
+identity; an unrepresentable v1 history refuses the save and requires explicit v2,
+rather than rewriting hashes or silently upgrading. Both formats retain canonical
+snapshot/anchor ordering. Version and doctor report `chainFormats` and
+`defaultChainFormat`; session welcome/doc report actual `chainFormat`, selected
+`writeChainFormat` and `chainReadOnly`. An optional hello `chainFormats` list makes
+an explicitly incompatible connection read-only. Omission preserves existing
+protocol behaviour; these JSON clients do not read the binary chain themselves.
+Explicit sync upgrades the tracked file permanently and prints a warning: once
+shared or committed, it requires upgraded readers. No automatic backup is made.
+Rollback requires the user's own pre-upgrade backup and loses subsequent edits.
+A crash after the locked upgrade but before registration leaves an unregistered
+v2 file; repeating registration is safe and completes publication.
+
 **Immutable change bytes (2026-10-24):** a change's existing SHA-256 formula
 uses its original single-change Loro update bytes, retained at authoring/import
 and forwarded verbatim. Native re-exports can reorder dependency peers and change
@@ -219,8 +238,9 @@ Legacy array headers remain readable and capture their current exports before
 mutation; recorded hashes and parent pointers are unchanged. Already drifted legacy
 snapshots cannot recover discarded original bytes: back up unsynced work and restore
 from a healthy archived replica, rather than accepting conflicting encodings.
-Old Foundation (49d3161) refuses the v2 object header (`entries is not iterable`)
-before writing; upgrade every writer before sharing v2 chains. The wire blob/hash
+Old Foundation (49d3161) continues opening default v1 writes. It refuses the v2
+object header (`entries is not iterable`) before writing, so sync opt-in requires
+v2-capable writers for that design. The wire blob/hash
 format and strict receive checks are unchanged; `importUpdate` accepts one change
 per blob, rejects overlapping spans, and cannot save incomplete causal history.
 

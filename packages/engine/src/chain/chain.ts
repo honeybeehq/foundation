@@ -146,7 +146,9 @@ export interface FdnChain {
   activityPage(opts?: ChainActivityOptions): ChainActivityPage
   fork(actor: string): FdnChain
   merge(other: FdnChain): void
-  save(): Uint8Array
+  storageFormat(): 1 | 2
+  upgradeStorage(): void
+  save(opts?: { format?: 1 | 2 }): Uint8Array
   verify(): { ok: boolean; brokenAt?: string }
   /** Wave 3 (SPEC 13a-i): the document id, or null if this chain predates/
    *  never received one. Immutable once set — see createChain's `docId` opt. */
@@ -220,6 +222,7 @@ class LoroChain implements FdnChain {
   private annotations: LoroMap
   private order: LoroMap
 
+  private format: 1 | 2 = 1
   private originals = new OriginalUpdates()
   private activity: ChainActivity | undefined
   private rootFrontiers: Frontier = []
@@ -317,6 +320,7 @@ class LoroChain implements FdnChain {
     for (const [name, frontier] of entries) chain.anchors.set(name, frontier)
     if (legacy) chain.captureOriginals()
     else {
+      chain.format = 2
       chain.originals.load(stored.updates, chain.sortedChanges())
       if (!verifiedStorage.has(stored.seal) && !cache?.has(stored.seal)) {
         if (!chain.verify().ok) throw new Error('chain history verification failed: original update archive does not match snapshot history')
@@ -516,6 +520,7 @@ class LoroChain implements FdnChain {
     const forked = new LoroChain(actor, this.loro.fork())
     this.captureOriginals()
     forked.originals.copyFrom(this.originals)
+    forked.format = this.format
     forked.rebuildIndex()
     return forked
   }
@@ -526,6 +531,7 @@ class LoroChain implements FdnChain {
     other.captureOriginals()
     this.originals.copyFrom(other.originals)
     this.loro.import(other.loro.export({ mode: 'update', from: this.loro.oplogVersion() }))
+    if (other.format === 2) this.upgradeStorage()
     this.rebuildIndex()
     for (const [name, frontier] of other.anchors) {
       const current = this.anchors.get(name)
@@ -561,9 +567,15 @@ class LoroChain implements FdnChain {
     return left.length - right.length
   }
 
-  save(): Uint8Array {
+  storageFormat(): 1 | 2 { return this.format }
+  upgradeStorage(): void { this.format = 2 }
+
+  save(opts?: { format?: 1 | 2 }): Uint8Array {
+    if (opts?.format === 1 && this.format === 2) throw new Error('chain storage v2 cannot be downgraded')
+    if (opts?.format === 2) this.upgradeStorage()
     assertFormatVersion({ specVersion: String(this.meta.get('specVersion') ?? '') })
     this.captureOriginals()
+    this.originals.assertCoverage(this.sortedChanges())
     const canonical = new LoroDoc()
     canonical.importBatch(this.changes().map(change => change.bytes))
     if (canonical.oplogVersion().compare(this.loro.oplogVersion()) !== 0) {
@@ -571,10 +583,22 @@ class LoroChain implements FdnChain {
     }
     const snapshot = canonical.export({ mode: 'snapshot' })
     const anchors = Array.from(this.anchors.entries()).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([name, frontier]) => [name, [...frontier].sort((a, b) => comparePeerIds(a.peer, b.peer) || a.counter - b.counter)])
-    const storage = { version: 2, anchors, updates: encodeOriginalUpdates(this.originals.save(this.sortedChanges())) }
-    const seal = createHash('sha256').update(JSON.stringify(storage)).update(snapshot).digest('hex')
-    const anchorsBytes = new TextEncoder().encode(JSON.stringify({ ...storage, seal }))
-    rememberVerifiedStorage(seal)
+    let anchorsBytes: Uint8Array
+    if (this.format === 1) {
+      // A v1 reader has no archive. Refuse rather than write a snapshot whose
+      // re-exports would change already-recorded envelope identities.
+      const legacy = LoroDoc.fromSnapshot(snapshot)
+      for (const change of this.sortedChanges()) {
+        const bytes = legacy.export({ mode: 'updates-in-range', spans: [{ id: { peer: change.peer, counter: change.counter }, len: change.length }] })
+        if (!Buffer.from(bytes).equals(this.bytesForSpan(change.peer, change.counter, change.length))) throw new Error(`v1 snapshot cannot preserve change identities for ${change.peer}:${change.counter}:${change.length}; opt in with FOUNDATION_CHAIN_FORMAT=2 or foundation sync open`)
+      }
+      anchorsBytes = new TextEncoder().encode(JSON.stringify(anchors))
+    } else {
+      const storage = { version: 2, anchors, updates: encodeOriginalUpdates(this.originals.save(this.sortedChanges())) }
+      const seal = createHash('sha256').update(JSON.stringify(storage)).update(snapshot).digest('hex')
+      anchorsBytes = new TextEncoder().encode(JSON.stringify({ ...storage, seal }))
+      rememberVerifiedStorage(seal)
+    }
     const header = new Uint8Array(4)
     new DataView(header.buffer).setUint32(0, anchorsBytes.length, true)
     const out = new Uint8Array(4 + anchorsBytes.length + snapshot.length)
