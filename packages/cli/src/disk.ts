@@ -178,3 +178,27 @@ export function commitDocument(chainPath: string, meta: ChangeMeta, target: FdnD
     return { status: 'committed', chain, envelope }
   })
 }
+
+/** Materialization uses the same G16 lock and pending-save receipt as local writers. */
+export function materializeDocument(file: string, incoming: FdnChain): FdnChain {
+  file = documentPath(file)
+  return withDocumentLock(file, () => {
+    const bytes = readBytesIfPresent(`${file}.chain`), source = readTextIfPresent(file)
+    const sourceId = source === null ? null : readDocIdAttr(source)
+    if (sourceId !== null && sourceId !== incoming.docId()) throw new Error('path-conflict: target contains another design')
+    if (source !== null && bytes === null) throw new Error('path-conflict: target contains an untracked document')
+    let chain = bytes === null ? incoming : loadChain(bytes, { actor: `materialize:${randomUUID()}` })
+    if (chain.docId() !== incoming.docId()) throw new Error('path-conflict: target chain belongs to another design')
+    if (bytes !== null && chain.changes().find(change => change.envelope.prevHash === null)?.envelope.hash !== incoming.changes().find(change => change.envelope.prevHash === null)?.envelope.hash) throw new Error('path-conflict: target has unrelated history')
+    recoverDocument(file)
+    if (bytes !== null) {
+      chain = loadChain(readFileSync(`${file}.chain`), { actor: `materialize:${randomUUID()}` })
+      const current = readTextIfPresent(file)
+      if (current !== null) ingestCurrentSource(file, chain, current)
+      chain.merge(incoming)
+    }
+    if (!chain.verify().ok) throw new Error('materialized chain failed history verification')
+    persistDocument(file, chain)
+    return chain
+  })
+}

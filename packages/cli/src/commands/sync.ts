@@ -1,3 +1,4 @@
+import { materialize, MaterializeError } from '../sync/materialize.js'
 import { readFileSync } from 'node:fs'
 import { loadChain } from 'foundation-engine'
 import { parseArgs, flagString } from '../argv.js'
@@ -9,6 +10,28 @@ export async function runSync(args: string[], io: CliIO): Promise<number> {
   const { positionals, flags } = parseArgs(args)
   try {
     switch (positionals[0]) {
+      case 'materialize':
+      case 'materialise': {
+        const entryFile = flagString(flags, 'entry')
+        const entry = entryFile ? JSON.parse(readFileSync(entryFile, 'utf8')) : {}
+        if (entry.deleted === true) throw new MaterializeError('deleted-source', 'the selected replica was deleted')
+        const docId = positionals[1] ?? entry.docId
+        const root = flagString(flags, 'repo-root')
+        const configFile = flagString(flags, 'comb-config') ?? process.env.FOUNDATION_COMB_CONFIG
+        if (!docId || !root || !configFile) throw new Error('materialize requires DOC_ID (or --entry FILE), --repo-root ROOT and --comb-config FILE')
+        const config = JSON.parse(readFileSync(configFile, 'utf8')) as CombConfig
+        if (!config || typeof config.binary !== 'string' || !Array.isArray(config.args) || config.args.some(arg => typeof arg !== 'string')) throw new Error('invalid Comb process config')
+        const result = await materialize({
+          docId, workspaceId: flagString(flags, 'workspace') ?? entry.workspaceId ?? process.env.FOUNDATION_WORKSPACE ?? 'default',
+          productId: flagString(flags, 'product') ?? entry.productId ?? process.env.FOUNDATION_PRODUCT ?? 'default',
+          checkoutRoot: root, targetPath: positionals[2],
+          repoRelativePath: flagString(flags, 'repo-relative-path') ?? entry.repoRelativePath,
+          sourceReplica: flagString(flags, 'source-replica') ?? entry.replicaId,
+          expectedHead: flagString(flags, 'expected-head') ?? entry.expectedHead ?? entry.headHash,
+          requestKey: flagString(flags, 'request-key') ?? entry.requestKey,
+        }, config)
+        io.stdout(flags.json ? JSON.stringify(result) : `ready: ${result.path}`); return 0
+      }
       case 'open': {
         if (!positionals[1]) throw new Error('sync open requires a file')
         const design = registerDesign(positionals[1], flagString(flags, 'workspace'), flagString(flags, 'product'), flagString(flags, 'repo-root'))
@@ -43,7 +66,11 @@ export async function runSync(args: string[], io: CliIO): Promise<number> {
         try { await serveSync(config, controller.signal, io.stderr) } finally { process.off('SIGTERM', stop); process.off('SIGINT', stop) }
         return 0
       }
-      default: throw new Error('usage: foundation sync open <file> [--workspace W --product P --repo-root R] | close <file> | serve --comb-config <file> | status [--json]')
+      default: throw new Error('usage: foundation sync materialize DOC_ID [TARGET] --repo-root ROOT --comb-config FILE [--workspace W --product P --json] | open <file> [--workspace W --product P --repo-root R] | close <file> | serve --comb-config <file> | status [--json]')
     }
-  } catch (err) { io.stderr(err instanceof Error ? err.message : String(err)); return 1 }
+  } catch (err) {
+    if (flags.json && err instanceof MaterializeError) io.stdout(JSON.stringify({ state: 'refused', code: err.code, message: err.message }))
+    else io.stderr(err instanceof Error ? err.message : String(err))
+    return 1
+  }
 }

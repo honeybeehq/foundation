@@ -79,7 +79,7 @@ commands:
   install [--from CHECKOUT] [--sha SHA] [--force] [--dry-run]  plan or install a node-level copy
   install --rollback [--dry-run]            restore the previous activation
   doctor --inventory --json                  inventory executable copies without changing them
-  sync open|serve|status                    register live designs, sync through Comb, inspect local/upload state
+  sync open|close|serve|status|materialize                    register live designs, sync through Comb, inspect local/upload state
   new <name> [--no-chain]                    write a minimal .fdn.html skeleton (chain-inits it too)
   copy <src> <dest> [--title T] [--json]      create an independent document with a fresh identity and chain
   inspect <file>                             summarize a document
