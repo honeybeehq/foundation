@@ -1217,7 +1217,8 @@ To fill: the fixtures.
 
 ## 15. Artboards and pages (T97)
 
-Explicit multi-artboard documents use `0.1.0-artboards`. Legacy single-body
+Explicit multi-artboard documents use `0.1.0-artboards`, or
+`0.2.0-artboard-frames` when artboard roots carry authored frame fields. Legacy single-body
 files retain their original format and open without writes. Updated writers
 refuse unsupported format versions before normalization or persistence. This
 cannot make older executables safe: the old parser drops an unknown wrapper
@@ -1231,8 +1232,12 @@ nodes use stable `data-fdn-id` and literal `data-fdn-name`; names may repeat.
 Artboards store literal finite pixel numbers in `data-fdn-x`, `data-fdn-y`,
 `data-fdn-width`, `data-fdn-height`, with positive dimensions, plus
 `data-fdn-overflow="clip|visible"`. Page/artboard DOM order is saved ordering,
-independent of canvas coordinates. Structural nodes cannot carry styles,
-conditions, iterations, named-style bindings or token-mode selections.
+independent of canvas coordinates. Pages and view records cannot carry styles,
+conditions, iterations, named-style bindings or token-mode selections. Under
+`0.2.0-artboard-frames`, the artboard node owns ordinary frame styles,
+interaction planes, named-style links, token modes and free/flow layout. It
+retains one source identity and no mandatory inner frame. Conditions, iterations
+and state scopes remain on design content, not the artboard root.
 
 A preview is addressed by `(artboardId,state,viewport)`, with null state for
 defaults/overview and null viewport for native dimensions. Only `(id,null,null)`
@@ -1251,8 +1256,11 @@ States, viewports, matrix, parameters, lookups, tokens, styles, components and
 component sets remain document-wide. Existing state scopes and per-state lookup
 bindings retain their semantics. Matrix state `""` maps to null. The Components
 catalog is synthetic, not a writable user page. Baking selects one artboard,
-removes all structural wrappers/view metadata and emits its children through the
-existing body emitter. Artboard placement never becomes content CSS.
+removes page/view metadata and emits the selected frame through the existing
+body emitter. Authored artboard frame fields resolve through the ordinary node
+style resolver and render on body, with the raw source id in editor output.
+Untouched roots retain their old output exactly. Artboard placement never
+becomes content CSS.
 
 Each semantic edit is one granular transaction and one writer-local Undo step.
 Legacy upgrade wraps the unchanged body using insert/move operations, preserves
@@ -1352,3 +1360,36 @@ unupgraded legacy previews. T103's client height forcing still applies to
 legacy frames because Foundation does not emit a body height there; it must
 step aside for standard frames. Upgrades preserve the measured pre-upgrade
 pixels, while standardization is an explicit visible layout change.
+
+
+### Authored artboard frames (T107)
+
+Ordinary root frame edits expand under the same canonical-path writer lock into
+format promotion, per-board legacy padding migration and the requested scalar
+operations, in one envelope and Undo. Migrated padding attrs become own CSS
+longhands; before migration they have own-value precedence above named styles.
+The legacy capture-overflow attr stays capture-only, above named overflow, until
+an explicit overflow style edit removes it. It is optional only in the new
+format. Authored overflow then determines the descriptor capture policy.
+
+Viewport W/H stays literal native/shared/per-view geometry. Root own, named and
+interaction CSS cannot replace it through dimensions/min/max/logical sizes,
+margins, insets, aspect-ratio, transforms, zoom or resets. Root display is
+block/flex/grid, position may only be relative, and box-sizing may only be
+border-box. Descendant frame sizing and T94 bindings keep their existing rules.
+
+For authored roots, a transparent gradient on html prevents body background
+propagation while preserving the host matte; html overflow:auto prevents body
+overflow propagation. This lets root radius, opacity and child clipping use the
+body box. Existing fixed capture bounds still crop exterior effects. Legacy
+markers keep the exact old body policy and normal/editor mode difference;
+standardization remains a separate explicit operation, never an implicit side
+effect of styling. Styled legacy box edges may therefore differ between quirks
+normal output and standards editor output.
+
+Protocol 0.2 hello accepts artboardFrames:true. Without it, a document promoted
+to the new frame format is read-only: welcome/doc carries readOnly with the
+reason, history is disabled, and commit/Undo/Redo/anchor refuse, including after
+peer promotion. Legacy0.1 negotiation keeps its existing first-board read-only
+adapter. Updated semantic CLI/MCP editing declares frame support. File-format
+promotion is document-wide and older T105a writers refuse the new version.

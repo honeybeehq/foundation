@@ -6,7 +6,7 @@ export function editDocument(path: string, ops: SessionOp[], label: string, auth
   const messages: WireServiceMessage[] = []
   const session = createSession({ path, watch: false, send: message => messages.push(message) })
   try {
-    session.receive(JSON.stringify({ t: 'hello', protocol: '0.2', client: 'foundation-edit', author }))
+    session.receive(JSON.stringify({ t: 'hello', protocol: '0.2', client: 'foundation-edit', artboardFrames: true, author }))
     const welcome = messages.find(message => message.t === 'welcome')
     if (!welcome || welcome.t !== 'welcome') throw new Error(messages.filter(message => message.t === 'fault').map(message => message.message).join('; ') || 'could not open document')
     messages.length = 0

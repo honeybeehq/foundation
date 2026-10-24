@@ -304,8 +304,8 @@ the editor path. Legacy HTML, margins and rendering modes remain unchanged.
 as finite nonnegative px values; at least one side is required. Zero removes
 an attribute, and equal nonzero numeric values are no-ops. `BoardView.padding`
 always contains all four numbers. Height owners now invalidate baked bodies;
-width-only geometry does not. A legacy upgrade deliberately normalizes margin,
-height and mode under the explicit artboard format.
+width-only geometry does not. Legacy upgrade retains its original margin, height and output modes through
+the legacy frame marker described below.
 
 
 Legacy upgrades write `data-fdn-frame="legacy"` and retain their old per-output
@@ -322,3 +322,33 @@ The vendored BoardView descriptor requires frame. Direct untyped callers of
 emitHtml/emitEditorHtml that still pass the older {height,padding} frame
 argument retain standard-frame behavior; only explicit frame:legacy selects
 the compatibility policy.
+
+
+Authored artboard frame fields require `ARTBOARD_FRAME_VERSION`, currently
+`0.2.0-artboard-frames`. The artboard FdnNode is the frame: use existing styles,
+styleStates/styleRef, collection modes and frame-layout operations on its id.
+`promoteArtboardFrame(doc,node)` plans granular format/padding migration for SDK
+callers; semantic session/CLI/MCP edits perform that expansion under the writer
+lock automatically. Root W/H and competing CSS geometry are refused because
+native/shared/per-view viewport sizing remains literal. Existing content frames
+retain dimension bindings.
+
+`selectArtboard` additionally returns `frame` for authored roots. Bake results
+may carry `root`, the resolved rendered body node without its design children;
+`tree` still contains the selected design children. Emission and render carry
+that root alongside the children and capsule CSS. Editor body has the raw board
+id, normal output adds no root source id unless includeNodeIds is requested.
+Untouched board HTML is unchanged, including after a sibling board is styled.
+
+`BoardView.padding` remains the numeric legacy-attr fallback. Editors read own
+CSS, then present legacy padding attrs as own-value aliases, then named styles.
+The descriptor overflow uses the legacy capture attr while present; explicit
+root overflow edits remove it and resolve CSS/lookup/token values for capture.
+`set-artboard-padding` on promoted documents writes ordinary longhands with the
+same binding guards. Root styles/modes invalidate only their board occurrences.
+
+Protocol0.2 hello accepts optional artboardFrames:boolean; updated clients send
+true. Welcome/doc has optional readOnly:string when an older0.2 connection
+observes the new format, including mid-session peer promotion. Such connections
+cannot commit, anchor or Undo/Redo. The existing0.1 adapter remains unchanged.
+Use matching runtime, protocol source and PIN when vendoring.

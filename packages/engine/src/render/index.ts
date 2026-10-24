@@ -340,7 +340,7 @@ export async function renderDocument(
     const bake = editor ? bakeEditorDocument : bakeDocument
     const baked = bake(doc, { ...(cell.state !== null ? { state: cell.state } : {}), ...(cell.artboardId === undefined ? {} : { artboardId: cell.artboardId, viewport: cell.viewportSelector ?? null, includeNodeIds: !editor }) })
     const view = cell.artboardId === undefined ? undefined : boardView(doc, { artboardId: cell.artboardId, state: cell.state, viewport: cell.viewportSelector ?? null })
-    const html = editor || view?.frame === 'standard' ? baked.html : emitHtml(doc, injectFdnIds(baked.tree), undefined, view)
+    const html = editor || view?.frame === 'standard' || baked.root ? baked.html : emitHtml(doc, injectFdnIds(baked.tree), undefined, view, false, baked.root)
     const fontLines = detectSystemFontStackLines(doc, baked.tree, html)
     // eslint-disable-next-line no-await-in-loop -- see above
     const capture = await captureHtml(browser, html, {

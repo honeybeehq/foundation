@@ -1,5 +1,7 @@
 import type { ArtboardPadding, ArtboardOp, ArtboardPage, BoardRef, BoardView, FdnDocument, FdnNode, PatchOp, ReportLine } from '../types.js'
 import { indexNodes } from '../chain/model.js'
+import { ARTBOARD_FRAME_VERSION, artboardFrameIssues, artboardOverflow, hasArtboardFrame } from './frame.js'
+export * from './frame.js'
 
 export const ARTBOARD_VERSION = '0.1.0-artboards'
 export const ARTBOARD_TAGS = new Set(['fdn-page', 'fdn-artboard', 'fdn-artboard-view'])
@@ -7,7 +9,7 @@ export const boardKey = (ref: BoardRef): string => JSON.stringify([ref.artboardI
 export const DEFAULT_BOARD_SIZE = { width: 1440, height: 900 } as const
 const attr = (node: FdnNode, key: string) => node.attrs[`data-fdn-${key}`]
 const number = (node: FdnNode, key: string) => Number(attr(node, key))
-export const explicitArtboards = (doc: FdnDocument): boolean => doc.specVersion === ARTBOARD_VERSION || doc.body.some(node => ARTBOARD_TAGS.has(node.tag))
+export const explicitArtboards = (doc: FdnDocument): boolean => [ARTBOARD_VERSION, ARTBOARD_FRAME_VERSION].includes(doc.specVersion) || doc.body.some(node => ARTBOARD_TAGS.has(node.tag))
 const emptyNode = (id: string, tag: string, attrs: Record<string, string> = {}): FdnNode => ({ id, tag, attrs, style: {}, styleStates: {}, children: [] })
 const viewRef = (node: FdnNode): Pick<BoardRef, 'state' | 'viewport'> => ({ state: attr(node, 'view-state') ?? null, viewport: attr(node, 'view-viewport') ?? null })
 const canonical = (ref: Pick<BoardRef, 'state' | 'viewport'>) => ref.state === null && ref.viewport === null
@@ -16,7 +18,7 @@ const paddingSides = ['top', 'right', 'bottom', 'left'] as const
 const padding = (node?: FdnNode): ArtboardPadding => ({ top: Number(node?.attrs['data-fdn-padding-top'] ?? 0), right: Number(node?.attrs['data-fdn-padding-right'] ?? 0), bottom: Number(node?.attrs['data-fdn-padding-bottom'] ?? 0), left: Number(node?.attrs['data-fdn-padding-left'] ?? 0) })
 const decimal = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i
 export function assertFormatVersion(doc: Pick<FdnDocument, 'specVersion'>): void {
-  if (!['0.0.1-draft', '0.1.0', '0.2.0', ARTBOARD_VERSION].includes(doc.specVersion)) throw new Error(`unsupported-format-version: ${doc.specVersion}; update this Foundation writer`)
+  if (!['0.0.1-draft', '0.1.0', '0.2.0', ARTBOARD_VERSION, ARTBOARD_FRAME_VERSION].includes(doc.specVersion)) throw new Error(`unsupported-format-version: ${doc.specVersion}; update this Foundation writer`)
 }
 
 export function validateArtboards(doc: FdnDocument): ReportLine[] {
@@ -25,7 +27,7 @@ export function validateArtboards(doc: FdnDocument): ReportLine[] {
   const issues: ReportLine[] = []
   const issue = (node: FdnNode, code: string, message: string, detail?: { attr: string }) => issues.push({ nodeId: node.id, code, message, severity: 'error', ...(detail ? { detail } : {}) })
   const explicit = explicitArtboards(doc)
-  if (explicit && doc.specVersion !== ARTBOARD_VERSION) issues.push({ code: 'artboard-format-version', severity: 'error', message: `artboard structure requires ${ARTBOARD_VERSION}` })
+  if (explicit && ![ARTBOARD_VERSION, ARTBOARD_FRAME_VERSION].includes(doc.specVersion)) issues.push({ code: 'artboard-format-version', severity: 'error', message: `artboard structure requires ${ARTBOARD_VERSION}` })
   const ids = new Set<string>()
   const visit = (node: FdnNode, parent: FdnNode | null, definition = false): void => {
     if (!definition) {
@@ -35,7 +37,10 @@ export function validateArtboards(doc: FdnDocument): ReportLine[] {
     if (attr(node, 'frame') !== undefined && (node.tag !== 'fdn-artboard' || attr(node, 'frame') !== 'legacy')) issue(node, 'artboard-frame', 'data-fdn-frame accepts only legacy on an artboard')
     if (ARTBOARD_TAGS.has(node.tag)) {
       if (definition || (node.tag === 'fdn-page' ? parent !== null : node.tag === 'fdn-artboard' ? parent?.tag !== 'fdn-page' : parent?.tag !== 'fdn-artboard')) issue(node, 'artboard-containment', 'pages belong at root, artboards inside pages, and views inside artboards')
-      if (node.when !== undefined || node.each !== undefined || node.styleRef !== undefined || Object.keys(node.style).length || Object.values(node.styleStates).some(plane => plane && Object.keys(plane).length) || node.text !== undefined || Object.keys(node.attrs).some(key => key === 'data-fdn-state' || key.startsWith('data-fdn-mode-'))) issue(node, 'artboard-wrapper-style', 'structural artboard nodes cannot carry content, styles or bindings')
+      const frame = node.tag === 'fdn-artboard' && doc.specVersion === ARTBOARD_FRAME_VERSION
+      if (Object.keys(node.attrs).some(key => /^(?:style(?:-.+)?|data-fdn-(?:style|id|when|each-filter)|when|each)$/i.test(key))) issue(node, 'artboard-wrapper-style', 'structural frame fields must use their canonical node fields')
+      if (node.when !== undefined || node.each !== undefined || node.text !== undefined || node.attrs['data-fdn-state'] !== undefined || !frame && (node.styleRef !== undefined || Object.keys(node.style).length || Object.values(node.styleStates).some(plane => plane && Object.keys(plane).length) || Object.keys(node.attrs).some(key => key.startsWith('data-fdn-mode-')))) issue(node, 'artboard-wrapper-style', 'structural artboard nodes cannot carry content, styles or bindings without the artboard-frames format')
+      if (frame) issues.push(...artboardFrameIssues(doc, node))
       if (node.tag !== 'fdn-artboard-view' && (!attr(node, 'name')?.trim() || control.test(attr(node, 'name')!))) issue(node, 'artboard-name', 'page and artboard names must be nonempty literal display names')
       if (node.tag !== 'fdn-page') {
         for (const key of node.tag === 'fdn-artboard' ? ['x', 'y', 'width', 'height'] : ['x', 'y', 'width', 'height'].filter(key => attr(node, key) !== undefined)) {
@@ -46,7 +51,7 @@ export function validateArtboards(doc: FdnDocument): ReportLine[] {
       for (const [key, value] of Object.entries(node.attrs)) if (key.startsWith('data-fdn-padding-')) {
         if (node.tag !== 'fdn-artboard' || !paddingSides.some(side => key === `data-fdn-padding-${side}`) || !decimal.test(value) || !Number.isFinite(Number(value)) || Number(value) < 0) issue(node, 'artboard-padding', `${key} must be a finite non-negative literal pixel number on an artboard`, { attr: key })
       }
-      if (node.tag === 'fdn-artboard' && !['clip', 'visible'].includes(attr(node, 'overflow') ?? '')) issue(node, 'artboard-overflow', 'artboard overflow must be clip or visible')
+      if (node.tag === 'fdn-artboard' && !(frame && attr(node, 'overflow') === undefined) && !['clip', 'visible'].includes(attr(node, 'overflow') ?? '')) issue(node, 'artboard-overflow', 'artboard overflow must be clip or visible')
       if (node.tag === 'fdn-artboard-view') {
         const ref = viewRef(node)
         if (node.children.length) issue(node, 'artboard-view-children', 'view metadata cannot contain design content')
@@ -107,7 +112,7 @@ export function boardView(doc: FdnDocument, ref: BoardRef): BoardView {
     const priorRecord = board.children.find(child => child.tag === 'fdn-artboard-view' && viewRef(child).state === ref.state && viewRef(child).viewport === ref.viewport)
     return sum + (priorRecord && attr(priorRecord, 'width') !== undefined ? number(priorRecord, 'width') : doc.viewports.find(viewport => viewport.name === ref.viewport)?.width ?? number(board, 'width')) + 120
   }, 0)
-  const view: BoardView = { ...ref, pageId: page!.id, name: attr(board, 'name') ?? board.id, x: record && attr(record, 'x') !== undefined ? number(record, 'x') : number(board, 'x') + xOffset, y: record && attr(record, 'y') !== undefined ? number(record, 'y') : number(board, 'y'), width: sizeOverride ? number(record!, 'width') : viewport?.width ?? number(board, 'width'), height: sizeOverride ? number(record!, 'height') : viewport?.height ?? number(board, 'height'), visible: attr(record ?? board, 'visible') !== 'false', overflow: attr(board, 'overflow') === 'clip' ? 'clip' : 'visible', sizeOverride, padding: padding(board), frame: attr(board, 'frame') === 'legacy' ? 'legacy' : 'standard' }
+  const view: BoardView = { ...ref, pageId: page!.id, name: attr(board, 'name') ?? board.id, x: record && attr(record, 'x') !== undefined ? number(record, 'x') : number(board, 'x') + xOffset, y: record && attr(record, 'y') !== undefined ? number(record, 'y') : number(board, 'y'), width: sizeOverride ? number(record!, 'width') : viewport?.width ?? number(board, 'width'), height: sizeOverride ? number(record!, 'height') : viewport?.height ?? number(board, 'height'), visible: attr(record ?? board, 'visible') !== 'false', overflow: doc.specVersion === ARTBOARD_FRAME_VERSION ? artboardOverflow(doc, board, ref.state) : attr(board, 'overflow') === 'clip' ? 'clip' : 'visible', sizeOverride, padding: padding(board), frame: attr(board, 'frame') === 'legacy' ? 'legacy' : 'standard' }
   if (attr(board, 'frame') !== undefined && attr(board, 'frame') !== 'legacy') throw new Error(`invalid-artboard-frame: ${ref.artboardId}`)
   if (!Object.values(view.padding).every(value => Number.isFinite(value) && value >= 0)) throw new Error(`invalid-artboard-padding: ${ref.artboardId}`)
   if (![view.x, view.y, view.width, view.height].every(Number.isFinite) || view.width <= 0 || view.height <= 0) throw new Error(`invalid-artboard-geometry: ${ref.artboardId}`)
@@ -130,7 +135,7 @@ export function boardViews(doc: FdnDocument): BoardView[] {
   return views
 }
 
-export function selectArtboard(doc: FdnDocument, id?: string | null, ref?: { state?: string; viewport?: string | null }): { doc: FdnDocument; artboardId: string | null; view?: BoardView } {
+export function selectArtboard(doc: FdnDocument, id?: string | null, ref?: { state?: string; viewport?: string | null }): { doc: FdnDocument; artboardId: string | null; view?: BoardView; frame?: FdnNode } {
   if (!explicitArtboards(doc)) {
     if (id != null) throw new Error(`unknown-artboard: ${id}`)
     return { doc, artboardId: null }
@@ -138,7 +143,7 @@ export function selectArtboard(doc: FdnDocument, id?: string | null, ref?: { sta
   const boards = doc.body.flatMap(page => page.children).filter(node => node.tag === 'fdn-artboard')
   const board = id == null && boards.length === 1 ? boards[0] : boards.find(board => board.id === id)
   if (!board) throw new Error(id == null ? 'ambiguous-artboard: select one artboard' : `unknown-artboard: ${id}`)
-  return { doc: { ...doc, body: board.children.filter(node => node.tag !== 'fdn-artboard-view') }, artboardId: board.id, view: boardView(doc, { artboardId: board.id, state: ref?.state && doc.states.some(state => state.name === ref.state) ? ref.state : null, viewport: ref?.viewport ?? null }) }
+  return { doc: { ...doc, body: board.children.filter(node => node.tag !== 'fdn-artboard-view') }, artboardId: board.id, ...(doc.specVersion === ARTBOARD_FRAME_VERSION && hasArtboardFrame(board) ? { frame: board } : {}), view: boardView(doc, { artboardId: board.id, state: ref?.state && doc.states.some(state => state.name === ref.state) ? ref.state : null, viewport: ref?.viewport ?? null }) }
 }
 
 export class ArtboardError extends Error {
@@ -239,6 +244,7 @@ export function expandArtboardOp(doc: FdnDocument, op: ArtboardOp): PatchOp[] {
     if (board?.tag !== 'fdn-artboard') fail('padding target must be an existing artboard')
     const sides = paddingSides.filter(side => Object.hasOwn(op, side))
     if (!sides.length || sides.some(side => typeof op[side] !== 'number' || !Number.isFinite(op[side]) || op[side]! < 0)) fail('padding requires at least one finite non-negative pixel value')
+    if (doc.specVersion === ARTBOARD_FRAME_VERSION) return sides.map(side => ({ op: 'set-style', id: op.id, prop: `padding-${side}`, value: `${op[side]}px` }))
     return sides.flatMap(side => {
       const current = attr(board!, `padding-${side}`)
       if (op[side] !== 0 && Number(current ?? 0) === op[side]) return []

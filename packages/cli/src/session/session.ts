@@ -1,5 +1,5 @@
 import { legacyMessage, legacyBoardRef, legacyArtboardReason, legacyArtboardOpReason } from './legacy.js'
-import { ArtboardError, validateArtboards, explicitArtboards, artboardPages, boardViews, boardView, boardKey } from 'foundation-engine'
+import { ARTBOARD_FRAME_VERSION, ArtboardError, validateArtboards, explicitArtboards, artboardPages, boardViews, boardView, boardKey } from 'foundation-engine'
 import type { BoardRef } from 'foundation-engine'
 import { bakeImpact, mergeBakeImpact, type BakeImpact } from './bake-impact.js'
 import { PlacementError } from './placement.js'
@@ -78,6 +78,7 @@ class DesignSession implements Session {
   private author = ''
   private protocol: SessionProtocol = SESSION_PROTOCOL
   private earlyResult = false
+  private artboardFrames = false
   private actor = `session:${randomUUID()}`
   private chain: FdnChain | null = null
   private readonly activityIdentity = randomUUID()
@@ -289,6 +290,7 @@ class DesignSession implements Session {
     this.protocol = message.protocol
     this.author = message.author || this.options.author || defaultAuthor()
     this.earlyResult = message.earlyResult === true
+    this.artboardFrames = message.artboardFrames === true
     const created = this.open()
     if (created === null) return
     if (this.earlyResult && !this.chain && !this.invalidExternalTokens && this.docId) {
@@ -334,7 +336,7 @@ class DesignSession implements Session {
     this.diskTextCanonical = canonicalText(incoming)
     this.diskChain = chainBytes
     this.docId = this.chain?.docId() ?? readDocIdAttr(text)
-    const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json' || ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code)) ?? validateTokenCollections(incoming)[0] ?? validateStateStyles(incoming)[0] ?? validateArtboards(incoming).find(line => ['artboard-padding', 'artboard-frame'].includes(line.code))
+    const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json' || ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code)) ?? validateTokenCollections(incoming)[0] ?? validateStateStyles(incoming)[0] ?? validateArtboards(incoming).find(line => ['artboard-padding', 'artboard-frame', 'artboard-frame-geometry', 'artboard-frame-conflict'].includes(line.code))
     if (issue) {
       this.invalidExternalTokens = `external metadata is invalid; source preserved and commits blocked until repaired: ${issue.message}`
       this.setDoc(this.chain ? this.chain.doc() : normalizeDocument(incoming))
@@ -468,7 +470,7 @@ class DesignSession implements Session {
       const baseCanonical = this.diskTextCanonical
       this.diskText = text
       this.diskTextCanonical = incomingCanonical
-      const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json' || ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code)) ?? validateTokenCollections(incoming)[0] ?? validateStateStyles(incoming)[0] ?? validateArtboards(incoming).find(line => ['artboard-padding', 'artboard-frame'].includes(line.code))
+      const issue = parsed.report.lines.find((line) => line.code === 'invalid-data-json' || ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code)) ?? validateTokenCollections(incoming)[0] ?? validateStateStyles(incoming)[0] ?? validateArtboards(incoming).find(line => ['artboard-padding', 'artboard-frame', 'artboard-frame-geometry', 'artboard-frame-conflict'].includes(line.code))
       if (issue) {
         const message = `external metadata is invalid; source preserved and commits blocked until repaired: ${issue.message}`
         if (this.invalidExternalTokens !== message) this.fault('unreadable', message, null)
@@ -524,6 +526,7 @@ class DesignSession implements Session {
   private commit(message: Extract<WireClientMessage, { t: 'commit' }>): void {
     this.syncAndAnnounce()
     if (this.protocol === LEGACY_SESSION_PROTOCOL && (explicitArtboards(this.doc) || message.ops.some(op => isArtboardOperation(op) || op.op === 'set-spec-version'))) return this.reject(message.id, { code: 'invalid-op', message: explicitArtboards(this.doc) ? legacyArtboardReason : legacyArtboardOpReason })
+    if (this.readOnlyReason()) return this.reject(message.id, { code: 'invalid-op', message: this.readOnlyReason()! })
     if (this.invalidExternalTokens) return this.reject(message.id, { code: 'invalid-op', message: this.invalidExternalTokens })
     if (message.ops.length === 0) return this.reject(message.id, { code: 'invalid-op', message: 'commit has no ops' })
     if (message.base > this.rev) return this.reject(message.id, { code: 'invalid-op', message: `base ${message.base} is ahead of rev ${this.rev}` })
@@ -550,6 +553,7 @@ class DesignSession implements Session {
     }
     const patch = message.ops.length === 1 && singlePatch ? singlePatch : applyPatch(this.doc, ops)
     if (!patch.ok) return this.reject(message.id, patch.error)
+    if (patch.doc.specVersion === ARTBOARD_FRAME_VERSION && !this.artboardFrames) return this.reject(message.id, { code: 'invalid-op', message: 'Artboard frame editing requires an updated client with artboardFrames enabled' })
     if (this.protocol === LEGACY_SESSION_PROTOCOL && explicitArtboards(patch.doc)) return this.reject(message.id, { code: 'invalid-op', message: legacyArtboardOpReason })
     if (patch.inverse.length === 0 && canonicalText(patch.doc) === this.docText) {
       this.emit({ t: 'result', id: message.id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}), ...(componentDetaches.length ? { componentDetaches } : {}) })
@@ -571,6 +575,7 @@ class DesignSession implements Session {
   private step(id: string, direction: 'undo' | 'redo'): void {
     this.syncAndAnnounce()
     if (this.protocol === LEGACY_SESSION_PROTOCOL && explicitArtboards(this.doc)) return this.reject(id, { code: 'invalid-op', message: legacyArtboardReason })
+    if (this.readOnlyReason()) return this.reject(id, { code: 'invalid-op', message: this.readOnlyReason()! })
     if (this.invalidExternalTokens) return this.reject(id, { code: 'invalid-op', message: this.invalidExternalTokens })
     const from = direction === 'undo' ? this.undoStack : this.redoStack
     const to = direction === 'undo' ? this.redoStack : this.undoStack
@@ -599,6 +604,7 @@ class DesignSession implements Session {
 
   private anchor(message: Extract<WireClientMessage, { t: 'anchor' }>): void {
     this.syncAndAnnounce()
+    if (this.readOnlyReason()) return this.reject(message.id, { code: 'invalid-op', message: this.readOnlyReason()! })
     if (this.protocol === LEGACY_SESSION_PROTOCOL && explicitArtboards(this.doc)) return this.reject(message.id, { code: 'invalid-op', message: legacyArtboardReason })
     if (!message.name.trim()) return this.reject(message.id, { code: 'invalid-op', message: 'anchor name must not be empty' })
     const label = `Anchor ${message.name}`
@@ -679,13 +685,18 @@ class DesignSession implements Session {
     return this.view.boards.filter(ref => { try { boardView(this.doc, ref); return false } catch { return true } })
   }
 
+  private readOnlyReason(): string | null {
+    return this.doc.specVersion === ARTBOARD_FRAME_VERSION && !this.artboardFrames ? 'This design uses artboard frame styles. Update this client to edit it.' : null
+  }
+
   private documentView(): DocumentView {
     const top = (stack: UndoStep[]): string | null => stack.at(-1)?.label ?? null
     return {
       rev: this.rev,
       doc: this.doc,
       head: this.head(),
-      history: { canUndo: this.undoStack.length > 0, canRedo: this.redoStack.length > 0, undoLabel: top(this.undoStack), redoLabel: top(this.redoStack) },
+      history: this.readOnlyReason() ? { canUndo: false, canRedo: false, undoLabel: null, redoLabel: null } : { canUndo: this.undoStack.length > 0, canRedo: this.redoStack.length > 0, undoLabel: top(this.undoStack), redoLabel: top(this.redoStack) },
+      ...(this.readOnlyReason() ? { readOnly: this.readOnlyReason()! } : {}),
       issues: this.issues,
       pages: artboardPages(this.doc),
       boards: boardViews(this.doc),

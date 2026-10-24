@@ -1,4 +1,4 @@
-import { expandArtboardOp } from 'foundation-engine'
+import { ARTBOARD_FRAME_VERSION, expandArtboardOp, promoteArtboardFrame } from 'foundation-engine'
 import type { ArtboardOp } from 'foundation-engine'
 import { applyPatch, indexNodes } from 'foundation-engine'
 import type { FdnDocument, FdnNode, InstanceDetachReport, InstanceSwapReport, PatchOp } from 'foundation-engine'
@@ -14,6 +14,22 @@ const MODE_OPS = new Set(['create-token-collection', 'add-token-mode', 'rename-t
 
 export function isArtboardOperation(op: SessionOp): op is ArtboardOp { return ARTBOARD_OPS.has(op.op) }
 
+function frameTarget(doc: FdnDocument, op: SessionOp): FdnNode | undefined {
+  if (!('id' in op)) return undefined
+  const node = indexNodes(doc.body).get(op.id)?.node
+  if (node?.tag !== 'fdn-artboard') return undefined
+  if (op.op === 'set-style') {
+    if (op.value === null && node.style[op.prop] === undefined && node.attrs[`data-fdn-${op.prop}`] === undefined) return undefined
+    return node
+  }
+  if (op.op === 'set-style-ref') return op.styleRef === null && node.styleRef === undefined ? undefined : node
+  if (op.op === 'set-frame-mode') return node
+  if (op.op === 'set-collection-mode') return op.mode === null && node.attrs[`data-fdn-mode-${op.collection}`] === undefined ? undefined : node
+  if (op.op === 'set-attr' && (op.key.startsWith('data-fdn-mode-') || op.key === 'data-fdn-layout')) return op.value === null && node.attrs[op.key] === undefined ? undefined : node
+  if (op.op === 'set-artboard-padding' && doc.specVersion === ARTBOARD_FRAME_VERSION) return node
+  return undefined
+}
+
 export function expandSessionOps(doc: FdnDocument, ops: SessionOp[], reports: InstanceSwapReport[] = [], detaches: InstanceDetachReport[] = []): PatchOp[] {
   ops = ops.flatMap<SessionOp>(op => {
     if (op.op !== 'remove-state' && op.op !== 'remove-viewport') return [op]
@@ -21,15 +37,24 @@ export function expandSessionOps(doc: FdnDocument, ops: SessionOp[], reports: In
     const remove: PatchOp[] = [...indexNodes(doc.body).values()].filter(loc => loc.node.tag === 'fdn-artboard-view' && loc.node.attrs[key] === op.name).map(loc => ({ op: 'remove-node', id: loc.node.id }))
     return [...remove, op]
   })
-  if (ops.every((op): op is PatchOp | PlacementOp => !MODE_OPS.has(op.op) && !COMPONENT_OPS.has(op.op) && !ARTBOARD_OPS.has(op.op))) return expandPlacement(doc, ops)
+  if (ops.every((op): op is PatchOp | PlacementOp => !MODE_OPS.has(op.op) && !COMPONENT_OPS.has(op.op) && !ARTBOARD_OPS.has(op.op) && !frameTarget(doc, op))) return expandPlacement(doc, ops)
   let working = doc
   const expanded: PatchOp[] = []
   for (const [position, op] of ops.entries()) {
+    const root = frameTarget(working, op)
+    const prefix = root ? promoteArtboardFrame(working, root) : []
+    if (root && op.op === 'set-style' && /^overflow(?:-[xy])?$/.test(op.prop)) prefix.push({ op: 'set-attr', id: root.id, key: 'data-fdn-overflow', value: null })
+    if (prefix.length) {
+      const prepared = applyPatch(working, prefix, { validateTokens: false, validateComponents: false, validateStateStyles: false, validateArtboards: false })
+      if (!prepared.ok) throw new PlacementError(prepared.error.code, prepared.error.message)
+      working = prepared.doc
+    }
     let batch: PatchOp[]
     if (ARTBOARD_OPS.has(op.op)) batch = expandArtboardOp(working, op as ArtboardOp)
     else if (COMPONENT_OPS.has(op.op)) batch = expandComponentOp(working, op as ComponentOp, reports, detaches)
     else if (!MODE_OPS.has(op.op)) batch = expandPlacement(working, [op as PatchOp | PlacementOp])
     else batch = modeOps(working, op as TokenModeOp)
+    batch = [...prefix, ...batch]
     if (position === ops.length - 1) {
       expanded.push(...batch)
       break

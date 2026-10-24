@@ -1,4 +1,6 @@
-import { selectArtboard } from '../artboards/index.js'
+import { artboardFrameNode, filterFrameOverflow, selectArtboard } from '../artboards/index.js'
+import { resolveNodeStyle as resolveSharedNodeStyle } from './node-style.js'
+import { stateContext } from './context.js'
 import { ownOverrides, overrideTarget, prepareOverrides, resolveOverrideTarget } from '../components/overrides.js'
 import type { OverrideOrigin, PreparedOverrides } from '../components/overrides.js'
 import { componentSelection, validateComponentSets } from '../components/variants.js'
@@ -36,7 +38,6 @@ import type {
   FdnNode,
   FdnParamType,
   FdnProp,
-  FdnState,
   NodeId,
   ReportLine,
   StateStyleKey,
@@ -83,7 +84,7 @@ function pushReport(ctx: BakeCtx, line: ReportLine): void {
   ctx.reports.push(line)
 }
 
-export function bakeDocument(doc: FdnDocument, opts?: { state?: string; artboardId?: string | null; viewport?: string | null; includeNodeIds?: boolean }): { html: string; tree: FdnNode[]; state: string | null; artboardId: string | null; report: ConformanceReport } {
+export function bakeDocument(doc: FdnDocument, opts?: { state?: string; artboardId?: string | null; viewport?: string | null; includeNodeIds?: boolean }): { html: string; tree: FdnNode[]; state: string | null; artboardId: string | null; report: ConformanceReport; root?: FdnNode } {
   const issue = validateTokenCollections(doc)[0]
   if (issue) throw new Error(issue.message)
   let selected: ReturnType<typeof selectArtboard>
@@ -92,11 +93,11 @@ export function bakeDocument(doc: FdnDocument, opts?: { state?: string; artboard
   }
   doc = selected.doc
   const stateName = opts?.state ?? null
-  const { tree, capsuleCss, report } = bakeTree(doc, stateName, false)
-  return { html: emitHtml(doc, tree, capsuleCss, selected.view, opts?.includeNodeIds), tree, state: stateName, artboardId: selected.artboardId, report }
+  const { tree, capsuleCss, report, root } = bakeTree(doc, stateName, false, undefined, selected.frame)
+  return { html: emitHtml(doc, tree, capsuleCss, selected.view, opts?.includeNodeIds, root), ...(root ? { root } : {}), tree, state: stateName, artboardId: selected.artboardId, report }
 }
 
-export function bakeEditorDocument(doc: FdnDocument, opts?: { state?: string; artboardId?: string | null; viewport?: string | null }): { html: string; tree: FdnNode[]; state: string | null; artboardId: string | null; report: ConformanceReport } {
+export function bakeEditorDocument(doc: FdnDocument, opts?: { state?: string; artboardId?: string | null; viewport?: string | null }): { html: string; tree: FdnNode[]; state: string | null; artboardId: string | null; report: ConformanceReport; root?: FdnNode } {
   const issue = validateTokenCollections(doc)[0]
   if (issue) throw new Error(issue.message)
   let selected: ReturnType<typeof selectArtboard>
@@ -105,11 +106,11 @@ export function bakeEditorDocument(doc: FdnDocument, opts?: { state?: string; ar
   }
   doc = selected.doc
   const stateName = opts?.state ?? null
-  const { tree, capsuleCss, report } = bakeTree(doc, stateName, true)
-  return { html: emitEditorHtml(doc, tree, capsuleCss, selected.view), tree, state: stateName, artboardId: selected.artboardId, report }
+  const { tree, capsuleCss, report, root } = bakeTree(doc, stateName, true, undefined, selected.frame)
+  return { html: emitEditorHtml(doc, tree, capsuleCss, selected.view, root), ...(root ? { root } : {}), tree, state: stateName, artboardId: selected.artboardId, report }
 }
 
-export function bakeEditorComponent(doc: FdnDocument, name: string): { html: string; tree: FdnNode[]; report: ConformanceReport } {
+export function bakeEditorComponent(doc: FdnDocument, name: string): { html: string; tree: FdnNode[]; report: ConformanceReport; root?: FdnNode } {
   const issue = validateTokenCollections(doc)[0]
   if (issue) throw new Error(issue.message)
   const componentSet = doc.componentSets?.find((item) => item.name === name)
@@ -187,36 +188,10 @@ function sampleValue(prop: FdnProp, body: FdnNode[]): string | undefined {
   }
 }
 
-function bakeTree(doc: FdnDocument, stateName: string | null, editor: boolean, materialization?: Materialization): { tree: FdnNode[]; capsuleCss: Map<string, string>; report: ConformanceReport } {
+function bakeTree(doc: FdnDocument, stateName: string | null, editor: boolean, materialization?: Materialization, frame?: FdnNode): { tree: FdnNode[]; capsuleCss: Map<string, string>; report: ConformanceReport; root?: FdnNode } {
   const reports: ReportLine[] = []
 
-  let state: FdnState | undefined
-  if (stateName !== null) {
-    state = doc.states.find((s) => s.name === stateName)
-    if (!state) {
-      reports.push({
-        code: 'unknown-state',
-        severity: 'error',
-        message: `state "${stateName}" is not declared; baking with defaults only`,
-      })
-    }
-  }
-
-  const params: Record<string, unknown> = {}
-  for (const p of doc.params) {
-    if (state && Object.prototype.hasOwnProperty.call(state.assignments, p.name)) {
-      params[p.name] = state.assignments[p.name]
-    } else if (p.default !== undefined) {
-      params[p.name] = p.default
-    } else {
-      params[p.name] = ''
-      reports.push({
-        code: 'param-missing-default',
-        severity: 'warning',
-        message: `param "${p.name}" has no default and no state assignment; baked empty`,
-      })
-    }
-  }
+  const expressionContext = stateContext(doc, stateName, reports)
 
   const tokenValueIndex = new Map<string, string[]>()
   for (const [name, value] of Object.entries(doc.tokens)) {
@@ -229,8 +204,7 @@ function bakeTree(doc: FdnDocument, stateName: string | null, editor: boolean, m
     doc,
     selectedState: stateName,
     ...(materialization ? { materialization } : {}),
-    bindings: { prop: {}, param: params, state: { name: stateName ?? '' } },
-    lookups: doc.lookups,
+    ...expressionContext,
     componentStack: [],
     instancePath: [],
     usedOverrides: new Set(),
@@ -242,6 +216,12 @@ function bakeTree(doc: FdnDocument, stateName: string | null, editor: boolean, m
     ...(editor ? { editor: { idPrefix: '' } } : {}),
   }
 
+  let root: FdnNode | undefined
+  if (frame) {
+    const rendered = resolveNodeStyle(artboardFrameNode(frame), ctx)
+    filterFrameOverflow(frame, rendered)
+    root = { id: frame.id, tag: 'body', ...rendered, attrs: { ...rendered.attrs, ...(editor ? { 'data-fdn-id': frame.id } : {}) }, children: [] }
+  }
   const tree = doc.body.flatMap((n) => bakeNode(n, ctx))
 
   for (const name of Object.keys(doc.tokens)) {
@@ -254,7 +234,7 @@ function bakeTree(doc: FdnDocument, stateName: string | null, editor: boolean, m
     }
   }
 
-  return { tree, capsuleCss: ctx.capsuleCss, report: { lines: dedupeReports(reports) } }
+  return { tree, capsuleCss: ctx.capsuleCss, report: { lines: dedupeReports(reports) }, ...(root ? { root } : {}) }
 }
 
 /**
@@ -548,58 +528,15 @@ function auditStyleValue(prop: string, value: string, ctx: BakeCtx, nodeId: Node
 }
 
 function resolveNodeStyle(node: FdnNode, ctx: BakeCtx): ResolvedStyle {
-  const attrs: Record<string, string> = {}
-  for (const [k, v] of Object.entries(node.attrs)) {
-    const { value, reports } = interpolateString(v, ctx, node.id)
-    ctx.reports.push(...reports)
-    attrs[k] = value
-  }
-
-  const namedStyle: FdnNamedStyle | undefined = node.styleRef
-    ? ctx.doc.namedStyles.find((s) => s.name === node.styleRef)
-    : undefined
-  if (node.styleRef && !namedStyle) {
-    pushReport(ctx, { code: 'unknown-style-ref', severity: 'warning', message: `named style "${node.styleRef}" is not declared`, nodeId: node.id })
-  }
-
-  const mergedRaw = namedStyle ? mergeStyles(namedStyle.style, node.style) : node.style
-  const style = mapStyleValues(mergedRaw, (prop, raw) => {
-    const { value, reports } = interpolateString(raw, ctx, node.id)
-    ctx.reports.push(...reports)
-    if (/\bstate\s*\.\s*name\b/.test(raw) && reports.some(report => report.severity === 'error')) return undefined
-    auditStyleValue(prop, value, ctx, node.id)
-    return value
-  })
-  if (node.styleRef) attrs['data-fdn-style'] = node.styleRef
-
-  const styleStates: Partial<Record<StateStyleKey, Record<string, string>>> = {}
-  for (const key of STATE_STYLE_KEYS) {
-    const base = namedStyle?.styleStates?.[key]
-    const own = node.styleStates?.[key]
-    if (!base && !own) continue
-    const merged = mergeStyles(base ?? {}, own ?? {})
-    const propNames = styleEntries(merged).map(([prop]) => prop)
-    if (propNames.length === 0) continue
-    const parts: string[] = []
-    const resolved = mapStyleValues(merged, (propName, raw) => {
-      const { value, reports } = interpolateString(raw, ctx, node.id)
-      ctx.reports.push(...reports)
-      if (/\bstate\s*\.\s*name\b/.test(raw) && reports.some(report => report.severity === 'error')) return undefined
-      parts.push(`${propName}:${value}`)
-      auditStyleValue(propName, value, ctx, node.id)
-      return value
-    })
-    if (!Object.keys(resolved).length) continue
-    styleStates[key] = resolved
-    attrs[`style-${key}`] = parts.join(';')
-  }
-
+  const resolved = resolveSharedNodeStyle(node, ctx.doc, ctx, ctx.reports, (prop, value) => auditStyleValue(prop, value, ctx, node.id))
+  const { attrs } = resolved
+  const namedStyle = node.styleRef ? ctx.doc.namedStyles.find(style => style.name === node.styleRef) : undefined
   if (ctx.materialization && node.styleRef && namedStyle) {
     if ([...Object.values(namedStyle.style), ...Object.values(namedStyle.styleStates).flatMap((plane) => Object.values(plane ?? {}))].some((value) => value.includes('{{'))) throw new Error("Can't detach: this named style has dynamic values that cannot stay linked while freezing the outer state")
     const own = (plane: Record<string, string>) => mapStyleValues(plane, (_prop, raw) => interpolateString(raw, ctx, node.id).value)
     return { attrs, style: own(node.style), styleStates: Object.fromEntries(Object.entries(node.styleStates).filter(([, plane]) => plane).map(([key, plane]) => [key, own(plane!)])) }
   }
-  return { attrs, style, styleStates }
+  return resolved
 }
 
 function buildRegularNode(node: FdnNode, ctx: BakeCtx): FdnNode {
