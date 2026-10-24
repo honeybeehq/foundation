@@ -21,7 +21,7 @@ export class DirectChanges {
     if (!nodeId) throw new Error('direct sync requires config.node.id')
     for (const workspace of Object.values(config.workspaces)) {
       if (workspace.secret.length < 32) throw new Error('direct sync workspace secret must have at least 32 characters')
-      for (const peer of workspace.peers) { const url = new URL(peer.url); if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) throw new Error('invalid direct peer URL') }
+      for (const peer of workspace.peers) { if (peer.nodeId === nodeId) throw new Error('direct sync peer cannot be this node'); const url = new URL(peer.url); if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) throw new Error('invalid direct peer URL'); const octets = url.hostname.split('.').map(Number); const tailnet = octets.length === 4 && octets[0] === 100 && octets[1]! >= 64 && octets[1]! <= 127 && octets.every(n => Number.isInteger(n) && n >= 0 && n <= 255); if (url.protocol === 'http:' && !tailnet && !['localhost', '127.0.0.1', '[::1]'].includes(url.hostname) && !url.hostname.startsWith('[fd7a:115c:a1e0:')) throw new Error('HTTP direct peer must use a tailnet or loopback address') }
     }
     this.server = createServer((req, res) => {
       const reject = (code: number): void => { res.writeHead(code); res.end() }
@@ -34,7 +34,7 @@ export class DirectChanges {
         try {
           const body = Buffer.concat(chunks).toString('utf8')
           const message = JSON.parse(body) as DirectChange & { nodeId: string; at: number }
-          const workspace = this.config.workspaces[message.workspace]
+          const workspace = Object.hasOwn(this.config.workspaces, message.workspace) ? this.config.workspaces[message.workspace] : undefined
           if (!workspace || !workspace.peers.some(peer => peer.nodeId === message.nodeId) || !Number.isFinite(message.at) || Math.abs(Date.now() - message.at) > 60000) return reject(403)
           const supplied = req.headers['x-foundation-signature']
           const expected = signature(workspace.secret, body)
@@ -45,6 +45,7 @@ export class DirectChanges {
         } catch { reject(400) }
       })
     })
+    this.server.on('error', error => { writeDirectStatus('disabled', error.message); this.server.close(); this.server.closeAllConnections() })
     this.server.headersTimeout = 2000
     this.server.requestTimeout = 2000
     this.server.maxConnections = 32
@@ -61,7 +62,7 @@ export class DirectChanges {
       const controller = new AbortController(); this.requests.add(controller)
       const done = syncTraceSpan('direct.send', () => ({ docId: change.docId, peer: peer.nodeId }))
       const timer = setTimeout(() => controller.abort(), 2000)
-      void fetch(new URL('/changes', peer.url), { method: 'POST', body, headers: { 'content-type': 'application/json', 'x-foundation-signature': signature(workspace.secret, body) }, signal: controller.signal }).then(async res => { await res.body?.cancel(); done({ ok: res.ok }) }, () => done({ ok: false })).finally(() => { clearTimeout(timer); this.requests.delete(controller) })
+      void fetch(new URL('/changes', peer.url), { method: 'POST', redirect: 'error', body, headers: { 'content-type': 'application/json', 'x-foundation-signature': signature(workspace.secret, body) }, signal: controller.signal }).then(async res => { await res.body?.cancel(); done({ ok: res.ok }) }, () => done({ ok: false })).finally(() => { clearTimeout(timer); this.requests.delete(controller) })
     }
   }
   async close(): Promise<void> { for (const request of this.requests) request.abort(); await new Promise<void>(resolve => { this.server.close(() => resolve()); this.server.closeAllConnections() }) }
