@@ -152,6 +152,6 @@
       "noise": "Shared Studio load varied19-40; receipts are observed recipe proof, not a stable baseline."
     }
   ],
-  "readiness": "Built/installed recipes pass on Studio and built passes on metal3. Original metal3 source309ms miss retained; single-process source-register route passes Studio and awaits satellite rerun. Shared-host observations only, no stable baseline.",
+  "readiness": "Studio built39ms/installed67ms and metal3 built53ms pass. Source shim single-process route passes Studio141ms and metal3 257ms; original metal3 source309ms miss retained. Twenty samples per series, shared-host observations only; no stable baseline.",
   "updatedAt": "2026-10-24"
 }
