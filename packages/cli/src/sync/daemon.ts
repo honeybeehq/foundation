@@ -65,7 +65,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
           let failed: unknown
           const follow = (async () => {
             while (!signal.aborted) {
-              const response = await active.request('follow', { log: feed, cursor: state.cursor, max_events: 128, max_bytes: 491520, timeout_ms: 1000 })
+              const response = await active.request('read', { log: feed, cursor: state.cursor, max_events: 128, max_bytes: 491520 })
               if (response.log !== feed) throw new Error('Comb response feed mismatch')
               const incoming = page(response, state.cursor)
               if (incoming.blobs.length) {
@@ -80,6 +80,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
                 state.cursor = incoming.next; state.updatedAt = new Date().toISOString(); writeSyncState(key, state)
               }
               succeeded('receive')
+              if (!incoming.blobs.length) await delay(250)
             }
           })().catch(err => { failed = err; receiveError = err; active.close(); wake?.() })
           try {
