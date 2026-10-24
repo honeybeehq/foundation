@@ -69,7 +69,7 @@ export async function runSync(args: string[], io: CliIO): Promise<number> {
       default: throw new Error('usage: foundation sync materialize DOC_ID [TARGET] --repo-root ROOT --comb-config FILE [--workspace W --product P --json] | open <file> [--workspace W --product P --repo-root R] | close <file> | serve --comb-config <file> | status [--json]')
     }
   } catch (err) {
-    if (flags.json && err instanceof MaterializeError) io.stdout(JSON.stringify({ state: 'refused', code: err.code, message: err.message }))
+    if (flags.json && err instanceof MaterializeError) io.stdout(JSON.stringify({ state: 'refused', code: err.code, message: err.message, ...(err.path ? { path: err.path } : {}) }))
     else io.stderr(err instanceof Error ? err.message : String(err))
     return 1
   }

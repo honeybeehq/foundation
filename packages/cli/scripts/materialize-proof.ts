@@ -1,6 +1,6 @@
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync, chmodSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import assert from 'node:assert/strict'
 import { loadChain } from 'foundation-engine'
@@ -53,6 +53,9 @@ try {
   assert.deepEqual(readFileSync(target), readFileSync(source)); assert.deepEqual(readFileSync(`${target}.chain`), readFileSync(`${source}.chain`))
   log(`PASS empty checkout -> catalogue path -> identical HTML and chain bytes: ${Math.round(performance.now() - start)}ms`)
   assert.equal(JSON.parse(cli(storeB, ['sync', 'status', '--json'], 0, true))[0].file, target); log('PASS restored design registered live')
+  const restoredStatus = JSON.parse(cli(storeB, ['sync', 'status', '--json'], 0, true))[0]
+  assert.equal(restoredStatus.pending, 0); assert.equal(restoredStatus.status, 'shared')
+  log('PASS restored cursor and shared hashes seeded before daemon startup')
   daemon(storeB)
   cli(storeA, ['edit', source, '--ops', JSON.stringify([{ op: 'set-text', id: 'n1', text: 'source after restore' }])])
   await until(() => text(target, 'n1') === 'source after restore', 'source edit reaches recovered copy')
@@ -69,4 +72,14 @@ try {
   const absent = JSON.parse(cli(storeB, ['sync', 'materialize', 'missing-document', 'absent.fdn.html', '--repo-root', freshRoot, ...common], 1))
   assert.equal(absent.code, 'history-unavailable'); assert.equal(existsSync(join(freshRoot, 'absent.fdn.html')), false)
   log('PASS unavailable history leaves no target document')
+  chmodSync(join(storeB, 'live'), 0o500)
+  try {
+    const failed = JSON.parse(cli(storeB, ['sync', 'materialize', entry.docId, 'registration-failure.fdn.html', '--repo-root', freshRoot, ...common], 1))
+    assert.equal(failed.code, 'registration-failed'); assert.ok(failed.path && existsSync(failed.path)); assert.ok(existsSync(`${failed.path}.chain`))
+    log('PASS registration failure reports saved path instead of claiming missing history')
+  } finally { chmodSync(join(storeB, 'live'), 0o700) }
+  cli(storeB, ['sync', 'close', target])
+  cli(storeB, ['sync', 'open', target, '--workspace', 'other-workspace', '--product', 'foundation', '--repo-root', freshRoot])
+  const cross = JSON.parse(cli(storeB, ['sync', 'materialize', entry.docId, 'boards/design.fdn.html', '--repo-root', freshRoot, ...common], 1))
+  assert.equal(cross.code, 'path-conflict'); log('PASS target registered under another workspace refused')
 } finally { for (const child of children) child.kill('SIGTERM') }
