@@ -163,7 +163,8 @@ clock. The optional value is stored inside the packed envelope message, so the
 existing hash over exported commit bytes covers it. Older envelopes are unchanged
 and report null. This is an observation for activity display, not a merge clock:
 causal/Lamport order and deterministic peer tie-breaking remain unchanged. Given
-identical document, operations and supplied metadata, the engine remains deterministic.
+identical document, operations, explicit writer identity and supplied metadata, the
+engine remains deterministic.
 An external-file ingest records when the ingest was committed; it does not recover
 the original editor's clock or identity.
 
@@ -187,6 +188,16 @@ that empty baseline is local to the running session; chain-backed tokens survive
 restart while their history remains available. Existing log/history APIs are
 unchanged. Activity reads enumerate only uncovered Loro change spans and decode
 at most one page of facts; they do not enumerate or sort covered history.
+**Replica identities and origin (2026-10-24):** annotation ids are collision-resistant
+UUIDs (`a-<UUID>`); existing `aN` ids remain readable. Each default chain create/load
+opens a fresh writer identity (UUID ids/default actors are intentionally random); callers supplying actors must keep them unique across
+writable replicas. Optional `originNode` is stored inside the hashed envelope message
+and exposed with `wallTime` (old envelopes report null); CLI/session/MCP boundaries
+supply `FOUNDATION_ORIGIN_NODE` or the hostname, never the engine. That machine
+name becomes permanent shared history; the environment override can provide an alias. Patch/insert ids
+are caller-owned and must be unique across replicas. Deterministic parser `nN` ids,
+import reminting and detach ids are source-local: offline writers creating nodes
+must assign distinct ids before syncing; these are not replica-safe id allocators.
 
 Why: this gives multiplayer (changes merge), local-first (chains sync lazily and
 offline), audit (every change carries authorship — `agent:<bee>` or `user:<id>`), and

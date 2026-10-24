@@ -57,6 +57,7 @@ import type { ConformanceReport, FdnAnnotation, FdnDocument, ValidationResult } 
 
 export interface ServeOptions {
   transaction?: <T>(mutate: (chain: FdnChain) => T) => T
+  originNode?: () => string
   wallTime?: () => string
   port?: number
   /** Chain envelope author for annotations written through the JSON API
@@ -527,7 +528,7 @@ export async function serveDocument(filePath: string, opts?: ServeOptions): Prom
       if (x !== undefined) annotation.x = x
       if (y !== undefined) annotation.y = y
       if (state !== undefined) annotation.state = state
-      chain.apply({ author: opts?.author ?? DEFAULT_SERVE_AUTHOR, message: `annotate: ${text}`, wallTime: opts?.wallTime?.() }, [{ op: 'annotate', annotation }])
+      chain.apply({ author: opts?.author ?? DEFAULT_SERVE_AUTHOR, message: `annotate: ${text}`, wallTime: opts?.wallTime?.(), originNode: opts?.originNode?.() }, [{ op: 'annotate', annotation }])
       return annotation
       })
       sendJson(res, 200, { annotation })
@@ -557,7 +558,7 @@ export async function serveDocument(filePath: string, opts?: ServeOptions): Prom
         sendJson(res, 404, { error: `no annotation "${id}"` })
         return
       }
-      mutateChain(chain, chain => chain.apply({ author: opts?.author ?? DEFAULT_SERVE_AUTHOR, message: `annotation ${id}: mark ${status}`, wallTime: opts?.wallTime?.() }, [
+      mutateChain(chain, chain => chain.apply({ author: opts?.author ?? DEFAULT_SERVE_AUTHOR, message: `annotation ${id}: mark ${status}`, wallTime: opts?.wallTime?.(), originNode: opts?.originNode?.() }, [
         { op: 'set-annotation-status', id, status },
       ]))
       sendJson(res, 200, { id, status })
