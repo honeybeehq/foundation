@@ -1,3 +1,5 @@
+import { derivePeerId } from '../src/chain/util.js'
+import type { LoroDoc } from 'loro-crdt'
 import { describe, expect, it } from 'vitest'
 import { createChain, loadChain } from '../src/chain/index.js'
 import { baseDocument, el } from './chain-fixtures.js'
@@ -86,6 +88,21 @@ describe('chain save/load — loadChain actor (contract amendment 2026-07-31)', 
     expect(a.doc()).toEqual(b.doc())
     expect(a.log()).toEqual(b.log())
     expect(a.verify()).toEqual({ ok: true })
+  })
+
+  it('round-trips full-width peer ids through Loro without number rounding', () => {
+    const actor = 'wide-peer'
+    const peer = derivePeerId(actor)
+    expect(BigInt(peer)).toBeGreaterThan(2n ** 53n)
+    expect(BigInt(peer)).toBeLessThan(0xffffffffffffffffn)
+    const chain = createChain(baseDocument(), AUTHOR, { actor })
+    const internal = chain as unknown as { loro: LoroDoc }
+    expect(internal.loro.peerIdStr).toBe(peer)
+    const loaded = loadChain(chain.save(), { actor: 'other-wide-peer' })
+    loaded.apply(M('wide'), [{ op: 'set-token', name: 'wide', value: 'yes' }])
+    chain.merge(loaded)
+    expect(chain.doc().tokens.wide).toBe('yes')
+    expect(chain.verify()).toEqual({ ok: true })
   })
 
   it('independent creates with the same author get different writer identities', () => {
