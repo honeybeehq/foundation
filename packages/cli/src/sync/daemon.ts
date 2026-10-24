@@ -113,6 +113,8 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
               const chain = loadChain(readFileSync(`${design.file}.chain`))
               if (chain.docId() !== design.docId) throw new Error('live path now holds another design')
               const published = new Set(state.published)
+              const receivedHistory = directReceived.get(key)
+              for (const hash of published) { hinted.delete(hash); receivedHistory?.delete(hash) }
               const unshared = chain.changes().filter(c => !published.has(c.envelope.hash))
               if (state.pending !== unshared.length) { state.pending = unshared.length; writeSyncState(key, state) }
               // Let the originating node finish its append; recover durability if it disappears.
