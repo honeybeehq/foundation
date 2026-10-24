@@ -107,22 +107,24 @@ describe('Wave 4 acceptance: import all four vendored fixtures', () => {
       expect(new Set(ids).size).toBe(ids.length)
     })
 
-    it('repeated import (independent runs from the same starting document) is byte-identical', async () => {
-      // Two independent copies of the SAME starting bytes (not two separate
-      // `foundation new` calls, which would each mint a fresh random doc id
-      // — SPEC 13a-i — and make the files differ for a reason that has
-      // nothing to do with the importer's own determinism). Determinism
-      // claim under test: importing the same four fixtures, in the same
-      // order, into the same starting document, is a pure function of that
-      // input — no wall-clock time, no randomness, no environment leakage.
+    it('independent imports have distinct source ids but equivalent content', async () => {
       const fileA = file
       const fileB = path.join(dir, 'board-b.fdn.html')
       writeFileSync(fileB, readFileSync(fileA, 'utf8'), 'utf8')
-
       await importAllFour(fileA)
       await importAllFour(fileB)
-
-      expect(readFileSync(fileB, 'utf8').replace(/ data-fdn-version="[^"]*"/, '')).toBe(readFileSync(fileA, 'utf8').replace(/ data-fdn-version="[^"]*"/, ''))
+      const a = parseDocument(readFileSync(fileA, 'utf8')).doc
+      const b = parseDocument(readFileSync(fileB, 'utf8')).doc
+      const collect = (nodes: FdnNode[]): string[] => nodes.flatMap(node => [node.id, ...collect(node.children)])
+      const aIds = new Set(a.components.filter(c => c.name !== 'Card').flatMap(c => collect(c.body)))
+      const bIds = b.components.filter(c => c.name !== 'Card').flatMap(c => collect(c.body))
+      expect(bIds.some(id => aIds.has(id))).toBe(false)
+      const withoutIds = (doc: FdnDocument) => {
+        const copy = JSON.parse(JSON.stringify(doc).replace(/n-[a-f0-9-]{36}/g, 'node').replace(/lookup_[a-f0-9_]+/g, 'lookup')) as FdnDocument
+        copy.lookups.sort((a, b) => JSON.stringify(a.entries).localeCompare(JSON.stringify(b.entries)))
+        return copy
+      }
+      expect(withoutIds(b)).toEqual(withoutIds(a))
     })
 
     it('bakes a state that instantiates an imported enum-prop component (Badge) via fdn-use with prop bindings', async () => {

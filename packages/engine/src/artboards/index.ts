@@ -1,3 +1,4 @@
+import { mintNodeId } from '../node-id.js'
 import type { ArtboardPadding, ArtboardOp, ArtboardPage, BoardRef, BoardView, FdnDocument, FdnNode, PatchOp, ReportLine } from '../types.js'
 import { indexNodes } from '../chain/model.js'
 import { ARTBOARD_FRAME_VERSION, artboardFrameIssues, artboardOverflow, hasArtboardFrame } from './frame.js'
@@ -183,14 +184,11 @@ export function expandArtboardOp(doc: FdnDocument, op: ArtboardOp): PatchOp[] {
     if (explicitArtboards(doc)) fail('document already has explicit artboards')
     name(op.name); size(op.width, op.height)
     const legacyViews = boardViews(doc)
-    const takenIds = new Set([...index.keys(), op.pageId, op.artboardId, ...op.placements.map(ref => ref.id)])
-    let serial = 0
-    const freshId = (): string => { let id: string; do { id = `${op.artboardId}-view-${++serial}` } while (takenIds.has(id)); takenIds.add(id); return id }
     const supplied = new Map(op.placements.map(ref => [boardKey({ artboardId: op.artboardId, state: ref.state, viewport: ref.viewport }), ref]))
     if (supplied.size !== op.placements.length) fail('upgrade placements must have unique state/viewport tuples')
     const complete = new Map(legacyViews.map(ref => {
       const key = boardKey({ artboardId: op.artboardId, state: ref.state, viewport: ref.viewport })
-      return [key, supplied.get(key) ?? { id: freshId(), state: ref.state, viewport: ref.viewport, x: ref.x, y: ref.y }]
+      return [key, supplied.get(key) ?? { id: mintNodeId(), state: ref.state, viewport: ref.viewport, x: ref.x, y: ref.y }]
     }))
     for (const [key, ref] of supplied) complete.set(key, ref)
     const placementsInput = [...complete.values()]

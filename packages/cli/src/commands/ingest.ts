@@ -1,3 +1,4 @@
+import { parseForWrite } from '../parse-write.js'
 /**
  * `foundation ingest <file> [--commit [-m msg] [--author A]]` — normalize in
  * place: parse -> project, write the canonical text back over the file,
@@ -16,7 +17,7 @@
  * without its chain.
  */
 import { existsSync, readFileSync } from 'node:fs'
-import { loadChain, parseDocument, projectDocument, validateDocument } from 'foundation-engine'
+import { loadChain, projectDocument, validateDocument } from 'foundation-engine'
 import type { NormalizationReport } from 'foundation-engine'
 import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
@@ -49,7 +50,7 @@ export async function runIngest(args: string[], io: CliIO): Promise<number> {
     return 2
   }
 
-  const { doc, report } = parseDocument(source)
+  const { doc, report } = parseForWrite(source)
   const malformedSet = report.lines.find((line) => ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code))
   if (malformedSet) { io.stderr(malformedSet.message); return 1 }
   const canonical = projectDocument(doc)

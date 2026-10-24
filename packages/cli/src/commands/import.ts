@@ -1,3 +1,5 @@
+import { mintNodeId } from 'foundation-engine'
+import { parseForWrite } from '../parse-write.js'
 /**
  * `foundation import <source.tsx> --into <file.fdn.html> [--name N]
  * [--props <json>] [--sealed]` — Wave 4 Stage 3 CLI wiring over
@@ -15,24 +17,8 @@
  * server startup, must not pay that cost just because `import` exists as a
  * command somewhere in the binary.
  *
- * CONTRACT FINDING (node-id collisions across independently-harvested
- * components): projectArtifact mints its component body's node ids (n1,
- * n2, …) from a FRESH, isolated counter local to that one artifact (see
- * project/html.ts, which reuses parseDocument's own minter on a bare
- * fragment) — it has no visibility into the target document's existing id
- * space. A real .fdn.html document mints ids from ONE counter shared across
- * its whole body + every component (packages/engine/src/parse/index.ts,
- * `scanMaxMintedId` + one shared `IdMinter`), and `parseDocument` only
- * mints for elements LACKING `data-fdn-id` — it never renumbers ids that
- * are already present, so simply splicing a harvested component's body
- * into the target doc and reprojecting would silently leave two "n1"s (one
- * in the pre-existing content, one in the freshly imported component) that
- * parseDocument would preserve verbatim forever after. Neither
- * `scanMaxMintedId` nor `IdMinter` is exported from foundation-engine, so
- * this module carries its own small equivalent (see `remintComponentIds`
- * below) and re-numbers the harvested component's body against the target
- * document's current max id BEFORE merging — the same invariant a real
- * hand-edit would get for free from parseDocument's single shared counter.
+ * Imported node identities are fresh UUIDs. Reimport preserves existing ids
+ * for unchanged subtrees, so unchanged imports remain a no-op.
  */
 import { existsSync, readFileSync } from 'node:fs'
 import { loadChain, parseDocument, projectDocument } from 'foundation-engine'
@@ -104,53 +90,48 @@ export function harnessErrorCode(err: unknown): string | undefined {
   return isHarnessErrorLike(err) ? err.code : undefined
 }
 
-// ——— node-id renumbering (see the module-doc CONTRACT FINDING) ———
+// ——— replica-safe imported identities ———
 
-const MINTED_ID_RE = /^n(\d+)$/
-
-function scanMaxMintedId(nodes: FdnNode[]): number {
-  let max = 0
-  const walk = (list: FdnNode[]): void => {
-    for (const n of list) {
-      const m = MINTED_ID_RE.exec(n.id)
-      if (m?.[1] !== undefined) max = Math.max(max, Number(m[1]))
-      walk(n.children)
-    }
-  }
-  walk(nodes)
-  return max
+/** Match unchanged subtrees by content, so insertion/reordering never shifts identities. */
+export function remintComponentIds(nodes: FdnNode[], existing: FdnNode[] = []): FdnNode[] {
+  const stable = (value: unknown): unknown => Array.isArray(value) ? value.map(stable)
+    : value && typeof value === 'object' ? Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b)).map(([key, value]) => [key, stable(value)])) : value
+  const shape = (node: FdnNode): unknown => ({ ...node, id: undefined, children: node.children.map(shape) })
+  const key = (node: FdnNode): string => JSON.stringify(stable(shape(node)))
+  const candidates = new Map<string, string[]>()
+  const collect = (nodes: FdnNode[]): void => { for (const node of nodes) { const k = key(node); candidates.set(k, [...(candidates.get(k) ?? []), node.id]); collect(node.children) } }
+  collect(existing)
+  const remint = (node: FdnNode): FdnNode => ({ ...node, id: candidates.get(key(node))?.shift() ?? mintNodeId(), children: node.children.map(remint) })
+  return nodes.map(remint)
 }
 
-/** Max minted id across the document, EXCLUDING `excludeComponentName`'s own
- *  body when given — that component is about to be replaced wholesale, so
- *  its current ids are about to be discarded, not kept. Excluding it is
- *  what makes re-importing the SAME component idempotent: without this, a
- *  second import of an unchanged source would scan the first import's own
- *  leftover ids as "existing", start the new counter above them, and grow
- *  the document's ids by one component's worth on every single re-import —
- *  breaking the "repeated import is byte-identical" determinism contract
- *  (API.md Wave 4 acceptance suite) for no reason other than replacing a
- *  component with an identical copy of itself. */
-export function docMaxMintedId(doc: FdnDocument, excludeComponentName?: string): number {
-  let max = scanMaxMintedId(doc.body)
-  for (const c of doc.components) {
-    if (c.name === excludeComponentName) continue
-    max = Math.max(max, scanMaxMintedId(c.body))
-  }
-  return max
-}
-
-/** Deep-clones `nodes`, replacing every node's `data-fdn-id`-shaped id with
- *  a fresh one minted from `counter` in the same pre-order (node, then its
- *  children, left to right) parseDocument's own IdMinter uses — so the
- *  renumbered subtree is indistinguishable from one parseDocument minted
- *  itself, just continuing the target document's counter instead of
- *  starting a new one at 1. */
-export function remintComponentIds(nodes: FdnNode[], counter: { n: number }): FdnNode[] {
-  return nodes.map((node) => {
-    counter.n += 1
-    return { ...node, id: `n${counter.n}`, children: remintComponentIds(node.children, counter) }
+/** The pure importer may use local names; the live writer assigns shared identities. */
+export function prepareImportedComponent(doc: FdnDocument, projected: ProjectResult): { component: FdnComponent; extraLookups: FdnLookup[] } {
+  const existing = doc.components.find(item => item.name === projected.component.name)
+  const references = JSON.stringify(existing ?? {})
+  const names = new Map<string, string>()
+  const extraLookups = projected.extraLookups.map(lookup => {
+    const previous = doc.lookups.find(item => references.includes(`${item.name}[`) && JSON.stringify(item.entries) === JSON.stringify(lookup.entries))
+    const name = previous?.name ?? `lookup_${mintNodeId().slice(2).replaceAll('-', '_')}`
+    names.set(lookup.name, name)
+    return { ...lookup, name }
   })
+  const body = projected.component.body
+  // Rewrite only the exact lookup expression shape emitted by foldValues.
+  // Quoted strings, property refs and each aliases are outside this pattern.
+  const renamed = JSON.parse(JSON.stringify(body, (_key, value: unknown) => typeof value === 'string'
+    ? value.replace(/{{([\s\S]*?)}}/g, (span, expression: string) => {
+      const lookup = /^\s*([A-Za-z_][\w-]*)(\[prop\.[A-Za-z_][\w-]*\])\s*$/.exec(expression)
+      if (lookup && names.has(lookup[1]!)) return `{{ ${names.get(lookup[1]!)}${lookup[2]} }}`
+      const unquoted = expression.replace(/'(?:[^'\\]|\\.)*(?:'|$)|"(?:[^"\\]|\\.)*(?:"|$)/g, '')
+      for (const ref of unquoted.matchAll(/(?<![\w.-])([A-Za-z_][\w-]*)\s*\[/g)) {
+        if (names.has(ref[1]!)) throw new Error(`unsupported generated lookup expression: ${expression}`)
+      }
+      return span
+    })
+    : value)) as FdnNode[]
+  const component = { ...projected.component, body: remintComponentIds(renamed, existing?.body) }
+  return { component, extraLookups }
 }
 
 // ——— lookup merge (name-collision -> error with hint) ———
@@ -287,19 +268,15 @@ export async function runImport(args: string[], io: CliIO): Promise<number> {
     return 1
   }
 
-  const { doc, report: sourceReport } = parseDocument(targetSource)
+  const { doc, report: sourceReport } = parseForWrite(targetSource)
   const malformedSet = sourceReport.lines.find((line) => ['malformed-component-set', 'malformed-instance-overrides', 'misplaced-override-wrapper'].includes(line.code))
   if (malformedSet) { io.stderr(malformedSet.message); return 1 }
 
   const targetName = projected.component.name
   const existingIndex = doc.components.findIndex((c) => c.name === targetName)
-  const maxId = docMaxMintedId(doc, targetName)
-  const component: FdnComponent = {
-    ...projected.component,
-    body: remintComponentIds(projected.component.body, { n: maxId }),
-  }
+  const { component, extraLookups } = prepareImportedComponent(doc, projected)
 
-  const lookupResult = mergeLookups(doc.lookups, projected.extraLookups)
+  const lookupResult = mergeLookups(doc.lookups, extraLookups)
   if ('error' in lookupResult) {
     io.stderr(`foundation import: ${lookupResult.error}`)
     return 1

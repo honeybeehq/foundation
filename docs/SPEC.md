@@ -195,10 +195,12 @@ opens a fresh writer identity (UUID ids/default actors are intentionally random)
 writable replicas. Optional `originNode` is stored inside the hashed envelope message
 and exposed with `wallTime` (old envelopes report null); CLI/session/MCP boundaries
 supply `FOUNDATION_ORIGIN_NODE` or the hostname, never the engine. That machine
-name becomes permanent shared history; the environment override can provide an alias. Patch/insert ids
-are caller-owned and must be unique across replicas. Deterministic parser `nN` ids,
-import reminting and detach ids are source-local: offline writers creating nodes
-must assign distinct ids before syncing; these are not replica-safe id allocators.
+name becomes permanent shared history; the environment override can provide an alias. Live writer
+boundaries assign UUID node identities for source additions, imported component
+nodes/lookups, detached children and generated artboard-view records; reimport
+preserves existing identities. Reading/parsing existing files stays deterministic.
+Explicit operation ids and duplicate id maps remain client-owned; clients mint
+UUIDs for new objects. Token/style/component names are semantic keys, not minted ids.
 
 Why: this gives multiplayer (changes merge), local-first (chains sync lazily and
 offline), audit (every change carries authorship — `agent:<bee>` or `user:<id>`), and

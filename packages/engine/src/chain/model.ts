@@ -1,4 +1,3 @@
-import { randomUUID } from 'node:crypto'
 /**
  * Pure, Loro-free helpers over the FdnDocument/PatchOp/SemanticOp vocabulary:
  * node-location indexing (used by both undo-inversion and diff), PatchOp
@@ -345,7 +344,4 @@ export function documentsEqual(a: FdnDocument, b: FdnDocument): boolean {
 //      scheme so an id minted through any surface never collides with one
 //      minted through another) ———
 
-/** Collision-resistant across offline replicas; existing ids (including aN) stay opaque. */
-export function mintAnnotationId(_existing: FdnAnnotation[]): string {
-  return `a-${randomUUID()}`
-}
+export { mintAnnotationId } from '../../../protocol/src/ids.js'

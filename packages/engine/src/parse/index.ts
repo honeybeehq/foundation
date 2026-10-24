@@ -189,8 +189,9 @@ function scanMaxMintedId(root: Node): number {
 }
 
 class IdMinter {
-  constructor(private counter: number) {}
+  constructor(private counter: number, private fresh?: () => string) {}
   mint(): string {
+    if (this.fresh) return this.fresh()
     this.counter += 1
     return `n${this.counter}`
   }
@@ -994,7 +995,7 @@ function parseTokenCollections(header: ElementNode): FdnTokenCollection[] {
   })
 }
 
-export function parseDocument(html: string): { doc: FdnDocument; report: NormalizationReport } {
+export function parseDocument(html: string, opts?: { mintNodeId?: () => string }): { doc: FdnDocument; report: NormalizationReport } {
   const lines: ReportLine[] = []
   const normalizedHtml = normalizeSelfClosingFdnTags(html, lines)
   const document = parse(normalizedHtml)
@@ -1096,7 +1097,7 @@ export function parseDocument(html: string): { doc: FdnDocument; report: Normali
 
   // node-id minting: continue from the highest existing minted id anywhere in the
   // raw document (API.md "node identity" — deterministic for a given input text).
-  const minter = new IdMinter(scanMaxMintedId(document))
+  const minter = new IdMinter(scanMaxMintedId(document), opts?.mintNodeId)
   const ctx: ConvertCtx = { minter, lines, textNormalizedCount: 0, classStyles }
 
   const components = bodyEl ? parseComponents(bodyEl, ctx) : []

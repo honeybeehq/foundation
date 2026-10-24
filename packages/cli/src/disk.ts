@@ -1,3 +1,4 @@
+import { parseForWrite } from './parse-write.js'
 import { createHash, randomUUID } from 'node:crypto'
 import { closeSync, fsyncSync, openSync, readFileSync, renameSync, rmSync, unlinkSync, writeFileSync } from 'node:fs'
 import { basename, dirname, join } from 'node:path'
@@ -121,7 +122,7 @@ export function persistDocument(file: string, chain: FdnChain, text = projectedT
 }
 
 function ingestCurrentSource(file: string, chain: FdnChain, source: string): boolean {
-  const parsed = parseDocument(source)
+  const parsed = parseForWrite(source)
   if (parsed.report.lines.some(line => line.severity === 'error')) throw new Error(`invalid external document; run foundation chain recover ${JSON.stringify(file)} to back it up and restore the projection`)
   const ops = diffPatch(sourceBase(chain, source, file), parsed.doc)
   if (ops === null) throw new Error(`external edit cannot be expressed as granular changes; run foundation chain recover ${JSON.stringify(file)}`)
