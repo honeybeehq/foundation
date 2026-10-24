@@ -12,7 +12,11 @@ import { computeEnvelopeHash } from '../src/chain/envelope.js'
 import { baseDocument } from './chain-fixtures.js'
 
 const fixtures = JSON.parse(readFileSync(new URL('./fixtures/envelope-drift.json', import.meta.url), 'utf8')) as { a: string; b: string }
-const pair = () => [loadChain(Buffer.from(fixtures.a, 'base64')), loadChain(Buffer.from(fixtures.b, 'base64'))] as const
+const pair = () => {
+  const pair = [loadChain(Buffer.from(fixtures.a, 'base64')), loadChain(Buffer.from(fixtures.b, 'base64'))] as const
+  pair.forEach(chain => chain.upgradeStorage())
+  return pair
+}
 const nativeBytes = (chain: ReturnType<typeof loadChain>) => {
   const loro = (chain as unknown as { loro: LoroDoc }).loro
   const changes = [...loro.getAllChanges().values()].flat().sort((a, b) => a.lamport - b.lamport || (BigInt(a.peer) < BigInt(b.peer) ? -1 : 1))
@@ -79,7 +83,7 @@ describe('immutable original change bytes', () => {
     }
     const missing = structuredClone(header); const missingEntries = decodeOriginalUpdates(missing.updates) as [string, string][]; missingEntries.pop(); missing.updates = encodeOriginalUpdates(missingEntries)
     expect(() => loadChain(pack(missing))).toThrow('storage integrity')
-    const unrelated = createChain(baseDocument(), { author: 'user:other', message: 'other' }).save()
+    const unrelated = createChain(baseDocument(), { author: 'user:other', message: 'other' }).save({ format: 2 })
     const m = new DataView(unrelated.buffer, unrelated.byteOffset).getUint32(0, true)
     const otherHeader = JSON.parse(new TextDecoder().decode(unrelated.subarray(4, 4 + m)))
     expect(() => loadChain(pack({ ...header, updates: otherHeader.updates }))).toThrow()
@@ -124,7 +128,7 @@ describe('immutable original change bytes', () => {
     const [counter, peer] = target.id.split('@')
     const c = forged.getChangeAt({ peer: peer as `${number}`, counter: Number(counter) })
     const alternate = forged.export({ mode: 'updates-in-range', spans: [{ id: { peer: c.peer, counter: c.counter }, len: c.length }] })
-    const saved = chain.save(), n = new DataView(saved.buffer, saved.byteOffset).getUint32(0, true)
+    const saved = chain.save({ format: 2 }), n = new DataView(saved.buffer, saved.byteOffset).getUint32(0, true)
     const header = JSON.parse(new TextDecoder().decode(saved.subarray(4, 4 + n)))
     const entries = decodeOriginalUpdates(header.updates) as [string, string][]
     entries.find(entry => entry[0] === `${c.peer}:${c.counter}:${c.length}`)![1] = Buffer.from(alternate).toString('base64')

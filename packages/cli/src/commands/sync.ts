@@ -34,7 +34,7 @@ export async function runSync(args: string[], io: CliIO): Promise<number> {
       }
       case 'open': {
         if (!positionals[1]) throw new Error('sync open requires a file')
-        const design = registerDesign(positionals[1], flagString(flags, 'workspace'), flagString(flags, 'product'), flagString(flags, 'repo-root'))
+        const design = registerDesign(positionals[1], flagString(flags, 'workspace'), flagString(flags, 'product'), flagString(flags, 'repo-root'), message => io.stderr(message))
         io.stdout(`saved locally: ${feedName(design)}`); return 0
       }
       case 'close': {

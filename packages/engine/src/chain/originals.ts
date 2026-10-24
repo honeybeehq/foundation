@@ -91,7 +91,7 @@ export class OriginalUpdates {
     for (const [key, bytes] of other.updates) this.store(key, bytes)
   }
 
-  private assertCoverage(changes: Change[]): void {
+  assertCoverage(changes: Change[]): void {
     const keys = new Set(changes.map(changeKey))
     if (this.updates.size !== keys.size || [...this.updates.keys()].some(key => !keys.has(key))) throw new Error('cannot save incomplete causal history')
   }

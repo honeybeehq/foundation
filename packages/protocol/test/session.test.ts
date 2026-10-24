@@ -23,6 +23,12 @@ const view = { pages: [], boards: [geometry], rev: 3, doc, head: { hash: 'h', pr
 const line = (value: unknown): string => JSON.stringify(value)
 
 describe('parseClientMessage', () => {
+  it('accepts optional chain-format negotiation and rejects unknown formats', () => {
+    const hello = { t: 'hello', protocol: SESSION_PROTOCOL, client: 'apiary', author: '', chainFormats: [1, 2] }
+    expect(parseClientMessage(line(hello))).toEqual(hello)
+    expect(parseClientMessage(line({ ...hello, chainFormats: [3] }))).toBeNull()
+  })
+
   it('accepts every client message shape', () => {
     const messages = [
       { t: 'hello', protocol: SESSION_PROTOCOL, client: 'apiary', author: '' },

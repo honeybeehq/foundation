@@ -32,6 +32,10 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
   const catalogueQueue = new CatalogueQueue(config, signal, log)
   const workers = new Map<string, { controller: AbortController; done: Promise<void>; registration: string }>()
   async function run(design: LiveDesign, signal: AbortSignal): Promise<void> {
+    updateDocument(design.file, chain => {
+      if (chain.docId() !== design.docId) throw new Error('live path now holds another design')
+      chain.upgradeStorage()
+    }, true)
     const key = copyKey(design), state = readSyncState(key), feed = combLog(design)
     let bridge: CombBridge | undefined, watcher: FSWatcher | undefined, wake: (() => void) | undefined
     const retry = { receive: 250, publish: 250, connection: 250 }
