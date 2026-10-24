@@ -279,7 +279,8 @@ class LoroChain implements FdnChain {
     const anchorsBytes = bytes.subarray(4, 4 + anchorsLen)
     const snapshotBytes = bytes.subarray(4 + anchorsLen)
     const entries = JSON.parse(new TextDecoder().decode(anchorsBytes)) as [string, Frontier][]
-    const loro = LoroDoc.fromSnapshot(snapshotBytes)
+    const loro = new LoroDoc()
+    loro.import(snapshotBytes)
     // Loading a snapshot opens an independent writer, never reuses its peer identity.
     const resolvedActor = actor ?? randomUUID()
     const chain = new LoroChain(resolvedActor, loro)
@@ -521,8 +522,10 @@ class LoroChain implements FdnChain {
 
   save(): Uint8Array {
     assertFormatVersion({ specVersion: String(this.meta.get('specVersion') ?? '') })
-    const snapshot = this.loro.export({ mode: 'snapshot' })
-    const anchorsBytes = new TextEncoder().encode(JSON.stringify(Array.from(this.anchors.entries())))
+    // Full updates retain history without the snapshot's materialized-state
+    // encoding, which can vary after loading or materializing the same frontier.
+    const snapshot = this.loro.export({ mode: 'update' })
+    const anchorsBytes = new TextEncoder().encode(JSON.stringify(Array.from(this.anchors.entries()).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([name, frontier]) => [name, [...frontier].sort((a, b) => comparePeerIds(a.peer, b.peer) || a.counter - b.counter)])))
     const header = new Uint8Array(4)
     new DataView(header.buffer).setUint32(0, anchorsBytes.length, true)
     const out = new Uint8Array(4 + anchorsBytes.length + snapshot.length)
