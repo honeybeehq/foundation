@@ -22,7 +22,7 @@ const design = join(repo, 'working tree only.fdn.html')
 writeFileSync(design, '<!doctype html><title>Uncommitted local design</title>')
 const entry = join(fixture, 'capabilities.mjs')
 await build({ entryPoints: [join(root, 'packages/cli/src/capabilities-bin.ts')], bundle: true, platform: 'node', format: 'esm', target: 'node22', outfile: entry })
-const prefix = source ? [join(root, 'node_modules/tsx/dist/cli.mjs'), join(root, 'packages/cli/src/main.ts'), 'doctor'] : [entry]
+const prefix = source ? ['--import', join(root, 'node_modules/tsx/dist/loader.mjs'), join(root, 'packages/cli/src/main.ts'), 'doctor'] : [entry]
 const args = ['--capabilities', '--json', '--product-root', repo, '--design-path', design]
 const cases = []
 function run(name, argv = args, overrides = {}, status = 0) {
@@ -97,7 +97,7 @@ for (let i = 0; i < 20; i++) {
 assert.deepEqual(snapshot(fixture), before)
 assert.equal(existsSync(marker), false)
 const sorted = [...samples].sort((a, b) => a - b)
-const receipt = { workload: 'doctor-capabilities', seriesId: `${hostname()}-${process.version}-${source ? 'source' : 'built'}-capabilities-v1`, fixture, head: execFileSync('git', ['-C', root, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
+const receipt = { workload: 'doctor-capabilities', seriesId: `${hostname()}-${process.version}-${source ? 'source-register' : 'built'}-capabilities-v1`, fixture, head: execFileSync('git', ['-C', root, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
   machine: hostname(), runtime: process.version, node: process.execPath, buildMode: source ? 'source' : 'built', loadBefore, loadAfter: loadavg(),
   command: [process.execPath, ...prefix, ...args], samples, p50: sorted[9], p95: sorted[18], max: sorted[19],
   results: [{ metric: 'commandP95', samples, invariantHolds: true }], cases, readonlyVerified: true, discoveredCommandsExecuted: false }
