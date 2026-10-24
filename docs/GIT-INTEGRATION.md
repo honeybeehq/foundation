@@ -62,15 +62,22 @@ Foundation session undo or explicit semantic edits instead.
 ## Stable saves
 
 Simple Loro snapshot measurements were byte-identical, but broader tests found
-encoding changes after loading or materializing complex documents. Saved chains
-now use full-history Loro updates and sorted anchor metadata, preserving every
-change while avoiding materialized snapshot state. Legacy snapshot chains
-continue to load. Older CLIs using Loro fromSnapshot cannot load the new update
-encoding; upgrade all writers before sharing newly saved chains. Loading updates
-replays full history rather than using a materialized snapshot. New saves agree across opposite import orders, blob exchange
-and both merge directions. Projection output is deterministic too. Unchanged
-saves compare bytes before writing, preserving chain, HTML and receipt mtimes.
+encoding changes after loading or materializing complex documents. Saves now
+rebuild a fresh Loro document by importing full-history changes in deterministic
+order, then export a standard snapshot with sorted anchor metadata. A version-vector check rejects an incomplete rebuild before any files are
+written. No history is removed, and existing `LoroDoc.fromSnapshot` readers remain compatible.
+
+Use the lockfile-pinned Loro release across writers; an encoder upgrade may
+change canonical bytes and should be verified before rollout.
+
+Canonicalization can produce a one-time byte diff when an old chain is first
+saved. Subsequent saves agree across opposite import orders, blob exchange and
+both merge directions. Projection output is deterministic too. Unchanged saves
+compare bytes before writing, preserving chain, HTML and receipt mtimes.
+Rebuilding adds save work proportional to retained history: the tracks-pane
+fixture with 1,000 additional edits took roughly 48–72 ms per save on metal-1.
 
 Real CLI integration tests exercise merge, rebase and cherry-pick in scratch
-repositories, verify both edits and exact projection bytes, then sync twice
-and check clean Git status and unchanged file mtimes.
+repositories using local branches with FETCH_HEAD removed, verify both edits
+and exact projection bytes, then sync twice and check clean Git status and
+unchanged file mtimes.
