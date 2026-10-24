@@ -127,6 +127,10 @@ commands:
                                               session protocol on stdin/stdout (packages/protocol)
   gateway install|uninstall|status           publish/withdraw the operator-gateway registry entry
   git setup                                 configure chain-aware Git merges
+  git pull [remote [branch]]                fast-forward while preserving live-synced design edits
+  git prepare-update <incoming> -- <command> [args...]
+                                              hold design locks around another fast-forward update
+  git recover-update <backup-directory>      restore edits after an interrupted update
   git-merge-driver <ancestor> <ours> <theirs> [repo-path]   git merge driver (see docs/GIT-INTEGRATION.md)
 `
 
