@@ -1,7 +1,8 @@
 /** Git passes temporary paths; %P identifies the sibling chains in Git objects. */
 import { execFileSync } from 'node:child_process'
 import { readFileSync, writeFileSync } from 'node:fs'
-import { loadChain, mergeChains } from 'foundation-engine'
+import { loadChain } from '../chain-cache.js'
+import { mergeChains } from 'foundation-engine'
 import type { CliIO } from '../io.js'
 import { projectedText, projectionVersion } from '../disk.js'
 import { readDocIdAttr } from '../docid.js'

@@ -1,3 +1,4 @@
+import { loadChain } from '../chain-cache.js'
 import { parseForWrite } from '../parse-write.js'
 /**
  * `foundation ingest <file> [--commit [-m msg] [--author A]]` — normalize in
@@ -17,7 +18,7 @@ import { parseForWrite } from '../parse-write.js'
  * without its chain.
  */
 import { existsSync, readFileSync } from 'node:fs'
-import { loadChain, projectDocument, validateDocument } from 'foundation-engine'
+import { projectDocument, validateDocument } from 'foundation-engine'
 import type { NormalizationReport } from 'foundation-engine'
 import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'

@@ -1,8 +1,9 @@
+import { loadChain, rememberSavedChain } from './chain-cache.js'
 import { parseForWrite } from './parse-write.js'
 import { createHash, randomUUID } from 'node:crypto'
 import { readFileSync, renameSync, rmSync, unlinkSync, writeFileSync } from 'node:fs'
 import { basename, dirname, join } from 'node:path'
-import { diffPatch, loadChain, normalizeDocument, parseDocument, projectDocument } from 'foundation-engine'
+import { diffPatch, normalizeDocument, parseDocument, projectDocument } from 'foundation-engine'
 import type { ChangeMeta, EnvelopeRecord, FdnChain, FdnDocument } from 'foundation-engine'
 import { withWallTime } from './change-meta.js'
 import { injectDocIdAttr, readDocIdAttr } from './docid.js'
@@ -116,6 +117,7 @@ export function persistDocument(file: string, chain: FdnChain, text = projectedT
   writeAtomic(file, text)
   writeAtomic(`${file}.chain.projection`, receipt)
   unlinkSync(pendingPath)
+  rememberSavedChain(bytes)
   return bytes
 }
 

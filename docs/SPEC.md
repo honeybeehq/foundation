@@ -201,6 +201,29 @@ preserves existing identities. Reading/parsing existing files stays deterministi
 Explicit operation ids and duplicate id maps remain client-owned; clients mint
 UUIDs for new objects. Token/style/component names are semantic keys, not minted ids.
 
+**Immutable change bytes (2026-10-24):** a change's existing SHA-256 formula
+uses its original single-change Loro update bytes, retained at authoring/import
+and forwarded verbatim. Native re-exports can reorder dependency peers and change
+checksums, so they never replace identity bytes. The `.chain` v2 header stores
+sorted original spans beside sorted anchors; the snapshot is rebuilt in canonical
+history order, preserving equal-frontier byte equality. The original archive is one canonically ordered, length-framed stream compressed
+with Brotli quality 5, generic mode, window 22 and explicit size hint (`brotli-v1`).
+A SHA-256 storage seal covers the header and snapshot. Every unseen seal receives
+full native checksum/span and operation/dependency replay before load returns.
+Verified seals are cached outside the file (process memory; CLI receipts under
+`~/.foundation/verified-chains-v2`), so foreign git checkouts, copies and restores
+cannot vouch for themselves. `verify()` always repeats full checks; receive
+boundaries call it before accepting a candidate. Encoder
+upgrades require cross-replica byte-stability checks.
+Legacy array headers remain readable and capture their current exports before
+mutation; recorded hashes and parent pointers are unchanged. Already drifted legacy
+snapshots cannot recover discarded original bytes: back up unsynced work and restore
+from a healthy archived replica, rather than accepting conflicting encodings.
+Old Foundation (49d3161) refuses the v2 object header (`entries is not iterable`)
+before writing; upgrade every writer before sharing v2 chains. The wire blob/hash
+format and strict receive checks are unchanged; `importUpdate` accepts one change
+per blob, rejects overlapping spans, and cannot save incomplete causal history.
+
 Why: this gives multiplayer (changes merge), local-first (chains sync lazily and
 offline), audit (every change carries authorship — `agent:<bee>` or `user:<id>`), and
 time-travel diffing ("render anchor 12 vs anchor 9") from one primitive. It is also the

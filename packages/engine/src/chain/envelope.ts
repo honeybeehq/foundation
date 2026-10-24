@@ -16,16 +16,12 @@
  * to avoid field-concatenation ambiguity:
  *   (prevHash ?? "genesis") + "\0" + author + "\0" + message + "\0"
  *   + specVersion + "\0" + <commit's exported update bytes>
- * The "commit's exported update bytes" are obtained via
- * `doc.export({ mode: 'updates-in-range', spans: [{ id: {peer, counter}, len }] })`
- * for exactly that one Loro Change — see chain.ts `bytesForSpan`. The
- * (peer, counter, len) span is derived once, at commit time, from the
- * version-vector delta between immediately-before and immediately-after the
- * commit (`doc.version()` before vs. after) — this is the
- * "exportFrom/export with version vectors" the task brief asks for: version
- * vectors identify *which* ops belong to this commit, and updates-in-range
- * (keyed by that same peer/counter/len span) re-derives the identical bytes
- * later, deterministically, regardless of which peer or how much later asks.
+ * The commit bytes are its ORIGINAL authored/imported single-change update,
+ * retained outside Loro and persisted in the chain's v2 storage header. Native
+ * re-exports can reorder dependencies and change their checksum without changing
+ * the logical operation. They reconstruct state but never replace identity bytes.
+ * Legacy array-header chains capture their existing exports on load, before any
+ * import can re-encode them. Hash formula and recorded prevHash fields are unchanged.
  */
 
 import { createHash } from 'node:crypto'

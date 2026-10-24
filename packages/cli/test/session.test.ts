@@ -130,9 +130,11 @@ describe('foundation session', () => {
       expect(only(fromFlag.say(commit), 'doc')[0]?.cause).toEqual({ kind: 'commit', id: 'c', author: 'user:flag' })
       const fromHello = start(file, { author: 'user:flag' })
       fromHello.open('user:hello')
+      commit.ops = [{ op: 'set-text', id: 'n1', text: 'hello' }]
       expect(only(fromHello.say(commit), 'doc')[0]?.cause).toMatchObject({ author: 'user:hello' })
       const fromEnv = start(file)
       fromEnv.open('')
+      commit.ops = [{ op: 'set-text', id: 'n1', text: 'environment' }]
       expect(only(fromEnv.say(commit), 'doc')[0]?.cause).toMatchObject({ author: defaultAuthor() })
     })
   })
