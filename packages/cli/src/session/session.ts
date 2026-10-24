@@ -1,5 +1,6 @@
 import { mintNodeId } from 'foundation-engine'
 import { runtimeVersion } from '../runtime-version.js'
+import { loadChain } from '../chain-cache.js'
 import { legacyMessage, legacyBoardRef, legacyArtboardReason, legacyArtboardOpReason } from './legacy.js'
 import { ARTBOARD_FRAME_VERSION, ArtboardError, validateArtboards, explicitArtboards, artboardPages, boardViews, boardView, boardKey } from 'foundation-engine'
 import type { BoardRef } from 'foundation-engine'
@@ -18,7 +19,6 @@ import {
   diffPatch,
   emptyActivityPage,
   indexNodes,
-  loadChain,
   normalizeDocument,
   parseDocument,
   prepareChain,

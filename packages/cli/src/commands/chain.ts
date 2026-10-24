@@ -1,3 +1,4 @@
+import { loadChain } from '../chain-cache.js'
 /**
  * `foundation chain ...` — CLI surface over `<file>.chain` (Loro-backed
  * FdnChain, engine/src/chain). Two argument shapes coexist by design:
@@ -14,7 +15,7 @@
  */
 import { existsSync, readFileSync } from 'node:fs'
 import { randomUUID } from 'node:crypto'
-import { createChain, exportBlobs, importBlobs, loadChain, mergeChains, parseDocument, projectDocument } from 'foundation-engine'
+import { createChain, exportBlobs, importBlobs, mergeChains, parseDocument, projectDocument } from 'foundation-engine'
 import type { ChangeMeta, EnvelopeRecord, FdnChain, FdnDocument, OverlapReport, SemanticOp } from 'foundation-engine'
 import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'

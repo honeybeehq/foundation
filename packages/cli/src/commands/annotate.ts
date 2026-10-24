@@ -1,3 +1,4 @@
+import { loadChain } from '../chain-cache.js'
 /**
  * `foundation annotate <file> ...` / `foundation annotations <file>` — CLI
  * surface over the three annotation PatchOps (types.ts: annotate,
@@ -23,7 +24,7 @@
  * (MCP) uses (see mcp/tools.ts).
  */
 import { existsSync, readFileSync } from 'node:fs'
-import { loadChain, mintAnnotationId, parseDocument } from 'foundation-engine'
+import { mintAnnotationId, parseDocument } from 'foundation-engine'
 import type { FdnAnnotation, FdnChain } from 'foundation-engine'
 import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
