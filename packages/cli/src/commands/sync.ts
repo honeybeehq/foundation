@@ -1,3 +1,4 @@
+import { readDirectStatus } from '../sync/direct.js'
 import { materialize, MaterializeError } from '../sync/materialize.js'
 import { readFileSync } from 'node:fs'
 import { loadChain } from 'foundation-engine'
@@ -42,16 +43,17 @@ export async function runSync(args: string[], io: CliIO): Promise<number> {
         closeDesign(positionals[1]); io.stdout('closed for sync; with automatic registration enabled, the next open or edit registers it again'); return 0
       }
       case 'status': {
+        const direct = readDirectStatus()
         const rows = liveDesigns().map(design => {
           let state
           try { state = readSyncState(copyKey(design)) } catch (err) {
-            return { ...design, feed: feedName(design), status: 'saved locally', pending: null, cursor: null, lastError: `replica state: ${String(err)}`, lastErrorAt: null, catalogueError: null, updatedAt: '' }
+            return { ...design, direct, feed: feedName(design), status: 'saved locally', pending: null, cursor: null, lastError: `replica state: ${String(err)}`, lastErrorAt: null, catalogueError: null, updatedAt: '' }
           }
           let pending: number | null = null, localError: string | null = null
           try { const known = new Set(state.published); pending = loadChain(readFileSync(`${design.file}.chain`)).changes().filter(c => !known.has(c.envelope.hash)).length } catch (err) { localError = String(err) }
-          return { ...design, feed: feedName(design), status: (localError ?? state.lastError) && pending === 0 ? 'blocked' : pending === 0 ? 'shared' : state.updatedAt ? 'waiting to upload' : 'saved locally', pending, cursor: state.cursor, lastError: localError ?? state.lastError, lastErrorAt: state.lastErrorAt ?? null, catalogueError: state.catalogueError ?? null, updatedAt: state.updatedAt }
+          return { ...design, direct, feed: feedName(design), status: (localError ?? state.lastError) && pending === 0 ? 'blocked' : pending === 0 ? 'shared' : state.updatedAt ? 'waiting to upload' : 'saved locally', pending, cursor: state.cursor, lastError: localError ?? state.lastError, lastErrorAt: state.lastErrorAt ?? null, catalogueError: state.catalogueError ?? null, updatedAt: state.updatedAt }
         })
-        io.stdout(flags.json ? JSON.stringify(rows) : rows.map(row => `${row.file}: ${row.status} (${row.pending ?? '?'} waiting)${row.lastError ? ` — ${row.lastError}` : ''}${row.catalogueError ? ` — catalogue: ${row.catalogueError}` : ''}`).join('\n'))
+        io.stdout(flags.json ? JSON.stringify(rows) : rows.map(row => `${row.file}: ${row.status} [direct ${row.direct.state}${row.direct.reason ? `: ${row.direct.reason}` : ''}] (${row.pending ?? '?'} waiting)${row.lastError ? ` — ${row.lastError}` : ''}${row.catalogueError ? ` — catalogue: ${row.catalogueError}` : ''}`).join('\n'))
         return 0
       }
       case 'serve': {
