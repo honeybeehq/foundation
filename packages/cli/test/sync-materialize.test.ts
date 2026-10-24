@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, expect, it } from 'vitest'
@@ -41,7 +41,7 @@ it('refuses foreign and untracked targets, and merges matching local edits under
 })
 it('confines paths, including symlink escapes', () => {
   root = mkdtempSync(join(tmpdir(), 'materialize-path-')); const repo = join(root, 'repo'); mkdirSync(repo)
-  expect(materializePath(repo, 'boards/new.fdn.html')).toBe(join(repo, 'boards/new.fdn.html'))
+  expect(materializePath(repo, 'boards/new.fdn.html')).toBe(join(realpathSync(repo), 'boards/new.fdn.html'))
   expect(() => materializePath(repo, '../escape.fdn.html')).toThrow()
   symlinkSync(join(root, 'missing'), join(repo, 'dangling.fdn.html.chain'))
   expect(() => materializePath(repo, 'dangling.fdn.html')).toThrow('symlinks')
