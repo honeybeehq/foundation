@@ -32,7 +32,8 @@ import type { ServerResult } from '@modelcontextprotocol/sdk/types.js'
 import { callTool, TOOLS } from './tools.js'
 
 export function createFoundationMcpServer(): Server {
-  const info = { name: 'foundation', version: `${runtimeVersion().packageVersion}+${runtimeVersion().sourceSha}`, _meta: { runtime: { ...runtimeVersion() } } }
+  const runtime = runtimeVersion()
+  const info = { name: 'foundation', version: `${runtime.packageVersion}+${runtime.sourceSha}${runtime.dirty ? '.dirty' : ''}`, description: JSON.stringify(runtime), _meta: { runtime: { ...runtime } } }
   const server = new Server(
     info,
     { capabilities: { tools: {} } },
