@@ -120,7 +120,7 @@ commands:
                                               session protocol on stdin/stdout (packages/protocol)
   gateway install|uninstall|status           publish/withdraw the operator-gateway registry entry
   git setup                                 configure chain-aware Git merges
-  git-merge-driver <ancestor> <ours> <theirs>   git merge driver (see docs/GIT-INTEGRATION.md)
+  git-merge-driver <ancestor> <ours> <theirs> [repo-path]   git merge driver (see docs/GIT-INTEGRATION.md)
 `
 
 export async function runCli(argv: string[], io: CliIO = processIo): Promise<number> {

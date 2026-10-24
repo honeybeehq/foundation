@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process'
-import { appendFileSync, chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { appendFileSync, chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { expect, it } from 'vitest'
@@ -28,7 +28,7 @@ it.each(['merge', 'cherry-pick', 'rebase'])('real CLI edits in separate copies s
  run(cwd!,'foundation','edit','board.fdn.html','--ops',JSON.stringify([{op:'set-token',name,value:color}]))
  run(cwd!,'git','add','.');run(cwd!,'git','commit','-m',name!)
  }
- run(a,'git','fetch',b,'other');run(a,'git',operation,...(operation === 'merge' ? ['--no-edit','FETCH_HEAD'] : ['FETCH_HEAD']))
+ run(a,'git','fetch',b,'other:refs/heads/other');unlinkSync(join(a,'.git','FETCH_HEAD'));run(a,'git',operation,...(operation === 'merge' ? ['--no-edit','other'] : ['other']))
  const file=join(a,'board.fdn.html'),chain=loadChain(readFileSync(file+'.chain'))
  expect(chain.doc().tokens).toMatchObject({ours:'red',theirs:'blue'})
  expect(readFileSync(file,'utf8')).toBe(projectedText(chain))
