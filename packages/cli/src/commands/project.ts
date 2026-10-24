@@ -139,8 +139,18 @@ export async function runProject(args: string[], io: CliIO): Promise<number> {
   if (sub === 'init') return runProjectInit(rest, flags, io)
   if (sub === 'add') return runProjectAdd(rest, io)
   if (sub === 'list') return runProjectList(rest, io)
+  if (sub === 'path') {
+    const [docId, dir = '.'] = rest
+    if (!docId) { io.stderr('usage: foundation project path DOC_ID [dir]'); return 2 }
+    const manifest = requireManifest(dir, io)
+    if (!manifest) return 2
+    const entries = manifest.documents.filter(entry => entry.docId === docId)
+    if (entries.length !== 1) { io.stderr(`expected one document for ${docId}; found ${entries.length}`); return 1 }
+    io.stdout(resolve(dir, entries[0]!.path))
+    return 0
+  }
   if (sub === 'scan') return runProjectScan(rest, io)
 
-  io.stderr('usage: foundation project init|add|list|scan ...')
+  io.stderr('usage: foundation project init|add|list|path|scan ...')
   return 2
 }

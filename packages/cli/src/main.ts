@@ -9,6 +9,7 @@
  * exit code — main.ts's only jobs are picking the command and calling
  * process.exit with what it returns.
  */
+import { runHelp, runSkill } from './commands/skill.js'
 import { runEdit } from './commands/edit.js'
 import { realpathSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -54,6 +55,8 @@ const COMMANDS: Record<string, (args: string[], io: CliIO) => Promise<number>> =
   project: runProject,
   session: runSession,
   edit: runEdit,
+  help: runHelp,
+  skill: runSkill,
 }
 
 const USAGE = `foundation — a design-document engine CLI
@@ -69,7 +72,9 @@ commands:
   import <source.tsx> --into <file.fdn.html> [--name N] [--props <json>] [--sealed] [--author A]
                                               harvest a React component and merge it into <file>
                                               (chain-committed when a chain exists)
-  edit <file> --ops JSON | --ops-file FILE   one atomic semantic edit batch
+  edit <file> --ops JSON | --ops-file FILE|-   one atomic semantic edit batch
+  help edit                                 print the agent editing quick reference
+  skill path                                print its installed absolute path
   bake <file> [--artboard ID] [--state S] [--viewport V] [-o out]           bake a state to HTML
   render <file> [--state S] [--viewport V] [--scale 1..4] [-o dir | --out file.png] [--json]
   diff <a.html> <b.html>                     structural (+ visual, when available) diff
@@ -97,6 +102,7 @@ commands:
   freeze --verify <frozenfile>               check a frozen file's lock header + pedigree
   project init [dir] [--name N]              write a fresh foundation.json manifest
   project add <file>                         register <file> in ./foundation.json (by docId)
+  project path <docId> [dir]                 resolve a document id from the known manifest
   project list [dir]                         list a manifest's documents + validate/chain status
   project scan [dir]                         discover *.fdn.html under dir not yet registered, add them
   mcp                                        run a stdio MCP server exposing Foundation's verbs

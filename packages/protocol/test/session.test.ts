@@ -98,8 +98,8 @@ describe('parseServiceMessage', () => {
       { t: 'doc', cause: { kind: 'external', author: null }, ...view },
       { t: 'baked', rev: 3, ...geometry, html: '<!doctype html>', report: [] },
       { t: 'component', rev: 3, name: 'Card', html: '<!doctype html>', report: [{ code: 'x', severity: 'info', message: 'm' }] },
-      { t: 'result', id: 'c1', ok: true, rev: 4 },
-      { t: 'result', id: 'c1', ok: false, code: 'conflict', message: 'm' },
+      { t: 'result', id: 'c1', ok: true, rev: 4, head: null, nodeIds: [], committedAt: '2026-10-24T19:00:00Z' },
+      { t: 'result', id: 'c1', ok: false, rev: 4, head: null, nodeIds: [], code: 'conflict', message: 'm' },
       { t: 'log', id: 'l1', entries: [view.head] },
       { t: 'fault', code: 'not-found', message: 'm' },
     ]

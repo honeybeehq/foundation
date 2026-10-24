@@ -91,14 +91,14 @@ describe.each(ENTRY_POINTS)('foundation session (real stdio child process, %s)',
 
     const target = firstElement(welcome.doc.body) as FdnNode
     client.send({ t: 'commit', id: 'c1', base: 1, ops: [{ op: 'set-style', id: target.id, prop: 'outline-color', value: 'rgb(1, 2, 3)' }], label: 'Outline' })
+    expect(await client.next('result')).toMatchObject({ t: 'result', id: 'c1', ok: true, rev: 2, head: { message: 'Outline' }, nodeIds: expect.any(Array), committedAt: expect.any(String) })
     expect(await client.next('doc')).toMatchObject({ rev: 2, cause: { kind: 'commit', id: 'c1', author: 'user:e2e' } })
     expect((await client.next('baked')).html).toContain(`data-fdn-id="${target.id}"`)
-    expect(await client.next('result')).toEqual({ t: 'result', id: 'c1', ok: true, rev: 2 })
     expect(readFileSync(file, 'utf8')).toContain('outline-color:rgb(1, 2, 3)')
 
     client.send({ t: 'undo', id: 'u1' })
-    expect(await client.next('doc')).toMatchObject({ rev: 3, cause: { kind: 'undo', id: 'u1' } })
     expect(await client.next('result')).toMatchObject({ ok: true, rev: 3 })
+    expect(await client.next('doc')).toMatchObject({ rev: 3, cause: { kind: 'undo', id: 'u1' } })
     expect(readFileSync(file, 'utf8')).not.toContain('outline-color:rgb(1, 2, 3)')
 
     const annotate = spawnSync(process.execPath, ['--import', 'tsx', MAIN_TS, 'annotate', file, '--text', 'from the second writer', '--node', target.id, '--author', 'agent:second'], { cwd: CLI_ROOT, encoding: 'utf8' })

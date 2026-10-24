@@ -1,5 +1,4 @@
 import { editDocument } from '../edit.js'
-import type { SessionOp } from 'foundation-protocol'
 /**
  * foundation MCP tools — the fixed tool list `foundation mcp` exposes over
  * stdio (packages/cli/src/mcp/server.ts wires these into the wire protocol).
@@ -965,11 +964,11 @@ export const TOOLS: ToolDefinition[] = [
   {
     name: 'foundation_edit',
     description: 'Apply one atomic semantic session-operation batch to a document, including artboard/page CRUD and upgrade. Uses the same file lock, validation and authored chain transaction as the editor.',
-    inputSchema: { type: 'object', properties: { path: { type: 'string' }, ops: { type: 'array', items: { type: 'object' } }, label: { type: 'string' }, author: { type: 'string' } }, required: ['path', 'ops'] },
+    inputSchema: { type: 'object', properties: { path: { type: 'string' }, ops: { type: 'array', items: { type: 'object' } }, id: { type: 'string' }, durable: { type: 'boolean' }, expectedHead: { type: ['string', 'null'] }, expectedDocId: { type: 'string' }, label: { type: 'string' }, author: { type: 'string' } }, required: ['path', 'ops'] },
     handler: async args => {
       if (!Array.isArray(args.ops)) return fail('ops must be an array')
-      const result = editDocument(requireString(args, 'path'), args.ops as SessionOp[], optionalString(args, 'label') ?? 'Edit', optionalString(args, 'author') ?? defaultAuthor())
-      return ok({ path: args.path, rev: result.rev })
+      const result = await editDocument(requireString(args, 'path'), args.ops, optionalString(args, 'label') ?? 'Edit', optionalString(args, 'author') ?? defaultAuthor(), optionalString(args, 'id'), { durable: args.durable === true, expectedDocId: optionalString(args, 'expectedDocId'), expectedHead: args.expectedHead === null ? null : optionalString(args, 'expectedHead') })
+      return { ...ok({ path: args.path, ...result }), ...(!result.ok ? { isError: true } : {}) }
     },
   },
   {

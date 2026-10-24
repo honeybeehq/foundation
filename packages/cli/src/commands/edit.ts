@@ -11,10 +11,10 @@ export async function runEdit(args: string[], io: CliIO): Promise<number> {
   const file = flagString(flags, 'ops-file')
   if (!path || (source === undefined) === (file === undefined)) { io.stderr('usage: foundation edit FILE --ops JSON | --ops-file FILE [--label TEXT] [--author ID]'); return 2 }
   try {
-    const ops = JSON.parse(source ?? readFileSync(file!, 'utf8'))
+    const ops = JSON.parse(source ?? readFileSync(file === '-' ? 0 : file!, 'utf8'))
     if (!Array.isArray(ops)) throw new Error('ops must be an array')
-    const result = editDocument(path, ops, flagString(flags, 'label') ?? 'Edit', flagString(flags, 'author') ?? defaultAuthor())
-    io.stdout(JSON.stringify({ path, rev: result.rev }))
-    return 0
+    const result = await editDocument(path, ops, flagString(flags, 'label') ?? 'Edit', flagString(flags, 'author') ?? defaultAuthor(), flagString(flags, 'id'), { durable: flags.durable === true, expectedDocId: flagString(flags, 'expected-doc-id'), expectedHead: flagString(flags, 'expected-head') })
+    io.stdout(JSON.stringify({ path, ...result }))
+    return result.ok ? 0 : 1
   } catch (err) { io.stderr(String(err)); return 1 }
 }

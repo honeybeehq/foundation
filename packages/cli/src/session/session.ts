@@ -32,7 +32,7 @@ import { withWallTime } from '../change-meta.js'
 import { defaultAuthor } from '../identity.js'
 import { readDocIdAttr } from '../docid.js'
 import { skeletonDocumentEmpty, titleFromName } from '../commands/new.js'
-import { canonicalText, documentText, persistDocument, projectedText, projectionVersion, recoverDocument, sourceBase, readBytesIfPresent, readTextIfPresent, sameBytes, writeAtomic } from '../disk.js'
+import { canonicalText, documentText, persistDocument, syncDocument, projectedText, projectionVersion, recoverDocument, sourceBase, readBytesIfPresent, readTextIfPresent, sameBytes, writeAtomic } from '../disk.js'
 import { DocumentBusyError, documentPath, isDocumentLocked, withDocumentLock } from '../document-lock.js'
 import { oppositeStep, placementHistory, undoOps, undoStep, type UndoStep } from './undo.js'
 
@@ -80,7 +80,6 @@ class DesignSession implements Session {
   private sourcePending = false
   private author = ''
   private protocol: SessionProtocol = SESSION_PROTOCOL
-  private earlyResult = false
   private artboardFrames = false
   private actor = `session:${randomUUID()}`
   private chain: FdnChain | null = null
@@ -127,6 +126,10 @@ class DesignSession implements Session {
     if (this.phase === 'closed' || line.trim() === '') return
     const message = parseWireClientMessage(line)
     if (!message) {
+      try {
+        const invalid = JSON.parse(line)
+        if (this.phase === 'open' && invalid?.t === 'commit' && typeof invalid.id === 'string') return this.reject(invalid.id, { code: 'invalid-op', message: 'malformed commit: expected base, label and valid session operations' })
+      } catch {}
       this.fault('protocol', `malformed message: ${line.slice(0, 200)}`, this.phase === 'waiting' ? 2 : null)
       return
     }
@@ -265,9 +268,9 @@ class DesignSession implements Session {
       case 'anchor':
         return this.anchor(message)
       case 'undo':
-        return this.step(message.id, 'undo')
+        return this.step(message.id, 'undo', message.durable)
       case 'redo':
-        return this.step(message.id, 'redo')
+        return this.step(message.id, 'redo', message.durable)
       case 'activity':
         this.syncAndAnnounce()
         try {
@@ -302,11 +305,10 @@ class DesignSession implements Session {
     }
     this.protocol = message.protocol
     this.author = message.author || this.options.author || defaultAuthor()
-    this.earlyResult = message.earlyResult === true
     this.artboardFrames = message.artboardFrames === true
     const created = this.open()
     if (created === null) return
-    if (!this.readMode && this.earlyResult && !this.chain && !this.invalidExternalTokens && this.docId) {
+    if (!this.readMode && !this.chain && !this.invalidExternalTokens && this.docId) {
       this.preparedChain = { text: this.docText, actor: this.actor, docId: this.docId, finish: prepareChain(this.doc, { actor: this.actor, docId: this.docId }) }
     }
     this.phase = 'open'
@@ -597,6 +599,8 @@ class DesignSession implements Session {
     if (this.protocol === LEGACY_SESSION_PROTOCOL && (explicitArtboards(this.doc) || message.ops.some(op => isArtboardOperation(op) || op.op === 'set-spec-version'))) return this.reject(message.id, { code: 'invalid-op', message: explicitArtboards(this.doc) ? legacyArtboardReason : legacyArtboardOpReason })
     if (this.readOnlyReason()) return this.reject(message.id, { code: 'invalid-op', message: this.readOnlyReason()! })
     if (this.invalidExternalTokens) return this.reject(message.id, { code: 'invalid-op', message: this.invalidExternalTokens })
+    if (message.expectedDocId !== undefined && message.expectedDocId !== this.docId) return this.reject(message.id, { code: 'conflict', message: 'document identity changed; refresh the edit context' })
+    if (message.expectedHead !== undefined && message.expectedHead !== (this.head()?.hash ?? null)) return this.reject(message.id, { code: 'conflict', message: 'document head changed; refresh the edit context' })
     if (message.ops.length === 0) return this.reject(message.id, { code: 'invalid-op', message: 'commit has no ops' })
     if (message.base > this.rev) return this.reject(message.id, { code: 'invalid-op', message: `base ${message.base} is ahead of rev ${this.rev}` })
     const componentSwaps: InstanceSwapReport[] = []
@@ -605,27 +609,35 @@ class DesignSession implements Session {
     let ops: PatchOp[]
     let singlePatch: ReturnType<typeof applyPatch> | undefined
     try {
-      const primitive: PatchOp[] = []
-      let target = this.doc
-      for (const op of message.ops) {
-        const expanded = op.op === 'replace-document' ? diffPatch(target, op.doc) : [op]
-        if (expanded === null) throw new Error('edit cannot be expressed as granular changes')
-        const checked = applyPatch(target, expandSessionOps(target, expanded, componentSwaps, componentDetaches), { validateComponents: message.ops.length === 1, validateStateStyles: message.ops.length === 1, validateArtboards: message.ops.length === 1 })
-        if (!checked.ok) throw new PlacementError(checked.error.code, checked.error.message)
-        primitive.push(...checked.applied)
-        singlePatch = checked
-        target = checked.doc
+      if (message.ops.every((op): op is PatchOp => ['set-style', 'set-text', 'set-attr', 'set-style-ref', 'set-when'].includes(op.op))) {
+        ops = message.ops
+        singlePatch = applyPatch(this.doc, ops)
+      } else {
+        const primitive: PatchOp[] = []
+        let target = this.doc
+        for (const op of message.ops) {
+          const expanded = op.op === 'replace-document' ? diffPatch(target, op.doc) : [op]
+          if (expanded === null) throw new Error('edit cannot be expressed as granular changes')
+          const checked = applyPatch(target, expandSessionOps(target, expanded, componentSwaps, componentDetaches), { validateComponents: message.ops.length === 1, validateStateStyles: message.ops.length === 1, validateArtboards: message.ops.length === 1 })
+          if (!checked.ok) throw new PlacementError(checked.error.code, checked.error.message)
+          primitive.push(...checked.applied)
+          if (message.ops.length === 1) singlePatch = checked
+          target = checked.doc
+        }
+        ops = primitive
       }
-      ops = primitive
     } catch (err) {
       return this.reject(message.id, { code: err instanceof PlacementError || err instanceof ArtboardError ? err.code : err instanceof Error && err.message.startsWith('swap preview changed') ? 'conflict' : 'invalid-op', message: err instanceof Error ? err.message : String(err) })
     }
-    const patch = message.ops.length === 1 && singlePatch ? singlePatch : applyPatch(this.doc, ops)
+    const patch = singlePatch ?? applyPatch(this.doc, ops)
     if (!patch.ok) return this.reject(message.id, patch.error)
     if (patch.doc.specVersion === ARTBOARD_FRAME_VERSION && !this.artboardFrames) return this.reject(message.id, { code: 'invalid-op', message: 'Artboard frame editing requires an updated client with artboardFrames enabled' })
     if (this.protocol === LEGACY_SESSION_PROTOCOL && explicitArtboards(patch.doc)) return this.reject(message.id, { code: 'invalid-op', message: legacyArtboardOpReason })
-    if (patch.inverse.length === 0 && canonicalText(patch.doc) === this.docText) {
-      this.emit({ t: 'result', id: message.id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}), ...(componentDetaches.length ? { componentDetaches } : {}) })
+    if (canonicalText(patch.doc) === this.docText) {
+      if (message.durable && this.chain) {
+        try { syncDocument(this.path) } catch (err) { return this.reject(message.id, { code: 'write-failed', message: err instanceof Error ? err.message : String(err) }) }
+      }
+      this.emit({ t: 'result', id: message.id, ok: true, rev: this.rev, head: this.head(), nodeIds: [], committedAt: new Date().toISOString(), ...(componentSwaps.length ? { componentSwaps } : {}), ...(componentDetaches.length ? { componentDetaches } : {}) })
       return
     }
     const before = this.doc
@@ -634,14 +646,14 @@ class DesignSession implements Session {
     try { history = placementHistory(before, patch.applied, patch.inverse) } catch (err) {
       return this.reject(message.id, { code: 'invalid-op', message: err instanceof Error ? err.message : String(err) })
     }
-    const failure = this.record(patch.applied, label)
+    const failure = this.record(patch.applied, label, message.durable)
     if (failure) return this.reject(message.id, failure)
     this.undoStack.push(undoStep(label, patch.inverse, before, this.doc, patch.applied, history))
     this.redoStack = []
-    this.accept(message.id, { kind: 'commit', id: message.id, author: this.author }, bakeImpact(this.doc, patch.applied, before), componentSwaps, componentDetaches)
+    this.accept(message.id, { kind: 'commit', id: message.id, author: this.author }, bakeImpact(this.doc, patch.applied, before), componentSwaps, componentDetaches, patch.applied, before)
   }
 
-  private step(id: string, direction: 'undo' | 'redo'): void {
+  private step(id: string, direction: 'undo' | 'redo', durable = false): void {
     this.syncAndAnnounce()
     if (this.protocol === LEGACY_SESSION_PROTOCOL && explicitArtboards(this.doc)) return this.reject(id, { code: 'invalid-op', message: legacyArtboardReason })
     if (this.readOnlyReason()) return this.reject(id, { code: 'invalid-op', message: this.readOnlyReason()! })
@@ -662,13 +674,13 @@ class DesignSession implements Session {
       from.pop()
       return this.reject(id, { code: 'conflict', message: `${patch.error.message}; skipped this undo step` })
     }
-    const failure = this.record(patch.applied, `${direction === 'undo' ? 'Undo' : 'Redo'} ${step.label}`)
+    const failure = this.record(patch.applied, `${direction === 'undo' ? 'Undo' : 'Redo'} ${step.label}`, durable)
     if (failure) {
       return this.reject(id, failure)
     }
     from.pop()
     to.push(oppositeStep(step, before, this.doc))
-    this.accept(id, { kind: direction, id, author: this.author }, bakeImpact(this.doc, patch.applied, before))
+    this.accept(id, { kind: direction, id, author: this.author }, bakeImpact(this.doc, patch.applied, before), [], [], patch.applied, before)
   }
 
   private anchor(message: Extract<WireClientMessage, { t: 'anchor' }>): void {
@@ -677,16 +689,16 @@ class DesignSession implements Session {
     if (this.protocol === LEGACY_SESSION_PROTOCOL && explicitArtboards(this.doc)) return this.reject(message.id, { code: 'invalid-op', message: legacyArtboardReason })
     if (!message.name.trim()) return this.reject(message.id, { code: 'invalid-op', message: 'anchor name must not be empty' })
     const label = `Anchor ${message.name}`
-    const failure = this.transact(chain => { chain.anchor(message.name, withWallTime({ author: this.author, message: label })) })
+    const failure = this.transact(chain => { chain.anchor(message.name, withWallTime({ author: this.author, message: label })) }, message.durable)
     if (failure) return this.reject(message.id, failure)
     this.accept(message.id, { kind: 'commit', id: message.id, author: this.author }, bakeImpact(this.doc, []))
   }
 
-  private record(ops: PatchOp[], message: string): Failure | null {
-    return this.transact(chain => { chain.apply(withWallTime({ author: this.author, message }), ops) })
+  private record(ops: PatchOp[], message: string, durable = false): Failure | null {
+    return this.transact(chain => { chain.apply(withWallTime({ author: this.author, message }), ops) }, durable)
   }
 
-  private transact(mutate: (chain: FdnChain) => void): Failure | null {
+  private transact(mutate: (chain: FdnChain) => void, durable = false): Failure | null {
     if (this.invalidExternalTokens) return { code: 'invalid-op', message: this.invalidExternalTokens }
     const snapshot = this.chain?.save() ?? null
     const previous = { doc: this.doc, docId: this.docId }
@@ -708,6 +720,7 @@ class DesignSession implements Session {
     }
     try {
       this.persist()
+      if (durable) syncDocument(this.path)
       return null
     } catch (err) {
       this.rollback(snapshot, previous)
@@ -729,20 +742,32 @@ class DesignSession implements Session {
     if (this.docText !== before || this.sourcePending !== sourcePending) this.announce({ kind: 'external', author: author ?? null })
   }
 
-  private accept(id: string, cause: Cause, impact: BakeImpact, componentSwaps: InstanceSwapReport[] = [], componentDetaches: InstanceDetachReport[] = []): void {
-    if (this.earlyResult) {
-      this.rev++
-      this.emit({ t: 'doc', cause, ...this.documentView() })
-      this.emit({ t: 'result', id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}), ...(componentDetaches.length ? { componentDetaches } : {}) })
-      this.sendBakes(impact)
-      return
+  private accept(id: string, cause: Cause, impact: BakeImpact, componentSwaps: InstanceSwapReport[] = [], componentDetaches: InstanceDetachReport[] = [], ops: PatchOp[] = [], before: FdnDocument = this.doc): void {
+    const nodeIds = new Set<string>()
+    for (const op of ops) {
+      if ('id' in op && op.op !== 'set-annotation-status' && op.op !== 'remove-annotation') nodeIds.add(op.id)
+      if (op.op === 'insert-node') for (const id of indexNodes([op.node]).keys()) nodeIds.add(id)
+      if (op.op === 'set-component' || op.op === 'remove-component') {
+        const name = op.op === 'set-component' ? op.component.name : op.name
+        for (const doc of [before, this.doc]) {
+          const component = doc.components.find(component => component.name === name)
+          if (component) for (const id of indexNodes(component.body).keys()) nodeIds.add(id)
+        }
+      }
+      if (op.op === 'remove-node') {
+        const node = indexNodes([...before.body, ...before.components.flatMap(component => component.body)]).get(op.id)?.node
+        if (node) for (const id of indexNodes([node]).keys()) nodeIds.add(id)
+      }
     }
-    this.announce(cause, impact)
-    this.emit({ t: 'result', id, ok: true, rev: this.rev, ...(componentSwaps.length ? { componentSwaps } : {}), ...(componentDetaches.length ? { componentDetaches } : {}) })
+    this.rev++
+    const head = this.head()
+    this.emit({ t: 'result', id, ok: true, rev: this.rev, head, nodeIds: [...nodeIds].sort(), committedAt: new Date().toISOString(), ...(componentSwaps.length ? { componentSwaps } : {}), ...(componentDetaches.length ? { componentDetaches } : {}) })
+    this.emit({ t: 'doc', cause, ...this.documentView(head) })
+    this.sendBakes(impact)
   }
 
   private reject(id: string, failure: Failure): void {
-    this.emit({ t: 'result', id, ok: false, code: failure.code, message: failure.message })
+    this.emit({ t: 'result', id, ok: false, rev: this.rev, head: this.head(), nodeIds: [], code: failure.code, message: failure.message })
   }
 
   private announce(cause: Cause, impact?: BakeImpact): void {
@@ -760,12 +785,12 @@ class DesignSession implements Session {
     return this.doc.specVersion === ARTBOARD_FRAME_VERSION && !this.artboardFrames ? 'This design uses artboard frame styles. Update this client to edit it.' : null
   }
 
-  private documentView(): DocumentView {
+  private documentView(head: EnvelopeRecord | null = this.head()): DocumentView {
     const top = (stack: UndoStep[]): string | null => stack.at(-1)?.label ?? null
     return {
       rev: this.rev,
       doc: this.doc,
-      head: this.head(),
+      head,
       history: this.readOnlyReason() ? { canUndo: false, canRedo: false, undoLabel: null, redoLabel: null } : { canUndo: this.undoStack.length > 0, canRedo: this.redoStack.length > 0, undoLabel: top(this.undoStack), redoLabel: top(this.redoStack) },
       ...(this.readOnlyReason() ? { readOnly: this.readOnlyReason()! } : {}),
       issues: this.sourcePending ? [...this.issues, { code: 'read-only-source-pending', severity: 'info', message: 'The source is missing or differs from saved history. This read-only session shows the saved chain without ingesting source edits.' }] : this.issues,
@@ -788,9 +813,12 @@ class DesignSession implements Session {
     const doc = this.doc
     const rev = this.rev
     const generation = ++this.bakeGeneration
-    if (this.earlyResult) this.pendingBakeImpact = this.pendingBakeImpact ? mergeBakeImpact(this.pendingBakeImpact, impact) : impact
+    this.pendingBakeImpact = this.pendingBakeImpact ? mergeBakeImpact(this.pendingBakeImpact, impact) : impact
     const send = (): void => {
-      if (!this.earlyResult) return this.sendBakesFor(doc, rev, impact)
+      if (!this.options.flush) {
+        this.pendingBakeImpact = null
+        return this.sendBakesFor(doc, rev, impact)
+      }
       void Promise.resolve(this.options.flush?.()).then(() => {
         if (this.phase !== 'open' || this.rev !== rev || this.bakeGeneration !== generation) return
         const pending = this.pendingBakeImpact ?? impact

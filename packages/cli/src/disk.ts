@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto'
-import { readFileSync, renameSync, rmSync, unlinkSync, writeFileSync } from 'node:fs'
+import { closeSync, fsyncSync, openSync, readFileSync, renameSync, rmSync, unlinkSync, writeFileSync } from 'node:fs'
 import { basename, dirname, join } from 'node:path'
 import { diffPatch, loadChain, normalizeDocument, parseDocument, projectDocument } from 'foundation-engine'
 import type { ChangeMeta, EnvelopeRecord, FdnChain, FdnDocument } from 'foundation-engine'
@@ -39,6 +39,15 @@ export function writeAtomic(path: string, data: string | Uint8Array): void {
     rmSync(temp, { force: true })
     throw err
   }
+}
+
+export function syncDocument(file: string): void {
+  for (const path of [`${file}.chain`, file, `${file}.chain.projection`]) {
+    const descriptor = openSync(path, 'r')
+    try { fsyncSync(descriptor) } finally { closeSync(descriptor) }
+  }
+  const directory = openSync(dirname(file), 'r')
+  try { fsyncSync(directory) } finally { closeSync(directory) }
 }
 
 export function writeUntrackedDocument(file: string, text: string, create = false): void {
