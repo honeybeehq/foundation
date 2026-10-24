@@ -190,6 +190,11 @@ export function loadChain(bytes: Uint8Array, opts?: { actor?: string; storageCac
   return LoroChain.load(bytes, opts?.actor, opts?.storageCache)
 }
 
+/** Bootstrap retained history without inventing a local genesis or re-exporting its bytes. */
+export function chainFromUpdates(updates: Uint8Array[]): FdnChain {
+  return LoroChain.fromUpdates(updates)
+}
+
 class LoroChain implements FdnChain {
   private loro: LoroDoc
   private tree: LoroTree
@@ -280,6 +285,13 @@ class LoroChain implements FdnChain {
       record({ ...meta, wallTime })
       return chain
     }
+  }
+
+  static fromUpdates(updates: Uint8Array[]): LoroChain {
+    const chain = new LoroChain(randomUUID())
+    for (const update of updates) chain.importUpdate(update)
+    assertFormatVersion({ specVersion: String(chain.meta.get('specVersion') ?? '') })
+    return chain
   }
 
   static load(bytes: Uint8Array, actor?: string, cache?: VerifiedStorageCache): LoroChain {
