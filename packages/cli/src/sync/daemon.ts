@@ -1,5 +1,5 @@
 import { syncTrace, syncTraceEnabled, syncTraceSpan } from '../sync-trace.js'
-import { watch, readFileSync, mkdirSync, type FSWatcher } from 'node:fs'
+import { watch, readFileSync, mkdirSync, statSync, type FSWatcher } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { createHash } from 'node:crypto'
 import { loadChain } from 'foundation-engine'
@@ -75,10 +75,36 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
     }
     let catalogueHead: string | undefined
     const hinted = new Set<string>()
+    let hintSignature = '', directPoll: NodeJS.Timeout | undefined
+    const pushDirect = (): void => {
+      if (!direct || signal.aborted) return
+      try {
+        const stat = statSync(`${design.file}.chain`), signature = `${stat.ino}:${stat.size}:${stat.mtimeMs}`
+        if (signature === hintSignature) return
+        const chain = loadChain(readFileSync(`${design.file}.chain`))
+        if (chain.docId() !== design.docId) return
+        const published = new Set(state.published), received = directReceived.get(key)
+        const changes = chain.changes().filter(change => !published.has(change.envelope.hash) && !hinted.has(change.envelope.hash) && !received?.has(change.envelope.hash))
+        const batch: { hash: string; hex: string }[] = []; let bytes = 0
+        for (const change of changes) {
+          const blob = encodeBlob(change.envelope, change.bytes)
+          if (blob.length > 491520) { hinted.add(change.envelope.hash); continue }
+          if (batch.length === 16 || bytes + blob.length > 500000) break
+          batch.push({ hash: change.envelope.hash, hex: Buffer.from(blob).toString('hex') }); bytes += blob.length
+        }
+        if (batch.length) {
+          syncTrace('direct.notice', () => ({ docId: design.docId, hashes: batch.map(change => change.hash) }))
+          direct.push({ workspace: design.workspace, product: design.product, docId: design.docId, blobs: batch.map(change => change.hex) })
+          for (const change of batch) hinted.add(change.hash)
+        }
+        if (batch.length === changes.length) hintSignature = signature
+      } catch { /* Atomic replacement or an unavailable optional peer never blocks Comb. */ }
+    }
     const stop = (): void => { bridge?.close(); wake?.() }
     signal.addEventListener('abort', stop)
     try {
-      try { watcher = watch(dirname(design.file), (_event, name) => { if (name === null || design.file.endsWith(`/${name}`) || `${design.file}.chain`.endsWith(`/${name}`)) { syncTrace('daemon.notice', () => ({ docId: design.docId, chain: name === null || String(name).endsWith('.chain') })); wake?.() } }); watcher.on('error', () => watcher?.close()) } catch { /* Poll remains active on unsupported filesystems. */ }
+      try { watcher = watch(dirname(design.file), (_event, name) => { if (name === null || design.file.endsWith(`/${name}`) || `${design.file}.chain`.endsWith(`/${name}`)) { syncTrace('daemon.notice', () => ({ docId: design.docId, chain: name === null || String(name).endsWith('.chain') })); pushDirect(); wake?.() } }); watcher.on('error', () => watcher?.close()) } catch { /* Poll remains active on unsupported filesystems. */ }
+      if (direct) { directPoll = setInterval(pushDirect, 250); pushDirect() }
       while (!signal.aborted) {
         let receiveError: unknown, publishingHash: string | undefined
         try {
@@ -121,11 +147,6 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
               const received = directReceived.get(key)
               const pending = unshared.filter(change => (received?.get(change.envelope.hash) ?? 0) <= Date.now())
               if (pending.length) {
-                const hints = pending.filter(change => !hinted.has(change.envelope.hash) && !received?.has(change.envelope.hash)).slice(0, 16)
-                if (hints.length && direct) {
-                  direct.push({ workspace: design.workspace, product: design.product, docId: design.docId, blobs: hints.map(change => Buffer.from(encodeBlob(change.envelope, change.bytes)).toString('hex')) })
-                  for (const change of hints) hinted.add(change.envelope.hash)
-                }
                 syncTrace('publish.pending', () => ({ docId: design.docId, hashes: pending.map(change => change.envelope.hash) }))
                 // A persistent bridge renews exclusive feed ownership. Bound each writer
                 // batch and send clean EOF, so other nodes can publish through the same log.
@@ -171,7 +192,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
           await delay(Math.round(retry[side] * (0.5 + Math.random() / 2))); retry[side] = Math.min(retry[side] * 2, 5000)
         }
       }
-    } finally { watcher?.close(); signal.removeEventListener('abort', stop) }
+    } finally { if (directPoll) clearInterval(directPoll); watcher?.close(); signal.removeEventListener('abort', stop) }
   }
   try {
     while (!signal.aborted) {
