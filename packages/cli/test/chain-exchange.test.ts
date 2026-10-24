@@ -171,10 +171,7 @@ describe('chain push / pull / sync / merge (CLI)', () => {
     expect(textA).toContain('Board — edited by A')
     expect(textA).toContain('Hello, B')
 
-    // the .chain snapshots need not be byte-identical (Loro snapshot encoding
-    // isn't guaranteed canonical across independently-merged instances — see
-    // chain-fork-merge.test.ts's equivalent doc()/log() comparisons), but
-    // their materialized content and history must agree exactly.
+    expect(readFileSync(`${fileA}.chain`)).toEqual(readFileSync(`${fileB}.chain`))
     const chainA = loadChain(readFileSync(`${fileA}.chain`))
     const chainB = loadChain(readFileSync(`${fileB}.chain`))
     expect(chainA.log().map((e) => e.author)).toEqual(expect.arrayContaining(['user:a', 'user:b']))
