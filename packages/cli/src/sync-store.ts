@@ -6,7 +6,7 @@ import { loadChain } from 'foundation-engine'
 import { writeAtomic } from './disk.js'
 
 export interface LiveDesign { docId: string; file: string; workspace: string; product: string; repoRoot?: string }
-export interface SyncState { cursor: string; published: string[]; lastError: string | null; lastErrorAt?: string; catalogueError?: string | null; updatedAt: string; pending: number }
+export interface SyncState { cursor: string; published: string[]; lastError: string | null; lastErrorAt?: string; receiveError?: string | null; publishError?: string | null; connectionError?: string | null; catalogueError?: string | null; updatedAt: string; pending: number }
 export function replicaRoot(): string { return process.env.FOUNDATION_REPLICA_STORE ?? join(homedir(), '.foundation', 'replicas') }
 export function registerDesign(file: string, workspace = process.env.FOUNDATION_WORKSPACE ?? 'default', product = process.env.FOUNDATION_PRODUCT ?? 'default', repoRoot?: string): LiveDesign {
   file = realpathSync(file)

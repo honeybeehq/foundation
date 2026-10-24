@@ -159,6 +159,8 @@ try {
   const poisoned = JSON.parse(cliQuiet(sa, 'sync', 'status', '--json')).find((row: any) => row.file === poison)
   await invalid.request('append', { log: combLog(poisoned), idempotency_key: 'bad0', payload_hex: '00000000' }); await invalid.finish()
   await until(() => JSON.parse(cliQuiet(sa, 'sync', 'status', '--json')).some((row: any) => row.file === poison && row.status === 'blocked' && row.lastError?.includes('cursor 2')), 'invalid event is blocked at its delivery cursor')
+  cli(sa, 'edit', poison, '--ops', JSON.stringify([{ op: 'set-text', id: 'n1', text: 'local save while receiving is blocked' }]))
+  await until(() => JSON.parse(cliQuiet(sa, 'sync', 'status', '--json')).some((row: any) => row.file === poison && row.status === 'blocked' && row.pending === 0 && row.lastError?.includes('cursor 2')), 'successful upload preserves independent blocked receive status')
   cli(sa, 'edit', a, '--ops', JSON.stringify([{ op: 'set-text', id: 'n1', text: 'healthy despite blocked feed' }]))
   await until(() => text(b, 'n1') === 'healthy despite blocked feed', 'blocked design does not stall healthy design')
   log(`BLOCKED STATUS ${cliQuiet(sa, 'sync', 'status', '--json').trim()}`)
