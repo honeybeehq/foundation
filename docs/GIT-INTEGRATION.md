@@ -104,6 +104,8 @@ The command takes all tracked designs' normal document locks, which pauses
 sync imports and interactive writers for the duration. It ingests any valid
 uncommitted HTML edits into an in-memory chain, then backs up original HTML,
 original chain and prepared local history under `.git/foundation-updates/`.
+Backup files, manifest and their directories are flushed to disk before any
+reset; restored designs are flushed before a successful backup is removed.
 Only after every design has passed preflight does it temporarily restore dirty
 design pairs to HEAD, run the fast-forward and merge local history into the
 incoming chain. Incoming bytes are retained untouched when they already contain
@@ -125,6 +127,10 @@ rebases or commands that modify the index independently. No concurrent Git
 index writer is supported. Holding the locks across the command prevents the
 sync daemon from racing between preparation and Git's writes. Long-running
 commands can cause ordinary writers to report busy; their changes must retry.
+Git hooks must not invoke Foundation edits, ingestion or sync imports during
+the wrapped operation: they would contend with the held document locks.
+Fetch and wrapped commands are noninteractive (stdin closed); configure SSH
+keys or a credential helper beforehand.
 
 The backup directory is printed before any design resets. On an ordinary
 failure the original files are restored when HEAD stayed put; if HEAD moved,
@@ -141,3 +147,10 @@ lock, preserving current edits too, and keeps the backup for inspection.
 Resolve any Git conflict or missing/replaced design first. Successful updates
 remove their backup only after all local changes have been restored. There is
 no automatic stash, commit, or background Git operation.
+
+After interruption, pull/setup/prepare and new edit/ingest/session/sync commands
+warn about retained journals with the exact recovery command. Locks use the
+local host and owner PID; a dead owner is reaped during recovery. A PID reused
+after a reboot may require manual inspection of a stale lock before retrying.
+Ctrl-C and forced termination rely on the durable journal and explicit
+recovery rather than an asynchronous signal handler.

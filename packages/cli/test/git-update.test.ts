@@ -1,12 +1,12 @@
 import { execFileSync, spawnSync } from 'node:child_process'
-import { appendFileSync, cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { appendFileSync, cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { expect, it } from 'vitest'
 import { loadChain } from 'foundation-engine'
 import { updateDocument } from '../src/disk.js'
 
-it.each(['synced', 'local-chain', 'local-text', 'blocked', 'command-fails'])('preserves %s work through a live-synced Git update', mode => {
+it.each(['synced', 'local-chain', 'local-text', 'blocked', 'command-fails', 'killed-update', 'head-moved'])('preserves %s work through a live-synced Git update', mode => {
  const temp=mkdtempSync(join(tmpdir(),'fdn-git-update-')), a=join(temp,'a'),b=join(temp,'b')
  mkdirSync(a)
  const main=resolve('packages/cli/src/main.ts'),tsx=resolve('node_modules/tsx/dist/cli.mjs')
@@ -23,11 +23,25 @@ it.each(['synced', 'local-chain', 'local-text', 'blocked', 'command-fails'])('pr
  git(a,'add','.');git(a,'commit','-m','A edit')
  // Same bytes delivered to B before its branch knows about A's commit.
  for(const suffix of ['', '.chain'])cpSync(join(a,'board.fdn.html'+suffix),join(b,'board.fdn.html'+suffix))
- if(mode==='local-chain')cli(b,'edit','board.fdn.html','--ops',JSON.stringify([{op:'set-token',name:'local-b',value:'blue'}]))
- if(mode==='local-text')writeFileSync(join(b,'board.fdn.html'),readFileSync(join(b,'board.fdn.html'),'utf8').replace('Hello, Foundation','Local uncommitted text'))
+ if(['local-chain','killed-update','head-moved'].includes(mode))cli(b,'edit','board.fdn.html','--ops',JSON.stringify([{op:'set-token',name:'local-b',value:'blue'}]))
+ if(['local-text','killed-update','head-moved'].includes(mode))writeFileSync(join(b,'board.fdn.html'),readFileSync(join(b,'board.fdn.html'),'utf8').replace('Hello, Foundation','Local uncommitted text'))
  if(mode==='blocked')writeFileSync(join(b,'notes.txt'),'local non-design edit\n')
  const original=readFileSync(join(b,'board.fdn.html')),originalChain=readFileSync(join(b,'board.fdn.html.chain'))
  expect(run(b,'git',['pull','--ff-only'],false).status).not.toBe(0)
+ if(mode==='killed-update' || mode==='head-moved') {
+   git(b,'fetch');const target=git(b,'rev-parse','origin/main')
+   const script=mode==='killed-update' ? 'process.kill(process.ppid,"SIGKILL")' : `require('node:child_process').execFileSync('git',['merge','--ff-only',${JSON.stringify(target)}]);process.exit(7)`
+   expect(run(b,process.execPath,[tsx,main,'git','prepare-update',target,'--',process.execPath,'-e',script],false).status).not.toBe(0)
+   const journal=join(b,'.git','foundation-updates',readdirSync(join(b,'.git','foundation-updates'))[0]!)
+   cli(b,'git','recover-update',journal)
+   const recovered=readFileSync(join(b,'board.fdn.html')),recoveredChain=readFileSync(join(b,'board.fdn.html.chain'))
+   expect(loadChain(recoveredChain).doc().tokens['local-b']).toBe('blue')
+   expect(recovered.toString()).toContain('Local uncommitted text')
+   cli(b,'git','recover-update',journal)
+   expect(readFileSync(join(b,'board.fdn.html'))).toEqual(recovered)
+   expect(readFileSync(join(b,'board.fdn.html.chain'))).toEqual(recoveredChain)
+   log(`PASS ${mode}: local chain and text edits recovered, dead writer lock reaped, repeated recovery byte-identical`);return
+ }
  if(mode==='command-fails') {
    git(b,'fetch');const target=git(b,'rev-parse','origin/main')
    expect(run(b,process.execPath,[tsx,main,'git','prepare-update',target,'--',process.execPath,'-e','process.exit(7)'],false).status).not.toBe(0)
@@ -46,8 +60,8 @@ it.each(['synced', 'local-chain', 'local-text', 'blocked', 'command-fails'])('pr
  expect(git(b,'rev-parse','HEAD')).toBe(git(a,'rev-parse','HEAD'))
  const file=join(b,'board.fdn.html'),chain=loadChain(readFileSync(file+'.chain'))
  expect(chain.doc().tokens['from-a']).toBe('red')
- if(mode==='local-chain')expect(chain.doc().tokens['local-b']).toBe('blue')
- if(mode==='local-text')expect(readFileSync(file,'utf8')).toContain('Local uncommitted text')
+ if(['local-chain','killed-update','head-moved'].includes(mode))expect(chain.doc().tokens['local-b']).toBe('blue')
+ if(mode==='local-text'){expect(readFileSync(file,'utf8')).toContain('Local uncommitted text');expect(chain.log().some(change=>change.message==='preserve local edits before Git update')).toBe(true)}
  if(mode==='synced')expect(git(b,'status','--porcelain')).toBe('')
  else expect(git(b,'status','--porcelain')).toContain('board.fdn.html')
  const times=['','.chain'].map(s=>statSync(file+s).mtimeMs)
