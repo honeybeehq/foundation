@@ -9,8 +9,9 @@ import { updateDocument } from '../disk.js'
 import { liveDesigns, replicaRoot, readSyncState, writeSyncState, type LiveDesign } from '../sync-store.js'
 import { CatalogueQueue } from './catalogue.js'
 import { CombBridge, validateAppendReceipt, type Frame } from './bridge.js'
+import { DirectChanges, writeDirectStatus, type DirectConfig } from './direct.js'
 
-export interface CombConfig { binary: string; args: string[]; node?: { id: string; name: string } }
+export interface CombConfig { binary: string; args: string[]; node?: { id: string; name: string }; direct?: DirectConfig }
 export function feedName(design: LiveDesign): string { return `foundation/${design.workspace}/${design.product}/${design.docId}` }
 // Comb's supported log names exclude '/'. Keep the logical address and map it without collisions.
 export function combLog(design: LiveDesign): string { return `foundation-${createHash('sha256').update(feedName(design)).digest('hex')}` }
@@ -30,6 +31,25 @@ function page(frame: Frame, cursor: string): { blobs: Uint8Array[]; next: string
 export async function serveSync(config: CombConfig, signal: AbortSignal, log: (text: string) => void): Promise<void> {
   mkdirSync(replicaRoot(), { recursive: true })
   const release = acquireDocumentLock(join(replicaRoot(), 'daemon'), 100)
+  const directReceived = new Map<string, Map<string, number>>()
+  let direct: DirectChanges | undefined
+  try { direct = config.direct ? new DirectChanges(config.direct, config.node?.id ?? '', change => {
+    const copies = liveDesigns(log).filter(design => design.workspace === change.workspace && design.product === change.product && design.docId === change.docId)
+    if (!copies.length) throw new Error('design is not live')
+    const blobs = change.blobs.map(blob => Buffer.from(blob, 'hex'))
+    for (const design of copies) {
+      const received = directReceived.get(copyKey(design)) ?? new Map<string, number>()
+      updateDocument(design.file, chain => {
+      if (chain.docId() !== change.docId) throw new Error('document identity mismatch')
+      importChangeBlobs(chain, blobs)
+    }, true)
+      for (const blob of blobs) { const hash = decodeBlob(blob).envelope.hash; if (!received.has(hash)) received.set(hash, Date.now() + 5000 + Math.floor(Math.random() * 5000)) }
+      directReceived.set(copyKey(design), received)
+    }
+  }) : undefined
+    await direct?.start()
+    writeDirectStatus(direct ? 'enabled' : 'disabled', direct ? null : 'not configured')
+  } catch (error) { log(`direct sync unavailable: ${String(error)}`); direct = undefined; writeDirectStatus('disabled', String(error)) }
   const catalogueQueue = new CatalogueQueue(config, signal, log)
   const workers = new Map<string, { controller: AbortController; done: Promise<void>; registration: string }>()
   async function run(design: LiveDesign, signal: AbortSignal): Promise<void> {
@@ -54,6 +74,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
       updateError('connection', null); updateError(side, null)
     }
     let catalogueHead: string | undefined
+    const hinted = new Set<string>()
     const stop = (): void => { bridge?.close(); wake?.() }
     signal.addEventListener('abort', stop)
     try {
@@ -92,9 +113,17 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
               const chain = loadChain(readFileSync(`${design.file}.chain`))
               if (chain.docId() !== design.docId) throw new Error('live path now holds another design')
               const published = new Set(state.published)
-              const pending = chain.changes().filter(c => !published.has(c.envelope.hash))
-              if (state.pending !== pending.length) { state.pending = pending.length; writeSyncState(key, state) }
+              const unshared = chain.changes().filter(c => !published.has(c.envelope.hash))
+              if (state.pending !== unshared.length) { state.pending = unshared.length; writeSyncState(key, state) }
+              // Let the originating node finish its append; recover durability if it disappears.
+              const received = directReceived.get(key)
+              const pending = unshared.filter(change => (received?.get(change.envelope.hash) ?? 0) <= Date.now())
               if (pending.length) {
+                const hints = pending.filter(change => !hinted.has(change.envelope.hash) && !received?.has(change.envelope.hash)).slice(0, 16)
+                if (hints.length && direct) {
+                  direct.push({ workspace: design.workspace, product: design.product, docId: design.docId, blobs: hints.map(change => Buffer.from(encodeBlob(change.envelope, change.bytes)).toString('hex')) })
+                  for (const change of hints) hinted.add(change.envelope.hash)
+                }
                 syncTrace('publish.pending', () => ({ docId: design.docId, hashes: pending.map(change => change.envelope.hash) }))
                 // A persistent bridge renews exclusive feed ownership. Bound each writer
                 // batch and send clean EOF, so other nodes can publish through the same log.
@@ -161,5 +190,5 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
     }
     await Promise.all([...workers.values()].map(worker => worker.done))
     await catalogueQueue.close()
-  } finally { release() }
+  } finally { await direct?.close(); writeDirectStatus('disabled', 'daemon stopped'); release() }
 }

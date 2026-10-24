@@ -75,3 +75,48 @@ Targets must remain within the checkout root. Document/save sibling symlinks (in
 Only envelope history is transported. Local named anchors are not published by the design feed, so they cannot be recreated on a fresh replica; byte equality with a source's `.chain` requires equivalent anchors and encoder version. The real drill uses designs without local-only anchors.
 
 Reproduce fresh-directory recovery and subsequent bidirectional editing with `pnpm exec tsx packages/cli/scripts/materialize-proof.ts /path/to/comb-bridge`.
+
+### Optional direct acceleration
+
+The JSON process config may add `direct` alongside `binary`, `args`, and `node`:
+
+```json
+{
+  "direct": {
+    "listen": { "host": "100.64.0.1", "port": 19486 },
+    "workspaces": {
+      "my-workspace": {
+        "secret": "replace-with-a-random-secret-of-at-least-32-characters",
+        "peers": [{ "nodeId": "other-node-id", "url": "http://100.64.0.2:19486" }]
+      }
+    }
+  }
+}
+```
+
+Bind to your explicit tailnet address and keep this config private (mode 0600).
+Configure the same workspace secret and reciprocal allowed node ids on peers.
+The shared secret authenticates workspace membership; the claimed node id is an
+allowlist key, not author provenance. HMAC covers POST, `/changes`, and the exact
+body, including address, sender and timestamp. Replays within the 60-second clock
+window are harmless because imports deduplicate by verified envelope hash.
+
+After noticing a local save, the daemon sends bounded envelope batches directly
+while Comb publication proceeds. Only live registered paths can receive them.
+Every new change still passes strict candidate verification and the normal save
+lock. Direct delivery changes neither the Comb cursor nor the published set;
+status stays waiting to upload until durable delivery/acknowledgement. A receiver
+never forwards direct-received hashes. It waits 5–10 seconds before a fallback
+append if the sender disappeared. This grace is in memory; restarting deliberately
+uses up the grace and permits immediate idempotent fallback publication.
+
+Requests are limited to 1 MiB, 16 frames, 32 concurrent connections and two-second
+network timeouts. Missing parents, clock skew, disconnected peers and lost requests
+fall back to Comb; direct errors do not clear blocked feed status. Listener startup
+failure disables acceleration without stopping durable sync. `sync status --json`
+includes `direct.state` and `direct.reason`; per-request outcomes are available in
+opt-in stage traces. All hints may be disabled by omitting `direct`.
+
+Duplicate Comb delivery still validates every frame and hash, but skips candidate
+replay when no new hash exists. Existing v1 stores undergo the normal one-time v2
+storage upgrade; subsequent duplicate pages do not rewrite either document file.
