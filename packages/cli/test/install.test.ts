@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readlinkSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readlinkSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { execFileSync } from 'node:child_process'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { activateInstall, runInstall } from '../src/commands/install.js'
@@ -75,4 +76,37 @@ it('refuses to roll back a release switched by another actor', async () => {
   rmSync(current); symlinkSync(release('b'.repeat(40)), current)
   expect(await runInstall(['--rollback'], captureIo())).toBe(1)
   expect(readlinkSync(current)).toContain('b'.repeat(40))
+})
+it('runs the printed rollback without the new release launcher and restores original file bytes', () => {
+  const bin = join(home, '.local/bin/foundation')
+  mkdirSync(join(bin, '..'), { recursive: true })
+  writeFileSync(bin, 'original executable', { mode: 0o751 })
+  const target = release('a'.repeat(40)), io = captureIo()
+  activateInstall(target, home, undefined, io)
+  rmSync(join(target, 'foundation'))
+  execFileSync('/bin/sh', ['-c', JSON.parse(io.out[0]!).rollback])
+  expect(readFileSync(bin, 'utf8')).toBe('original executable')
+  expect(lstatSync(bin).mode & 0o777).toBe(0o751)
+})
+it('keeps current on the new release until rollback completes and allows retry after failure', async () => {
+  const a = 'a'.repeat(40), b = 'b'.repeat(40)
+  activateInstall(release(a), home, undefined, captureIo())
+  const registry = join(home, '.hive/gateways/foundation.json')
+  const original = readFileSync(registry, 'utf8')
+  activateInstall(release(b), home, a, captureIo())
+  chmodSync(join(registry, '..'), 0o555)
+  try {
+    expect(await runInstall(['--rollback'], captureIo())).toBe(1)
+    expect(readlinkSync(join(home, '.local/share/foundation/current'))).toContain(b)
+  } finally { chmodSync(join(registry, '..'), 0o755) }
+  expect(await runInstall(['--rollback'], captureIo())).toBe(0)
+  expect(readlinkSync(join(home, '.local/share/foundation/current'))).toContain(a)
+  expect(readFileSync(registry, 'utf8')).toBe(original)
+})
+it('refuses to overwrite a gateway edited after activation', async () => {
+  activateInstall(release('a'.repeat(40)), home, undefined, captureIo())
+  const registry = join(home, '.hive/gateways/foundation.json')
+  writeFileSync(registry, 'changed by owner')
+  expect(await runInstall(['--rollback'], captureIo())).toBe(1)
+  expect(readFileSync(registry, 'utf8')).toBe('changed by owner')
 })
