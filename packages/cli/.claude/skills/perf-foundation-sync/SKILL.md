@@ -1,10 +1,10 @@
 ---
 name: perf-foundation-sync
-description: Measure Foundation shared-store save-to-session latency, per-stage costs, idle work and hint-loss recovery on Studio and metal-3.
+description: Measure Foundation sync latency and read-only capability command startup, with bounded local recipes on Studio and metal-3.
 ---
-# Foundation sync performance
+# Foundation sync and capability performance
 
-Read workloads/README.md and sync-save-to-session.{json,md}. Workload scope is sync only; this is not a whole-engine performance inventory.
+Read workloads/README.md and sync-save-to-session.{json,md}. The map covers sync and the bounded doctor-capabilities startup probe; this is not a whole-engine performance inventory. For capability routing, read doctor-capabilities.{json,md}; run its local isolated recipe without the S5 shared-store setup.
 
 Launch/doctor: coordinate the S5 temporary setup; same installed candidate and fixed fixture on both nodes, quiet mutation window, capture host/runtime/load and fast clock brackets. No uncoordinated active-feed edits. Store credentials stay in private untracked config.
 
