@@ -36,7 +36,7 @@ A logical address is `foundation/<workspace>/<product>/<docId>`. Comb log names 
 
 The chain is the outbox. The daemon records a published hash only after Comb acknowledges it, and advances a receive cursor only after importing a validated page through the locked local save boundary. If a checkpoint write fails or an acknowledgement is lost, replay and stable-key append make retries harmless. Bad framing, hashes, identity changes, incomplete history and cursor gaps stop that copy's import with a visible status error. They never become visible as partial changes. Errors include the failing cursor (or oversized change hash) and failure time. A bad event deliberately blocks that design at its cursor; it does not stop other designs. Foundation does not skip or rewrite delivery history. Stop the affected replica and repair/replay its feed through the backend owner before resuming. For an oversized change, preserve the original chain, then split/re-author the operation below the bridge limit using a new design/feed; the daemon cannot publish that history through this bounded bridge. For a damaged local checkpoint, stop the daemon, back up/remove that copy’s state JSON, and restart to replay from cursor1 (stable append protects re-publication). Raw HTML edits require `foundation ingest <file> --commit` to create envelopes before publication. Only frontier growth (or a pending local source edit) writes the document. Comb delivery order is not the document clock; Loro merges history.
 
-Comb retains a writer lease for the lifetime of a publishing bridge. The daemon uses a persistent read-only follower and a separate writer bridge for at most 16 appends, then sends clean EOF to release its lease. This permits nodes to take turns using the supported contract. A crashed writer can delay a new publisher until Comb's lease expires; stable append still protects retries. Backend failures back off from 250ms to 10s; local editing does not involve the bridge.
+Comb retains a writer lease for the lifetime of a publishing bridge. The daemon uses a persistent read-only follower and a separate writer bridge for at most 16 appends, then sends clean EOF to release its lease. This permits nodes to take turns using the supported contract. A crashed writer can delay a new publisher until Comb's lease expires; stable append still protects retries. Backend retries use independent 250ms bases capped at 5s, with 0.5–1× jitter; local editing does not involve the bridge.
 
 `status` reports locally saved / waiting to upload / shared (or blocked when an import error prevents receiving), the pending count, saved cursor, last backend/import error and last acknowledged activity. “Shared” means every currently saved envelope was acknowledged by Comb; it does not claim every remote node has imported it.
 
@@ -106,9 +106,12 @@ while Comb publication proceeds. Only live registered paths can receive them.
 Every new change still passes strict candidate verification and the normal save
 lock. Direct delivery changes neither the Comb cursor nor the published set;
 status stays waiting to upload until durable delivery/acknowledgement. A receiver
-never forwards direct-received hashes. It waits 5–10 seconds before a fallback
+does not forward hashes received directly during that daemon run. It waits 5–10 seconds before a fallback
 append if the sender disappeared. This grace is in memory; restarting deliberately
-uses up the grace and permits immediate idempotent fallback publication.
+uses up the grace and permits immediate idempotent fallback publication. Because
+receipt provenance is in memory, restart may also reannounce unacknowledged
+history once. An author receiving that echo may acquire one 5–10s grace hold;
+later local descendants wait behind it. Replays do not extend an existing hold.
 
 Requests are limited to 1 MiB, 16 frames, 32 concurrent connections and two-second
 network timeouts. Missing parents, clock skew, disconnected peers and lost requests
@@ -127,3 +130,7 @@ uses a prefix of Lamport-ordered changes and stops before the first direct-recei
 hash still in its grace period. This deliberately holds later local changes too:
 a descendant must never enter the feed before its full native causal history.
 Once the parent arrives through Comb (or grace expires), publication resumes.
+
+Performance receipts and the CLI-local workload map are in `packages/cli/performance/`
+and `packages/cli/.claude/skills/perf-foundation-sync/`. The latency target measures
+save-to-other-session visibility; durable Comb acknowledgement is reported separately.
