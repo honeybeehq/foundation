@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -12,7 +12,7 @@ export interface RuntimeVersion {
   artboardWriteSafe: boolean
 }
 export const sourceRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
-export function runtimeVersion(root = process.env.FDN_ROOT || sourceRoot): RuntimeVersion {
+export function runtimeVersion(root = existsSync(resolve(sourceRoot, 'packages/cli/package.json')) ? sourceRoot : process.env.FDN_ROOT || sourceRoot): RuntimeVersion {
   try { return JSON.parse(readFileSync(resolve(root, 'foundation-install.json'), 'utf8')).runtime } catch {}
   let sourceSha = 'unknown'
   let dirty: boolean | null = null
