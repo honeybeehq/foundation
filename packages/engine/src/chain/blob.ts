@@ -49,6 +49,7 @@ export function importChangeBlobs(chain: FdnChain, blobs: Uint8Array[]): number 
   if (scratch.docId() !== chain.docId()) throw new Error('document identity mismatch')
   const actual = scratch.changes()
   if (actual.length !== expected.size || actual.some(c => !expected.has(c.envelope.hash))) throw new Error('incomplete causal history or envelope mismatch')
+  if (!scratch.verify().ok) throw new Error('candidate chain failed history verification')
   for (const c of missing) chain.importUpdate(c.bytes)
   return new Set(missing.map(c => c.envelope.hash)).size
 }
