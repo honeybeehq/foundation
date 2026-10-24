@@ -24,7 +24,7 @@ describe('runtime attestation', () => {
       mkdirSync(join(root, 'packages/cli'), { recursive: true })
       writeFileSync(join(root, 'packages/cli/package.json'), '{"version":"1.2.3"}')
       git('add', '.'); git('commit', '-qm', 'fixture')
-      expect(runtimeVersion(root)).toMatchObject({ sourceSha: git('rev-parse', 'HEAD'), dirty: false, packageVersion: '1.2.3', sessionProtocols: ['0.2', '0.1'] })
+      expect(runtimeVersion(root)).toMatchObject({ sourceSha: git('rev-parse', 'HEAD'), dirty: false, packageVersion: '1.2.3', sessionProtocols: ['0.2', '0.1'], documentFormats: ['0.1.0-artboards', '0.0.1-draft', '0.1.0', '0.2.0'] })
       writeFileSync(join(root, 'changed'), 'yes')
       expect(runtimeVersion(root).dirty).toBe(true)
     } finally { rmSync(root, { recursive: true, force: true }) }
