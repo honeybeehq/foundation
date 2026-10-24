@@ -11,6 +11,8 @@ import { runImages } from './commands/images.js'
  * process.exit with what it returns.
  */
 import { runHelp, runSkill } from './commands/skill.js'
+import { runInstall } from './commands/install.js'
+import { runtimeVersion } from './runtime-version.js'
 import { runEdit } from './commands/edit.js'
 import { realpathSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -40,6 +42,8 @@ const COMMANDS: Record<string, (args: string[], io: CliIO) => Promise<number>> =
   images: runImages,
   'import-image': (args, io) => runImages(args, io, 'import-image'),
   'localize-images': (args, io) => runImages(args, io, 'localize-images'),
+  install: runInstall,
+  version: async (_args, io) => { io.stdout(JSON.stringify(runtimeVersion())); return 0 },
   new: runNew,
   copy: runCopy,
   inspect: runInspect,
@@ -73,6 +77,9 @@ commands:
   images <file>                            list image references and storage status
   import-image <file> <source> --node ID    store image and attach to node (one undo)
   localize-images <file> [--node ID]        store remote images explicitly (one undo)
+  version [--json]                          report source revision and compatibility
+  install [--from CHECKOUT] [--sha SHA] [--force]  install a node-level committed copy
+  doctor --inventory --json                  inventory executable copies without changing them
   new <name> [--no-chain]                    write a minimal .fdn.html skeleton (chain-inits it too)
   copy <src> <dest> [--title T] [--json]      create an independent document with a fresh identity and chain
   inspect <file>                             summarize a document
@@ -124,6 +131,7 @@ commands:
 `
 
 export async function runCli(argv: string[], io: CliIO = processIo): Promise<number> {
+  if (argv[0] === '--version') { io.stdout(JSON.stringify(runtimeVersion())); return 0 }
   const [command, ...rest] = argv
   if (!command || command === '--help' || command === '-h') {
     io.stdout(USAGE)

@@ -2,6 +2,7 @@ import { mintNodeId } from 'foundation-engine'
 import { hasImageOperations, prepareImageOperations } from './images.js'
 import { listDocumentImages } from 'foundation-engine'
 import type { ImageImportResult } from 'foundation-protocol'
+import { runtimeVersion } from '../runtime-version.js'
 import { legacyMessage, legacyBoardRef, legacyArtboardReason, legacyArtboardOpReason } from './legacy.js'
 import { ARTBOARD_FRAME_VERSION, ARTBOARD_TAGS, ArtboardError, validateArtboards, explicitArtboards, artboardPages, boardViews, boardView, boardKey } from 'foundation-engine'
 import type { BoardRef } from 'foundation-engine'
@@ -326,6 +327,7 @@ class DesignSession implements Session {
     this.rev = 1
     this.emit({
       t: 'welcome',
+      runtime: runtimeVersion(),
       protocol: SESSION_PROTOCOL,
       features: ['images'],
       path: this.displayPath,

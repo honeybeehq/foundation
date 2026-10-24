@@ -105,7 +105,7 @@ export interface MutationReceipt {
 }
 
 export type ServiceMessage =
-  | ({ t: 'welcome'; protocol: string; path: string; docId: string | null; chain: boolean; created: boolean; features?: string[]; mode?: 'read' } & DocumentView)
+  | ({ t: 'welcome'; runtime?: { sourceSha: string; dirty: boolean | null; packageVersion: string; sessionProtocols: string[]; documentFormats: string[]; artboardWriteSafe: boolean }; protocol: string; path: string; docId: string | null; chain: boolean; created: boolean; features?: string[]; mode?: 'read' } & DocumentView)
   | ({ t: 'doc'; cause: Cause } & DocumentView)
   | ({ t: 'baked'; rev: number; html: string; report: ReportLine[] } & BoardView)
   | ({ t: 'baked-diff'; rev: number; baseRev: number; start: number; deleteCount: number; insert: string; report: ReportLine[] } & BoardView)
@@ -120,7 +120,7 @@ export type ServiceMessage =
 
 export type LegacyDocumentView = Omit<DocumentView, 'pages' | 'boards' | 'unavailableBoards'>
 export type LegacyServiceMessage =
-  | ({ t: 'welcome'; protocol: typeof LEGACY_SESSION_PROTOCOL; path: string; docId: string | null; chain: boolean; created: boolean; features?: string[]; mode?: 'read' } & LegacyDocumentView)
+  | ({ t: 'welcome'; runtime?: { sourceSha: string; dirty: boolean | null; packageVersion: string; sessionProtocols: string[]; documentFormats: string[]; artboardWriteSafe: boolean }; protocol: typeof LEGACY_SESSION_PROTOCOL; path: string; docId: string | null; chain: boolean; created: boolean; features?: string[]; mode?: 'read' } & LegacyDocumentView)
   | ({ t: 'doc'; cause: Cause } & LegacyDocumentView)
   | { t: 'baked'; rev: number; state: string | null; html: string; report: ReportLine[] }
   | { t: 'baked-diff'; rev: number; state: string | null; baseRev: number; start: number; deleteCount: number; insert: string; report: ReportLine[] }
