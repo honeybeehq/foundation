@@ -52,7 +52,7 @@ export class DirectChanges {
   }
   async start(): Promise<number> { return await new Promise<number>((resolve, reject) => { this.server.once('error', reject); this.server.listen(this.config.listen.port, this.config.listen.host, () => { this.server.removeListener('error', reject); resolve((this.server.address() as { port: number }).port) }) }) }
   push(change: DirectChange): void {
-    const workspace = this.config.workspaces[change.workspace]
+    const workspace = Object.hasOwn(this.config.workspaces, change.workspace) ? this.config.workspaces[change.workspace] : undefined
     if (!workspace) return
     const body = JSON.stringify({ ...change, nodeId: this.nodeId, at: Date.now() })
     if (Buffer.byteLength(body) > LIMIT) return
