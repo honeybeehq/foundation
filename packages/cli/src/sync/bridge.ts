@@ -9,11 +9,12 @@ export class CombBridge {
   private sequence = 0
   private buffer = Buffer.alloc(0)
   private closed = false
+  private diagnostics = ''
   constructor(binary: string, args: string[]) {
     this.child = spawn(binary, args, { stdio: 'pipe' })
-    this.child.stderr.on('data', () => { /* RPC errors carry the actionable failure; drain diagnostics. */ })
+    this.child.stderr.on('data', chunk => { this.diagnostics = (this.diagnostics + String(chunk)).slice(-4096) })
     this.child.on('error', err => this.fail(err))
-    this.child.on('exit', (code, signal) => this.fail(new Error(`Comb bridge exited (${code ?? signal})`)))
+    this.child.on('exit', (code, signal) => this.fail(new Error(`Comb bridge exited (${code ?? signal})${this.diagnostics ? `: ${this.diagnostics.trim()}` : ''}`)))
     this.child.stdin.on('error', err => this.fail(err))
     this.child.stdout.on('data', (chunk: Buffer) => {
       try {
