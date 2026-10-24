@@ -1,13 +1,14 @@
 import { execFileSync } from 'node:child_process'
 import { join } from 'node:path'
 import { readTextIfPresent, writeAtomic } from '../disk.js'
-import { prepareGitUpdate, pullGit, recoverGitUpdate } from '../git-update.js'
+import { prepareGitUpdate, pullGit, recoverGitUpdate, warnPendingGitUpdates } from '../git-update.js'
 import type { CliIO } from '../io.js'
 
 export async function runGit(args: string[], io: CliIO): Promise<number> {
   if (!args.length) { io.stderr('usage: foundation git setup|pull|prepare-update|recover-update'); return 2 }
   try {
     const root = execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim()
+    if (args[0] !== 'recover-update') warnPendingGitUpdates(root, io)
     if (args[0] === 'pull') { pullGit(root, args.slice(1), io); return 0 }
     if (args[0] === 'prepare-update') {
       if (!args[1] || args[2] !== '--' || !args[3]) throw new Error('usage: foundation git prepare-update <incoming> -- <command> [args...]')
