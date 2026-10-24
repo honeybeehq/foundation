@@ -8,7 +8,14 @@ import { runtimeVersion, sourceRoot } from '../runtime-version.js'
 import { gatewayRegistryPath, writeGatewayRegistry, readGatewayRegistry } from '../mcp/gatewayRegistry.js'
 
 export async function runInstall(args: string[], io: CliIO): Promise<number> {
-  const { flags } = parseArgs(args)
+  const { flags, positionals } = parseArgs(args)
+  if (positionals.length || Object.keys(flags).some((key) => !['from', 'sha', 'force'].includes(key))
+      || (flags.from !== undefined && typeof flags.from !== 'string')
+      || (flags.sha !== undefined && (typeof flags.sha !== 'string' || !/^[a-f0-9]{7,40}$/i.test(flags.sha)))
+      || (flags.force !== undefined && flags.force !== true)) {
+    io.stderr('usage: foundation install [--from CHECKOUT] [--sha SHA] [--force]')
+    return 2
+  }
   const from = resolve(flagString(flags, 'from') || process.env.FDN_ROOT || sourceRoot)
   const git = (...argv: string[]) => execFileSync('git', ['-C', from, ...argv], { encoding: 'utf8' }).trim()
   const sha = git('rev-parse', '--verify', `${flagString(flags, 'sha') || 'HEAD'}^{commit}`)
@@ -36,7 +43,7 @@ export async function runInstall(args: string[], io: CliIO): Promise<number> {
       const runtime = { ...runtimeVersion(stage), sourceSha: sha, dirty: false }
       writeFileSync(join(stage, 'foundation-install.json'), JSON.stringify({ runtime, installedAt: new Date().toISOString() }, null, 2))
       writeFileSync(join(stage, 'foundation'), `#!/bin/sh
-FDN_ROOT=${JSON.stringify(target)}
+FDN_ROOT=${shellQuote(target)}
 export FDN_ROOT
 if [ "$1" = session ]; then exec node "$FDN_ROOT/packages/cli/bin/session.mjs" "$@"; fi
 exec "$FDN_ROOT/node_modules/.bin/tsx" "$FDN_ROOT/packages/cli/src/main.ts" "$@"
@@ -61,10 +68,17 @@ exec "$FDN_ROOT/node_modules/.bin/tsx" "$FDN_ROOT/packages/cli/src/main.ts" "$@"
     if (existsSync(registry) && !existsSync(`${registry}.before-foundation-install`)) writeFileSync(`${registry}.before-foundation-install`, readFileSync(registry))
     writeGatewayRegistry(registry, { name: 'foundation', protocol: 'mcp', shim: { command: bin, args: ['mcp'] }, env: {}, startedAt: new Date().toISOString(), gatewayRev: 1, stateless: true })
   }
-  io.stdout(JSON.stringify({ installed: target, sourceSha: sha, previous: previous || null, rollback: previous ? `ln -sfn '${join(base, 'versions', previous)}' '${current}'` : `restore ${backup} to ${bin}; restore ${registry}.before-foundation-install if present` }))
+  const restoreBin = existsSync(backup) ? `rm ${shellQuote(bin)} && mv ${shellQuote(backup)} ${shellQuote(bin)}` : `rm ${shellQuote(bin)}`
+  const registryBackup = `${registry}.before-foundation-install`
+  const restoreRegistry = existsSync(registryBackup) ? `mv ${shellQuote(registryBackup)} ${shellQuote(registry)}` : `rm ${shellQuote(registry)}`
+  io.stdout(JSON.stringify({ installed: target, sourceSha: sha, previous: previous || null, rollback: previous ? `ln -sfn ${shellQuote(join(base, 'versions', previous))} ${shellQuote(current)}` : `${restoreBin}; ${restoreRegistry}` }))
   return 0
 }
 import { readlinkSync } from 'node:fs'
 function readLinkIsOurs(path: string, base: string): boolean {
   return lstatSync(path).isSymbolicLink() && readlinkSync(path) === join(base, 'current/foundation')
+}
+
+function shellQuote(value: string): string {
+  return "'" + value.replaceAll("'", "'\\''") + "'"
 }

@@ -1,5 +1,6 @@
 #!/usr/bin/env -S npx tsx
 import { runImages } from './commands/images.js'
+import { runDoctor } from './commands/doctor.js'
 /**
  * foundation-cli — entry point (API.md "CLI (packages/cli)"). Zero-dependency
  * argv parsing; bin name `foundation`; tsx is the runtime (this file is the
@@ -42,6 +43,7 @@ const COMMANDS: Record<string, (args: string[], io: CliIO) => Promise<number>> =
   images: runImages,
   'import-image': (args, io) => runImages(args, io, 'import-image'),
   'localize-images': (args, io) => runImages(args, io, 'localize-images'),
+  doctor: runDoctor,
   install: runInstall,
   version: async (_args, io) => { io.stdout(JSON.stringify(runtimeVersion())); return 0 },
   new: runNew,
