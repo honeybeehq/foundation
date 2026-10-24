@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
-import { isAbsolute, join, relative, resolve } from 'node:path'
+import { closeSync, existsSync, fsyncSync, mkdirSync, openSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
 import { diffPatch, type FdnChain } from 'foundation-engine'
 import { loadChain } from './chain-cache.js'
 import { withWallTime } from './change-meta.js'
@@ -12,6 +12,28 @@ import type { CliIO } from './io.js'
 
 function git(root: string, args: string[]): Buffer {
   return execFileSync('git', ['-C', root, ...args], { maxBuffer: 128 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] })
+}
+function flushDirectory(path: string): void {
+  const fd = openSync(path, 'r')
+  try { fsyncSync(fd) } finally { closeSync(fd) }
+}
+function durableBackup(path: string, data: string | Uint8Array): void {
+  const fd = openSync(path, 'wx', 0o600)
+  try { writeFileSync(fd, data); fsyncSync(fd) } finally { closeSync(fd) }
+}
+export function warnPendingGitUpdates(root: string, io: CliIO): void {
+  const dir = join(git(root, ['rev-parse', '--absolute-git-dir']).toString().trim(), 'foundation-updates')
+  if (!existsSync(dir)) return
+  for (const name of readdirSync(dir)) {
+    if (existsSync(join(dir, name, 'journal.json'))) io.stderr(`Unrecovered design backup; run foundation git recover-update ${JSON.stringify(join(dir, name))}, then remove the backup when satisfied`)
+  }
+}
+export function warnPendingGitUpdatesNear(file: string | undefined, io: CliIO): void {
+  try {
+    const cwd = file ? dirname(resolve(file)) : process.cwd()
+    const root = git(cwd, ['rev-parse', '--show-toplevel']).toString().trim()
+    warnPendingGitUpdates(root, io)
+  } catch { /* files outside a Git repository have no update journal */ }
 }
 function paths(bytes: Buffer): string[] { return bytes.toString('utf8').split('\0').filter(Boolean) }
 function editedChain(file: string): FdnChain {
@@ -32,7 +54,8 @@ interface Journal { root: string; before: string; incoming: string; entries: Ent
 export function prepareGitUpdate(root: string, incoming: string, command: string[], io: CliIO): void {
   const target = git(root, ['rev-parse', '--verify', `${incoming}^{commit}`]).toString().trim()
   const before = git(root, ['rev-parse', 'HEAD']).toString().trim()
-  git(root, ['merge-base', '--is-ancestor', before, target])
+  try { git(root, ['merge-base', '--is-ancestor', before, target]) }
+  catch { throw new Error('Git branches diverged; refusing a non-fast-forward update') }
   if (git(root, ['diff', '--cached', '--name-only', '-z']).length) throw new Error('staged changes present; commit or unstage them before updating')
   const tracked = paths(git(root, ['ls-files', '-z']))
   const designs = tracked.filter(path => path.endsWith('.fdn.html.chain')).map(path => path.slice(0, -6)).sort()
@@ -43,6 +66,7 @@ export function prepareGitUpdate(root: string, incoming: string, command: string
   let resetStarted = false
   try {
     for (const path of designs) releases.push(acquireDocumentLock(join(root, path)))
+    if (git(root, ['rev-parse', 'HEAD']).toString().trim() !== before) throw new Error('HEAD changed while acquiring design locks; retry the update')
     for (const path of designs) recoverDocument(join(root, path))
     const dirty = paths(git(root, ['diff', 'HEAD', '--name-only', '-z']))
     const other = dirty.filter(path => !allowed.has(path))
@@ -59,24 +83,26 @@ export function prepareGitUpdate(root: string, incoming: string, command: string
       if (loadChain(headBytes).docId() !== local.docId()) throw new Error(`local design identity differs from HEAD: ${path}`)
       // Preflight the merge before touching any file; preserve all local-only history.
       next.merge(local)
-      return { path, local: local.save(), original: readFileSync(file), chain: readFileSync(`${file}.chain`), head: git(root, ['show', `HEAD:${path}`]), headBytes }
+      return { path, local: local.save(), original: readFileSync(file), chain: readFileSync(`${file}.chain`) }
     })
     if (prepared.length) {
       const gitDir = git(root, ['rev-parse', '--absolute-git-dir']).toString().trim()
       journalPath = join(gitDir, 'foundation-updates', randomUUID())
       mkdirSync(journalPath, { recursive: true, mode: 0o700 })
+      flushDirectory(gitDir)
       journal = { root, before, incoming: target, entries: prepared.map((entry, i) => ({ path: entry.path, slot: String(i) })) }
       for (const [i, entry] of prepared.entries()) {
-        writeFileSync(join(journalPath, `${i}.html`), entry.original)
-        writeFileSync(join(journalPath, `${i}.original.chain`), entry.chain)
-        writeFileSync(join(journalPath, `${i}.chain`), entry.local)
+        durableBackup(join(journalPath, `${i}.html`), entry.original)
+        durableBackup(join(journalPath, `${i}.original.chain`), entry.chain)
+        durableBackup(join(journalPath, `${i}.chain`), entry.local)
       }
-      writeFileSync(join(journalPath, 'journal.json'), JSON.stringify(journal))
+      durableBackup(join(journalPath, 'journal.json'), JSON.stringify(journal))
+      flushDirectory(journalPath)
+      flushDirectory(join(gitDir, 'foundation-updates'))
       io.stderr(`Local design backup: ${journalPath}`)
       resetStarted = true
       for (const entry of prepared) {
-        writeAtomic(join(root, `${entry.path}.chain`), entry.headBytes)
-        writeAtomic(join(root, entry.path), entry.head)
+        git(root, ['--literal-pathspecs', 'restore', '--source=HEAD', '--worktree', '--', entry.path, `${entry.path}.chain`])
       }
     }
     const [program, ...args] = command
@@ -84,7 +110,18 @@ export function prepareGitUpdate(root: string, incoming: string, command: string
     const output = execFileSync(program, args, { cwd: root, maxBuffer: 128 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] })
     if (output.length) io.stdout(output.toString().trimEnd())
     if (git(root, ['rev-parse', 'HEAD']).toString().trim() !== target) throw new Error('update command did not move HEAD to the requested incoming commit')
-    if (journal && journalPath) restoreJournal(journal, journalPath, false)
+    if (journal && journalPath) {
+      restoreJournal(journal, journalPath, false)
+      // Do not delete the durable outbox until restored local edits are durable.
+      for (const entry of journal.entries) {
+        const file = join(root, entry.path)
+        for (const path of [file, `${file}.chain`]) {
+          const fd = openSync(path, 'r')
+          try { fsyncSync(fd) } finally { closeSync(fd) }
+        }
+        flushDirectory(dirname(file))
+      }
+    }
     if (journalPath) rmSync(journalPath, { recursive: true })
     io.stdout('Git update complete; local design changes preserved')
   } catch (error) {
@@ -122,6 +159,7 @@ function restoreJournal(journal: Journal, dir: string, original: boolean): void 
 export function recoverGitUpdate(root: string, dir: string): void {
   const journal = JSON.parse(readFileSync(join(dir, 'journal.json'), 'utf8')) as Journal
   if (journal.root !== root) throw new Error('backup belongs to another repository')
+  if (!Array.isArray(journal.entries) || journal.entries.some(entry => typeof entry.path !== 'string' || !entry.path.endsWith('.fdn.html') || isAbsolute(entry.path) || relative(root, resolve(root, entry.path)).startsWith('..') || !/^\d+$/.test(entry.slot))) throw new Error('invalid design backup manifest')
   const releases: (() => void)[] = []
   try {
     for (const entry of journal.entries) releases.push(acquireDocumentLock(join(root, entry.path)))
