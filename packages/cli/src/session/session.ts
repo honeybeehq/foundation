@@ -2,7 +2,6 @@ import { mintNodeId } from 'foundation-engine'
 import { runtimeVersion } from '../runtime-version.js'
 import { loadChain } from '../chain-cache.js'
 import { autoOpenDesign } from '../sync-store.js'
-import { loadChain } from '../chain-cache.js'
 import { legacyMessage, legacyBoardRef, legacyArtboardReason, legacyArtboardOpReason } from './legacy.js'
 import { ARTBOARD_FRAME_VERSION, ArtboardError, validateArtboards, explicitArtboards, artboardPages, boardViews, boardView, boardKey } from 'foundation-engine'
 import type { BoardRef } from 'foundation-engine'
@@ -27,7 +26,8 @@ import {
   stableStringify,
   validateDocument,
   validateTokenCollections,
-  validateStateStyles} from 'foundation-engine'
+  validateStateStyles,
+} from 'foundation-engine'
 import type { EnvelopeRecord, FdnChain, FdnDocument, InstanceDetachReport, InstanceSwapReport, PatchOp, ReportLine } from 'foundation-engine'
 import { parseWireClientMessage, SESSION_PROTOCOL, LEGACY_SESSION_PROTOCOL, isSessionProtocol } from 'foundation-protocol'
 import type { Cause, WireClientMessage, DocumentView, FaultCode, ResultCode, ServiceMessage, WireServiceMessage, SessionProtocol } from 'foundation-protocol'
