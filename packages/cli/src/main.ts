@@ -10,6 +10,8 @@
  * process.exit with what it returns.
  */
 import { runHelp, runSkill } from './commands/skill.js'
+import { runInstall } from './commands/install.js'
+import { runtimeVersion } from './runtime-version.js'
 import { runEdit } from './commands/edit.js'
 import { realpathSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -35,6 +37,8 @@ import { runSession } from './commands/session.js'
 import type { CliIO } from './io.js'
 
 const COMMANDS: Record<string, (args: string[], io: CliIO) => Promise<number>> = {
+  install: runInstall,
+  version: async (_args, io) => { io.stdout(JSON.stringify(runtimeVersion())); return 0 },
   new: runNew,
   copy: runCopy,
   inspect: runInspect,
@@ -64,6 +68,9 @@ const USAGE = `foundation — a design-document engine CLI
 usage: foundation <command> [args]
 
 commands:
+  version [--json]                          report source revision and compatibility
+  install [--from CHECKOUT] [--sha SHA] [--force]  install a node-level committed copy
+  doctor --inventory --json                  inventory executable copies without changing them
   new <name> [--no-chain]                    write a minimal .fdn.html skeleton (chain-inits it too)
   copy <src> <dest> [--title T] [--json]      create an independent document with a fresh identity and chain
   inspect <file>                             summarize a document
@@ -114,6 +121,7 @@ commands:
 `
 
 export async function runCli(argv: string[], io: CliIO = processIo): Promise<number> {
+  if (argv[0] === '--version') { io.stdout(JSON.stringify(runtimeVersion())); return 0 }
   const [command, ...rest] = argv
   if (!command || command === '--help' || command === '-h') {
     io.stdout(USAGE)

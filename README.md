@@ -37,3 +37,29 @@ pnpm test          # gauntlet + harness tests
 pnpm spike:chain   # run the full chain gauntlet, writes spikes/chain/RESULTS.md
 pnpm spike:render  # render determinism check, writes spikes/render/RESULTS.md
 ```
+
+### Install the same Foundation on every node
+
+Run `foundation install --from /path/to/foundation --sha <commit>` on Linux or
+macOS (Node 22+, pnpm, Git and tar required). The installer archives that commit,
+installs its locked dependencies and builds its session bundle once. Uncommitted
+checkout edits are excluded. Releases live in
+`~/.local/share/foundation/versions/<sha>`; `~/.local/bin/foundation` follows the
+`current` release and the Hive MCP gateway uses that stable executable.
+Installed sessions never rebuild from source mtimes. Use `--from` when upgrading
+from an installed copy; the source must contain the requested commit.
+
+`foundation --version` and `foundation version --json` report the source SHA,
+dirty state, package version, supported session protocols and document formats.
+The session welcome and MCP server information carry the same runtime identity.
+`foundation doctor --inventory --json` reads executable/configuration candidates
+on the current node without running or changing discovered copies; unknown
+revision or format safety stays unknown.
+
+Reinstalling a commit reuses its release. A non-descendant revision requires
+`--force`. The installer prints the previous revision and rollback command;
+the original executable and gateway registration are retained with a
+`.before-foundation-install` suffix. To restore the pre-install setup, move those
+back to their original paths (remove the new executable symlink first). Restart
+existing agent sessions to pick up a changed MCP registration. Install into a
+temporary `HOME` to test without changing the node's active Foundation.

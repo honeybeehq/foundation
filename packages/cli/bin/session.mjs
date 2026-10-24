@@ -62,7 +62,7 @@ async function build() {
 }
 
 try {
-  if (!isFresh()) await build()
+  if (!modifiedAt(join(root, 'foundation-install.json')) && !isFresh()) await build()
   const { main } = await import(pathToFileURL(bundle).href)
   process.exit(await main(process.argv.slice(3)))
 } catch (err) {
