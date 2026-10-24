@@ -333,11 +333,22 @@ class LoroChain implements FdnChain {
       return first ? this.envelopeFor(first).hash : null
     }
     const target = this.loro.oplogFrontiers()
-    let delta = this.loro.findIdSpansBetween(this.rootFrontiers, target)
-    if (delta.retreat.length) {
+    let delta = this.rootChange ? this.loro.findIdSpansBetween(this.rootFrontiers, target) : undefined
+    if (delta?.retreat.length) {
       this.rootChange = undefined
       this.rootHash = undefined
-      delta = this.loro.findIdSpansBetween([], target)
+      delta = undefined
+    }
+    if (!delta) {
+      const peers = this.loro.oplogVersion().length()
+      if (peers > 1 && peers * 2 >= this.loro.changeCount()) {
+        for (const changes of this.loro.getAllChanges().values()) {
+          for (const change of changes) {
+            if (!this.rootChange || compareChanges(change, this.rootChange) < 0) this.rootChange = change
+          }
+        }
+        delta = { forward: [], retreat: [] }
+      } else delta = this.loro.findIdSpansBetween([], target)
     }
     for (const span of delta.forward) {
       const change = this.loro.getChangeAt({ peer: span.peer, counter: span.counter })
