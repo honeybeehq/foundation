@@ -482,7 +482,10 @@ class LoroChain implements FdnChain {
     // states. Snapshot encoding of a long-lived document can vary after loads
     // or reads; this fresh document always takes the same export path.
     const canonical = new LoroDoc()
-    for (const change of this.changes()) canonical.import(change.bytes)
+    canonical.importBatch(this.changes().map(change => change.bytes))
+    if (canonical.oplogVersion().compare(this.loro.oplogVersion()) !== 0) {
+      throw new Error('canonical snapshot rebuild did not preserve the complete history')
+    }
     const snapshot = canonical.export({ mode: 'snapshot' })
     const anchorsBytes = new TextEncoder().encode(JSON.stringify(Array.from(this.anchors.entries()).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([name, frontier]) => [name, [...frontier].sort((a, b) => comparePeerIds(a.peer, b.peer) || a.counter - b.counter)])))
     const header = new Uint8Array(4)
