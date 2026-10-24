@@ -90,6 +90,7 @@ import { join } from 'node:path'
 import type { EnvelopeRecord, FdnDocument, ReportLine, SemanticOp } from '../types.js'
 import type { FdnChain } from './chain.js'
 import { loadChain } from './chain.js'
+import { encodeBlob, decodeBlob, importChangeBlobs } from './blob.js'
 import { structuralDiff } from './model.js'
 
 /** SPEC 13a-iv / API.md "chain exchange" — code "concurrent-overlap". Not in
@@ -101,34 +102,6 @@ export interface OverlapReport {
 const BLOB_EXT = '.fdnc'
 
 // ——— blob framing ———
-
-function encodeBlob(envelope: EnvelopeRecord, bytes: Uint8Array): Uint8Array {
-  // Fixed key order — deterministic bytes for a logically-identical envelope
-  // (mirrors util.ts's stableStringify rationale, inlined here since the
-  // envelope's shape is small and fixed rather than arbitrary JSON).
-  const json = JSON.stringify({
-    hash: envelope.hash,
-    prevHash: envelope.prevHash,
-    author: envelope.author,
-    message: envelope.message,
-    specVersion: envelope.specVersion,
-  })
-  const jsonBytes = new TextEncoder().encode(json)
-  const out = new Uint8Array(4 + jsonBytes.length + bytes.length)
-  new DataView(out.buffer).setUint32(0, jsonBytes.length, true)
-  out.set(jsonBytes, 4)
-  out.set(bytes, 4 + jsonBytes.length)
-  return out
-}
-
-function decodeBlob(buf: Uint8Array): { envelope: EnvelopeRecord; bytes: Uint8Array } {
-  const view = new DataView(buf.buffer, buf.byteOffset, buf.byteLength)
-  const jsonLen = view.getUint32(0, true)
-  const jsonBytes = buf.subarray(4, 4 + jsonLen)
-  const updateBytes = buf.subarray(4 + jsonLen)
-  const envelope = JSON.parse(new TextDecoder().decode(jsonBytes)) as EnvelopeRecord
-  return { envelope, bytes: updateBytes }
-}
 
 async function listBlobFiles(dir: string): Promise<string[]> {
   try {
@@ -223,7 +196,9 @@ export async function importBlobs(chain: FdnChain, dir: string): Promise<{ impor
   const missingDecoded: { envelope: EnvelopeRecord; bytes: Uint8Array }[] = []
   for (const filename of missingFiles) {
     const raw = await readFile(join(inDir, filename))
-    missingDecoded.push(decodeBlob(new Uint8Array(raw.buffer, raw.byteOffset, raw.byteLength)))
+    const decoded = decodeBlob(new Uint8Array(raw.buffer, raw.byteOffset, raw.byteLength))
+    if (filename !== `${decoded.envelope.hash}${BLOB_EXT}`) throw new Error('blob filename hash mismatch')
+    missingDecoded.push(decoded)
   }
 
   const pushedPrefixLen = findAncestorIndex(missingDecoded, changesBefore)
@@ -231,11 +206,7 @@ export async function importBlobs(chain: FdnChain, dir: string): Promise<{ impor
   const ancestorDoc = chain.docFromUpdates(ancestorUpdates)
   const beforeDoc = chain.doc()
 
-  let imported = 0
-  for (const { bytes } of missingDecoded) {
-    chain.importUpdate(bytes)
-    imported++
-  }
+  const imported = importChangeBlobs(chain, missingDecoded.map(c => encodeBlob(c.envelope, c.bytes)))
   // "What the incoming blobs alone claim, independent of Loro's LWW outcome
   // in our real chain" — ancestor + ONLY the just-imported bytes, excluding
   // any of our own unshared local edits (see module doc: diffing only
