@@ -1,6 +1,7 @@
 import { mintNodeId } from 'foundation-engine'
 import { runtimeVersion } from '../runtime-version.js'
 import { loadChain } from '../chain-cache.js'
+import { autoOpenDesign } from '../sync-store.js'
 import { legacyMessage, legacyBoardRef, legacyArtboardReason, legacyArtboardOpReason } from './legacy.js'
 import { ARTBOARD_FRAME_VERSION, ArtboardError, validateArtboards, explicitArtboards, artboardPages, boardViews, boardView, boardKey } from 'foundation-engine'
 import type { BoardRef } from 'foundation-engine'
@@ -314,6 +315,7 @@ class DesignSession implements Session {
       this.preparedChain = { text: this.docText, actor: this.actor, docId: this.docId, finish: prepareChain(this.doc, { actor: this.actor, docId: this.docId }) }
     }
     this.phase = 'open'
+    if (this.chain) autoOpenDesign(this.path, message => this.log(message))
     this.rev = 1
     this.emit({
       t: 'welcome',

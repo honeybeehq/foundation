@@ -1110,14 +1110,25 @@ Malformed JSON is retained as a literal attribute and reported during ingestion;
 sessions preserve the source and block commits until repaired. Extra attributes
 on a JSON item merge underneath its JSON fields and produce a warning.
 
-## 9. Sync & multiplayer — *skeleton*
+## 9. Sync & multiplayer
 
-Intent: chains sync as append-only logs; local-first; any transport (filesystem, peer
-replication, a relay server) — the spec defines the log exchange, not the pipe.
-Annotations and review state are in-chain (they are changes like any other, so they
-sync, merge, and carry authorship for free). To fill: exchange protocol, awareness
-(presence/cursors) as an explicitly *non-truth* side channel, auth boundary for
-cloud relays.
+Local chains are authoritative and save before network work. One `foundation sync
+serve` daemon per node publishes immutable exchange envelopes through Comb's
+supported JSONL bridge and imports them through the existing locked save boundary.
+Only explicitly registered live paths are touched (`sync open` / `sync close`).
+The logical feed is `foundation/<workspace>/<product>/<docId>`; because Comb log
+names exclude slashes, its wire name is `foundation-<SHA256(logical feed)>`.
+Envelope SHA-256 is the stable append key. Comb sequence numbers are delivery
+cursors; Loro supplies document causality and merge semantics. Frames, hashes,
+document identity and causal completeness are checked before imports become visible.
+
+The chain is the durable outbox. Acknowledged hashes and receive cursors live in the
+node-local replica store; receive cursors advance only after locked import. Outages
+leave local editing available; retries back off and duplicate delivery is inert.
+Caught-up imports do not rewrite files. Status distinguishes saved locally, waiting
+to upload and shared (acknowledged by Comb, not by every peer). Full feed history
+must be retained for replay. Backend location is configured by file and does not
+change this contract. Setup, hooks and real-process verification: `packages/cli/SYNC.md`.
 
 ## 10. Conformance — *skeleton*
 
