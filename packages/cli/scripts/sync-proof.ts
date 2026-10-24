@@ -1,7 +1,7 @@
 /** Real-process proof. Run: pnpm exec tsx packages/cli/scripts/sync-proof.ts /path/comb-bridge */
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
-import { chmodSync, copyFileSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync, statSync } from 'node:fs'
+import { chmodSync, copyFileSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync, statSync, existsSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import assert from 'node:assert/strict'
 import { loadChain } from 'foundation-engine'
@@ -16,7 +16,7 @@ const transcript: string[] = []
 function log(message: string): void { const line = `${new Date().toISOString()} ${message}`; transcript.push(line); console.log(line); writeFileSync(join(root, 'transcript.log'), transcript.join('\n') + '\n') }
 const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 function cli(store: string, ...args: string[]): string {
-  const run = spawnSync(process.execPath, ['--import', 'tsx', main, ...args], { env: { ...process.env, FOUNDATION_REPLICA_STORE: store }, encoding: 'utf8' })
+  const run = spawnSync(process.execPath, ['--import', 'tsx', main, ...args], { env: { ...process.env, FOUNDATION_REPLICA_STORE: store, FOUNDATION_ORIGIN_NODE: store === sa ? 'proof-node-A' : 'proof-node-B' }, encoding: 'utf8' })
   assert.equal(run.status, 0, `${args.join(' ')}: ${run.stderr}`)
   log(`CLI ${args.join(' ')} => ${run.stdout.trim()}`); return run.stdout
 }
@@ -47,7 +47,8 @@ try {
   log(`proof root ${root}; binary ${binary}`)
   cli(sa, 'new', a)
   for (const dest of [b, idle]) { copyFileSync(a, dest); copyFileSync(`${a}.chain`, `${dest}.chain`) }
-  const idleBytes = readFileSync(`${idle}.chain`)
+  const idleBytes = readFileSync(`${idle}.chain`), idleHtml = readFileSync(idle)
+  const idleTimes = [statSync(idle).mtimeMs, statSync(`${idle}.chain`).mtimeMs]
   cli(sa, 'sync', 'open', a, '--workspace', 'proof', '--product', 'foundation')
   cli(sb, 'sync', 'open', b, '--workspace', 'proof', '--product', 'foundation')
   let da = daemon(sa); daemon(sb)
@@ -67,7 +68,7 @@ try {
   assert.deepEqual(chain(a).doc(), chain(b).doc()); log('CONVERGED both directions through real CLI')
   const bridge = new CombBridge(binary, ['--dir', configDir]); await bridge.hello()
   const status = JSON.parse(cliQuiet(sa, 'sync', 'status', '--json'))[0]
-  const { combLog } = await import('../src/sync/daemon.js')
+  const { combLog, copyKey } = await import('../src/sync/daemon.js')
   const change = chain(a).changes().at(-1)!
   const append = { log: combLog(status), idempotency_key: change.envelope.hash, payload_hex: Buffer.from(encodeBlob(change.envelope, change.bytes)).toString('hex') }
   const first = await bridge.request('append', append), again = await bridge.request('append', append)
@@ -84,23 +85,49 @@ try {
   chmodSync(objects, 0); log('BACKEND OUTAGE: chmod local object root 000 (both bridge processes denied)')
   cli(sa, 'edit', a, '--ops', JSON.stringify([{ op: 'set-text', id: 'n1', text: 'offline A' }]), '--author', 'proof-A')
   cli(sb, 'edit', b, '--ops', JSON.stringify([{ op: 'set-text', id: 'n2', text: 'offline B' }]), '--author', 'proof-B')
+  cli(sa, 'annotate', a, '--text', 'offline comment A')
+  cli(sb, 'annotate', b, '--text', 'offline comment B')
   assert.equal(text(a, 'n1'), 'offline A'); assert.equal(text(b, 'n2'), 'offline B'); log('LOCAL SAVES succeeded while backend denied')
   await until(() => JSON.parse(cliQuiet(sa, 'sync', 'status', '--json'))[0].lastError !== null, 'outage visible in status')
   log(`OUTAGE STATUS ${cliQuiet(sa, 'sync', 'status', '--json').trim()}`)
   // Restart one daemon while disconnected: cursor and chain outbox must survive.
   da.kill('SIGTERM'); await new Promise(resolve => da.once('exit', resolve)); da = daemon(sa); log('RESTARTED daemon A during outage')
   chmodSync(objects, 0o755); const recovery = performance.now(); log('BACKEND RESTORED')
-  await until(() => text(a, 'n2') === 'offline B' && text(b, 'n1') === 'offline A', 'offline edits converge after recovery', 30000)
+  await until(() => text(a, 'n2') === 'offline B' && text(b, 'n1') === 'offline A' && chain(a).doc().annotations.length === 2 && chain(b).doc().annotations.length === 2, 'offline edits converge after recovery', 30000)
   log(`recovery end-to-end ${Math.round(performance.now() - recovery)}ms`)
-  assert.deepEqual(chain(a).doc(), chain(b).doc()); assert.deepEqual(readFileSync(`${idle}.chain`), idleBytes); assert.deepEqual(readFileSync(`${late}.chain`), closedBytes)
+  assert.deepEqual(chain(a).doc(), chain(b).doc()); assert.deepEqual(readFileSync(`${idle}.chain`), idleBytes); assert.deepEqual(readFileSync(idle), idleHtml)
+  assert.deepEqual([statSync(idle).mtimeMs, statSync(`${idle}.chain`).mtimeMs], idleTimes)
+  assert.equal(existsSync(join(sa, `${copyKey({ ...status, file: idle })}.json`)), false)
+  log('IDLE COPY: HTML and chain bytes/mtime unchanged; no replica checkpoint created'); assert.deepEqual(readFileSync(`${late}.chain`), closedBytes)
+  const origins = new Set(chain(a).log().map(envelope => envelope.originNode))
+  assert.ok(origins.has('proof-node-A') && origins.has('proof-node-B')); log('S1 INTEGRATION: both offline comments and origin nodes survive bridge exchange')
   log('PASS convergence, duplicate append, outage saves, restart recovery, untouched idle copy')
   log(`FINAL STATUS A ${cliQuiet(sa, 'sync', 'status', '--json').trim()}`)
   log(`FINAL STATUS B ${cliQuiet(sb, 'sync', 'status', '--json').trim()}`)
+  const poison = join(root, 'blocked.fdn.html')
+  cli(sa, 'new', poison); cli(sa, 'sync', 'open', poison, '--workspace', 'proof', '--product', 'foundation')
+  await until(() => JSON.parse(cliQuiet(sa, 'sync', 'status', '--json')).some((row: any) => row.file === poison && row.status === 'shared'), 'second design ready')
+  const invalid = new CombBridge(binary, ['--dir', configDir]); await invalid.hello()
+  const poisoned = JSON.parse(cliQuiet(sa, 'sync', 'status', '--json')).find((row: any) => row.file === poison)
+  await invalid.request('append', { log: combLog(poisoned), idempotency_key: 'bad0', payload_hex: '00000000' }); await invalid.finish()
+  await until(() => JSON.parse(cliQuiet(sa, 'sync', 'status', '--json')).some((row: any) => row.file === poison && row.status === 'blocked' && row.lastError?.includes('cursor 2')), 'invalid event is blocked at its delivery cursor')
+  cli(sa, 'edit', a, '--ops', JSON.stringify([{ op: 'set-text', id: 'n1', text: 'healthy despite blocked feed' }]))
+  await until(() => text(b, 'n1') === 'healthy despite blocked feed', 'blocked design does not stall healthy design')
+  log(`BLOCKED STATUS ${cliQuiet(sa, 'sync', 'status', '--json').trim()}`)
+  // A short lease keeps the crash probe bounded; the default lease has the same expiry contract.
+  const owner = new CombBridge(binary, ['--dir', configDir, '--lease', '3']); await owner.hello()
+  await owner.request('append', { log: 'foundation-lease-crash-probe', idempotency_key: '01', payload_hex: '01' }); owner.close()
+  const contender = new CombBridge(binary, ['--dir', configDir, '--lease', '3']); await contender.hello()
+  const takeover = performance.now()
+  await contender.request('append', { log: 'foundation-lease-crash-probe', idempotency_key: '02', payload_hex: '02' })
+  log(`WRITER CRASH: next writer acquired after ${Math.round(performance.now() - takeover)}ms with 3s lease`); await contender.finish()
+  log('PASS extra checks: invalid feed isolated; abrupt writer crash recovers after lease expiry')
+
 } finally {
   chmodSync(objects, 0o755)
   for (const child of children) child.kill('SIGTERM')
 }
 function cliQuiet(store: string, ...args: string[]): string {
-  const run = spawnSync(process.execPath, ['--import', 'tsx', main, ...args], { env: { ...process.env, FOUNDATION_REPLICA_STORE: store }, encoding: 'utf8' })
+  const run = spawnSync(process.execPath, ['--import', 'tsx', main, ...args], { env: { ...process.env, FOUNDATION_REPLICA_STORE: store, FOUNDATION_ORIGIN_NODE: store === sa ? 'proof-node-A' : 'proof-node-B' }, encoding: 'utf8' })
   assert.equal(run.status, 0, run.stderr); return run.stdout
 }
