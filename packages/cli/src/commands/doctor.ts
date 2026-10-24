@@ -77,6 +77,25 @@ function configCommands(value: unknown, foundation = false): string[] {
   return found
 }
 
+/** Conservative TOML subset: only literal command strings in Foundation's MCP
+ * table. Interpolation and shell expressions remain unresolved inventory data. */
+function tomlCommands(raw: string): string[] {
+  let foundation = false
+  const commands: string[] = []
+  for (const line of raw.split(/\r?\n/)) {
+    const table = /^\s*\[([^\]]+)\]\s*(?:#.*)?$/.exec(line)
+    if (table) {
+      foundation = /^mcp_servers\.(?:foundation|"foundation"|'foundation')$/.test(table[1] ?? '')
+      continue
+    }
+    if (!foundation) continue
+    const match = /^\s*command\s*=\s*("(?:[^"\\]|\\.)*"|'[^']*')\s*(?:#.*)?$/.exec(line)
+    if (!match?.[1]) continue
+    try { commands.push(match[1].startsWith('"') ? JSON.parse(match[1]) : match[1].slice(1, -1)) } catch { /* unsupported escape */ }
+  }
+  return commands
+}
+
 export async function runDoctor(args: string[], io: CliIO): Promise<number> {
   const { flags, positionals } = parseArgs(args)
   if (flags.inventory !== true || flags.json !== true || positionals.length
@@ -96,6 +115,7 @@ export async function runDoctor(args: string[], io: CliIO): Promise<number> {
   const configs = new Set([registry])
   // Only known config locations are inspected: never recurse into Cell checkouts.
   const cells = join(home, '.hive', 'v2', 'cells')
+  let cellCoverage = 'known config paths at immediate Cell roots only; checkout contents excluded'
   try {
     for (const cell of readdirSync(cells, { withFileTypes: true })) {
       if (!cell.isDirectory()) continue
@@ -103,7 +123,7 @@ export async function runDoctor(args: string[], io: CliIO): Promise<number> {
         configs.add(join(cells, cell.name, name))
       }
     }
-  } catch { /* Hive not installed or unreadable */ }
+  } catch { cellCoverage = 'Cell directory missing or unreadable; Cell config coverage unavailable' }
   const configInventory: { path: string; status: string }[] = []
   for (const path of configs) {
     const raw = readable(path)
@@ -112,7 +132,7 @@ export async function runDoctor(args: string[], io: CliIO): Promise<number> {
       continue
     }
     let commands: string[]
-    try { commands = configCommands(JSON.parse(raw)) } catch {
+    try { commands = path.endsWith('.toml') ? tomlCommands(raw) : configCommands(JSON.parse(raw)) } catch {
       configInventory.push({ path, status: 'unsupported or malformed config' })
       continue
     }
@@ -128,6 +148,6 @@ export async function runDoctor(args: string[], io: CliIO): Promise<number> {
       else configInventory.push({ path, status: 'relative command cannot be resolved without config cwd' })
     }
   }
-  io.stdout(JSON.stringify({ inventoryVersion: 1, readOnly: true, entries, configs: configInventory }, null, 2))
+  io.stdout(JSON.stringify({ inventoryVersion: 1, readOnly: true, coverage: { cells: cellCoverage, commandsExecuted: false, metadata: 'install stamp claims only; unstamped runtime metadata is unknown' }, entries, configs: configInventory }, null, 2))
   return 0
 }
