@@ -39,7 +39,8 @@ it('authenticates peers and imports only verified changes through the locked sav
     const times = [file, `${file}.chain`].map(path => statSync(path).mtimeMs)
     expect(await send()).toBe(204)
     expect([file, `${file}.chain`].map(path => statSync(path).mtimeMs)).toEqual(times)
-    const corrupt = message.blobs.at(-1)!.slice(0, -2) + 'ff'
+    const last = message.blobs.at(-1)!
+    const corrupt = last.slice(0, -2) + (Number.parseInt(last.slice(-2), 16) ^ 1).toString(16).padStart(2, '0')
     expect(await send({ ...message, blobs: [corrupt] })).toBe(409)
     expect(await send({ ...message, docId: 'other' })).toBe(409)
     const stable = readFileSync(`${file}.chain`)
