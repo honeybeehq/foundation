@@ -121,6 +121,7 @@ import { ChainActivity } from './activity.js'
 import { createHash } from 'node:crypto'
 
 const STATE_KEYS: StateStyleKey[] = ['hover', 'focus', 'active', 'disabled']
+const compareChanges = (a: Change, b: Change): number => a.lamport - b.lamport || comparePeerIds(a.peer, b.peer) || a.counter - b.counter
 
 type KeyedSection = 'componentSets' | 'tokenCollections' | 'params' | 'data' | 'lookups' | 'states' | 'viewports' | 'namedStyles' | 'components'
 
@@ -210,6 +211,9 @@ class LoroChain implements FdnChain {
   private order: LoroMap
 
   private activity: ChainActivity | undefined
+  private rootFrontiers: Frontier = []
+  private rootChange: Change | undefined
+  private rootHash: string | undefined
   private clock = new DeterministicClock()
   private idToTree = new Map<NodeId, TreeID>()
   private materializedNodes = new Map<TreeID, FdnNode>()
@@ -324,8 +328,28 @@ class LoroChain implements FdnChain {
   }
 
   historyRoot(): string | null {
-    const first = this.sortedChanges()[0]
-    return first ? this.envelopeFor(first).hash : null
+    if (this.loro.getPendingTxnLength()) {
+      const first = this.sortedChanges()[0]
+      return first ? this.envelopeFor(first).hash : null
+    }
+    const target = this.loro.oplogFrontiers()
+    let delta = this.loro.findIdSpansBetween(this.rootFrontiers, target)
+    if (delta.retreat.length) {
+      this.rootChange = undefined
+      this.rootHash = undefined
+      delta = this.loro.findIdSpansBetween([], target)
+    }
+    for (const span of delta.forward) {
+      const change = this.loro.getChangeAt({ peer: span.peer, counter: span.counter })
+      if (!this.rootChange || compareChanges(change, this.rootChange) < 0 || (compareChanges(change, this.rootChange) === 0 && change.length !== this.rootChange.length)) {
+        this.rootChange = change
+        this.rootHash = undefined
+      }
+    }
+    this.rootFrontiers = target
+    if (!this.rootChange) return null
+    this.rootHash ??= this.envelopeFor(this.rootChange).hash
+    return this.rootHash
   }
 
   apply(meta: ChangeMeta, ops: PatchOp[]): EnvelopeRecord {
@@ -456,7 +480,7 @@ class LoroChain implements FdnChain {
 
   merge(other: FdnChain): void {
     if (!(other instanceof LoroChain)) throw new Error('merge: other chain is not a LoroChain instance')
-    this.loro.import(other.loro.export({ mode: 'update' }))
+    this.loro.import(other.loro.export({ mode: 'update', from: this.loro.oplogVersion() }))
     this.rebuildIndex()
     for (const [name, frontier] of other.anchors) {
       const current = this.anchors.get(name)
@@ -520,7 +544,15 @@ class LoroChain implements FdnChain {
   // ——— envelope internals ———
 
   private tryHead(): EnvelopeRecord | null {
-    const last = this.sortedChanges().at(-1)
+    if (this.loro.getPendingTxnLength()) {
+      const last = this.sortedChanges().at(-1)
+      return last ? this.envelopeFor(last) : null
+    }
+    let last: Change | undefined
+    for (const point of this.loro.oplogFrontiers()) {
+      const change = this.loro.getChangeAt(point)
+      if (!last || compareChanges(change, last) > 0) last = change
+    }
     return last ? this.envelopeFor(last) : null
   }
 
@@ -550,7 +582,7 @@ class LoroChain implements FdnChain {
   private sortedChanges(): Change[] {
     const flat: Change[] = []
     for (const changes of this.loro.getAllChanges().values()) flat.push(...changes)
-    flat.sort((a, b) => a.lamport - b.lamport || comparePeerIds(a.peer, b.peer) || a.counter - b.counter)
+    flat.sort(compareChanges)
     return flat
   }
 
