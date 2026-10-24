@@ -62,7 +62,7 @@ export class DirectChanges {
       const controller = new AbortController(); this.requests.add(controller)
       const done = syncTraceSpan('direct.send', () => ({ docId: change.docId, peer: peer.nodeId }))
       const timer = setTimeout(() => controller.abort(), 2000)
-      void fetch(new URL('/changes', peer.url), { method: 'POST', redirect: 'error', body, headers: { 'content-type': 'application/json', 'x-foundation-signature': signature(workspace.secret, body) }, signal: controller.signal }).then(async res => { await res.body?.cancel(); done({ ok: res.ok }) }, () => done({ ok: false })).finally(() => { clearTimeout(timer); this.requests.delete(controller) })
+      void fetch(new URL('/changes', peer.url), { method: 'POST', redirect: 'error', body, headers: { 'content-type': 'application/json', 'x-foundation-signature': signature(workspace.secret, body) }, signal: controller.signal }).then(res => { void res.body?.cancel().catch(() => {}); done({ ok: res.ok }) }, () => done({ ok: false })).finally(() => { clearTimeout(timer); this.requests.delete(controller) })
     }
   }
   async close(): Promise<void> { for (const request of this.requests) request.abort(); await new Promise<void>(resolve => { this.server.close(() => resolve()); this.server.closeAllConnections() }) }
