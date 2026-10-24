@@ -81,3 +81,63 @@ Real CLI integration tests exercise merge, rebase and cherry-pick in scratch
 repositories using local branches with FETCH_HEAD removed, verify both edits
 and exact projection bytes, then sync twice and check clean Git status and
 unchanged file mtimes.
+
+## Pull after live sync
+
+Live sync may deliver A's committed design to B before B has pulled that
+commit. B then has the correct bytes but Git sees local modifications relative
+to B's old HEAD, so plain `git pull --ff-only` refuses to overwrite them.
+Use:
+
+```sh
+foundation git pull                    # fetch configured upstream, fast-forward
+foundation git pull origin main        # fetch this branch, fast-forward
+```
+
+This never creates a commit. It refuses staged changes and tracked non-design
+edits; commit or stash those yourself. Divergent branches also refuse before
+changing files. Dirty designs must exist in HEAD and the incoming commit with
+the same document identity. Deletions or identity replacements require manual
+resolution.
+
+The command takes all tracked designs' normal document locks, which pauses
+sync imports and interactive writers for the duration. It ingests any valid
+uncommitted HTML edits into an in-memory chain, then backs up original HTML,
+original chain and prepared local history under `.git/foundation-updates/`.
+Only after every design has passed preflight does it temporarily restore dirty
+design pairs to HEAD, run the fast-forward and merge local history into the
+incoming chain. Incoming bytes are retained untouched when they already contain
+all local changes. Extra local changes remain uncommitted after the pull.
+Locks are released after restoration; duplicate daemon deliveries use the
+existing unchanged-frontier save path and do not rewrite the files.
+
+For other tools that already fetched the incoming commit, use a single scoped
+operation, not a separate reset step:
+
+```sh
+foundation git prepare-update origin/main -- git merge --ff-only origin/main
+```
+
+The wrapper requires the command to finish at the declared incoming commit.
+Use it only for Git updates that advance HEAD atomically, such as a
+fast-forward or checkout to that commit. Do not use it to run editors, commits,
+rebases or commands that modify the index independently. No concurrent Git
+index writer is supported. Holding the locks across the command prevents the
+sync daemon from racing between preparation and Git's writes. Long-running
+commands can cause ordinary writers to report busy; their changes must retry.
+
+The backup directory is printed before any design resets. On an ordinary
+failure the original files are restored when HEAD stayed put; if HEAD moved,
+local history is merged into the checked-out chain. Failure keeps the backup.
+If the process is interrupted or restoration fails, preserve that directory
+and run:
+
+```sh
+foundation git recover-update /absolute/path/to/.git/foundation-updates/backup-id
+```
+
+Recovery merges the backed-up local history into the current design under its
+lock, preserving current edits too, and keeps the backup for inspection.
+Resolve any Git conflict or missing/replaced design first. Successful updates
+remove their backup only after all local changes have been restored. There is
+no automatic stash, commit, or background Git operation.
