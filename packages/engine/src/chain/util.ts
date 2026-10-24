@@ -1,27 +1,12 @@
-/**
- * Small deterministic helpers for the chain module.
- *
- * Constraint (SPEC D2 + task brief): no Date.now()/Math.random() may leak into
- * document content (timestamps, actor/peer ids, hashes). Peer ids are derived
- * deterministically from author-supplied actor strings, exactly as proven in
- * spikes/chain/src/util.ts, so replays and merges are reproducible.
- */
+import { createHash } from 'node:crypto'
 
-/** FNV-1a 32-bit hash, good enough for deterministic id derivation (not crypto). */
-function fnv1a(input: string): number {
-  let hash = 0x811c9dc5
-  for (let i = 0; i < input.length; i++) {
-    hash ^= input.charCodeAt(i)
-    hash = Math.imul(hash, 0x01000193)
-  }
-  return hash >>> 0
-}
-
-/** Deterministic small positive integer peer id for Loro (fits comfortably in u53). */
-export function derivePeerId(actor: string): number {
-  const a = fnv1a(actor)
-  const b = fnv1a(`${actor}:salt`)
-  return a * 0x10000 + (b % 0x10000)
+/** Deterministically use Loro's full 64-bit peer space without JS number rounding.
+ * Explicit actors enable reproducible replay; default actors are fresh UUIDs.
+ * Existing snapshots retain their recorded peers and history unchanged. */
+export function derivePeerId(actor: string): `${number}` {
+  // u64::MAX is reserved by Loro. Reduce into its supported peer range.
+  const peer = createHash('sha256').update(actor).digest().readBigUInt64BE(0) % 0xffffffffffffffffn
+  return peer.toString() as `${number}`
 }
 
 /** A monotonic, deterministic clock for change timestamps (never Date.now()). */
