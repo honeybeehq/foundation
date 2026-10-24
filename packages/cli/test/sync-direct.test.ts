@@ -71,6 +71,7 @@ it('contains listener errors, rejects self peers, and never follows a redirect w
   const service = new DirectChanges({ listen, workspaces: { w: { secret, peers: [{ nodeId: 'b', url: `http://127.0.0.1:${(redirect.address() as { port: number }).port}` }] } } }, 'a', () => {})
   try {
     await service.start()
+    expect(() => service.push({ workspace: '__proto__', product: 'p', docId: 'd', blobs: ['01'] })).not.toThrow()
     service.push({ workspace: 'w', product: 'p', docId: 'd', blobs: ['01'] })
     await contact
     await new Promise(resolve => setTimeout(resolve, 50))
