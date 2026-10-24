@@ -207,7 +207,7 @@ class LoroChain implements FdnChain {
   private clock = new DeterministicClock()
   private idToTree = new Map<NodeId, TreeID>()
   private materializedNodes = new Map<TreeID, FdnNode>()
-  private peerId: number
+  private peerId: PeerID
   private peerIdStr: PeerID
   private anchors = new Map<string, Frontier>()
   private lastLocalChange: PatchOp[] | undefined
