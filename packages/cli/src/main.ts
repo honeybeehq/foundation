@@ -76,7 +76,8 @@ usage: foundation <command> [args]
 
 commands:
   version [--json]                          report source revision and compatibility
-  install [--from CHECKOUT] [--sha SHA] [--force]  install a node-level committed copy
+  install [--from CHECKOUT] [--sha SHA] [--force] [--dry-run]  plan or install a node-level copy
+  install --rollback [--dry-run]            restore the previous activation
   doctor --inventory --json                  inventory executable copies without changing them
   sync open|serve|status                    register live designs, sync through Comb, inspect local/upload state
   new <name> [--no-chain]                    write a minimal .fdn.html skeleton (chain-inits it too)
