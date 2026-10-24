@@ -43,9 +43,12 @@ export function importChangeBlobs(chain: FdnChain, blobs: Uint8Array[], timing?:
     const started = performance.now()
     try { return run() } finally { timing(stage, performance.now() - started) }
   }
-  const scratch = measure('candidate', () => loadChain(chain.save()))
-  const known = new Set(scratch.changes().map(c => c.envelope.hash))
+  const known = new Set(chain.changes().map(c => c.envelope.hash))
   const missing = measure('decode', () => blobs.map(decodeBlob).filter(c => !known.has(c.envelope.hash)))
+  // Validate every delivered frame, but existing hashes introduce no new history.
+  // Keep the storage upgrade hook without replaying and verifying that history again.
+  if (missing.length === 0) { chain.upgradeStorage(); return 0 }
+  const scratch = measure('candidate', () => loadChain(chain.save()))
   const expected = new Set([...known, ...missing.map(c => c.envelope.hash)])
   for (const c of missing) {
     if (c.envelope.prevHash === null || !expected.has(c.envelope.prevHash)) throw new Error('missing causal history or foreign genesis')
