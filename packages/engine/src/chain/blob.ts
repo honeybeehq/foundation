@@ -37,10 +37,15 @@ export function decodeBlob(buf: Uint8Array): { envelope: EnvelopeRecord; bytes: 
 }
 
 /** Validate in isolation: pending causal updates or foreign history never reach the live chain. */
-export function importChangeBlobs(chain: FdnChain, blobs: Uint8Array[]): number {
-  const scratch = loadChain(chain.save())
+export function importChangeBlobs(chain: FdnChain, blobs: Uint8Array[], timing?: (stage: string, durationMs: number) => void): number {
+  const measure = <T>(stage: string, run: () => T): T => {
+    if (!timing) return run()
+    const started = performance.now()
+    try { return run() } finally { timing(stage, performance.now() - started) }
+  }
+  const scratch = measure('candidate', () => loadChain(chain.save()))
   const known = new Set(scratch.changes().map(c => c.envelope.hash))
-  const missing = blobs.map(decodeBlob).filter(c => !known.has(c.envelope.hash))
+  const missing = measure('decode', () => blobs.map(decodeBlob).filter(c => !known.has(c.envelope.hash)))
   const expected = new Set([...known, ...missing.map(c => c.envelope.hash)])
   for (const c of missing) {
     if (c.envelope.prevHash === null || !expected.has(c.envelope.prevHash)) throw new Error('missing causal history or foreign genesis')
@@ -49,7 +54,7 @@ export function importChangeBlobs(chain: FdnChain, blobs: Uint8Array[]): number 
   if (scratch.docId() !== chain.docId()) throw new Error('document identity mismatch')
   const actual = scratch.changes()
   if (actual.length !== expected.size || actual.some(c => !expected.has(c.envelope.hash))) throw new Error('incomplete causal history or envelope mismatch')
-  if (!scratch.verify().ok) throw new Error('candidate chain failed history verification')
+  if (!measure('verify', () => scratch.verify()).ok) throw new Error('candidate chain failed history verification')
   for (const c of missing) chain.importUpdate(c.bytes)
   chain.upgradeStorage()
   return new Set(missing.map(c => c.envelope.hash)).size

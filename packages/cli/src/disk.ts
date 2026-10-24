@@ -1,3 +1,4 @@
+import { syncTrace, syncTraceSpan } from './sync-trace.js'
 import { selectedChainFormat } from './chain-format.js'
 import { loadChain, rememberSavedChain } from './chain-cache.js'
 import { parseForWrite } from './parse-write.js'
@@ -106,21 +107,26 @@ export function recoverDocument(file: string): void {
 }
 
 export function persistDocument(file: string, chain: FdnChain, text = projectedText(chain, chain.docId() ?? readDocIdAttr(readTextIfPresent(file) ?? '')), protectedProjection = true): Uint8Array {
-  if (selectedChainFormat(file, chain.storageFormat()) === 2) chain.upgradeStorage()
-  const bytes = chain.save()
-  const receipt = JSON.stringify({ version: projectionVersion(text), protected: protectedProjection })
-  if (sameBytes(readBytesIfPresent(`${file}.chain`), bytes) && readTextIfPresent(file) === text) {
+  const finish = syncTraceSpan('save', () => ({ docId: chain.docId(), hash: chain.head().hash }))
+  let ok = false
+  try {
+    if (selectedChainFormat(file, chain.storageFormat()) === 2) chain.upgradeStorage()
+    const bytes = chain.save()
+    const receipt = JSON.stringify({ version: projectionVersion(text), protected: protectedProjection })
+    if (sameBytes(readBytesIfPresent(`${file}.chain`), bytes) && readTextIfPresent(file) === text) {
+      writeAtomic(`${file}.chain.projection`, receipt)
+      ok = true; return bytes
+    }
+    const pendingPath = `${file}.chain.pending`
+    writeAtomic(pendingPath, JSON.stringify({ before: readTextIfPresent(file), after: text, chainHash: createHash('sha256').update(bytes).digest('hex'), protected: protectedProjection }))
+    writeAtomic(`${file}.chain`, bytes)
+    syncTrace('save.chain-written', () => ({ docId: chain.docId(), hash: chain.head().hash }))
+    writeAtomic(file, text)
     writeAtomic(`${file}.chain.projection`, receipt)
-    return bytes
-  }
-  const pendingPath = `${file}.chain.pending`
-  writeAtomic(pendingPath, JSON.stringify({ before: readTextIfPresent(file), after: text, chainHash: createHash('sha256').update(bytes).digest('hex'), protected: protectedProjection }))
-  writeAtomic(`${file}.chain`, bytes)
-  writeAtomic(file, text)
-  writeAtomic(`${file}.chain.projection`, receipt)
-  unlinkSync(pendingPath)
-  rememberSavedChain(bytes)
-  return bytes
+    unlinkSync(pendingPath)
+    rememberSavedChain(bytes)
+    ok = true; return bytes
+  } finally { finish({ ok }) }
 }
 
 function ingestCurrentSource(file: string, chain: FdnChain, source: string): boolean {

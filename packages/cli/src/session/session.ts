@@ -1,3 +1,4 @@
+import { syncTrace } from '../sync-trace.js'
 import { selectedChainFormat } from '../chain-format.js'
 import { runtimeVersion } from '../runtime-version.js'
 import { loadChain } from '../chain-cache.js'
@@ -178,8 +179,12 @@ class DesignSession implements Session {
 
   private emit(message: ServiceMessage): void {
     const wire = this.protocol === LEGACY_SESSION_PROTOCOL ? legacyMessage(message) : message
-    if (this.locked) this.outbox.push(() => this.options.send(wire))
-    else this.options.send(wire)
+    const send = () => {
+      if (message.t === 'doc') syncTrace('session.emit', () => ({ docId: this.docId, hash: message.head?.hash, rev: message.rev }))
+      this.options.send(wire)
+    }
+    if (this.locked) this.outbox.push(send)
+    else send()
   }
 
   private syncLocked(): void {
@@ -806,7 +811,7 @@ class DesignSession implements Session {
   private startWatching(): void {
     const names = new Set([basename(this.path), basename(this.chainPath)])
     this.watcher = watch(dirname(this.path), (_event, filename) => {
-      if (filename === null || names.has(filename)) this.scheduleSync()
+      if (filename === null || names.has(filename)) { syncTrace('session.notice', () => ({ docId: this.docId, chain: filename === null || String(filename).endsWith('.chain') })); this.scheduleSync() }
     })
     this.watcher.on('error', (err) => this.log(`watch error: ${err.message}`))
     this.seenSignature = this.fileSignature()
