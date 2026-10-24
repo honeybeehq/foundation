@@ -6,7 +6,7 @@ Each workload is a `<id>.json` record (machine-readable, schema in `record.schem
 
 | Workload | Lane | Processes | gap | recipe-only | measured | stale | gated | Unmeasured states | Readiness |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- | --- |
-| [Read-only node and checkout capabilities](./doctor-capabilities.md) | startup | helper | 0 | 1 | 0 | 0 | 0 | repeated | Built/installed recipes pass on Studio and built passes on metal3. Original metal3 source309ms miss retained; single-process source-register route passes Studio and awaits satellite rerun. Shared-host observations only, no stable baseline. |
+| [Read-only node and checkout capabilities](./doctor-capabilities.md) | startup | helper | 0 | 1 | 0 | 0 | 0 | repeated | Studio built39ms/installed67ms and metal3 built53ms pass. Source shim single-process route passes Studio141ms and metal3 257ms; original metal3 source309ms miss retained. Twenty samples per series, shared-host observations only; no stable baseline. |
 | [Shared-store save to remote session event](./sync-save-to-session.md) | streaming | main, helper, node-remote | 0 | 0 | 4 | 0 | 0 | idle, scale, release, recovery | Same-build30bea85 on/off visibility data passes direct budgets. Later125cdeb startup-error wrapper is independently tested/reviewed; repeated worker body and5transport files are byte-identical (runtime-scope receipt). No startup-failure latency claim. |
 
 ## Accounted gaps (33)
