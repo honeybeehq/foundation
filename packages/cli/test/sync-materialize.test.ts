@@ -43,5 +43,7 @@ it('confines paths, including symlink escapes', () => {
   root = mkdtempSync(join(tmpdir(), 'materialize-path-')); const repo = join(root, 'repo'); mkdirSync(repo)
   expect(materializePath(repo, 'boards/new.fdn.html')).toBe(join(repo, 'boards/new.fdn.html'))
   expect(() => materializePath(repo, '../escape.fdn.html')).toThrow()
+  symlinkSync(join(root, 'missing'), join(repo, 'dangling.fdn.html.chain'))
+  expect(() => materializePath(repo, 'dangling.fdn.html')).toThrow('symlinks')
   symlinkSync(root, join(repo, 'escape')); expect(() => materializePath(repo, 'escape/file.fdn.html')).toThrow('symlink')
 })
