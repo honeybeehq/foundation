@@ -1162,6 +1162,14 @@ to upload and shared (acknowledged by Comb, not by every peer). Full feed histor
 must be retained for replay. Backend location is configured by file and does not
 change this contract. Setup, hooks and real-process verification: `packages/cli/SYNC.md`.
 
+Configured workspace peers may receive authenticated direct envelope pushes in parallel
+with Comb publication. They use the same strict validation and locked import; direct
+delivery never advances a Comb cursor or marks a change shared. The durable feed remains
+required and converges with every direct request lost. Direct-received changes are not
+forwarded; fallback publication waits a bounded grace period and preserves a causally
+closed prefix so descendants never enter the feed ahead of their parents. Shared
+workspace authentication establishes membership, not author provenance.
+
 A separate workspace catalogue (`foundation/<workspace>/catalogue`, same log mapping)
 advertises versioned per-replica metadata after referenced envelopes are shared.
 Each local path owns a durable replica ID and increasing generation; stable append
