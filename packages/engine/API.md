@@ -352,3 +352,9 @@ true. Welcome/doc has optional readOnly:string when an older0.2 connection
 observes the new format, including mid-session peer promotion. Such connections
 cannot commit, anchor or Undo/Redo. The existing0.1 adapter remains unchanged.
 Use matching runtime, protocol source and PIN when vendoring.
+
+Root visibility/view metadata is excluded from rendered body attributes, so
+geometry-only preview edits leave cached HTML and fresh bakes identical. Overflow
+resolution includes inherited tokens, scoped mode values, own/named custom
+properties and nested var fallbacks. Unresolved CSS variables conservatively
+retain fixed capture rather than silently treating the board as visible.

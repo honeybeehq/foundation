@@ -2,6 +2,7 @@ import type { FdnDocument, FdnNode, PatchOp, ReportLine } from '../types.js'
 import { stateContext } from '../bake/context.js'
 import { resolveNodeStyle } from '../bake/node-style.js'
 import { tokenValueCss } from '../tokens/index.js'
+import { styleEntries } from '../bake/styles.js'
 
 export const ARTBOARD_FRAME_VERSION = '0.2.0-artboard-frames'
 const sides = ['top', 'right', 'bottom', 'left'] as const
@@ -32,7 +33,7 @@ export function artboardFrameNode(node: FdnNode): FdnNode {
     const value = node.attrs[`data-fdn-padding-${side}`]
     return value === undefined || node.style.padding !== undefined ? [] : [[`padding-${side}`, `${Number(value)}px`]]
   }))
-  const attrs = Object.fromEntries(Object.entries(node.attrs).filter(([key]) => !/^data-fdn-(?:name|x|y|width|height|overflow|frame|padding-.+)$/.test(key)))
+  const attrs = Object.fromEntries(Object.entries(node.attrs).filter(([key]) => !/^data-fdn-(?:name|x|y|width|height|overflow|frame|visible|padding-.+|view-.+)$/.test(key)))
   return { ...node, tag: 'body', attrs, style: { ...fallback, ...node.style }, children: node.children.filter(child => child.tag !== 'fdn-artboard-view') }
 }
 
@@ -48,21 +49,74 @@ export function filterFrameOverflow(source: FdnNode, resolved: ReturnType<typeof
   }
 }
 
+function resolveCssValue(value: string, variable: (name: string) => string | undefined): string | undefined {
+  const start = value.indexOf('var(')
+  if (start === -1) return value
+  let depth = 1, end = start + 4, comma = -1
+  for (; end < value.length && depth > 0; end++) {
+    const char = value[end]
+    if (char === '(') depth++
+    if (char === ')') depth--
+    if (char === ',' && depth === 1 && comma === -1) comma = end
+  }
+  if (depth !== 0) return undefined
+  const name = value.slice(start + 4, comma === -1 ? end - 1 : comma).trim()
+  if (!/^--[\w-]+$/.test(name)) return undefined
+  const replacement = variable(name) ?? (comma === -1 ? undefined : resolveCssValue(value.slice(comma + 1, end - 1), variable))
+  return replacement === undefined ? undefined : resolveCssValue(value.slice(0, start) + replacement + value.slice(end), variable)
+}
+
+function resolveCssVariables(declarations: Record<string, string>, inherited: Record<string, string> = {}): Record<string, string> {
+  const active: string[] = [], cyclic = new Set<string>(), cached = new Map<string, string | undefined>()
+  const variable = (name: string): string | undefined => {
+    const cycle = active.indexOf(name)
+    if (cycle !== -1) { active.slice(cycle).forEach(key => cyclic.add(key)); return undefined }
+    if (cached.has(name)) return cached.get(name)
+    if (!Object.hasOwn(declarations, name)) return inherited[name]
+    active.push(name)
+    const raw = declarations[name]!.trim()
+    const resolved = raw === 'initial' ? undefined : ['inherit', 'unset', 'revert', 'revert-layer'].includes(raw) ? inherited[name] : resolveCssValue(raw, variable)
+    active.pop()
+    const value = cyclic.has(name) ? undefined : resolved
+    cached.set(name, value)
+    return value
+  }
+  const resolved = { ...inherited }
+  for (const name of Object.keys(declarations)) {
+    const value = variable(name)
+    if (value === undefined) delete resolved[name]
+    else resolved[name] = value
+  }
+  return resolved
+}
+
 export function artboardOverflow(doc: FdnDocument, node: FdnNode, state: string | null): 'clip' | 'visible' {
   const legacy = node.attrs['data-fdn-overflow']
   if (legacy !== undefined) return legacy === 'clip' ? 'clip' : 'visible'
   const resolved = resolveNodeStyle(artboardFrameNode(node), doc, stateContext(doc, state), [])
-  const tokens: Record<string, string> = { ...doc.tokens }
+  const defaults = { ...doc.tokens }, scoped: Record<string, string> = {}
+  if (doc.tokenCollections?.length) for (const [name, value] of Object.entries(doc.tokens)) if (value.includes('var(')) scoped[name] = value
   for (const collection of doc.tokenCollections ?? []) {
     const mode = node.attrs[`data-fdn-mode-${collection.name}`] ?? collection.modes[0]!
     for (const token of collection.tokens) {
+      defaults[token.name] = tokenValueCss(token.values[collection.modes[0]!]!, token.type)
       const value = token.values[mode]
-      if (value !== undefined) tokens[token.name] = tokenValueCss(value, token.type)
+      if (value !== undefined) scoped[token.name] = tokenValueCss(value, token.type)
     }
   }
-  const expand = (value: string, active = new Set<string>()): string => value.replace(/var\(\s*--([\w-]+)\s*(?:,\s*([^()]+))?\)/g, (_, name: string, fallback: string | undefined) => active.has(name) ? '' : expand(tokens[name] ?? fallback ?? '', new Set([...active, name])))
-  const values = [resolved.style.overflow, resolved.style['overflow-x'], resolved.style['overflow-y']].filter((value): value is string => value !== undefined).map(value => expand(value).trim())
-  return values.some(value => value.split(/\s+/).some(part => ['hidden', 'clip', 'auto', 'scroll', 'inherit'].includes(part))) ? 'clip' : 'visible'
+  for (const [key, value] of Object.entries(resolved.style)) if (key.startsWith('--')) scoped[key.slice(2)] = value
+  const tokens = resolveCssVariables(Object.fromEntries(Object.entries(scoped).map(([key, value]) => [`--${key}`, value])), resolveCssVariables(Object.fromEntries(Object.entries(defaults).map(([key, value]) => [`--${key}`, value]))))
+  let x = 'visible', y = 'visible'
+  for (const [key, raw] of styleEntries(resolved.style)) {
+    if (!overflow(key)) continue
+    const value = resolveCssValue(raw, name => tokens[name])?.trim()
+    const parts = value?.split(/\s+/) ?? ['clip']
+    if (parts.length === 1 && ['initial', 'unset', 'revert', 'revert-layer', 'inherit'].includes(parts[0]!)) parts[0] = parts[0] === 'inherit' ? 'auto' : 'visible'
+    if (parts.length > (key === 'overflow' ? 2 : 1) || parts.some(part => !['hidden', 'clip', 'auto', 'scroll', 'visible'].includes(part))) continue
+    if (key === 'overflow' || key === 'overflow-x') x = parts[0]!
+    if (key === 'overflow' || key === 'overflow-y') y = parts[1] ?? parts[0]!
+  }
+  return [x, y].some(value => value !== 'visible') ? 'clip' : 'visible'
 }
 
 export function promoteArtboardFrame(doc: FdnDocument, node: FdnNode): PatchOp[] {
