@@ -1,3 +1,4 @@
+import { selectedChainFormat } from './chain-format.js'
 import { loadChain, rememberSavedChain } from './chain-cache.js'
 import { parseForWrite } from './parse-write.js'
 import { createHash, randomUUID } from 'node:crypto'
@@ -114,6 +115,7 @@ export function recoverDocument(file: string): void {
 }
 
 export function persistDocument(file: string, chain: FdnChain, text = projectedText(chain, chain.docId() ?? readDocIdAttr(readTextIfPresent(file) ?? '')), protectedProjection = true): Uint8Array {
+  if (selectedChainFormat(file, chain.storageFormat()) === 2) chain.upgradeStorage()
   const bytes = chain.save()
   const receipt = JSON.stringify({ version: projectionVersion(text), protected: protectedProjection })
   if (sameBytes(readBytesIfPresent(`${file}.chain`), bytes) && readTextIfPresent(file) === text) {
@@ -149,8 +151,9 @@ export function updateDocument<T>(file: string, mutate: (chain: FdnChain) => T, 
       ingestCurrentSource(file, chain, source)
     }
     const before = chain.versionRef()
+    const beforeFormat = chain.storageFormat()
     const result = mutate(chain)
-    if (!onlyIfChanged || chain.versionRef() !== before || (source !== null && projectedText(chain) !== source)) persistDocument(file, chain)
+    if (!onlyIfChanged || chain.storageFormat() !== beforeFormat || chain.versionRef() !== before || (source !== null && projectedText(chain) !== source)) persistDocument(file, chain)
     return result
   })
 }
