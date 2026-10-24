@@ -23,6 +23,7 @@ export interface MaterializeRequest {
   requestKey?: string
 }
 export function materializePath(root: string, path: string): string {
+  root = realpathSync(root)
   if (!path || path.includes('\\') || path.split('/').includes('..')) throw new MaterializeError('invalid-path', 'target must be a confined .fdn.html path')
   const target = resolve(root, path), rel = relative(root, target)
   if (!rel || isAbsolute(rel) || rel.split('/').includes('..') || !target.endsWith('.fdn.html')) throw new MaterializeError('invalid-path', 'target must stay inside the Product checkout')
