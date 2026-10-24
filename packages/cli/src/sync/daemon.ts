@@ -210,8 +210,27 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
       for (const design of designs) {
         const key = copyKey(design)
         if (!workers.has(key)) {
-          const controller = new AbortController()
-          const done = run(design, AbortSignal.any([signal, controller.signal])).catch(err => log(String(err)))
+          const controller = new AbortController(), workerSignal = AbortSignal.any([signal, controller.signal])
+          const done = (async () => {
+            let backoff = 250
+            while (!workerSignal.aborted) {
+              try { await run(design, workerSignal); return }
+              catch (err) {
+                if (workerSignal.aborted) return
+                const message = `startup: ${err instanceof Error ? err.message : String(err)}`
+                try {
+                  const state = readSyncState(key)
+                  state.connectionError = message
+                  state.lastError = [state.receiveError, state.publishError, state.connectionError].filter(Boolean).join('; ')
+                  state.lastErrorAt = new Date().toISOString()
+                  writeSyncState(key, state)
+                } catch { /* Status reads surface corrupt/unreadable state; never replace its cursor with defaults. */ }
+                log(`${feedName(design)}: ${message}`)
+                await delay(Math.round(backoff * (0.5 + Math.random() / 2)))
+                backoff = Math.min(backoff * 2, 5000)
+              }
+            }
+          })()
           workers.set(key, { controller, done, registration: JSON.stringify(design) })
         }
       }
