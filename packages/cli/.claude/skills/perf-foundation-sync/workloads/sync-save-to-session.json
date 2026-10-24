@@ -350,7 +350,7 @@
         "status": "ruled",
         "source": "Orchestrator task S3c, 2026-10-24 07:58 UTC",
         "ruledAt": "2026-10-24",
-        "condition": "Studio <-> metal-3, same shared S3-compatible backend and fixed fixture; >=20 samples/direction"
+        "condition": "Direct acceleration enabled on Studio\u2194metal-3; same shared S3-compatible backend and fixed61-change fixture; >=20samples/direction. Off mode requires convergence, not this fast-path budget."
       },
       "invariant": "Every measured save is observed by its unique envelope hash in the target session.",
       "noise": "Host load, network RTT and clock-bound uncertainty retained per series",
@@ -360,16 +360,16 @@
         "commit": "30bea85f5634b20d4e7bf552e40e4809eccac3a6",
         "samples": 20,
         "machine": "Studio and metal-3, one live copy each, temporary SeaweedFS4.49 over tailnet",
-        "runtime": "Node24.18, per-host OS metadata in Project S5 trace packages",
+        "runtime": "Studio Node24.20.0; metal-3 Node24.18.0; exact per-host runtime unchanged between feature/control series",
         "buildMode": "built",
         "aggregation": "median",
-        "aggregate": 430.57763671875,
-        "median": 430.57763671875,
-        "p95": 589.774169921875,
+        "aggregate": 434.019287109375,
+        "median": 434.019287109375,
+        "p95": 593.2158203125,
         "probes": [
           "Foundation trace off",
           "S3 proxy service spans on",
-          "RTT clock brackets before and after",
+          "Union of before/after RTT clock brackets",
           "2ms quantization guard"
         ],
         "capturedAt": "2026-10-24"
@@ -394,7 +394,7 @@
         "status": "ruled",
         "source": "Orchestrator task S3c, 2026-10-24 07:58 UTC",
         "ruledAt": "2026-10-24",
-        "condition": "Studio <-> metal-3, same shared S3-compatible backend and fixed fixture; >=20 samples/direction"
+        "condition": "Direct acceleration enabled on Studio\u2194metal-3; same shared S3-compatible backend and fixed61-change fixture; >=20samples/direction. Off mode requires convergence, not this fast-path budget."
       },
       "invariant": "Every measured save is observed by its unique envelope hash in the target session.",
       "noise": "Host load, network RTT and clock-bound uncertainty retained per series",
@@ -404,16 +404,16 @@
         "commit": "30bea85f5634b20d4e7bf552e40e4809eccac3a6",
         "samples": 20,
         "machine": "Studio and metal-3, one live copy each, temporary SeaweedFS4.49 over tailnet",
-        "runtime": "Node24.18, per-host OS metadata in Project S5 trace packages",
+        "runtime": "Studio Node24.20.0; metal-3 Node24.18.0; exact per-host runtime unchanged between feature/control series",
         "buildMode": "built",
         "aggregation": "p95",
-        "aggregate": 589.774169921875,
-        "median": 430.57763671875,
-        "p95": 589.774169921875,
+        "aggregate": 593.2158203125,
+        "median": 434.019287109375,
+        "p95": 593.2158203125,
         "probes": [
           "Foundation trace off",
           "S3 proxy service spans on",
-          "RTT clock brackets before and after",
+          "Union of before/after RTT clock brackets",
           "2ms quantization guard"
         ],
         "capturedAt": "2026-10-24"
@@ -438,7 +438,7 @@
         "status": "ruled",
         "source": "Orchestrator task S3c, 2026-10-24 07:58 UTC",
         "ruledAt": "2026-10-24",
-        "condition": "Studio <-> metal-3, same shared S3-compatible backend and fixed fixture; >=20 samples/direction"
+        "condition": "Direct acceleration enabled on Studio\u2194metal-3; same shared S3-compatible backend and fixed61-change fixture; >=20samples/direction. Off mode requires convergence, not this fast-path budget."
       },
       "invariant": "Every measured save is observed by its unique envelope hash in the target session.",
       "noise": "Host load, network RTT and clock-bound uncertainty retained per series",
@@ -448,16 +448,16 @@
         "commit": "30bea85f5634b20d4e7bf552e40e4809eccac3a6",
         "samples": 20,
         "machine": "Studio and metal-3, one live copy each, temporary SeaweedFS4.49 over tailnet",
-        "runtime": "Node24.18, per-host OS metadata in Project S5 trace packages",
+        "runtime": "Studio Node24.20.0; metal-3 Node24.18.0; exact per-host runtime unchanged between feature/control series",
         "buildMode": "built",
         "aggregation": "median",
-        "aggregate": 554.9683837890625,
-        "median": 554.9683837890625,
-        "p95": 905.466796875,
+        "aggregate": 567.7462158203125,
+        "median": 567.7462158203125,
+        "p95": 918.24462890625,
         "probes": [
           "Foundation trace off",
           "S3 proxy service spans on",
-          "RTT clock brackets before and after",
+          "Union of before/after RTT clock brackets",
           "2ms quantization guard"
         ],
         "capturedAt": "2026-10-24"
@@ -482,7 +482,7 @@
         "status": "ruled",
         "source": "Orchestrator task S3c, 2026-10-24 07:58 UTC",
         "ruledAt": "2026-10-24",
-        "condition": "Studio <-> metal-3, same shared S3-compatible backend and fixed fixture; >=20 samples/direction"
+        "condition": "Direct acceleration enabled on Studio\u2194metal-3; same shared S3-compatible backend and fixed61-change fixture; >=20samples/direction. Off mode requires convergence, not this fast-path budget."
       },
       "invariant": "Every measured save is observed by its unique envelope hash in the target session.",
       "noise": "Host load, network RTT and clock-bound uncertainty retained per series",
@@ -492,16 +492,16 @@
         "commit": "30bea85f5634b20d4e7bf552e40e4809eccac3a6",
         "samples": 20,
         "machine": "Studio and metal-3, one live copy each, temporary SeaweedFS4.49 over tailnet",
-        "runtime": "Node24.18, per-host OS metadata in Project S5 trace packages",
+        "runtime": "Studio Node24.20.0; metal-3 Node24.18.0; exact per-host runtime unchanged between feature/control series",
         "buildMode": "built",
         "aggregation": "p95",
-        "aggregate": 905.466796875,
-        "median": 554.9683837890625,
-        "p95": 905.466796875,
+        "aggregate": 918.24462890625,
+        "median": 567.7462158203125,
+        "p95": 918.24462890625,
         "probes": [
           "Foundation trace off",
           "S3 proxy service spans on",
-          "RTT clock brackets before and after",
+          "Union of before/after RTT clock brackets",
           "2ms quantization guard"
         ],
         "capturedAt": "2026-10-24"
@@ -515,5 +515,5 @@
   ],
   "updatedAt": "2026-10-24",
   "updatedBy": "S3c worker",
-  "readiness": "Matched61\u2192107 unprofiled series collected; four ruled latency budgets pass. Final outage proof pending separately."
+  "readiness": "Same-build on/off61\u2192107 series complete; direct lane passes all four ruled limits. Durable-only bidirectional and outages pass; cold drain attribution is a separate accepted follow-up."
 }

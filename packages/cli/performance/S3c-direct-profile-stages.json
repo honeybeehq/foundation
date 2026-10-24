@@ -11,8 +11,8 @@
       "hash": "2c1489150bf0fecbc5cd7a5efa7f4490f836f3becab42dd61c4938507719bf31",
       "saveToDirectNoticeMs": 37.775146484375,
       "noticeToReceiveIntervalMs": [
-        13.9208984375,
-        74.8779296875
+        4.01611328125,
+        83.394287109375
       ],
       "strictLockedImportMs": 153.524764,
       "importEndToSessionMs": 174,
@@ -27,8 +27,8 @@
       "hash": "915eed4795fddddc84e61af94dd82aa7f383fb232b06145e9f43935df1415079",
       "saveToDirectNoticeMs": 42.415283203125,
       "noticeToReceiveIntervalMs": [
-        42.1220703125,
-        103.0791015625
+        33.605712890625,
+        112.98388671875
       ],
       "strictLockedImportMs": 73.01025,
       "importEndToSessionMs": 283,
@@ -44,7 +44,7 @@
       "saveToDirectNoticeMs": 137.450927734375,
       "noticeToReceiveIntervalMs": [
         0,
-        33.8779296875
+        42.394287109375
       ],
       "strictLockedImportMs": 141.039168,
       "importEndToSessionMs": 155,
@@ -59,8 +59,8 @@
       "hash": "826bf89de1fc4421c74c7da986aff1686106b7bb8cf5896ede4f29ca9925324a",
       "saveToDirectNoticeMs": 58.333984375,
       "noticeToReceiveIntervalMs": [
-        30.1220703125,
-        91.0791015625
+        21.605712890625,
+        100.98388671875
       ],
       "strictLockedImportMs": 59.439166,
       "importEndToSessionMs": 687,
@@ -76,7 +76,7 @@
       "saveToDirectNoticeMs": 76.171142578125,
       "noticeToReceiveIntervalMs": [
         0,
-        34.8779296875
+        43.394287109375
       ],
       "strictLockedImportMs": 134.511877,
       "importEndToSessionMs": 195,
@@ -91,8 +91,8 @@
       "hash": "2ab11fe6535dbf4ca107ce9e313a6fcfe97ccec8a3fa21c280c8e33e08e348ab",
       "saveToDirectNoticeMs": 68.234375,
       "noticeToReceiveIntervalMs": [
-        14.1220703125,
-        75.0791015625
+        5.605712890625,
+        84.98388671875
       ],
       "strictLockedImportMs": 73.410667,
       "importEndToSessionMs": 200,
@@ -108,7 +108,7 @@
       "saveToDirectNoticeMs": 56.10888671875,
       "noticeToReceiveIntervalMs": [
         0,
-        39.8779296875
+        48.394287109375
       ],
       "strictLockedImportMs": 125.874448,
       "importEndToSessionMs": 148,
@@ -123,8 +123,8 @@
       "hash": "3b64e9c052b3e40536451b2f29808d5190da3cfd8ba6aee77c79fffe11fe116e",
       "saveToDirectNoticeMs": 58.165771484375,
       "noticeToReceiveIntervalMs": [
-        17.1220703125,
-        78.0791015625
+        8.605712890625,
+        87.98388671875
       ],
       "strictLockedImportMs": 77.071584,
       "importEndToSessionMs": 61,
@@ -140,7 +140,7 @@
       "saveToDirectNoticeMs": 42.59033203125,
       "noticeToReceiveIntervalMs": [
         0,
-        35.8779296875
+        44.394287109375
       ],
       "strictLockedImportMs": 125.066096,
       "importEndToSessionMs": 133,
@@ -155,8 +155,8 @@
       "hash": "8e4150a93370ba00bcd83c8ee2714f1be41505cac54152870925e1a2db108275",
       "saveToDirectNoticeMs": 58.106201171875,
       "noticeToReceiveIntervalMs": [
-        20.1220703125,
-        81.0791015625
+        11.605712890625,
+        90.98388671875
       ],
       "strictLockedImportMs": 79.201125,
       "importEndToSessionMs": 169,
@@ -166,5 +166,11 @@
       ],
       "directFirst": true
     }
-  ]
+  ],
+  "observedClockOffsetEnvelopeMs": {
+    "lo": -11.394287109375,
+    "hi": 63.98388671875
+  },
+  "clockAssumption": "offset remains inside union of observed before/after RTT brackets",
+  "timestampResolutionGuardMs": 2
 }

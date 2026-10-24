@@ -16,6 +16,8 @@ node packages/cli/scripts/perf-map.mjs check packages/cli/performance/S3c-baseli
 The baseline correctly fails all four ruled latency budgets. The collector
 recomputes intervals from observed timestamps and before/after clock brackets;
 it rejects contradictory reported intervals and inconsistent retained RTT brackets.
+Acceptance then uses the union of all before/after brackets instead of the
+constant-offset intersection, assuming skew stays within that observed envelope.
 A two-millisecond guard covers integer-millisecond event/clock quantization. It retains failures without
 inventing their latency. Startup failures remain in the receipt and are not
 mixed into steady-state percentiles.
@@ -53,3 +55,9 @@ claimed. Source and target clock uncertainty can leave a negative lower network
 bound; the retained bound intersects that interval with nonnegative physical time.
 Full verification is included in the direct locked-import span and is not
 separately timed there. Baseline verify timings are separate observations.
+
+Same-build direct-off control: `S3c-off-control-samples.json` and its recomputed
+`S3c-off-control.json` receipt. Same30bea85 runtime,61→107fixture, one copy per
+host,3warmups+20measured/direction, traceoff and proxy19344. The feature-on lane
+is the ruled fast-path budget; off-mode proves delivery and supplies the control,
+not an assertion that storage-only visibility always meets that budget.
