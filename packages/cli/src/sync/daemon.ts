@@ -6,9 +6,10 @@ import { encodeBlob, decodeBlob, importChangeBlobs } from '../../../engine/src/c
 import { acquireDocumentLock } from '../document-lock.js'
 import { updateDocument } from '../disk.js'
 import { liveDesigns, replicaRoot, readSyncState, writeSyncState, type LiveDesign } from '../sync-store.js'
-import { CombBridge, type Frame } from './bridge.js'
+import { CatalogueQueue } from './catalogue.js'
+import { CombBridge, validateAppendReceipt, type Frame } from './bridge.js'
 
-export interface CombConfig { binary: string; args: string[] }
+export interface CombConfig { binary: string; args: string[]; node?: { id: string; name: string } }
 export function feedName(design: LiveDesign): string { return `foundation/${design.workspace}/${design.product}/${design.docId}` }
 // Comb's supported log names exclude '/'. Keep the logical address and map it without collisions.
 export function combLog(design: LiveDesign): string { return `foundation-${createHash('sha256').update(feedName(design)).digest('hex')}` }
@@ -27,12 +28,14 @@ function page(frame: Frame, cursor: string): { blobs: Uint8Array[]; next: string
 }
 export async function serveSync(config: CombConfig, signal: AbortSignal, log: (text: string) => void): Promise<void> {
   mkdirSync(replicaRoot(), { recursive: true })
-  const release = acquireDocumentLock(join(replicaRoot(), 'daemon'), 0)
-  const workers = new Map<string, { controller: AbortController; done: Promise<void> }>()
+  const release = acquireDocumentLock(join(replicaRoot(), 'daemon'), 100)
+  const catalogueQueue = new CatalogueQueue(config, signal, log)
+  const workers = new Map<string, { controller: AbortController; done: Promise<void>; registration: string }>()
   async function run(design: LiveDesign, signal: AbortSignal): Promise<void> {
     const key = copyKey(design), state = readSyncState(key), feed = combLog(design)
     let bridge: CombBridge | undefined, watcher: FSWatcher | undefined, wake: (() => void) | undefined
     let backoff = 250
+    let catalogueHead: string | undefined
     const stop = (): void => { bridge?.close(); wake?.() }
     signal.addEventListener('abort', stop)
     try {
@@ -86,12 +89,23 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
                     const bytes = encodeBlob(change.envelope, change.bytes)
                     if (bytes.length > 491520) throw new Error(`change ${change.envelope.hash} exceeds Comb append limit (491520 bytes)`)
                     const receipt = await writer.request('append', { log: feed, idempotency_key: change.envelope.hash, payload_hex: Buffer.from(bytes).toString('hex') })
-                    if (receipt.log !== feed || typeof receipt.first !== 'string' || !/^[1-9][0-9]*$/.test(receipt.first) || receipt.last !== receipt.first || receipt.cursor !== String(BigInt(receipt.first) + 1n)) throw new Error('invalid Comb append receipt')
+                    validateAppendReceipt(receipt, feed)
                     if (!state.published.includes(change.envelope.hash)) state.published.push(change.envelope.hash)
                     state.pending = Math.max(0, state.pending - 1); state.updatedAt = new Date().toISOString(); state.lastError = null; backoff = 250; writeSyncState(key, state)
                   }
                 } finally { await writer.finish() }
                 publishingHash = undefined
+              }
+              const sharedHashes = new Set(state.published), head = chain.head().hash
+              if (!signal.aborted && head !== catalogueHead && chain.changes().every(change => sharedHashes.has(change.envelope.hash))) {
+                catalogueHead = head
+                catalogueQueue.enqueue(key, design, chain, error => {
+                  if (signal.aborted) return
+                  if (state.catalogueError !== error) {
+                    state.catalogueError = error; writeSyncState(key, state)
+                    if (error) log(`${feedName(design)} catalogue: ${error}`)
+                  }
+                })
               }
               await new Promise<void>(resolve => { const timer = setTimeout(done, 250); function done(): void { clearTimeout(timer); wake = undefined; resolve() }; wake = done })
             }
@@ -109,8 +123,8 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
   }
   try {
     while (!signal.aborted) {
-      const designs = liveDesigns(log), liveKeys = new Set(designs.map(copyKey))
-      for (const [key, worker] of workers) if (!liveKeys.has(key) && !worker.controller.signal.aborted) {
+      const designs = liveDesigns(log), liveRecords = new Map(designs.map(design => [copyKey(design), JSON.stringify(design)]))
+      for (const [key, worker] of workers) if (liveRecords.get(key) !== worker.registration && !worker.controller.signal.aborted) {
         worker.controller.abort()
         void worker.done.finally(() => workers.delete(key))
       }
@@ -119,11 +133,12 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
         if (!workers.has(key)) {
           const controller = new AbortController()
           const done = run(design, AbortSignal.any([signal, controller.signal])).catch(err => log(String(err)))
-          workers.set(key, { controller, done })
+          workers.set(key, { controller, done, registration: JSON.stringify(design) })
         }
       }
       await delay(250)
     }
     await Promise.all([...workers.values()].map(worker => worker.done))
+    await catalogueQueue.close()
   } finally { release() }
 }
