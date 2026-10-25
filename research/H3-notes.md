@@ -181,3 +181,27 @@ Comb credentials are private outside the repo under
 `~/.config/foundation-share/h3-stub`. Production19487 remains separate and
 unconfigured. Disable its proxy and stop `foundation-share-h3-stub.service`
 after the transport drill.
+
+## Dedicated macOS drill Keychain
+
+The Studio scratch HOME has no default Keychain; a harmless initial canary timed
+out and created no item. Commit `9bf6723` adds optional
+`FOUNDATION_SHARE_KEYCHAIN`: an absolute, single-line, private regular 0600
+Keychain file, with symlinks refused. Both security read/write commands select
+that file explicitly; no user default/search-list mutation and no plaintext Mac
+fallback. The two mock tests pass. A strict-indexing test typo initially made
+tsc fail while a chained shell command masked that exit; `b806e27` fixes it, and
+a standalone root tsc exits0. The earlier tsc-pass claim for9bf6723 is retracted.
+
+Studio then performed a real macOS canary: explicit isolated Keychain add/find/
+delete all succeeded; private comparison passed; find after deletion returned44;
+file remained0600 after securityd writes. The user's default/search list remained
+identical. Password was generated in memory and stored only in a0600 file under
+its private OS-temp root outside repos; no value was output. This establishes
+Keychain storage isolation, not yet the real share login/key handover result.
+
+App activation preserves a private service-config backup and checks HTTP after
+restart, restoring that backup on failure. A stale service.json.new causes safe
+refusal: inspect the private file and ensure no activation is running before
+removing only that temporary file and retrying. This helper targets task member
+trmdy explicitly. Its real App execution is still pending App creation.
