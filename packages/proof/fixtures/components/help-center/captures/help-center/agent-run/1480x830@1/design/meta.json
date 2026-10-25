@@ -1,6 +1,6 @@
 {
   "schema": "fdn-capture/0",
-  "rendererSourceHash": "70ab9ab5f56628fc5094ec5abec49e461eaab6881ff79dc29f3203b41903da92",
+  "rendererSourceHash": "d43b6b7b6fe9b71ca710b0f479cd1f3c15a4413098973b7d552d7e06950b78db",
   "rendererSources": [
     {
       "file": "package.json",
@@ -168,7 +168,7 @@
     },
     {
       "file": "packages/proof/src/capture/cli.ts",
-      "sha256": "4108b03ba1c00f929085b027b779750c3bc56d2e3e295944b369e35f07ec6df0"
+      "sha256": "d7314a0761a2b06ba7defb4a213cf52fb9f16d7155ea46dc8f9bcfc64411e62f"
     },
     {
       "file": "packages/proof/src/capture/code-cli.ts",
@@ -219,7 +219,7 @@
       "sha256": "65b137b164da0eabf320bd8ad051d2e75dc1b210019746c3be72a78d3db92f37"
     }
   ],
-  "rendererCommit": "617ef30a2203e299eb026bd32098cac64d7e9617",
+  "rendererCommit": "4b192f7060909a6ca79ee060d907faa5b4990307",
   "rendererDirty": false,
   "provable": true,
   "source": "design",
@@ -260,7 +260,28 @@
   "boundary": {
     "codeSelector": "[data-help-center]",
     "originNormalized": true,
-    "sizePreserved": true
+    "bothRootsNormalized": true,
+    "sizePreserved": true,
+    "audit": {
+      "nodes": 281,
+      "properties": 54,
+      "differences": [
+        {
+          "node": 0,
+          "property": "position",
+          "before": "absolute",
+          "after": "relative"
+        }
+      ],
+      "unexpected": [],
+      "scrolls": [],
+      "designExtraction": {
+        "nodes": 281,
+        "properties": 54,
+        "differences": []
+      },
+      "finalScrolls": []
+    }
   },
   "url": "foundation:baked",
   "fonts": [
@@ -554,6 +575,6 @@
   "blocked": [],
   "errors": [],
   "timingsMs": {
-    "capture": 2152
+    "capture": 2178
   }
 }
