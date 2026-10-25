@@ -77,7 +77,7 @@ curl --fail https://netcup-1.tailff9529.ts.net:19487/v1/oauth
 
 The service restarts on failure after three seconds. The minute health check
 probes HTTP `/v1/oauth` and restarts on failure. This is process/HTTP liveness, not
-a GitHub or durable backend write probe. Health checks skip active backups.
+a GitHub or durable backend write probe. Health and backup share a filesystem lock; health skips the entire stopped backup window, including oneshot activating state. A real stopped-service lock probe verifies health does not restart it.
 
 Nightly backup runs at 03:15 server local time plus up to ten minutes jitter,
 with Persistent=true. Run/test it manually:
