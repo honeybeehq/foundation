@@ -3,6 +3,7 @@ import { spawn } from 'node:child_process'
 import { mkdtemp, writeFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { metadataToken } from './github-app.js'
 import type { ShareDevice } from './service-store.js'
 
 export class ShareAuthError extends Error {
@@ -24,7 +25,7 @@ interface Challenge {
 export class ShareAuth {
   private challenges = new Map<string, Challenge>()
   private inFlight = 0
-  constructor(private config: { githubApiUrl?: string; githubPermissionToken?: string }) {}
+  constructor(private config: { githubApiUrl?: string; githubPermissionToken?: string; githubAppConfig?: string }) {}
   challenge(action: Challenge['action'], space: string, repo: string) {
     for (const [key, value] of this.challenges) if (value.expiresAt <= Date.now()) this.challenges.delete(key)
     if (this.challenges.size >= 4096) throw new ShareAuthError(503, 'challenge capacity reached')
@@ -41,14 +42,20 @@ export class ShareAuth {
       throw new ShareAuthError(401, 'invalid or expired challenge')
     return value
   }
-  private async request(path: string, keys = false): Promise<{ status: number; text: string }> {
+  private async request(path: string, keys = false, repo?: string): Promise<{ status: number; text: string }> {
     const origin = this.config.githubApiUrl ?? (keys ? 'https://github.com' : 'https://api.github.com')
     const headers: Record<string, string> = {
       'User-Agent': 'foundation-share',
       Accept: keys ? 'text/plain' : 'application/vnd.github+json'
     }
-    if (!keys && this.config.githubPermissionToken)
-      headers.Authorization = `Bearer ${this.config.githubPermissionToken}`
+    if (!keys) {
+      let token = this.config.githubPermissionToken
+      if (this.config.githubAppConfig && repo) {
+        try { token = await metadataToken(repo, this.config.githubAppConfig) }
+        catch { throw new ShareAuthError(502, 'GitHub App metadata credential unavailable') }
+      }
+      if (token) headers.Authorization = `Bearer ${token}`
+    }
     let response: Response
     try {
       response = await fetch(origin + path, { headers, redirect: 'error', signal: AbortSignal.timeout(10000) })
@@ -66,8 +73,8 @@ export class ShareAuth {
     }
     return { status: response.status, text: Buffer.concat(chunks).toString('utf8') }
   }
-  private async json(path: string) {
-    const response = await this.request(path)
+  private async json(path: string, repo?: string) {
+    const response = await this.request(path, false, repo)
     if (response.status !== 200) throw new ShareAuthError(502, 'GitHub verification unavailable')
     try {
       return JSON.parse(response.text) as Record<string, any>
@@ -80,7 +87,7 @@ export class ShareAuth {
   async descriptor(repo: string, service: string, space: string): Promise<void> {
     const key = JSON.stringify([repo, service, space])
     if (Date.now() - (this.descriptors.get(key) ?? 0) < 30000) return
-    const result = await this.request(`/repos/${repo.slice(11)}/contents/.foundation/share.json`)
+    const result = await this.request(`/repos/${repo.slice(11)}/contents/.foundation/share.json`, false, repo)
     if (result.status !== 200)
       throw new ShareAuthError(412, 'Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)')
     let descriptor: Record<string, unknown>
@@ -118,7 +125,7 @@ export class ShareAuth {
       throw new ShareAuthError(401, 'invalid device proof')
     this.inFlight++
     try {
-      const identity = await this.json(`/users/${device.login}`)
+      const identity = await this.json(`/users/${device.login}`, repo)
       if (
         identity.id !== device.githubId ||
         typeof identity.login !== 'string' ||
@@ -192,16 +199,16 @@ export class ShareAuth {
   }
   async permission(repo: string, login: string, publicAccess: PublicAccess): Promise<'read' | 'write' | 'none'> {
     const path = `/repos/${repo.slice('github.com/'.length)}`
-    const metadata = await this.json(path)
+    const metadata = await this.json(path, repo)
     if (metadata.private === false && publicAccess === 'repo-read')
       throw new ShareAuthError(400, 'Public repositories require collaborators and organization members; repo-read is only allowed for private repositories')
-    if (!this.config.githubPermissionToken && !this.config.githubApiUrl) {
+    if (!this.config.githubPermissionToken && !this.config.githubAppConfig && !this.config.githubApiUrl) {
       throw new ShareAuthError(503, 'service metadata permission credential required')
     }
-    const response = await this.request(`${path}/collaborators/${login}/permission`)
+    const response = await this.request(`${path}/collaborators/${login}/permission`, false, repo)
     if (response.status === 404 || (metadata.private === false && publicAccess === 'collaborators')) {
       for (let page = 1; page <= 1000; page++) {
-        const list = await this.request(`${path}/collaborators?affiliation=all&per_page=100&page=${page}`)
+        const list = await this.request(`${path}/collaborators?affiliation=all&per_page=100&page=${page}`, false, repo)
         if (list.status !== 200) throw new ShareAuthError(502, 'Cannot confirm collaborator removal')
         const users = JSON.parse(list.text) as {
           login: string
