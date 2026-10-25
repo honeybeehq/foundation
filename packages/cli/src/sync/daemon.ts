@@ -1,3 +1,4 @@
+import { AssetSharing } from '../share/assets.js'
 import { syncTrace, syncTraceEnabled, syncTraceSpan } from '../sync-trace.js'
 import { watch, readFileSync, mkdirSync, statSync, type FSWatcher } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -116,6 +117,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
       updateError('connection', null); updateError(side, null)
     }
     let catalogueHead: string | undefined
+    const assets = transport.share ? new AssetSharing(transport,design.file,design.repoRoot ?? findShareRoot(dirname(design.file)) ?? dirname(design.file)) : undefined
     const shareHints=transport.share&&process.env.FOUNDATION_SHARE_HINTS!=='0'?new ShareHints(transport,feed):undefined
     const hinted = new Set<string>(transport.share?baseline.changes().map(c=>c.envelope.hash):[])
     const freshFacts=new Map<string,number>()
@@ -127,6 +129,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
         if (signature === hintSignature) return
         const chain = loadChain(readFileSync(`${design.file}.chain`))
         if (chain.docId() !== design.docId) return
+        if (shareHints && assets && !assets.hintsReady(chain)) return
         const published = new Set(state.published), received = directReceived.get(key)
         const changes = chain.changes().filter(change => !published.has(change.envelope.hash) && !hinted.has(change.envelope.hash) && !received?.has(change.envelope.hash))
         const batch: { hash: string; hex: string }[] = []; let bytes = 0
@@ -147,7 +150,8 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
       } catch { /* Atomic replacement or an unavailable optional peer never blocks Comb. */ }
     }
     const relayController = new AbortController()
-    const relay = transport.share&&process.env.FOUNDATION_SHARE_RELAY!=='0' ? shareRelay(transport.share, transport.shareLog??feed, AbortSignal.any([signal,relayController.signal]), (bytes,signatureVerified,source) => {
+    const relay = transport.share&&process.env.FOUNDATION_SHARE_RELAY!=='0' ? shareRelay(transport.share, transport.shareLog??feed, AbortSignal.any([signal,relayController.signal]), async (bytes,signatureVerified,source) => {
+      if (assets) { const candidate=loadChain(readFileSync(design.file+'.chain'));importChangeBlobs(candidate,[bytes]);await assets.receive(candidate) }
       let imported=0
       const importedChain=updateDocument(design.file, chain => { if(chain.docId()!==design.docId)throw new Error('document identity mismatch');const hash=decodeBlob(bytes).envelope.hash;const present=chain.log().some(c=>c.hash===hash);imported=importChangeBlobs(chain,[bytes]);if(!present)importedHashes.add(hash);return chain },true)
       const factHash=decodeBlob(bytes).envelope.hash
@@ -177,6 +181,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
               const decode = syncTraceSpan('receive.page', () => ({ docId: design.docId, cursor: state.cursor }))
               const incoming = page(response, state.cursor); decode({ count: incoming.blobs.length })
               if (incoming.blobs.length) {
+                if (assets) {const candidate=loadChain(readFileSync(design.file+'.chain'));importChangeBlobs(candidate,incoming.blobs);await assets.receive(candidate)}
                 const done = syncTraceSpan('receive.locked-import', () => ({ docId: design.docId, cursor: state.cursor, hashes: incoming.blobs.map(blob => decodeBlob(blob).envelope.hash) }))
                 let imported = 0, ok = false, importedChain: FdnChain | undefined
                 const freshHashes:string[]=[]
@@ -213,6 +218,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
               // changes() is in Lamport order: never publish a descendant past a held parent.
               const pending = publishablePrefix(unshared, received)
               if (pending.length) {
+                await assets?.publish(chain)
                 syncTrace('publish.pending', () => ({ docId: design.docId, hashes: pending.map(change => change.envelope.hash) }))
                 // A persistent bridge renews exclusive feed ownership. Bound each writer
                 // batch and send clean EOF, so other nodes can publish through the same log.

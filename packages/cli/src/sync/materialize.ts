@@ -1,3 +1,4 @@
+import { AssetSharing, copyCachedAssets } from '../share/assets.js'
 import { mkdirSync, realpathSync, statSync, existsSync, lstatSync, readFileSync } from 'node:fs'
 import { loadChain } from 'foundation-engine'
 import { dirname, isAbsolute, relative, resolve } from 'node:path'
@@ -89,6 +90,7 @@ export async function materialize(request: MaterializeRequest, config: CombConfi
           const cached = loadChain(readFileSync(`${candidate}.chain`))
           if (cached.docId() !== request.docId || !cached.verify().ok || !cached.changes().some(c => c.envelope.hash === request.expectedHead)) continue
           mkdirSync(dirname(file), { recursive: true }); materializePath(root, file)
+          await copyCachedAssets(cached,candidate,file,root)
           const chain = materializeDocument(file, cached)
           registerDesign(file, request.workspaceId, request.productId, root)
           return { state: 'ready' as const, workspaceId: request.workspaceId, productId: request.productId, docId: request.docId, path: file, repoPath: root, headHash: chain.head().hash, requestKey: request.requestKey ?? null, fromCache: true }
@@ -143,6 +145,7 @@ export async function materialize(request: MaterializeRequest, config: CombConfi
     // No document writes occur until the complete remote candidate passes verification.
     stage = 'local'; savedPath = file
     mkdirSync(dirname(file), { recursive: true }); materializePath(root, file); checkAddress()
+    await new AssetSharing(config,file,root).receive(chain)
     try { chain = materializeDocument(file, chain) }
     catch (err) {
       if (String(err).includes('path-conflict:')) throw new MaterializeError('path-conflict', String(err))

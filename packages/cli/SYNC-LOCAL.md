@@ -111,3 +111,43 @@ FOUNDATION_ORIGIN_NODE for the writer's chosen machine label.
 State isolation validates the final state-root component and private modes. Ancestor
 path ownership/resolution belongs to the local OS/account trust boundary; it does
 not defend a compromised local account or maliciously substituted parent path.
+
+## Immutable image assets
+
+Live sharing carries document-relative `.foundation/assets/<sha256>.<ext>` files
+alongside changes. The path is relative to the containing design directory;
+accepted extensions are png, jpg, gif, webp, avif and svg. Each file is at most
+20 MiB. Plain Git still carries these ordinary repository files. No asset GC is
+performed: retained, unreferenced image files are uploaded too, preserving undo.
+
+The client streams 128 KiB chunks through existing signed XChaCha20-Poly1305
+records. Each chunk has its own keyed/opaque physical feed; content SHA, extension, size, chunk
+index/count and bytes stay inside authenticated ciphertext. Existing AD binds the
+opaque asset feed, epoch, key id and keyed chunk identity; the feed address also binds the content identity and chunk index, and the encrypted signed
+header binds the total. Dedup is keyed per epoch. No custom
+crypto or separate service storage keys are introduced.
+
+Receivers validate the candidate chain, fetch its missing current images, and
+verify sequence, bounded length, full SHA256 and image signature before atomically
+installing without overwrite. Only then may the referencing change import or
+materialize report ready. Failures leave the previous design intact and appear
+in sync's receive error or materialize refusal; retries use the existing outbox.
+Materialization into another directory brings current images there, including
+from complete local cache while offline. Historical blobs stay available for
+later undo references; local undo fetches a missing historical image before republication; materialization does not eagerly download every historical
+image. A corrupt pre-existing immutable local file is refused and preserved for
+inspection, never silently replaced.
+
+There are at most two active transfers and32 queued per client process. Temp
+files are exclusive, removed on failure, and dead-owner temps are cleaned on the
+next fetch in that directory. A live owner or reused PID is never cleaned up.
+Changes without assets keep their independent transport. Legacy explicit Comb
+config retains its existing development behaviour; asset transport requires
+per-repo encrypted sharing.
+
+SVG bytes are not rewritten or trusted as sanitized by sync. A buggy or malicious
+member can share arbitrary SVG bytes. **Every receiver must display SVG only in
+an image context (`img src` or CSS image URL), never inline DOM, object or embed.**
+A future consumer that inlines SVG must sanitize on read first. The Design pane
+owner confirms image-context rendering; writer-side ingestion sanitization is
+additional protection, not the receiver's security boundary.
