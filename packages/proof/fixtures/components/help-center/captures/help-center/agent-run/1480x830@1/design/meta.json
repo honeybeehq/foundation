@@ -1,0 +1,559 @@
+{
+  "schema": "fdn-capture/0",
+  "rendererSourceHash": "62c88b6959c04a7d7f2d61fa365667dbd6a6d7f399fadf88bb9d49b54d0e37a1",
+  "rendererSources": [
+    {
+      "file": "package.json",
+      "sha256": "b22faf1759df3cb80d059fe751e8ab6f9c645fd870a6f524a5cd6f1588da1e0a"
+    },
+    {
+      "file": "packages/engine/package.json",
+      "sha256": "554ce65b98f7d7a584d2b9cee61fc8cc824e8a4ac8b9710dee4f007a52ffc3c7"
+    },
+    {
+      "file": "packages/engine/src/artboards/frame.ts",
+      "sha256": "5689f9b7ef9568b041cd86e50e49f2f38e888449964a884fb62ed263a1b33e8f"
+    },
+    {
+      "file": "packages/engine/src/artboards/index.ts",
+      "sha256": "98f15b165a6d48a1c5ea7f73e3f8c50d5f049eec1d6e2f201ebd5afdff9dd1b2"
+    },
+    {
+      "file": "packages/engine/src/bake/capsule.ts",
+      "sha256": "3b8069be01009b43e931ccddc8f7df91b1c1831782caaf8eb64da9b6da4fa68f"
+    },
+    {
+      "file": "packages/engine/src/bake/context.ts",
+      "sha256": "c55666cb4a9b90a9bc5270dc3b6d8b31fe9a7706f3821d09335692537f8cb37c"
+    },
+    {
+      "file": "packages/engine/src/bake/emit.ts",
+      "sha256": "5ab04a6bdc0f3b90cafe705f9f685234863781f037f98a485571800a0ba21c85"
+    },
+    {
+      "file": "packages/engine/src/bake/expr.ts",
+      "sha256": "777684e2022b4a4d8866caf691577d436d6dc48a9b4c73dcfb9502ecb8194366"
+    },
+    {
+      "file": "packages/engine/src/bake/index.ts",
+      "sha256": "15576c41d152224ea17589ffe98bcfe20326aaf1dbeca8b66693339db34f3169"
+    },
+    {
+      "file": "packages/engine/src/bake/node-style.ts",
+      "sha256": "b99c8ec31ede9e883ef9ce3d36b1dedb42e6bb8f0595c0c970b427fc7093ae40"
+    },
+    {
+      "file": "packages/engine/src/bake/styles.ts",
+      "sha256": "9556315c51b27ebdeabfd20e0f4a12401b562bfe8ed378a48e534a3ca4d12f7a"
+    },
+    {
+      "file": "packages/engine/src/chain/activity.ts",
+      "sha256": "9e3b58899d409f1cb38354b75331b320f782c9d320829cc51277ddb56523d99a"
+    },
+    {
+      "file": "packages/engine/src/chain/chain.ts",
+      "sha256": "600280b3a338886f85a0e1bf6bb5341daad2f5f169fb492cb6c247866accb62f"
+    },
+    {
+      "file": "packages/engine/src/chain/envelope.ts",
+      "sha256": "d1e86e3ec18d24a275e9fb165107f9fed34e6afffa3ac76c7108f856c0026de7"
+    },
+    {
+      "file": "packages/engine/src/chain/exchange.ts",
+      "sha256": "8e4ffb2eff3225b489df5c748ff31d6d49ae31c43c41aa53e5a5285ffa3266e6"
+    },
+    {
+      "file": "packages/engine/src/chain/index.ts",
+      "sha256": "ce6d77ba1b421582b8ef7204b27aaf4f84806e55785aa07ec4dbd2f217b3020a"
+    },
+    {
+      "file": "packages/engine/src/chain/model.ts",
+      "sha256": "b735672539200f7d7247fd91c0368881bb06084dc3d262bc75320dadc47d2f81"
+    },
+    {
+      "file": "packages/engine/src/chain/util.ts",
+      "sha256": "9db9e55865d7e272a3bdbbec320b9de5ecede6234f0a370efcb3ee895f5ec7cf"
+    },
+    {
+      "file": "packages/engine/src/components/detach.ts",
+      "sha256": "2d67603d3419bccd6dd278d5318dcf95aa7008a65f830ced944a811a75f4afa4"
+    },
+    {
+      "file": "packages/engine/src/components/overrides.ts",
+      "sha256": "1dfa8c36badc2208c916928f619139f908e3dcfda4ece93cbfc6072811c6abe3"
+    },
+    {
+      "file": "packages/engine/src/components/swap.ts",
+      "sha256": "f8f0151ca01bcc3a94e3642aafdb7bf5292a00beb0685c275e297426dc5938f7"
+    },
+    {
+      "file": "packages/engine/src/components/variants.ts",
+      "sha256": "6a510cb1e0ab1c9ae82340bfecc55476fc63f368f72f685a7f9950aa9cd22132"
+    },
+    {
+      "file": "packages/engine/src/data.ts",
+      "sha256": "d8c8416a65184ed70ecd751a58478e5e37b3aac8db6c39d12858298a884ad1f5"
+    },
+    {
+      "file": "packages/engine/src/diff/index.ts",
+      "sha256": "e587305c74f35d7433756be6bb29c130efb5839cdf43f99079671f7f6e231cdc"
+    },
+    {
+      "file": "packages/engine/src/freeze/index.ts",
+      "sha256": "e55b319a89164730532b642866c802df05438ea40c3dcd63ce58c2a7462fb601"
+    },
+    {
+      "file": "packages/engine/src/grammar/expr.ts",
+      "sha256": "564cba3842e8872ee1b400df85f3381ab3f803a7885afce441b1d3c6a0486df6"
+    },
+    {
+      "file": "packages/engine/src/grammar/schema.ts",
+      "sha256": "9a65e073c6f772ec1425e56768396b8ae192299b7a90fef1fb8bf523806efe1f"
+    },
+    {
+      "file": "packages/engine/src/index.ts",
+      "sha256": "c7276825cc1d5b9740b009229314c31f00e2048b80f183a9b301a1dccd387b28"
+    },
+    {
+      "file": "packages/engine/src/parse/index.ts",
+      "sha256": "56bd57fa43f5e147a353a0dc269c93fa81a9c400e9023e190ad1a7df486830ba"
+    },
+    {
+      "file": "packages/engine/src/parse/style.ts",
+      "sha256": "e227e4cdf626056bb8b57f99f9ba880baddac654fff12b00378472b3518b0f28"
+    },
+    {
+      "file": "packages/engine/src/patch/index.ts",
+      "sha256": "6443e1723141c906a9024b1be958fe06742615ae23d328b8689afcb48e325cd0"
+    },
+    {
+      "file": "packages/engine/src/project/index.ts",
+      "sha256": "9ac106fa5017c5e95e8549371b308342a6fb0f6554ce0f670f8b013cf2b6f8b5"
+    },
+    {
+      "file": "packages/engine/src/render/browser.ts",
+      "sha256": "7b20add08a596a9555cbac5a13903dc53dae4c0e26428c3aef9a5c674bf45a98"
+    },
+    {
+      "file": "packages/engine/src/render/index.ts",
+      "sha256": "03ee3b8ba5f5e24a661b39b0bacf5bcf5062511dff62d055813f6b1b56f36dd1"
+    },
+    {
+      "file": "packages/engine/src/serve/index.ts",
+      "sha256": "28a38d257dcd3a88dccac3fcfe7b712c83ed7ce64802cde5b2c4d59ad0e237d8"
+    },
+    {
+      "file": "packages/engine/src/state-styles.ts",
+      "sha256": "69fba776353ae79d52aae5335fafecbf7d6be82104d621dcbd7726323e308fa1"
+    },
+    {
+      "file": "packages/engine/src/tokens/index.ts",
+      "sha256": "84592adf2762299f0aea06ade1cc070db714588cdcd75d03e64510bed05642cc"
+    },
+    {
+      "file": "packages/engine/src/types.ts",
+      "sha256": "18a78b50bf538287cf14c1f8c743d9fe10d1a6a3e217132bfab3f34c76eac25d"
+    },
+    {
+      "file": "packages/engine/src/validate/index.ts",
+      "sha256": "b74113650972351e7359d373a031607144e8fc7aec2c3681d0982141f3c00b4b"
+    },
+    {
+      "file": "packages/engine/src/validate/styles.ts",
+      "sha256": "c04cf023f2d05f03a48babda7a36c0383f78f59eafeb4c92996a8dedc5fba1fa"
+    },
+    {
+      "file": "packages/proof/package.json",
+      "sha256": "b8461be2be2b6aca250f60de65ee1f534927aba94ce5ac49d1423cdc9ef5282d"
+    },
+    {
+      "file": "packages/proof/src/capture/cli.ts",
+      "sha256": "a7be6d90868fbc54f1929427ca7190a6de4132d07e08ab7ef37a7fe54b4f5756"
+    },
+    {
+      "file": "packages/proof/src/capture/code-cli.ts",
+      "sha256": "66dbdd0ef5ff55bbed5da8baa8b6d8715de897a0eb3098e4c1d2f1f195424370"
+    },
+    {
+      "file": "packages/proof/src/capture/dom.ts",
+      "sha256": "c150903e25374a32893c0936ef5a4f1735be8652086372a81153752bb2361a87"
+    },
+    {
+      "file": "packages/proof/src/capture/extent.ts",
+      "sha256": "07c5d903afd383fd68a9bc29bc97488556cf290d540700098f81cc2ff08a4acf"
+    },
+    {
+      "file": "packages/proof/src/capture/fonts.ts",
+      "sha256": "b0e1e3c0104194a298c4998f9b0b2506deecfca56a2078945aa7784afcd258ea"
+    },
+    {
+      "file": "packages/proof/src/capture/gallery.ts",
+      "sha256": "6c830b566a655197c82c8a15b22913f0851459618bcfd6a1870803b9e3356542"
+    },
+    {
+      "file": "packages/proof/src/capture/provenance.ts",
+      "sha256": "1647933a888a910b78c7bc6db8fb3416c8bdf0804f651557e684621f50c22c96"
+    },
+    {
+      "file": "packages/proof/src/capture/settle.ts",
+      "sha256": "b7d1c585fcf85de43075d70962aa9736b63f3f901693c902b2eaa7462d853918"
+    },
+    {
+      "file": "packages/proof/src/capture/types.ts",
+      "sha256": "38ffda760a841e862aeb2497688d59a08de1a963d6c0fcaff6399b2a63c00f99"
+    },
+    {
+      "file": "packages/proof/src/capture/vite.ts",
+      "sha256": "7f62bc1c21da6c2efc0c1ca229be3abaf152ae63bd64d86cd01a6ae7d0df554c"
+    },
+    {
+      "file": "packages/proof/src/compare/style.ts",
+      "sha256": "ae3e4cf614452a4217a3419bb8a1fb13fc7f970c103020e9154d404054966d74"
+    },
+    {
+      "file": "pnpm-lock.yaml",
+      "sha256": "35660c0f2da4d33be4b224fbb80ea76c9b7d4fca4953f48774eae70d242b2722"
+    },
+    {
+      "file": "tsconfig.json",
+      "sha256": "65b137b164da0eabf320bd8ad051d2e75dc1b210019746c3be72a78d3db92f37"
+    }
+  ],
+  "rendererCommit": "843cc541317354bd5d13a74dc29cc503b543a6d6",
+  "rendererDirty": false,
+  "provable": true,
+  "source": "design",
+  "artboard": "help-center",
+  "state": "agent-run",
+  "viewport": {
+    "width": 1480,
+    "height": 830,
+    "dpr": 1
+  },
+  "extent": {
+    "frame": [
+      0,
+      0,
+      1064,
+      720
+    ],
+    "scroll": [
+      1064,
+      720
+    ],
+    "viewport": [
+      0,
+      0,
+      1480,
+      830
+    ]
+  },
+  "fullExtent": {
+    "file": "full-extent.png",
+    "sha256": "452066b350f9fec4d2d1be78795499a3dc9703e52aa7d00fb10d15a0adaba37d",
+    "diagnosticPaint": true
+  },
+  "frame": {
+    "width": 1064,
+    "height": 720
+  },
+  "boundary": {
+    "codeSelector": "[data-help-center]",
+    "originNormalized": true,
+    "sizePreserved": true
+  },
+  "url": "foundation:baked",
+  "fonts": [
+    "\"Foundation Design Serif\", \"Foundation Symbols\"",
+    "\"Hanken Grotesk\", \"Foundation Design Sans\", \"Foundation Symbols\"",
+    "\"IBM Plex Mono\", \"Foundation Design Mono\", \"Foundation Symbols\""
+  ],
+  "fontPolicy": {
+    "sans": "Foundation Design Sans",
+    "mono": "Foundation Design Mono",
+    "serif": "Foundation Design Serif",
+    "fallback": "Foundation Symbols",
+    "requireCustomFonts": true
+  },
+  "fontSubstitutions": [
+    {
+      "from": "\"Hanken Grotesk\", sans-serif",
+      "to": "\"Hanken Grotesk\", \"Foundation Design Sans\", \"Foundation Symbols\""
+    },
+    {
+      "from": "\"IBM Plex Mono\", monospace",
+      "to": "\"IBM Plex Mono\", \"Foundation Design Mono\", \"Foundation Symbols\""
+    },
+    {
+      "from": "\"Times New Roman\"",
+      "to": "\"Foundation Design Serif\", \"Foundation Symbols\""
+    }
+  ],
+  "platformFonts": [
+    {
+      "familyName": "DejaVu Sans Mono",
+      "postScriptName": "DejaVuSansMono",
+      "isCustomFont": true,
+      "glyphCount": 41
+    },
+    {
+      "familyName": "Hanken Grotesk Medium",
+      "postScriptName": "HankenGrotesk-Medium",
+      "isCustomFont": true,
+      "glyphCount": 238
+    },
+    {
+      "familyName": "Hanken Grotesk",
+      "postScriptName": "HankenGrotesk-Regular",
+      "isCustomFont": true,
+      "glyphCount": 1026
+    },
+    {
+      "familyName": "Hanken Grotesk SemiBold",
+      "postScriptName": "HankenGrotesk-SemiBold",
+      "isCustomFont": true,
+      "glyphCount": 168
+    },
+    {
+      "familyName": "IBM Plex Mono Medium",
+      "postScriptName": "IBMPlexMono-Medium",
+      "isCustomFont": true,
+      "glyphCount": 35
+    },
+    {
+      "familyName": "IBM Plex Mono",
+      "postScriptName": "IBMPlexMono-Regular",
+      "isCustomFont": true,
+      "glyphCount": 572
+    }
+  ],
+  "fontAssets": [
+    {
+      "family": "Hanken Grotesk",
+      "weight": "400",
+      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-400-normal.woff2",
+      "sha256": "787b3fdd0b7e6d59ae7ce14ce7a41d1a44616584b4c919b527da951972d5d87d",
+      "postScriptName": "HankenGrotesk-Regular"
+    },
+    {
+      "family": "Hanken Grotesk",
+      "weight": "500",
+      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-500-normal.woff2",
+      "sha256": "31f666af7bff625900c46aa34a05d8620482ba2db37db7b63749b693ab0c72ec",
+      "postScriptName": "HankenGrotesk-Medium"
+    },
+    {
+      "family": "Hanken Grotesk",
+      "weight": "600",
+      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-600-normal.woff2",
+      "sha256": "58f23b7ae3e13b21a4dca4c05360be87b3531d60fc1cbff89732cac8fb3019ae",
+      "postScriptName": "HankenGrotesk-SemiBold"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "weight": "400",
+      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2",
+      "sha256": "08949f728dc52d528e69b1667d15c89a5686a4ee9a296ff90983985f99c380f7",
+      "postScriptName": "IBMPlexMono-Regular"
+    },
+    {
+      "family": "Foundation Design Sans",
+      "weight": "400",
+      "path": ".foundation/fonts/LiberationSans-Regular.ttf",
+      "format": "truetype",
+      "sha256": "4659bc0c58c5028dd488ec928d41d9265db43d9b669fc14ca8b0832daca7b144",
+      "postScriptName": "LiberationSans"
+    },
+    {
+      "family": "Foundation Design Sans",
+      "weight": "700",
+      "path": ".foundation/fonts/LiberationSans-Bold.ttf",
+      "format": "truetype",
+      "sha256": "3973aa5054fb467dd5627245d3dc82e37bf16fe075756156a570455871351582",
+      "postScriptName": "LiberationSans-Bold"
+    },
+    {
+      "family": "Foundation Design Mono",
+      "weight": "400",
+      "path": ".foundation/fonts/DejaVuSansMono.ttf",
+      "format": "truetype",
+      "sha256": "c805f9436dbc268644c1d9584f01a601a653e028e08fd74b9b949f6cf8304d88",
+      "postScriptName": "DejaVuSansMono"
+    },
+    {
+      "family": "Foundation Design Mono",
+      "weight": "700",
+      "path": ".foundation/fonts/DejaVuSansMono-Bold.ttf",
+      "format": "truetype",
+      "sha256": "3a3c502eeff669a231549e80df9f7c49de109bafe303170409e905d0b31a38fe",
+      "postScriptName": "DejaVuSansMono-Bold"
+    },
+    {
+      "family": "Foundation Design Serif",
+      "weight": "400",
+      "path": ".foundation/fonts/LiberationSerif-Regular.ttf",
+      "format": "truetype",
+      "sha256": "705903ae1382f0150f115d6f10a30f5b2f3d6ade649c474afe6366c39174fb65",
+      "postScriptName": "LiberationSerif"
+    },
+    {
+      "family": "Foundation Design Serif",
+      "weight": "700",
+      "path": ".foundation/fonts/LiberationSerif-Bold.ttf",
+      "format": "truetype",
+      "sha256": "9e66c25e20868756bf12eb24a520a4552727c9cd108f577f7ae33e3c0110e39c",
+      "postScriptName": "LiberationSerif-Bold"
+    },
+    {
+      "family": "Foundation Symbols",
+      "weight": "400",
+      "path": ".foundation/fonts/DejaVuSans.ttf",
+      "format": "truetype",
+      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
+      "postScriptName": "DejaVuSans"
+    },
+    {
+      "family": "Foundation Symbols",
+      "weight": "700",
+      "path": ".foundation/fonts/DejaVuSans-Bold.ttf",
+      "format": "truetype",
+      "sha256": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895",
+      "postScriptName": "DejaVuSans-Bold"
+    },
+    {
+      "family": "Hanken Grotesk",
+      "weight": "700",
+      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-700-normal.woff2",
+      "format": "woff2",
+      "sha256": "d85de6e272296d06f8205ad11e27140274e0ef97050232777d146eabb71c312d",
+      "postScriptName": "HankenGrotesk-Bold"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "weight": "500",
+      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2",
+      "format": "woff2",
+      "sha256": "01d285447409c8a588692162439a038b8cbd7871309ee20267b0d2d91c6e8e22",
+      "postScriptName": "IBMPlexMono-Medium"
+    }
+  ],
+  "tokens": {
+    "--color-accent": "#9C6A1C",
+    "--color-bg": "#F5F4F1",
+    "--color-border": "#E7E5E0",
+    "--color-border-hairline": "#F1EFEB",
+    "--color-border-subtle": "#ECEAE5",
+    "--color-caret": "#9A8E78",
+    "--color-selected-bg": "#EEEDE9",
+    "--color-surface": "#FFFFFF",
+    "--color-surface-alt": "#FAFAF8",
+    "--color-text-disabled": "#B5B1A9",
+    "--color-text-faint": "#A8A59E",
+    "--color-text-ghost": "#C5BEB3",
+    "--color-text-muted": "#8A877F",
+    "--color-text-placeholder": "#B4AEA4",
+    "--color-text-primary": "#2E2B27",
+    "--color-text-secondary": "#4A463F",
+    "--color-text-tertiary": "#6F6B63",
+    "--font-mono": "'IBM Plex Mono', monospace",
+    "--font-sans": "'Hanken Grotesk', sans-serif",
+    "--font-serif": "'Spectral', serif",
+    "--radius-2xl": "12px",
+    "--radius-lg": "8px",
+    "--radius-md": "6px",
+    "--radius-xl": "10px",
+    "--shadow-card": "0 10px 30px rgba(40,35,30,.10)",
+    "--shadow-card-lg": "0 16px 44px rgba(40,35,30,.14)",
+    "--shadow-panel": "0 24px 64px rgba(40,35,30,.30)"
+  },
+  "renderedAt": "2026-07-31T12:00:00.000Z",
+  "file": "boards/system-help-center.fdn.html",
+  "htmlSha256": "5d3cce513cd26d3b0cc8e4ff6118a9fa3666602de1edbe15880cb2ae9cf5dab9",
+  "designHead": "9ecb6cc7215d7d955053117cbfb920c53fc2508afec9ac46e1e0a5f22bae0a9a",
+  "binding": "chain-head",
+  "browserVersion": "151.0.7922.34",
+  "platform": "linux",
+  "flags": [
+    "--disable-gpu",
+    "--disable-gpu-compositing",
+    "--use-gl=angle",
+    "--use-angle=swiftshader",
+    "--force-color-profile=srgb",
+    "--disable-lcd-text",
+    "--font-render-hinting=none",
+    "--run-all-compositor-stages-before-draw",
+    "--disable-partial-raster",
+    "--disable-checker-imaging",
+    "--disable-image-animation-resync",
+    "--disable-skia-runtime-opts",
+    "--force-prefers-reduced-motion",
+    "--hide-scrollbars",
+    "--disable-background-timer-throttling",
+    "--disable-backgrounding-occluded-windows",
+    "--disable-renderer-backgrounding",
+    "--disable-domain-reliability",
+    "--disable-component-update",
+    "--js-flags=--random-seed=1"
+  ],
+  "styleProperties": [
+    "color",
+    "background-color",
+    "background-image",
+    "border-top-color",
+    "border-right-color",
+    "border-bottom-color",
+    "border-left-color",
+    "border-top-width",
+    "border-right-width",
+    "border-bottom-width",
+    "border-left-width",
+    "border-top-style",
+    "border-right-style",
+    "border-bottom-style",
+    "border-left-style",
+    "border-top-left-radius",
+    "border-top-right-radius",
+    "border-bottom-left-radius",
+    "border-bottom-right-radius",
+    "padding-top",
+    "padding-right",
+    "padding-bottom",
+    "padding-left",
+    "margin-top",
+    "margin-right",
+    "margin-bottom",
+    "margin-left",
+    "row-gap",
+    "column-gap",
+    "font-family",
+    "font-size",
+    "font-weight",
+    "line-height",
+    "letter-spacing",
+    "text-align",
+    "text-transform",
+    "opacity",
+    "box-shadow",
+    "text-shadow",
+    "display",
+    "align-items",
+    "justify-content",
+    "flex-direction",
+    "visibility",
+    "position",
+    "box-sizing",
+    "overflow-x",
+    "overflow-y",
+    "font-style",
+    "text-decoration-line",
+    "white-space",
+    "gap",
+    "flex-grow",
+    "flex-shrink"
+  ],
+  "blocked": [],
+  "errors": [],
+  "timingsMs": {
+    "capture": 1739
+  }
+}
