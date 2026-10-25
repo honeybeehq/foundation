@@ -6,10 +6,11 @@ Each workload is a `<id>.json` record (machine-readable, schema in `record.schem
 
 | Workload | Lane | Processes | gap | recipe-only | measured | stale | gated | Unmeasured states | Readiness |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- | --- |
-| [Read-only node and checkout capabilities](./doctor-capabilities.md) | startup | helper | 0 | 1 | 0 | 0 | 0 | repeated | Studio built39ms/installed67ms and metal3 built53ms pass. Source shim single-process route passes Studio141ms and metal3 257ms; original metal3 source309ms miss retained. Twenty samples per series, shared-host observations only; no stable baseline. |
-| [Shared-store save to remote session event](./sync-save-to-session.md) | streaming | main, helper, node-remote | 0 | 0 | 4 | 0 | 0 | idle, scale, release, recovery | Same-build30bea85 on/off visibility data passes direct budgets. Later125cdeb startup-error wrapper is independently tested/reviewed; repeated worker body and5transport files are byte-identical (runtime-scope receipt). No startup-failure latency claim. |
+| [Read-only node and checkout capabilities](./doctor-capabilities.md) | startup | helper | 0 | 0 | 0 | 1 | 0 | repeated | Earlier startup receipts are historical; lazy share dispatch changed main. Startup has not been remeasured for H2. |
+| [Encrypted relay while durable append is held](./share-held-store.md) | streaming | main, helper | 0 | 1 | 0 | 0 | 0 | repeated, release, recovery | Matched local held-store control and hint-on recipe; shared host, no cross-host or population-tail claim. |
+| [Shared-store save to remote session event](./sync-save-to-session.md) | streaming | main, helper, node-remote | 0 | 0 | 0 | 4 | 0 | idle, repeated, scale, release, recovery | Earlier receipts remain historical; current H2/main owners changed. H3 must rerun the two-host series; local held-store recipe is separate. |
 
-## Accounted gaps (33)
+## Accounted gaps (68)
 
 Census keys no workload measures, each with a reason. Removing a reason moves the key to drift.
 
@@ -46,3 +47,38 @@ Census keys no workload measures, each with a reason. Removing a reason moves th
 - `rpc:packages/cli/src/sync/catalogue.ts:append` — Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers
 - `rpc:packages/cli/src/sync/materialize.ts:head` — Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers
 - `rpc:packages/cli/src/sync/materialize.ts:read` — Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers
+- `entry:packages/cli/src/commands/share.ts:runShare` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/client.ts:createSpace` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/client.ts:ghToken` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/client.ts:initializeKeys` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/client.ts:login` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/client.ts:prepareDevice` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/client.ts:renew` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/client.ts:restoreRecovery` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/client.ts:rotateRecovery` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/client.ts:sharingStatus` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/config.ts:serviceUrl` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/crypto.ts:authProof` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/crypto.ts:certifyEpoch` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/crypto.ts:deviceId` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/crypto.ts:deviceStatement` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/crypto.ts:generateDeviceKeys` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/crypto.ts:newEpoch` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/crypto.ts:recoverEpoch` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/crypto.ts:recoveryKeypair` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/crypto.ts:unwrapKey` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/crypto.ts:validateEpoch` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/crypto.ts:verifyEpochCertificate` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/crypto.ts:wrapKey` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/github.ts:githubIdentity` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/github.ts:signDevice` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/service-store.ts:backupShareMetadata` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/service.ts:backupShareService` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `http:packages/cli/src/commands/share.ts#1` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `http:packages/cli/src/share/auth.ts#1` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `http:packages/cli/src/share/client.ts#1` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `http:packages/cli/src/share/github.ts#1` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `http:packages/cli/src/share/github.ts#2` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `poll:packages/cli/src/commands/share.ts#1` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `poll:packages/cli/src/share/auth.ts#1` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `spawn:packages/cli/src/share/auth.ts#1` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing

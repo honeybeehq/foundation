@@ -1,0 +1,32 @@
+2026-10-25T06:13:30.218Z LABELLED STUB: GitHub identities, repo membership and SSH public keys served by loopback fixture; actual CLI/crypto/HTTP/Comb/disk are real
+2026-10-25T06:13:30.629Z init created secret-free share.json; recovery code withheld from transcript
+2026-10-25T06:13:30.949Z second member login: Live sharing: waiting for key — Waiting for a teammate's machine to share the key
+2026-10-25T06:13:31.317Z automatic signed-device key handover with no designs open: 363ms
+2026-10-25T06:13:33.046Z genesis durably acknowledged: 338ms
+2026-10-25T06:13:33.848Z alice edit visible on other member: 437ms
+2026-10-25T06:13:33.848Z save-to-remote visibility alice: 456.8134765625ms
+2026-10-25T06:13:34.449Z bob edit visible on other member: 233ms
+2026-10-25T06:13:34.449Z save-to-remote visibility bob: 257.7685546875ms
+2026-10-25T06:13:34.761Z NO ACCESS REFUSED: Live sharing: no access
+2026-10-25T06:13:35.045Z daemon bob: foundation/machine-B/local-B/c325680b-0ea2-4c3a-8616-f81e01cc754b: receive cursor 4: Live sharing: no access
+2026-10-25T06:13:35.068Z removal causes epoch rotation: 1ms
+2026-10-25T06:13:35.068Z removed device token revoked and relay disconnected
+2026-10-25T06:13:35.225Z daemon bob: foundation/machine-B/local-B/c325680b-0ea2-4c3a-8616-f81e01cc754b: receive cursor 4: Live sharing: no access
+2026-10-25T06:13:35.622Z daemon bob: foundation/machine-B/local-B/c325680b-0ea2-4c3a-8616-f81e01cc754b: receive cursor 4: Live sharing: no access
+2026-10-25T06:13:35.805Z new epoch change durably acknowledged: 356ms
+2026-10-25T06:13:35.885Z RAW STORE CIPHERTEXT: removed member old keys and nonmember empty keys cannot decrypt latest event
+2026-10-25T06:13:35.888Z REMOVED TOKEN REFUSED: HTTP 403
+2026-10-25T06:13:35.909Z RAW-STORE GREP: exit 1, no plaintext matches in Comb objects or service metadata
+2026-10-25T06:13:35.912Z TAMPER REFUSED: changed encrypted record fails authentication
+2026-10-25T06:13:36.155Z ROLLBACK REFUSED: {"state":"unavailable","reason":"service rolled back epoch 2 to 1"}
+2026-10-25T06:13:36.404Z RECOVERY SUBSTITUTION REFUSED: {"state":"unavailable","reason":"recovery key differs from committed share.json"}
+2026-10-25T06:13:36.571Z daemon bob: foundation/machine-B/local-B/c325680b-0ea2-4c3a-8616-f81e01cc754b: receive cursor 4: Live sharing: no access
+2026-10-25T06:13:36.622Z REFUSED ROTATION: requirement persisted across retries; old-key sending stays paused
+2026-10-25T06:13:36.648Z OUTAGE: service stopped
+2026-10-25T06:13:37.027Z local edit saved during outage
+2026-10-25T06:13:37.388Z outbox recovered after service restart: 358ms
+2026-10-25T06:13:38.422Z daemon bob: foundation/machine-B/local-B/c325680b-0ea2-4c3a-8616-f81e01cc754b: receive cursor 4: waiting for key epoch 2
+2026-10-25T06:13:41.266Z re-attested replacement device receives current key: 3492ms
+2026-10-25T06:13:41.266Z RE-ATTEST: renewed SSH binding and replaced revoked device keys; current access checked again
+2026-10-25T06:13:42.447Z complete stopped local-store backup includes metadata and Comb objects
+2026-10-25T06:13:42.447Z PASS real two-HOME CLI/daemon/Comb encrypted sharing, handover, subsecond bidirectional visibility, refusal, removal/rotation, raw-store grep, outage and backup

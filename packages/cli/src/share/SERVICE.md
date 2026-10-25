@@ -45,10 +45,13 @@ old-epoch appends until a writer rotates. Ambiguous GitHub failures are not loss
 
 HTTP lives under `/v1`: challenge, spaces, token, state, keys, rpc, relay and oauth.
 State/relay accept a space query; key/RPC bodies accept space. Bearers use headers.
-RPC wraps hello/head/read/append; physical Comb names are built on the server.
+RPC wraps hello/head/read/append plus an authenticated `hint` operation; physical Comb names are built on the server.
 Encrypted records must include epoch, key id, keyed dedup, nonce, ciphertext and
 sender signature. The service checks sender/token binding and epoch; clients check
-cryptography. SSE carries immediate encrypted hints without durable cursors. Slow
+cryptography. The hint operation applies the same writer, current-epoch and ciphertext
+checks as append, then relays without writing Comb or returning a cursor. An
+independent bounded client queue keeps later hints moving while a durable append
+waits. SSE carries immediate encrypted hints without durable cursors. Slow
 subscribers disconnect and recover by durable replay. Bounds cover bodies, state,
 requests, challenges, connections, pages and SSH verification concurrency.
 

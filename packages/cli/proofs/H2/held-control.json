@@ -1,0 +1,26 @@
+{
+  "workload": "share-held-store",
+  "seriesId": "metal3-local-held-v1",
+  "commit": "3c49364d4c2d46f3ad1c0cf2dcaddf174fc1850d",
+  "machine": "trmd-metal-3",
+  "runtime": "v24.18.0",
+  "buildMode": "source-tsx",
+  "load": [
+    0.74,
+    0.75,
+    0.81
+  ],
+  "independentHints": false,
+  "relay": true,
+  "driverSha256": "df220883aa7ced8dfa8d4d87d432e372ad8d4b74df5f5a25640082086c89b07b",
+  "failure": "Error: timeout held save 1 imports before release",
+  "results": [
+    {
+      "metric": "heldSaveVisibilityMax",
+      "samples": [
+        54.522705078125
+      ],
+      "invariantHolds": false
+    }
+  ]
+}

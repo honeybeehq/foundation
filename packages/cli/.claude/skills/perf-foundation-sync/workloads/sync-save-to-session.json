@@ -339,7 +339,7 @@
       "collector": "Clock-bounded host event timestamps, unprofiled runs; local monotonic spans used only for attribution",
       "aggregation": "median",
       "kind": "upper-bound",
-      "status": "measured",
+      "status": "stale",
       "states": [
         "repeated"
       ],
@@ -383,7 +383,7 @@
       "collector": "Clock-bounded host event timestamps, unprofiled runs; local monotonic spans used only for attribution",
       "aggregation": "p95",
       "kind": "upper-bound",
-      "status": "measured",
+      "status": "stale",
       "states": [
         "repeated"
       ],
@@ -427,7 +427,7 @@
       "collector": "Clock-bounded host event timestamps, unprofiled runs; local monotonic spans used only for attribution",
       "aggregation": "median",
       "kind": "upper-bound",
-      "status": "measured",
+      "status": "stale",
       "states": [
         "repeated"
       ],
@@ -471,7 +471,7 @@
       "collector": "Clock-bounded host event timestamps, unprofiled runs; local monotonic spans used only for attribution",
       "aggregation": "p95",
       "kind": "upper-bound",
-      "status": "measured",
+      "status": "stale",
       "states": [
         "repeated"
       ],
@@ -517,5 +517,5 @@
   ],
   "updatedAt": "2026-10-24",
   "updatedBy": "S3c worker",
-  "readiness": "Same-build30bea85 on/off visibility data passes direct budgets. Later125cdeb startup-error wrapper is independently tested/reviewed; repeated worker body and5transport files are byte-identical (runtime-scope receipt). No startup-failure latency claim."
+  "readiness": "Earlier receipts remain historical; current H2/main owners changed. H3 must rerun the two-host series; local held-store recipe is separate."
 }

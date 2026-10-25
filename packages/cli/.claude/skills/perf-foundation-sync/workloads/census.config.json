@@ -19,7 +19,9 @@
     "packages/cli/src/io.ts",
     "packages/cli/src/argv.ts",
     "packages/cli/src/commands/install.ts",
-    "scripts/foundation-shim.sh"
+    "scripts/foundation-shim.sh",
+    "packages/cli/src/share",
+    "packages/cli/src/commands/share.ts"
   ],
   "extensions": "\\.(ts|tsx|sh)$",
   "exclude": "(\\.test\\.|/test/|/node_modules/)",

@@ -131,6 +131,146 @@
     {
       "key": "rpc:packages/cli/src/sync/materialize.ts:read",
       "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/commands/share.ts:runShare",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/client.ts:createSpace",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/client.ts:ghToken",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/client.ts:initializeKeys",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/client.ts:login",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/client.ts:prepareDevice",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/client.ts:renew",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/client.ts:restoreRecovery",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/client.ts:rotateRecovery",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/client.ts:sharingStatus",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/config.ts:serviceUrl",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:authProof",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:certifyEpoch",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:deviceId",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:deviceStatement",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:generateDeviceKeys",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:newEpoch",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:recoverEpoch",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:recoveryKeypair",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:unwrapKey",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:validateEpoch",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:verifyEpochCertificate",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:wrapKey",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github.ts:githubIdentity",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github.ts:signDevice",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/service-store.ts:backupShareMetadata",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/service.ts:backupShareService",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "http:packages/cli/src/commands/share.ts#1",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "http:packages/cli/src/share/auth.ts#1",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "http:packages/cli/src/share/client.ts#1",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "http:packages/cli/src/share/github.ts#1",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "http:packages/cli/src/share/github.ts#2",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "poll:packages/cli/src/commands/share.ts#1",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "poll:packages/cli/src/share/auth.ts#1",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "spawn:packages/cli/src/share/auth.ts#1",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
     }
   ]
 }

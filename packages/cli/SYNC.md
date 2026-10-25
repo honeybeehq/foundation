@@ -243,3 +243,12 @@ SSH signing, processes, relay, storage and refusal paths are real. Logs remain i
 `.audit/share-run-*`. A real GitHub App setup and second account are needed for a
 fully live multi-account acceptance run. Service/config/backup instructions follow
 in [the service guide](src/share/SERVICE.md).
+
+The encrypted service also accepts advisory `hint` RPCs with the same writer,
+current-epoch, ciphertext and sender checks as append. They never write Comb or
+return a durable cursor. A separate file-event wakeup and bounded sender (one
+request in flight, at most32 queued frames/1MiB plaintext) send these while an
+older durable append is still waiting. Only newly imported hints get fallback
+publication grace; an author's own echoed hint cannot defer its outbox. A later
+Comb receipt remains the only sharing acknowledgement. See the held-store recipe
+in `packages/cli/performance/README.md` for before/after and all-relay-loss checks.

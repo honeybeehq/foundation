@@ -1,0 +1,46 @@
+2026-10-25T06:10:43.648Z LABELLED STUB: GitHub identities, repo membership and SSH public keys served by loopback fixture; actual CLI/crypto/HTTP/Comb/disk are real
+2026-10-25T06:10:44.051Z init created secret-free share.json; recovery code withheld from transcript
+2026-10-25T06:10:44.370Z second member login: Live sharing: waiting for key — Waiting for a teammate's machine to share the key
+2026-10-25T06:10:44.739Z automatic signed-device key handover with no designs open: 364ms
+2026-10-25T06:10:46.487Z genesis durably acknowledged: 336ms
+2026-10-25T06:10:46.982Z alice edit visible on other member: 137ms
+2026-10-25T06:10:46.982Z save-to-remote visibility alice: 156.166015625ms
+2026-10-25T06:10:47.389Z bob edit visible on other member: 50ms
+2026-10-25T06:10:47.389Z save-to-remote visibility bob: 71.138427734375ms
+2026-10-25T06:10:47.431Z both replicas caught up before held store: 41ms
+2026-10-25T06:10:48.196Z held save 0 imports before release: 27ms
+2026-10-25T06:10:48.196Z HELD-STORE local save visibility 0: 64.092529296875ms
+2026-10-25T06:10:48.237Z actual Comb append deliberately held: 40ms
+2026-10-25T06:10:48.640Z held save 1 imports before release: 29ms
+2026-10-25T06:10:48.641Z HELD-STORE local save visibility 1: 53.067138671875ms
+2026-10-25T06:10:49.046Z held save 2 imports before release: 30ms
+2026-10-25T06:10:49.046Z HELD-STORE local save visibility 2: 54.04443359375ms
+2026-10-25T06:10:49.444Z held save 3 imports before release: 26ms
+2026-10-25T06:10:49.444Z HELD-STORE local save visibility 3: 52.02197265625ms
+2026-10-25T06:10:49.853Z held save 4 imports before release: 28ms
+2026-10-25T06:10:49.854Z HELD-STORE local save visibility 4: 57.999267578125ms
+2026-10-25T06:10:50.203Z HELD-STORE: all5 saves visible, durable cursor unchanged before release
+2026-10-25T06:10:51.655Z held-store durable drain after release: 1443ms
+2026-10-25T06:10:52.002Z NO ACCESS REFUSED: Live sharing: no access
+2026-10-25T06:10:52.283Z daemon bob: foundation/machine-B/local-B/8bb1eb90-c7c9-458b-80b9-75998f95c965: receive cursor 9: Live sharing: no access
+2026-10-25T06:10:52.303Z removal causes epoch rotation: 0ms
+2026-10-25T06:10:52.304Z removed device token revoked and relay disconnected
+2026-10-25T06:10:52.475Z daemon bob: foundation/machine-B/local-B/8bb1eb90-c7c9-458b-80b9-75998f95c965: receive cursor 9: Live sharing: no access
+2026-10-25T06:10:52.957Z daemon bob: foundation/machine-B/local-B/8bb1eb90-c7c9-458b-80b9-75998f95c965: receive cursor 9: Live sharing: no access
+2026-10-25T06:10:53.030Z new epoch change durably acknowledged: 361ms
+2026-10-25T06:10:53.160Z RAW STORE CIPHERTEXT: removed member old keys and nonmember empty keys cannot decrypt latest event
+2026-10-25T06:10:53.162Z REMOVED TOKEN REFUSED: HTTP 403
+2026-10-25T06:10:53.179Z RAW-STORE GREP: exit 1, no plaintext matches in Comb objects or service metadata
+2026-10-25T06:10:53.181Z TAMPER REFUSED: changed encrypted record fails authentication
+2026-10-25T06:10:53.415Z ROLLBACK REFUSED: {"state":"unavailable","reason":"service rolled back epoch 2 to 1"}
+2026-10-25T06:10:53.561Z daemon bob: foundation/machine-B/local-B/8bb1eb90-c7c9-458b-80b9-75998f95c965: receive cursor 9: Live sharing: no access
+2026-10-25T06:10:53.660Z RECOVERY SUBSTITUTION REFUSED: {"state":"unavailable","reason":"recovery key differs from committed share.json"}
+2026-10-25T06:10:54.058Z REFUSED ROTATION: requirement persisted across retries; old-key sending stays paused
+2026-10-25T06:10:54.085Z OUTAGE: service stopped
+2026-10-25T06:10:54.481Z local edit saved during outage
+2026-10-25T06:10:54.841Z outbox recovered after service restart: 356ms
+2026-10-25T06:10:55.098Z daemon bob: foundation/machine-B/local-B/8bb1eb90-c7c9-458b-80b9-75998f95c965: receive cursor 9: Live sharing: no access
+2026-10-25T06:10:58.573Z re-attested replacement device receives current key: 3339ms
+2026-10-25T06:10:58.574Z RE-ATTEST: renewed SSH binding and replaced revoked device keys; current access checked again
+2026-10-25T06:10:59.837Z complete stopped local-store backup includes metadata and Comb objects
+2026-10-25T06:10:59.837Z PASS real two-HOME CLI/daemon/Comb encrypted sharing, handover, subsecond bidirectional visibility, refusal, removal/rotation, raw-store grep, outage and backup
