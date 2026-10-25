@@ -3,17 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "bin": { "foundation": "src/main.ts" },
+  "bin": {
+    "foundation": "src/main.ts"
+  },
   "dependencies": {
-    "foundation-engine": "workspace:*",
-    "foundation-protocol": "workspace:*",
-    "foundation-importer": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "esbuild": "^0.28.1",
+    "foundation-engine": "workspace:*",
+    "foundation-importer": "workspace:*",
+    "foundation-protocol": "workspace:*",
+    "libsodium-wrappers-sumo": "^0.8.4",
     "loro-crdt": "^1.13.8",
     "pngjs": "^7.0.0"
   },
   "devDependencies": {
+    "@types/libsodium-wrappers-sumo": "^0.8.2",
     "@types/pngjs": "^6.0.5"
   }
 }
