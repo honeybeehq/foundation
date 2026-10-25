@@ -1,0 +1,232 @@
+{
+  "schema": "fdn-drift/0",
+  "artboard": "tracks-pane/default",
+  "state": "default",
+  "viewport": {
+    "width": 1280,
+    "height": 800,
+    "dpr": 1
+  },
+  "design": {
+    "file": "boards/tracks-pane.fdn.html",
+    "head": "bc4ad7441c5826f24e7a675d518edd01ee4cad2790349c94b00d02d4a632bb00",
+    "htmlSha256": "26c4829922be5f91d50abcf38fd9772855bd7d4dc6fc0d3f626e547a614f600d",
+    "binding": "chain-head"
+  },
+  "code": {
+    "repo": null,
+    "commit": null,
+    "root": null
+  },
+  "provable": true,
+  "styles": {
+    "properties": [
+      "color",
+      "background-color",
+      "background-image",
+      "border-top-color",
+      "border-right-color",
+      "border-bottom-color",
+      "border-left-color",
+      "border-top-width",
+      "border-right-width",
+      "border-bottom-width",
+      "border-left-width",
+      "border-top-style",
+      "border-right-style",
+      "border-bottom-style",
+      "border-left-style",
+      "border-top-left-radius",
+      "border-top-right-radius",
+      "border-bottom-left-radius",
+      "border-bottom-right-radius",
+      "padding-top",
+      "padding-right",
+      "padding-bottom",
+      "padding-left",
+      "margin-top",
+      "margin-right",
+      "margin-bottom",
+      "margin-left",
+      "row-gap",
+      "column-gap",
+      "font-family",
+      "font-size",
+      "font-weight",
+      "line-height",
+      "letter-spacing",
+      "text-align",
+      "text-transform",
+      "opacity",
+      "box-shadow",
+      "text-shadow",
+      "display",
+      "align-items",
+      "justify-content",
+      "flex-direction",
+      "visibility",
+      "position",
+      "box-sizing",
+      "overflow-x",
+      "overflow-y",
+      "font-style",
+      "text-decoration-line",
+      "white-space",
+      "gap",
+      "flex-grow",
+      "flex-shrink"
+    ],
+    "unavailable": []
+  },
+  "matching": {
+    "algorithm": "hungarian",
+    "maxCost": 0.48,
+    "weights": {
+      "text": 0.4,
+      "tag": 0.15,
+      "roleName": 0.15,
+      "iou": 0.25,
+      "path": 0.05
+    },
+    "containerText": "descendant-Dice",
+    "confidence": "1-cost; uncalibrated"
+  },
+  "offscreen": {
+    "status": "measured"
+  },
+  "tolerances": {
+    "pixelRatio": 0.001,
+    "boxPx": 1,
+    "colorDeltaE": 1,
+    "stylePx": 1,
+    "pixelThreshold": 0.1
+  },
+  "pixels": {
+    "diffRatio": 0.0005107421875,
+    "diffPixels": 523,
+    "diffImage": "diff.png",
+    "designImage": "design.png",
+    "codeImage": "code.png"
+  },
+  "drifts": [
+    {
+      "id": "d1",
+      "kind": "missing",
+      "designNode": "n92",
+      "confidence": 0,
+      "property": "node",
+      "designBox": [
+        24,
+        40,
+        1216,
+        22
+      ]
+    },
+    {
+      "id": "d2",
+      "kind": "layout",
+      "property": "offscreen",
+      "codeNode": "n92",
+      "confidence": 1,
+      "codeBox": [
+        24,
+        1040,
+        1216,
+        22
+      ],
+      "code": {
+        "box": [
+          24,
+          1040,
+          1216,
+          22
+        ],
+        "frame": [
+          0,
+          0,
+          1280,
+          800
+        ],
+        "viewport": [
+          0,
+          0,
+          1280,
+          800
+        ],
+        "elements": [
+          "0/0/0/0"
+        ],
+        "clips": [],
+        "summary": "rendered outside the visible pane: Apiary — Tracks pane"
+      }
+    }
+  ],
+  "defects": [
+    {
+      "id": "def-1908216aec3f5ccacc7e",
+      "layer": {
+        "design": "n92"
+      },
+      "kind": "missing",
+      "cause": "missing:subtree",
+      "classification": "product",
+      "findings": [
+        "d1"
+      ],
+      "summary": "missing subtree differs at n92"
+    },
+    {
+      "id": "def-1ae216a0788acac6bac0",
+      "layer": {
+        "code": "n92"
+      },
+      "kind": "layout",
+      "cause": "offscreen",
+      "classification": "product",
+      "findings": [
+        "d2"
+      ],
+      "summary": "rendered outside the visible pane: Apiary — Tracks pane",
+      "offscreen": {
+        "box": [
+          24,
+          1040,
+          1216,
+          22
+        ],
+        "frame": [
+          0,
+          0,
+          1280,
+          800
+        ],
+        "viewport": [
+          0,
+          0,
+          1280,
+          800
+        ],
+        "elements": [
+          "0/0/0/0"
+        ],
+        "clips": []
+      }
+    }
+  ],
+  "summary": {
+    "uniqueDefects": 2,
+    "accepted": 0,
+    "raw": 2,
+    "uncertainMatches": 0,
+    "environment": 0,
+    "uncertain": 0
+  },
+  "verdict": "drift",
+  "timingsMs": {
+    "compare": 109.12757699999929
+  },
+  "matchCounts": {
+    "id": 159,
+    "heuristic": 0
+  }
+}

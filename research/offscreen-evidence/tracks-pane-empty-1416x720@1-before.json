@@ -1,0 +1,380 @@
+[
+  {
+    "id": "def-0a3695ce3a8dfd31c48c",
+    "layer": {
+      "design": "n284::n265",
+      "code": "n284::n265"
+    },
+    "kind": "style",
+    "cause": "style:surface",
+    "classification": "product",
+    "findings": [
+      "d1",
+      "d2",
+      "d3",
+      "d4",
+      "d5",
+      "d6"
+    ],
+    "summary": "style surface differs at n284::n265"
+  },
+  {
+    "id": "def-19009fc3468668bf1bc6",
+    "layer": {
+      "design": "n284::n265",
+      "code": "n284::n265"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d7",
+      "d8",
+      "d9",
+      "d10",
+      "d11"
+    ],
+    "summary": "layout configuration differs at n284::n265"
+  },
+  {
+    "id": "def-e5055ad300715d2ed2f7",
+    "layer": {
+      "design": "n284::n271",
+      "code": "n284::n271"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d12",
+      "d13",
+      "d14",
+      "d15",
+      "d16",
+      "d17",
+      "d18",
+      "d19",
+      "d20"
+    ],
+    "summary": "layout configuration differs at n284::n271"
+  },
+  {
+    "id": "def-e1a777144bcb56b2712f",
+    "layer": {
+      "design": "n284::n273",
+      "code": "n284::n273"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d21",
+      "d22",
+      "d23",
+      "d24",
+      "d26",
+      "d28",
+      "d29"
+    ],
+    "summary": "layout configuration differs at n284::n273"
+  },
+  {
+    "id": "def-73f96564eb6295ad4e29",
+    "layer": {
+      "design": "n284::n273",
+      "code": "n284::n273"
+    },
+    "kind": "text",
+    "cause": "text:text",
+    "classification": "product",
+    "findings": [
+      "d25"
+    ],
+    "summary": "text text differs at n284::n273"
+  },
+  {
+    "id": "def-0c9fbfd972140f974eab",
+    "layer": {
+      "design": "0",
+      "code": "0"
+    },
+    "kind": "style",
+    "cause": "declared-linux-font-substitution",
+    "classification": "environment",
+    "findings": [
+      "d27",
+      "d37",
+      "d47"
+    ],
+    "summary": "Font family differs under the declared Linux substitution"
+  },
+  {
+    "id": "def-55c140ffc1f49e3fdf1a",
+    "layer": {
+      "design": "n284::n274",
+      "code": "n284::n274"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d30",
+      "d31",
+      "d32",
+      "d33",
+      "d36",
+      "d38",
+      "d39"
+    ],
+    "summary": "layout configuration differs at n284::n274"
+  },
+  {
+    "id": "def-70fa105a918ce9890316",
+    "layer": {
+      "design": "n284::n274",
+      "code": "n284::n274"
+    },
+    "kind": "text",
+    "cause": "text:text",
+    "classification": "product",
+    "findings": [
+      "d34"
+    ],
+    "summary": "text text differs at n284::n274"
+  },
+  {
+    "id": "def-2d516e9b50d589b2b876",
+    "layer": {
+      "design": "n284::n274",
+      "code": "n284::n274"
+    },
+    "kind": "token",
+    "cause": "token:color",
+    "classification": "product",
+    "findings": [
+      "d35"
+    ],
+    "summary": "token color differs at n284::n274"
+  },
+  {
+    "id": "def-20a00fc76f833d7c3c13",
+    "layer": {
+      "design": "n284::n276::n40",
+      "code": "n284::n276::n40"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d40",
+      "d41",
+      "d42",
+      "d45",
+      "d46",
+      "d49",
+      "d51",
+      "d52",
+      "d53"
+    ],
+    "summary": "layout configuration differs at n284::n276::n40"
+  },
+  {
+    "id": "def-aea252968eb4f8660e79",
+    "layer": {
+      "design": "n284::n276::n40",
+      "code": "n284::n276::n40"
+    },
+    "kind": "text",
+    "cause": "text:text",
+    "classification": "product",
+    "findings": [
+      "d43"
+    ],
+    "summary": "text text differs at n284::n276::n40"
+  },
+  {
+    "id": "def-e636a40e31b7dcead176",
+    "layer": {
+      "design": "n284::n276::n40",
+      "code": "n284::n276::n40"
+    },
+    "kind": "token",
+    "cause": "token:color",
+    "classification": "product",
+    "findings": [
+      "d44"
+    ],
+    "summary": "token color differs at n284::n276::n40"
+  },
+  {
+    "id": "def-cb56b813059b1af509b3",
+    "layer": {
+      "design": "n284::n276::n40",
+      "code": "n284::n276::n40"
+    },
+    "kind": "token",
+    "cause": "token:font-weight",
+    "classification": "product",
+    "findings": [
+      "d48"
+    ],
+    "summary": "token font-weight differs at n284::n276::n40"
+  },
+  {
+    "id": "def-c57024cd4804fce204d8",
+    "layer": {
+      "design": "n284::n276::n40",
+      "code": "n284::n276::n40"
+    },
+    "kind": "style",
+    "cause": "style:text-align",
+    "classification": "product",
+    "findings": [
+      "d50"
+    ],
+    "summary": "style text-align differs at n284::n276::n40"
+  },
+  {
+    "id": "def-2df5460f62e257dd1302",
+    "layer": {
+      "design": "n284::n266"
+    },
+    "kind": "missing",
+    "cause": "missing:subtree",
+    "classification": "product",
+    "findings": [
+      "d54",
+      "d55",
+      "d56",
+      "d57"
+    ],
+    "summary": "missing subtree differs at n284::n266"
+  },
+  {
+    "id": "def-fd556e1f9bf9fdc709da",
+    "layer": {
+      "design": "n284::n272::n303"
+    },
+    "kind": "missing",
+    "cause": "missing:subtree",
+    "classification": "product",
+    "findings": [
+      "d58",
+      "d59",
+      "d60",
+      "d61",
+      "d62",
+      "d63",
+      "d64",
+      "d65",
+      "d66",
+      "d67",
+      "d68",
+      "d69",
+      "d70",
+      "d71",
+      "d72",
+      "d73",
+      "d74",
+      "d75",
+      "d76",
+      "d77",
+      "d78",
+      "d79",
+      "d80",
+      "d81",
+      "d82",
+      "d83",
+      "d84",
+      "d85",
+      "d86",
+      "d87",
+      "d88",
+      "d89",
+      "d90",
+      "d91",
+      "d92",
+      "d93",
+      "d94"
+    ],
+    "summary": "missing subtree differs at n284::n272::n303"
+  },
+  {
+    "id": "def-7f8b7f1a0d74dac3b82f",
+    "layer": {
+      "design": "n284::n276::n41"
+    },
+    "kind": "missing",
+    "cause": "missing:subtree",
+    "classification": "product",
+    "findings": [
+      "d95"
+    ],
+    "summary": "missing subtree differs at n284::n276::n41"
+  },
+  {
+    "id": "def-144943ebaa071be572ce",
+    "layer": {
+      "design": "n284::n276::n42"
+    },
+    "kind": "missing",
+    "cause": "missing:subtree",
+    "classification": "product",
+    "findings": [
+      "d96"
+    ],
+    "summary": "missing subtree differs at n284::n276::n42"
+  },
+  {
+    "id": "def-86b344b6cf920e9b1e0b",
+    "layer": {
+      "design": "n284::n277"
+    },
+    "kind": "missing",
+    "cause": "missing:subtree",
+    "classification": "product",
+    "findings": [
+      "d97"
+    ],
+    "summary": "missing subtree differs at n284::n277"
+  },
+  {
+    "id": "def-82d4525fe6fe80b1fbeb",
+    "layer": {
+      "design": "n284::n278"
+    },
+    "kind": "missing",
+    "cause": "missing:subtree",
+    "classification": "product",
+    "findings": [
+      "d98",
+      "d99",
+      "d100"
+    ],
+    "summary": "missing subtree differs at n284::n278"
+  },
+  {
+    "id": "def-be2f5a39bd50d8db8e1f",
+    "layer": {
+      "code": "0/0/0"
+    },
+    "kind": "extra",
+    "cause": "extra:subtree",
+    "classification": "product",
+    "findings": [
+      "d101",
+      "d102",
+      "d103",
+      "d104",
+      "d105",
+      "d106",
+      "d107",
+      "d108",
+      "d109",
+      "d110",
+      "d111",
+      "d112"
+    ],
+    "summary": "extra subtree differs at 0/0/0"
+  }
+]
