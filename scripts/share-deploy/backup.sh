@@ -5,7 +5,7 @@ umask 077
 : "${SHARE_FOUNDATION:?}" "${SHARE_CONFIG:?}" "${SHARE_BACKUPS:?}" "${SHARE_COMB_CONFIG:?}"
 mkdir -p "$SHARE_BACKUPS"
 exec 9>"$SHARE_BACKUPS/.backup.lock"
-flock -n 9
+flock -w 120 9
 was_active=false
 if systemctl --user is-active --quiet foundation-share.service; then was_active=true; fi
 restart() { if "$was_active"; then systemctl --user start foundation-share.service; fi; }
@@ -15,7 +15,11 @@ stamp=$(date -u +%Y%m%dT%H%M%SZ)
 destination="$SHARE_BACKUPS/$stamp"
 "$SHARE_FOUNDATION" share backup "$destination" --config "$SHARE_CONFIG"
 # Matching tenant/digest config is secret and stays outside repositories.
-cp "$SHARE_COMB_CONFIG" "$destination/comb-config.toml"
+if ! cp "$SHARE_COMB_CONFIG" "$destination/comb-config.toml"; then
+  # Do not leave a snapshot labelled complete without its matching secret config.
+  rm -rf -- "$destination"
+  exit 1
+fi
 chmod 600 "$destination/comb-config.toml"
 # Prune only complete snapshots created by this script, after a successful backup.
 python3 - "$SHARE_BACKUPS" <<'PY'
