@@ -7,10 +7,10 @@ Each workload is a `<id>.json` record (machine-readable, schema in `record.schem
 | Workload | Lane | Processes | gap | recipe-only | measured | stale | gated | Unmeasured states | Readiness |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- | --- |
 | [Read-only node and checkout capabilities](./doctor-capabilities.md) | startup | helper | 0 | 0 | 0 | 1 | 0 | repeated | Earlier startup receipts are historical; lazy share dispatch changed main. Startup has not been remeasured for H2. |
-| [Encrypted relay while durable append is held](./share-held-store.md) | streaming | main, helper | 0 | 1 | 0 | 0 | 0 | repeated, release, recovery | Matched local held-store control and hint-on recipe; shared host, no cross-host or population-tail claim. |
+| [Encrypted relay while durable append is held](./share-held-store.md) | streaming | main, helper | 0 | 1 | 0 | 0 | 0 | repeated, release, recovery | Integrated H3 source rerun on netcup-1: five held saves49–53ms, cursor unchanged before release; recipe proof only, no cross-host or population-tail claim. |
 | [Shared-store save to remote session event](./sync-save-to-session.md) | streaming | main, helper, node-remote | 0 | 0 | 0 | 4 | 0 | idle, repeated, scale, release, recovery | Earlier receipts remain historical; current H2/main owners changed. H3 must rerun the two-host series; local held-store recipe is separate. |
 
-## Accounted gaps (68)
+## Accounted gaps (78)
 
 Census keys no workload measures, each with a reason. Removing a reason moves the key to drift.
 
@@ -82,3 +82,13 @@ Census keys no workload measures, each with a reason. Removing a reason moves th
 - `poll:packages/cli/src/commands/share.ts#1` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
 - `poll:packages/cli/src/share/auth.ts#1` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
 - `spawn:packages/cli/src/share/auth.ts#1` — Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing
+- `entry:packages/cli/src/share/github-app.ts:appJwt` — GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured
+- `entry:packages/cli/src/share/github-app.ts:checkContentsRefusal` — GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured
+- `entry:packages/cli/src/share/github-app.ts:githubJson` — GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured
+- `entry:packages/cli/src/share/github-app.ts:githubRepo` — GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured
+- `entry:packages/cli/src/share/github-app.ts:githubRequest` — GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured
+- `entry:packages/cli/src/share/github-app.ts:metadataToken` — GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured
+- `entry:packages/cli/src/share/github-app.ts:mintMetadataToken` — GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured
+- `entry:packages/cli/src/share/github-app.ts:parseGithubAppConfig` — GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured
+- `entry:packages/cli/src/share/github-app.ts:readGithubAppConfig` — GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured
+- `entry:packages/cli/src/share/github-app.ts:requireMetadataOnly` — GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured
