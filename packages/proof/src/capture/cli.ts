@@ -9,6 +9,8 @@ import { collectDom, STYLE_PROPERTIES } from './dom.js'
 import { startCodeServer } from './vite.js'
 import type { Links } from './types.js'
 import { writePair, writeGallery } from './gallery.js'
+import { pinFontStacks, usedFonts } from './fonts.js'
+import {rendererSources} from './provenance.js'
 
 const args = process.argv.slice(2)
 const option = (key: string, fallback?: string) => args.includes(key) ? args[args.indexOf(key) + 1] : fallback
@@ -27,7 +29,9 @@ const designHead = links.binding === 'chain-sha256' ? createHash('sha256').updat
 if (links.designHead && links.designHead !== designHead) throw new Error('Linked design head differs from design sidecar')
 const fontAssets = await Promise.all((links.fonts ?? []).map(async font => {
   const bytes = await readFile(resolve(repo, font.path))
-  return { ...font, sha256: createHash('sha256').update(bytes).digest('hex'), css: `@font-face{font-family:${JSON.stringify(font.family)};font-weight:${font.weight};font-style:normal;src:url(data:font/woff2;base64,${bytes.toString('base64')}) format('woff2')}` }
+  const sha256 = createHash('sha256').update(bytes).digest('hex')
+  if (font.sha256 && font.sha256 !== sha256) throw new Error(`Font asset hash mismatch: ${font.path}`)
+  return { ...font, sha256, css: `@font-face{font-family:${JSON.stringify(font.family)};font-weight:${font.weight};font-style:normal;src:url(data:font/${font.format === 'truetype' ? 'ttf' : 'woff2'};base64,${bytes.toString('base64')}) format('${font.format ?? 'woff2'}')}` }
 }))
 const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim()
 const dirty = execFileSync('git', ['status', '--porcelain'], { cwd: repo, encoding: 'utf8' }).trim()
@@ -35,9 +39,12 @@ if (dirty && !args.includes('--allow-dirty')) throw new Error('Code checkout is 
 const rendererRepo = resolve(import.meta.dirname, '../../../..')
 const rendererCommit = execFileSync('git', ['rev-parse', 'HEAD'], {cwd: rendererRepo, encoding:'utf8'}).trim()
 const rendererDirty = Boolean(execFileSync('git', ['status', '--porcelain', '--', 'packages/engine', 'packages/proof/src', 'package.json', 'pnpm-lock.yaml'], {cwd: rendererRepo, encoding:'utf8'}).trim())
+const provenance = await rendererSources(rendererRepo)
 const target = await startCodeServer(repo, links)
 const browser = await getBrowser()
 try {
+if (links.browserVersion && browser.version() !== links.browserVersion) throw new Error(`Browser mismatch: expected ${links.browserVersion}, got ${browser.version()}`)
+if (links.platform && process.platform !== links.platform) throw new Error(`Platform mismatch: expected ${links.platform}, got ${process.platform}`)
   let index = 0
   const pairs: {path: string; state: string}[] = []
   for (const { board, state } of target.entries) {
@@ -103,6 +110,7 @@ try {
         }
         await page.addStyleTag({ content: fontAssets.map(font => font.css).join('\n') + '\n*{animation:none!important;transition:none!important;caret-color:transparent!important} #foundation-root{width:100vw;height:100vh;overflow:hidden}' })
         await page.evaluate(() => document.fonts.ready)
+        const fontSubstitutions = await pinFontStacks(page, links.fontPolicy)
         if (side === 'design') frame = await page.evaluate(() => {
           const rect = document.querySelector('#foundation-root')!.firstElementChild!.getBoundingClientRect()
           return {width: rect.width, height: rect.height}
@@ -111,6 +119,7 @@ try {
         await page.waitForFunction(() => (window as any).__foundationPendingTimers === 0, undefined, {timeout:5000})
         await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
         const dom = await collectDom(page, '#foundation-root')
+        const platformFonts = await usedFonts(page, links.fontPolicy?.requireCustomFonts ?? false, fontAssets.map(font => font.postScriptName).filter((name): name is string => Boolean(name)))
         if (errors.length || blocked.length) throw new Error(JSON.stringify({ errors, blocked }))
         const fonts = await page.evaluate(() => [...new Set(Array.from(document.querySelectorAll('#foundation-root *')).map(el => getComputedStyle(el).fontFamily))].sort())
         const tokens = await page.evaluate(() => { const css = getComputedStyle(document.documentElement); return Object.fromEntries(Array.from(css).filter(k => k.startsWith('--')).sort().map(k => [k, css.getPropertyValue(k).trim()])) })
@@ -118,7 +127,7 @@ try {
         await mkdir(destination, { recursive: true })
         await page.screenshot({ path: join(destination, 'screenshot.png'), animations: 'disabled' })
         await writeFile(join(destination, 'dom.json'), JSON.stringify(dom, null, 2) + '\n')
-        const meta = { schema: 'fdn-capture/0', rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, frame, url, fonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
+        const meta = { schema: 'fdn-capture/0', ...provenance, rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, frame, url, fonts, fontPolicy: links.fontPolicy, fontSubstitutions, platformFonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
         await writeFile(join(destination, 'meta.json'), JSON.stringify(meta, null, 2) + '\n')
         console.log(`${board.id}/${state.name} ${side}: ${dom.nodes.length} nodes, ${meta.timingsMs.capture} ms`)
       } finally { await context.close() }
@@ -129,5 +138,5 @@ try {
     index++
   }
   await writeGallery(out, pairs)
-} finally { await target.server.close(); await closeBrowser() }
+} finally { await target.close(); await closeBrowser() }
 console.log(`Captured ${target.entries.length} pairs in ${Math.round(performance.now() - started)} ms`)

@@ -1,7 +1,8 @@
 import { createRequire } from 'node:module'
-import { resolve } from 'node:path'
+import { resolve,join } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { realpath } from 'node:fs/promises'
+import { realpath,mkdtemp,rm } from 'node:fs/promises'
+import {tmpdir} from 'node:os'
 import type { Links } from './types.js'
 
 export function moduleRef(repo: string, ref: string) {
@@ -15,6 +16,8 @@ export async function startCodeServer(repo: string, links: Links) {
   const vite = await import(pathToFileURL(require.resolve('vite')).href)
   const loaded = await vite.loadConfigFromFile({ command: 'serve', mode: 'foundation' }, resolve(repo, links.viteConfig))
   if (!loaded) throw new Error('Could not load target Vite config')
+  const cacheRoot = await mkdtemp(join(tmpdir(),'foundation-proof-vite-'))
+  const cacheDir = join(cacheRoot,'node_modules/.vite')
   const harness = `/@fs/${resolve(repo, links.harness)}`
   const entries = links.artboards.flatMap(board => board.states.map(state => ({ board, state })))
   const plugin = {
@@ -44,8 +47,10 @@ export async function startCodeServer(repo: string, links: Links) {
       })
     },
   }
-  const config = { ...loaded.config, configFile: false, plugins: [...(loaded.config.plugins ?? []), plugin], server: { ...loaded.config.server, fs: { allow: [...(loaded.config.server?.fs?.allow ?? []), repo, await realpath(resolve(repo, 'node_modules'))] }, host: '127.0.0.1', port: 0, strictPort: false, hmr: false }, optimizeDeps: { ...loaded.config.optimizeDeps, include: ['react', 'react-dom/client', 'react/jsx-runtime', '@stylexjs/stylex'] } }
+  const entryFiles = [...new Set([links.harness, ...entries.flatMap(({board,state}) => [board.component.split('#')[0]!, state.fixture.split('#')[0]!])])].map(file => resolve(repo,file))
+  const config = { ...loaded.config, cacheDir, configFile: false, plugins: [...(loaded.config.plugins ?? []), plugin], server: { ...loaded.config.server, fs: { allow: [...(loaded.config.server?.fs?.allow ?? []), repo, await realpath(resolve(repo, 'node_modules'))] }, host: '127.0.0.1', port: 0, strictPort: false, hmr: false }, optimizeDeps: { ...loaded.config.optimizeDeps, entries:entryFiles, include: [...(loaded.config.optimizeDeps?.include ?? []), 'react', 'react-dom/client', 'react/jsx-runtime'] } }
   const server = await vite.createServer(config)
   await server.listen()
-  return { server, url: server.resolvedUrls.local[0] as string, entries }
+  await server.environments.client.depsOptimizer?.scanProcessing
+  return { server, url: server.resolvedUrls.local[0] as string, entries, close:async () => {await server.close();await rm(cacheRoot,{recursive:true,force:true})} }
 }

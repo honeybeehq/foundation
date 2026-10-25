@@ -23,6 +23,9 @@ export interface Links {
   binding?: 'chain-head' | 'chain-sha256'
   viteConfig: string
   harness: string
-  fonts?: { family: string; weight: string; path: string }[]
+  fonts?: { family: string; weight: string; path: string; format?: string; sha256?: string; postScriptName?: string }[]
+  fontPolicy?: {sans: string; mono: string; serif: string; fallback: string; requireCustomFonts: boolean}
+  browserVersion?: string
+  platform?: string
   artboards: ArtboardLink[]
 }
