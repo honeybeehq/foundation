@@ -127,9 +127,11 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
           const css = getComputedStyle(selected)
           const horizontal = css.boxSizing === 'border-box' ? 0 : ['paddingLeft','paddingRight','borderLeftWidth','borderRightWidth'].reduce((sum,key) => sum + parseFloat(css[key as keyof CSSStyleDeclaration] as string || '0'), 0)
           const vertical = css.boxSizing === 'border-box' ? 0 : ['paddingTop','paddingBottom','borderTopWidth','borderBottomWidth'].reduce((sum,key) => sum + parseFloat(css[key as keyof CSSStyleDeclaration] as string || '0'), 0)
+          const focused = selected.contains(document.activeElement) ? document.activeElement as HTMLElement : null
           const scrolls = [selected, ...selected.querySelectorAll('*')].map(el => ({el, x:el.scrollLeft, y:el.scrollTop}))
           root.replaceChildren(selected)
           Object.assign(selected.style, {position:'relative', inset:'auto', left:'0px', top:'0px', margin:'0px', width:`${width-horizontal}px`, height:`${height-vertical}px`})
+          focused?.focus({preventScroll:true})
           for (const {el,x,y} of scrolls) { el.scrollLeft=x; el.scrollTop=y }
           const after = selected.getBoundingClientRect()
           if (Math.abs(after.width-width)>0.05 || Math.abs(after.height-height)>0.05) throw new Error('Capture boundary size changed during extraction')
