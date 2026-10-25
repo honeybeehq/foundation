@@ -63,3 +63,11 @@ reviewed by claude-opus-5-5
 - Replay proves measurement consistency for captured bytes. The trusted runner must render declared sources; hashes do not attest authenticity or a source build.
 - Composite shadows compare exact strings, ΔE is CIE76 not CIEDE2000, and equal token aliases map alphabetically. Token labels do not prove CSS variable usage.
 - No repository verification skill or AGENTS.md was found; no unavailable skill is claimed.
+
+## Reopened: independent fresh-capture reproduction (2026-10-25)
+
+The independent checker on metal-2 replayed the committed reports exactly and independently passed the verifier's stated mechanics, but fresh capture counts were249/491/594/83 (rest/selected/proposal/empty), not250/513/581/83. Fresh selected/proposal design heights were530.5/640 versus stored525.5/611. Keep these results separate; the earlier figures are stored-capture replay, not a portable from-scratch baseline. A local repeat differed by9 graph-decoration pixels, so the original16/16 bit-identical claim is not a cross-machine guarantee. See Project `research/e2e-check.md` for the independent cold-Vite failure, repeat and10-row visual sample (one ambiguous extra-content claim).
+
+A design-only red-capable command reproduces the fresh heights on metal-3 without Apiary: `pnpm exec tsx packages/proof/src/compare/diagnostics/design-fonts.ts packages/proof/src/compare/diagnostics/evidence --expect-stored` exits1. CDP reports actual WenQuanYi Zen Hei Mono for metadata node n212::n139, whose box is167.78125×14 instead of208.625×12, despite the same computed family/size/normal line-height. T2 independently measured metal-1's face as DejaVuSansMono. Sans title boxes are identical. Changing only the mono face to embedded LiberationMono changes frames to524.5/612 and metadata to207.9375×12, proving the font-metric dependency rather than attributing it vaguely to machines or source revisions.
+
+T2 owns the fix: bundle actual font bytes, pin alias resolution, audit rendered platform faces and fail closed on unbundled glyphs, and replace the cold Vite optimizer path. Do not overwrite the stored results until the fixed captures are independently checked. No new portable-equality or deterministic-repeat claim is made yet.
