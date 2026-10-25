@@ -1,6 +1,7 @@
 import { chainFormatUpgradeWarning } from './chain-format.js'
 import { mkdirSync, readFileSync, readdirSync, realpathSync, unlinkSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, dirname } from 'node:path'
+import { findShareRoot, readShareConfig } from './share/config.js'
 import { homedir } from 'node:os'
 import { createHash } from 'node:crypto'
 import { loadChain } from 'foundation-engine'
@@ -64,8 +65,10 @@ export function closeDesign(file: string): void {
 }
 /** Opt-in node installation hook; sync registration must never prevent local editing. */
 export function autoOpenDesign(file: string, log: (message: string) => void): void {
-  if (process.env.FOUNDATION_SYNC_AUTO_OPEN !== '1') return
   try {
+    if (process.env.FOUNDATION_SYNC_AUTO_OPEN !== '1') {
+      const root=findShareRoot(dirname(file));if(!root || !readShareConfig(root))return
+    }
     const canonical = realpathSync(file)
     if (liveDesigns().some(design => design.file === canonical)) return
     registerDesign(canonical, undefined, undefined, undefined, log)

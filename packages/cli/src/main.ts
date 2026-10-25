@@ -19,6 +19,7 @@ const COMMANDS: Record<string, (args: string[], io: CliIO) => Promise<number>> =
   doctor: async (args, io) => args.includes('--capabilities') ? runCapabilities(args, io) : (await import('./commands/doctor.js')).runDoctor(args, io),
   install: async (args, io) => (await import('./commands/install.js')).runInstall(args, io),
   version: async (_args, io) => { io.stdout(JSON.stringify((await import('./runtime-version.js')).runtimeVersion())); return 0 },
+  share: async (args, io) => (await import('./commands/share.js')).runShare(args, io),
   sync: async (args, io) => (await import('./commands/sync.js')).runSync(args, io),
   new: async (args, io) => (await import('./commands/new.js')).runNew(args, io),
   copy: async (args, io) => (await import('./commands/copy.js')).runCopy(args, io),
@@ -56,6 +57,7 @@ commands:
   doctor --inventory --json                  inventory executable copies without changing them
   doctor --capabilities --json [--product-root ABS] [--design-path ABS] [--foundation-path ABS]
                                               report installed runtime and selected checkout without writes
+  share init|login|status|grant|revoke-device|serve|backup     encrypted repo sharing
   sync open|close|serve|status|materialize                    register live designs, sync through Comb, inspect local/upload state
   new <name> [--no-chain]                    write a minimal .fdn.html skeleton (chain-inits it too)
   copy <src> <dest> [--title T] [--json]      create an independent document with a fresh identity and chain

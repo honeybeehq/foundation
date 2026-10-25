@@ -6,7 +6,8 @@ import { hostname } from 'node:os'
 import type { FdnChain } from 'foundation-engine'
 import { writeAtomic } from '../disk.js'
 import { replicaRoot, type LiveDesign } from '../sync-store.js'
-import { CombBridge, validateAppendReceipt } from './bridge.js'
+import { validateAppendReceipt } from './bridge.js'
+import { createBridge, configForDesign } from '../share/transport.js'
 import type { CombConfig } from './daemon.js'
 
 export interface NodeRef { id: string; name: string }
@@ -74,7 +75,7 @@ export class CataloguePublisher {
     if (!record) return
     const hash = catalogueHash(record)
     if (this.state.acknowledged === hash) return
-    const writer = new CombBridge(this.config.binary, this.config.args)
+    const writer = createBridge({...configForDesign(this.config,this.design),shareLog:'foundation-share-catalogue-v1'})
     try {
       await writer.hello()
       const log = catalogueLog(this.design.workspace)
