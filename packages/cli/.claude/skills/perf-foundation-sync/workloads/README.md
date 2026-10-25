@@ -9,6 +9,7 @@ Each workload is a `<id>.json` record (machine-readable, schema in `record.schem
 | [Read-only node and checkout capabilities](./doctor-capabilities.md) | startup | helper | 0 | 0 | 0 | 1 | 0 | repeated | Earlier startup receipts are historical; lazy share dispatch changed main. Startup has not been remeasured for H2. |
 | [Local activity notice with ten thousand cached facts](./local-activity-journal.md) | streaming | main | 0 | 1 | 0 | 0 | 0 | repeated, scale | Recipe declared before append-segment fix; baseline source0a014bd. |
 | [Encrypted relay while durable append is held](./share-held-store.md) | streaming | main, helper | 0 | 0 | 0 | 1 | 0 | repeated, release, recovery | Retained H3 pre-gate local receipts are historical after the committed-descriptor gate changed service authorization. New gate functional drill passes; no current real-App latency claim. |
+| [Bounded encrypted image chunk transfer](./shared-image-assets.md) | streaming | main | 0 | 1 | 0 | 0 | 0 | repeated, scale | Declared before per-chunk feed redesign; first growing-feed functional attempt retained with89s image transfer and later duplicate-upload timeout. |
 | [Shared-store save to remote session event](./sync-save-to-session.md) | streaming | main, helper, node-remote | 0 | 0 | 0 | 4 | 0 | idle, repeated, scale, release, recovery | Earlier receipts remain historical; current H2/main owners changed. H3 must rerun the two-host series; local held-store recipe is separate. |
 
 ## Accounted gaps (104)

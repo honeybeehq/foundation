@@ -1,3 +1,5 @@
+import { PNG } from 'pngjs'
+import { chromium } from 'playwright'
 /** One-machine real CLI/daemon/Comb drill. GitHub multi-account/SSH responses are a LABELLED loopback stub. */
 import { createServer } from 'node:http'
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process'
@@ -12,7 +14,7 @@ import {
   existsSync,
   unlinkSync
 } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { join, resolve, dirname } from 'node:path'
 import { randomBytes, createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 import { loadavg, hostname } from 'node:os'
@@ -23,7 +25,10 @@ import { decrypt, opaqueName, ready } from '../src/share/crypto.js'
 const root = mkdtempSync(resolve('.audit/share-run-')),
   main = resolve('packages/cli/src/main.ts'),
   binary = resolve(process.argv[2] ?? '.audit/comb-source/target/debug/comb-bridge')
-const localModelMode=process.argv.includes('--local-model')
+const assetMode=process.argv.includes('--assets')
+const localModelMode=process.argv.includes('--local-model') || assetMode
+const assetFault=join(root,'asset-tamper-feed')
+let proofAsset:{path:string;hash:string;bytes:Buffer}|undefined
 const heldMode = process.argv.includes('--held-store'),
   holdFile = join(root, 'hold-append'),
   heldFeed = join(root, 'held-feed'),
@@ -129,9 +134,10 @@ if (heldMode)
     wrapper,
     `import{spawn}from'node:child_process';import{createInterface}from'node:readline';import{readFileSync,existsSync,writeFileSync}from'node:fs';const child=spawn(${JSON.stringify(binary)},process.argv.slice(2),{stdio:'pipe'});child.stdout.pipe(process.stdout);child.stderr.pipe(process.stderr);const held=[];const timer=setInterval(()=>{if(existsSync(${JSON.stringify(releaseFile)})||!existsSync(${JSON.stringify(holdFile)}))for(const line of held.splice(0))child.stdin.write(line+String.fromCharCode(10))},10);const input=createInterface({input:process.stdin});input.on('line',line=>{const request=JSON.parse(line);if(request.op==='append'&&existsSync(${JSON.stringify(holdFile)})&&request.log===readFileSync(${JSON.stringify(heldFeed)},'utf8')){held.push(line);writeFileSync(${JSON.stringify(heldNotice)},'held')}else child.stdin.write(line+String.fromCharCode(10))});input.on('close',()=>{clearInterval(timer);child.stdin.end()});`
   )
+if(assetMode)writeFileSync(wrapper,`import{spawn}from'node:child_process';import{createInterface}from'node:readline';import{readFileSync,existsSync}from'node:fs';const child=spawn(${JSON.stringify(binary)},process.argv.slice(2),{stdio:'pipe'});const requests=new Map();createInterface({input:process.stdin}).on('line',line=>{const request=JSON.parse(line);requests.set(request.id,request);child.stdin.write(line+String.fromCharCode(10))}).on('close',()=>child.stdin.end());createInterface({input:child.stdout}).on('line',line=>{const frame=JSON.parse(line),request=requests.get(frame.id);requests.delete(frame.id);if(existsSync(${JSON.stringify(assetFault)})&&request?.op==='read'&&request.log===readFileSync(${JSON.stringify(assetFault)},'utf8'))for(const event of frame.events??[]){const r=JSON.parse(Buffer.from(event.payload_hex,'hex'));const b=Buffer.from(r.ciphertext,'base64');b[0]^=1;r.ciphertext=b.toString('base64');event.payload_hex=Buffer.from(JSON.stringify(r)).toString('hex')}process.stdout.write(JSON.stringify(frame)+String.fromCharCode(10))});child.stderr.pipe(process.stderr);`)
 const serviceConfig = {
   stateDir,
-  comb: heldMode
+  comb: heldMode || assetMode
     ? { binary: process.execPath, args: [wrapper, '--dir', comb, '--lease', '3'] }
     : { binary, args: ['--dir', comb, '--lease', '3'] },
   githubApiUrl: github,
@@ -289,6 +295,31 @@ try {
     log(`save-to-remote visibility ${ids[from]}: ${elapsed}ms`)
     assert.ok(elapsed < 1000, `sub-second visibility ${elapsed}`)
   }
+  if(assetMode) {
+    const width=1280,height=1024,data=Buffer.alloc(width*height*4)
+    for(let y=0;y<height;y++)for(let x=0;x<width;x++){const n=(y*width+x)*4;data[n]=Math.floor(x*255/width);data[n+1]=Math.floor(y*255/height);data[n+2]=(x+y)%256;data[n+3]=255}
+    const bytes=PNG.sync.write({width,height,data},{deflateLevel:0,filterType:0}),hash=createHash('sha256').update(bytes).digest('hex'),path=`.foundation/assets/${hash}.png`
+    assert.ok(bytes.length>=5*1024*1024);proofAsset={path,hash,bytes}
+    mkdirSync(join(repos[0]!,'.foundation/assets'),{recursive:true});writeFileSync(join(repos[0]!,path),bytes)
+    await ok(0,'edit',files[0]!,'--ops',JSON.stringify([{op:'insert-node',parent:null,index:2,node:{id:'asset-image',tag:'img',attrs:{src:path,alt:'Encrypted shared five megabyte image','data-asset-proof':'true'},style:{width:'640px',height:'512px'},styleStates:{},children:[]}}]),'--author','alice')
+    await until(()=>{const present=chain(1).doc().body.some(n=>n.id==='asset-image');if(present)assert.ok(existsSync(join(repos[1]!,path)),'reference imported before asset installation');return present},'5MB image reference imports only with installed bytes',120000)
+    assert.deepEqual(readFileSync(join(repos[1]!,path)),bytes)
+    const browser=await chromium.launch({headless:true,args:['--no-sandbox']})
+    try{const page=await browser.newPage({viewport:{width:1000,height:900}});await page.goto('file://'+files[1]);await page.waitForFunction(()=>{const image=document.querySelector('img[data-asset-proof]') as HTMLImageElement|null;return image?.complete&&image.naturalWidth===1280});await page.screenshot({path:join(root,'received-image.png'),fullPage:true});log('IMAGE RENDER: second HOME actual browser img naturalWidth1280/naturalHeight1024; screenshot '+join(root,'received-image.png'))}finally{await browser.close()}
+    log(`ASSET: ${bytes.length}byte PNG transferred byte-exact before reference import`)
+    await ok(0,'edit',files[0]!,'--ops',JSON.stringify([{op:'set-text',id:'n1',text:'A1-AFTER-IMAGE'}]),'--author','alice');await until(()=>text(1,'n1')==='A1-AFTER-IMAGE','ordinary edit on image design still relays promptly',1000)
+    const state=vault(1)[space],current=state.keys.at(-1),opaque=opaqueName(`foundation-share-asset-v1:${hash}.png:0`,current.feedKey)
+    const counts:number[]=[]
+    const {CombBridge}=await import('../src/sync/bridge.js');const inspector=new CombBridge(binary,['--dir',comb,'--lease','3']);try{await inspector.hello();for(let i=0;i<Math.ceil(bytes.length/(128*1024));i++){const name=opaqueName(`foundation-share-asset-v1:${hash}.png:${i}`,current.feedKey);const head=await inspector.request('head',{log:`share-${space}-${name}`});counts.push(Number(head.cursor)-1)}}finally{await inspector.finish()}
+    assert.ok(counts.every(n=>n===1));writeFileSync(join(root,'asset-feed-counts.json'),JSON.stringify({workload:'shared-image-assets',seriesId:'metal3-image-5mb-v1',results:[{metric:'maxChunkFeedEvents',samples:counts,invariantHolds:true}]}));log(`ASSET BOUNDS: ${counts.length} opaque chunk feeds; max durable events perfeed ${Math.max(...counts)}`)
+    writeFileSync(assetFault,`share-${space}-${opaque}`)
+    const dir=join(repos[1]!,'tamper');mkdirSync(dir)
+    const script=join(root,'fetch-tampered.ts')
+    writeFileSync(script,`import{readFileSync}from'node:fs';import{loadChain}from${JSON.stringify(resolve('packages/engine/src/index.ts'))};import{AssetSharing}from${JSON.stringify(resolve('packages/cli/src/share/assets.ts'))};const chain=loadChain(readFileSync(${JSON.stringify(files[1]+'.chain')}));await new AssetSharing({binary:'',args:[],share:${JSON.stringify(config)}},${JSON.stringify(join(dir,'board.fdn.html'))},${JSON.stringify(repos[1])}).receive(chain);`)
+    const result=await new Promise<{code:number;err:string}>(resolve=>{const child=spawn(process.execPath,['--import','tsx',script],{env:{...process.env,HOME:homes[1],FOUNDATION_SHARE_STATE_DIR:join(homes[1]!,'.foundation/share'),FOUNDATION_SHARE_TEST_GITHUB:github,FOUNDATION_REPLICA_STORE:join(homes[1]!,'replicas')},stdio:['ignore','ignore','pipe']});let err='';child.stderr.on('data',v=>err+=v);child.on('exit',code=>resolve({code:code??1,err}))})
+    unlinkSync(assetFault);assert.notEqual(result.code,0);assert.match(result.err,/signature|decrypt|authentication/i);assert.equal(existsSync(join(dir,path)),false);assert.deepEqual(readdirSync(join(dir,'.foundation/assets')),[])
+    log('ASSET TAMPER REFUSED: real Comb read ciphertext bit-flip rejected; no installed file or partial temp')
+  }
   if(localModelMode) {
     await until(()=>activity!.records.some(r=>r.entry?.author==='alice'&&r.delivery==='live'),'signed ephemeral hint yields live imported activity')
     const event=activity!.records.find(r=>r.entry?.author==='alice'&&r.delivery==='live')
@@ -304,6 +335,7 @@ try {
     await until(()=>activity!.records.some(r=>r.type==='ready'),'persistent activity observer ready for outage')
     const remoteOnly=join(repos[0]!,'remote-only.fdn.html')
     await ok(0,'new',remoteOnly)
+    if(assetMode)await ok(0,'edit',remoteOnly,'--ops',JSON.stringify([{op:'insert-node',parent:null,index:2,node:{id:'asset-image',tag:'img',attrs:{src:proofAsset!.path,alt:'Materialized shared image'},style:{width:'640px',height:'512px'},styleStates:{},children:[]}}]),'--author','alice')
     await ok(0,'sync','close',remoteOnly)
     await ok(0,'sync','open',remoteOnly,'--repo-root',repos[0]!,'--workspace','machine-A','--product','local-A')
     const remoteDocId=loadChain(readFileSync(remoteOnly+'.chain')).docId()
@@ -313,11 +345,14 @@ try {
     assert.equal(index.version,1);assert.equal(index.localReplicas.length,0)
     log(`CATALOGUE: cached remote-only row ${record.docId}; origin ${record.originNode.id}; revision ${index.revision}`)
     const key='S7-open-'+record.docId
-    const accepted=JSON.parse(await ok(1,'sync','materialize',record.docId,'remote-open.fdn.html','--repo-root',repos[1]!,'--workspace','machine-A','--product','local-A','--source-replica',record.replicaId,'--expected-head',record.headHash,'--request-key',key,'--json','--accept'))
+    if(assetMode){mkdirSync(join(repos[1]!,'materialized'),{recursive:true})}
+    const accepted=JSON.parse(await ok(1,'sync','materialize',record.docId,assetMode?'materialized/remote-open.fdn.html':'remote-open.fdn.html','--repo-root',repos[1]!,'--workspace','machine-A','--product','local-A','--source-replica',record.replicaId,'--expected-head',record.headHash,'--request-key',key,'--json','--accept'))
     assert.equal(accepted.state,'accepted')
     let settled:any
     await until(async()=>{settled=JSON.parse(await ok(1,'sync','materialize-status',key,'--json'));if(settled.state==='refused')throw new Error(JSON.stringify(settled));return settled.state==='ready'},'encrypted materialization accepted then ready')
-    assert.equal(settled.path,join(repos[1]!,'remote-open.fdn.html'));assert.equal(loadChain(readFileSync(settled.path+'.chain')).docId(),record.docId);assert.notEqual(settled.fromCache,true)
+    assert.equal(settled.path,join(repos[1]!,assetMode?'materialized/remote-open.fdn.html':'remote-open.fdn.html'))
+    if(assetMode){assert.deepEqual(readFileSync(join(dirname(settled.path),proofAsset!.path)),proofAsset!.bytes);log('ASSET MATERIALIZE: remote-only encrypted history plus missing5MB image ready in a new directory')}
+    ;assert.equal(loadChain(readFileSync(settled.path+'.chain')).docId(),record.docId);assert.notEqual(settled.fromCache,true)
     materialized={docId:record.docId,headHash:settled.headHash}
     log('MATERIALIZE: asynchronous accepted/ready; actual encrypted network history (no local candidate); confined path; original document identity')
     const verified=JSON.parse(await ok(1,'sync','verify',settled.path,'--doc-id',record.docId,'--expected-head',record.headHash,'--json'))
@@ -493,6 +528,7 @@ try {
   )
   assert.equal(grep.status, 1, grep.stdout)
   log(`RAW-STORE GREP: exit ${grep.status}, no plaintext matches in Comb objects or service metadata`)
+  if(assetMode){const walk=(dir:string):string[]=>readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(join(dir,e.name)):[join(dir,e.name)]);for(const file of [...walk(objects),...walk(stateDir)]){const raw=readFileSync(file);assert.equal(raw.includes(proofAsset!.bytes.subarray(64,192)),false);assert.equal(raw.includes(Buffer.from(proofAsset!.hash)),false)}log('ASSET RAW-STORE GREP: zero matches for128 exact PNG bytes or plaintext content SHA in all Comb/service files')}
   assert.notEqual(text(1, 'n1'), 'SECRET-AFTER-REMOVAL')
   const altered = JSON.parse(Buffer.from(latest, 'hex').toString())
   altered.ciphertext = altered.ciphertext.slice(0, -4) + 'AAAA'

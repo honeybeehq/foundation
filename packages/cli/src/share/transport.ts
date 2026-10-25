@@ -136,7 +136,7 @@ class ShareBridge implements Bridge {
                 String(value.payload_hex),
                 state,
                 session,
-                this.address === 'foundation-share-catalogue-v1'
+                this.address === 'foundation-share-catalogue-v1' || this.address?.startsWith('foundation-share-asset-v1:') === true
               )
             ).toString('hex'),
             writerSignatureVerified: true
@@ -154,7 +154,7 @@ export async function shareRelay(
   config: ShareConfig,
   logical: string,
   signal: AbortSignal,
-  onBytes: (bytes: Uint8Array, signatureVerified: boolean, source: 'hint'|'append') => void
+  onBytes: (bytes: Uint8Array, signatureVerified: boolean, source: 'hint'|'append') => void | Promise<void>
 ): Promise<void> {
   while (!signal.aborted) {
     try {
@@ -188,7 +188,7 @@ export async function shareRelay(
                 const event = JSON.parse(line.slice(5)) as Frame
                 if (event.log === log) {
                   try {
-                    onBytes(
+                    await onBytes(
                       await verifiedDecrypt(
                         config,
                         log,

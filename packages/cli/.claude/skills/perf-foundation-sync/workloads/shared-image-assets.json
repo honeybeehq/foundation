@@ -1,0 +1,144 @@
+{
+  "protocolVersion": 1,
+  "id": "shared-image-assets",
+  "title": "Bounded encrypted image chunk transfer",
+  "lane": "streaming",
+  "processes": [
+    "main"
+  ],
+  "owners": [
+    "packages/cli/src/share/assets.ts@5787c510405cd5d8cb6c7dc32b1a40c02bb1f78a"
+  ],
+  "effect": {
+    "user": "Large immutable images are shared without growing per-feed dedup scans.",
+    "assertions": [
+      "Image installs byte-exact before reference imports",
+      "One chunk per opaque feed on a clean upload"
+    ],
+    "exclusions": [
+      "UI paint latency SLO",
+      "Cross-host transport",
+      "Real GitHub setup"
+    ]
+  },
+  "accounts": [
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/assets.ts:assetRef"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/assets.ts:assetReferences"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/assets.ts:copyCachedAssets"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/assets.ts:sniffAsset"
+    },
+    {
+      "inventory": "boundaries",
+      "key": "rpc:packages/cli/src/share/assets.ts:append"
+    },
+    {
+      "inventory": "boundaries",
+      "key": "rpc:packages/cli/src/share/assets.ts:head"
+    },
+    {
+      "inventory": "boundaries",
+      "key": "rpc:packages/cli/src/share/assets.ts:read"
+    }
+  ],
+  "states": {
+    "idle": {
+      "matters": false,
+      "why": "Outside this bounded local recipe"
+    },
+    "first-use": {
+      "matters": false,
+      "why": "Outside this bounded local recipe"
+    },
+    "repeated": {
+      "matters": true,
+      "why": "Declared local ten-thousand-fact storage recipe"
+    },
+    "scale": {
+      "matters": true,
+      "why": "Declared local ten-thousand-fact storage recipe"
+    },
+    "background": {
+      "matters": false,
+      "why": "Outside this bounded local recipe"
+    },
+    "release": {
+      "matters": false,
+      "why": "Outside this bounded local recipe"
+    },
+    "recovery": {
+      "matters": false,
+      "why": "Outside this bounded local recipe"
+    }
+  },
+  "fixture": {
+    "preset": "5MiB PNG, two isolated HOMEs, actual Comb, labelled GitHub stub",
+    "isolationPolicy": 1,
+    "scaleAxes": [
+      {
+        "axis": "image bytes",
+        "values": [
+          5244767
+        ],
+        "unit": "bytes"
+      }
+    ]
+  },
+  "recipe": {
+    "driver": "share-proof.ts --assets",
+    "command": "pnpm exec tsx packages/cli/scripts/share-proof.ts /absolute/comb-bridge --assets",
+    "readiness": "Two signed-in clients, actual local Comb, private fixture",
+    "completion": "Image decoded in receiver browser, tamper refused, materialize and raw-store checks pass",
+    "reset": "New private fixture",
+    "teardown": "Driver closes service and children",
+    "serial": true,
+    "requires": [
+      "Comb b73e9bb",
+      "Node/tsx",
+      "Playwright Chromium"
+    ]
+  },
+  "metrics": [
+    {
+      "id": "maxChunkFeedEvents",
+      "unit": "count",
+      "scope": "Actual clean-upload chunk feeds inspected in durable Comb",
+      "collector": "head cursor minus1 per opaque asset/index feed",
+      "aggregation": "max",
+      "kind": "actual",
+      "status": "recipe-only",
+      "states": [
+        "repeated",
+        "scale"
+      ],
+      "betterWhen": "lower",
+      "budget": {
+        "value": 1,
+        "unit": "count",
+        "comparator": "<=",
+        "status": "proposed",
+        "source": "A1 engineering bound before replacing growing blob feed",
+        "condition": "Clean upload; epoch-rotation retries may add versions"
+      },
+      "invariant": "Exact image bytes installed, malformed ciphertext refused and no plaintext in store.",
+      "noise": "Deterministic work count; timing is contextual only"
+    }
+  ],
+  "linked": [],
+  "gaps": [
+    "No cross-host latency SLO established"
+  ],
+  "updatedAt": "2026-10-25",
+  "updatedBy": "S7f",
+  "readiness": "Declared before per-chunk feed redesign; first growing-feed functional attempt retained with89s image transfer and later duplicate-upload timeout."
+}
