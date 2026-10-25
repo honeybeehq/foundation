@@ -139,3 +139,95 @@ Worker startup failures are retried with jittered backoff capped at5s and appear
 as connection errors in status. The saved cursor and published set are preserved.
 A corrupt checkpoint remains unchanged until explicitly repaired; status reports
 its parse/read error. Startup retry sleep can delay shutdown by up to5s.
+
+## Encrypted sharing per repository
+
+Keep `.foundation/share.json` in the repository to select live sharing. Without it,
+or with `{"version":1,"mode":"git-only"}`, the default daemon makes no network
+connection for that repository. An explicit `--comb-config` still selects the older
+trusted development transport described above.
+
+Prerequisites: OpenSSH with `ssh-keygen -Y`, a GitHub SSH key available locally or
+through ssh-agent (`--ssh-key ~/.ssh/key.pub` works with an agent), and GitHub login.
+The client uses its own `gh auth token` or OAuth device-flow token for **direct**
+GitHub identity/member checks. It never sends that token to the share service.
+The service needs a GitHub App installation credential with repository **Metadata:
+read** and no Contents permission. Do not give the service a repo-scoped PAT.
+
+```sh
+foundation share init --service https://share.example.ts.net --ssh-key ~/.ssh/id_ed25519
+# Commit .foundation/share.json, including its public recovery-key pin.
+foundation share login --ssh-key ~/.ssh/id_ed25519
+foundation sync serve
+foundation share status --json
+```
+
+`--oauth` performs GitHub device sign-in locally using the service's configured
+OAuth App client id. `--token-stdin` accepts a local GitHub token without putting
+it in process arguments. `--repo-root` selects a checkout explicitly. `share init`
+can take `--repo github.com/OWNER/REPO` instead of inferring origin. Public repos
+follow repo read access by default; `--public-access collaborators` instead limits
+live keys to explicitly listed collaborators. Every peer enforces that committed
+policy independently. Read members receive keys and fetch; only writers append.
+
+The descriptor adds public `recoveryPublicKey` and `publicAccess` fields to the
+version 1 discovery shape. Keys are mandatory end-to-end (`e2e-v1`); encryption
+cannot be downgraded. Document feeds depend on space and document id, not local
+workspace/product ids. Opening/editing a design in a shared repo registers it
+automatically; explicit `sync close` stops its imports until the next open/edit.
+Signed-in repo roots are remembered locally, so daemon key handover also works
+when no design is open. A daemon must be running on at least one key-holding
+member. `share grant` runs the same independent checks immediately.
+
+`share status` distinguishes git-only, sign in, no access, waiting for key, shared,
+and unavailable with a reason. `sync status --json` adds `sharing` for consumers
+such as the Design panel. No Design panel code is changed here. Missing keys or
+service/GitHub failures leave ordinary git and local editing available.
+
+The OS Keychain holds device secrets and local GitHub tokens on macOS. Headless
+Linux uses a 0600 file in a 0700 `~/.foundation/share` directory; symlink/insecure
+secret files are refused. Recovery codes are written once to a private file in
+that directory, never printed. Move that file offline. To restore on a newly
+signed-in device, use `share recovery restore --code-file /private/code.txt`.
+`share recovery rotate` creates a new recovery key and design epoch: commit the
+updated descriptor and have teammates pull it. An old descriptor produces a
+visible pin-mismatch alarm until updated. Keep the recovery holder trusted until
+rotation. `share revoke-device DEVICE_ID` rotates and revokes immediately; for a
+stolen machine also remove its SSH key from GitHub and revoke its GitHub tokens.
+
+Clients verify GitHub SSH bindings and current permissions independently before
+handing over a sealed key or accepting a writer-certified epoch. Signed recipient
+lists remain in local epoch packages; hiding a device from service state does not
+erase known recipients. Full checks run before sending after startup and every
+120 seconds. GitHub failures never imply removal; a successful check has a one-hour
+grace, after which appends pause with the last-check time. Writers self-rotate
+at 24 hours before another append. Local monotonic epochs reject service rollback;
+key identifiers produce explicit fork errors. A malicious service can still deny
+or freeze data; there is no transparency log or global latest-epoch guarantee.
+Devices that receive historical keys are additional readers of those epochs;
+under hidden grants, a frozen writer rotates within 24 hours or holds appends.
+
+Changes, catalogue records and chain annotations cross the encryption boundary
+before network/storage; the generic feed transport also encrypts future presence
+fact payloads. This change does not add a separate presence publisher. Symmetric
+content uses libsodium XChaCha20-Poly1305; keys use sealed boxes and signed writer
+certificates. New records carry device signatures; current-epoch signers must
+currently have write access. Historical record signatures remain checkable after
+removal, while historical authorization relies on the service's original append
+permission check. Feed pseudonyms stay stable across epochs (removed members can
+link known feeds), while dedup keys rotate and are feed-specific. Plaintext S1b
+identities and chain/blob formats are unchanged.
+
+Encrypted sharing currently accepts at most 350000 plaintext bytes per append.
+The service serializes appends per feed, scans bounded durable pages to coalesce
+randomly encrypted retries, then appends through Comb without changing Comb's
+semantics. Full retained-feed scans and registry polling are initial scaling costs.
+Relay receipt gives immediate visibility; only a durable Comb receipt marks shared.
+
+Run `pnpm exec tsx packages/cli/scripts/share-proof.ts /absolute/comb-bridge` for
+a real two-HOME CLI/daemon/Comb drill. Its multiple GitHub identities, permissions
+and SSH-key directory are an explicitly labelled loopback stub; encryption,
+SSH signing, processes, relay, storage and refusal paths are real. Logs remain in
+`.audit/share-run-*`. A real GitHub App setup and second account are needed for a
+fully live multi-account acceptance run. Service/config/backup instructions follow
+in [the service guide](src/share/SERVICE.md).

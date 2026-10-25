@@ -1179,6 +1179,27 @@ and runs separately from document uploads; its failure must not delay local edit
 or document publication. Claimed node/authorship fields are not authenticated by a
 content hash or shared backend access; trusted presence requires a separate binding.
 
+Repository sharing is selected by committed `.foundation/share.json`; absent or
+`git-only` means no network. `foundation share` initializes a space, signs devices
+in, reports status, grants keys and revokes devices. The default daemon discovers
+each registered design's repo descriptor; explicit Comb process configuration is
+retained for development. Space/document identity determines shared feeds across
+machines independently of local workspace addresses.
+
+The share service checks GitHub repo rights on every one-hour token issuance using
+a service-owned Metadata-only App credential. User GitHub tokens stay on clients.
+Devices prove possession of an SSH-attested key through a single-use challenge.
+Read can fetch/current-epoch handover; write can append/rotate. End-to-end encryption
+is mandatory for shared mode: libsodium XChaCha20-Poly1305 content, sealed design
+keys, signed devices and writer-certified epochs. Recovery public keys are pinned
+in git; epoch/recipient history is retained locally. Unknown keys, rollback, forks,
+revocation and unavailable authorization are visible status states, preserving
+local edits. A 120-second membership check, one-hour authorization grace and daily
+writer rotation bound stale access and hidden grants; no global transparency or
+instantaneous revocation is claimed. See `packages/cli/SYNC.md` for setup, exact
+trust limits, recovery, real-run evidence and the complete local backup command.
+Original change identities and saved chain/blob formats remain unchanged.
+
 ## 10. Conformance — *skeleton*
 
 Intent: three implementable levels so others can build partial systems on the format —
