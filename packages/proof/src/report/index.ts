@@ -41,6 +41,11 @@ export function notProvable(binding: Record<string, unknown>, reason: string) {
     provable: false,
     verdict: "not-provable",
     reason,
+    notProvable: {
+      reason,
+      detail: reason,
+      fix: "Provide an isolated renderable fixture, then capture and verify this state again.",
+    },
     drifts: [],
   });
 }

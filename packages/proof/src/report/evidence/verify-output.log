@@ -66,6 +66,12 @@
     "stderr": ""
   },
   {
+    "name": "dirty-capture",
+    "exitCode": 1,
+    "stdout": "{\n  \"passed\": false,\n  \"errors\": [\n    \"replay/drift-report.json: not-provable: Capture was produced from uncommitted source changes\"\n  ],\n  \"reports\": 1\n}",
+    "stderr": ""
+  },
+  {
     "name": "chain-sha256-match",
     "exitCode": 0,
     "stdout": "{\n  \"passed\": true,\n  \"errors\": [],\n  \"reports\": 1\n}",

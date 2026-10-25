@@ -6,7 +6,7 @@ import { canonical } from "./canonical.ts";
 import { defaults } from "./types.ts";
 import { writeManifest } from "../report/index.ts";
 const viewport = process.argv[2] || "1416x720@1";
-const out = "packages/proof/src/compare/evidence/real";
+const out = "packages/proof/fixtures/sample-reports";
 const states = ["at-rest", "track-selected", "proposal-pending", "empty"];
 const rows = [],
   reports = [];

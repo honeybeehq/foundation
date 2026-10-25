@@ -172,11 +172,22 @@ export function compare(
   const unavailable = properties.filter((p) =>
     [...design.nodes, ...code.nodes].some((n) => n.style[p] === undefined),
   );
-  const failure = [design, code].find((c) => c.meta.provable === false);
+  const failure = [design, code].find(
+    (c) =>
+      c.meta.provable === false ||
+      c.meta.dirty === true ||
+      c.meta.rendererDirty === true ||
+      c.meta.errors?.length ||
+      c.meta.blocked?.length,
+  );
   const reason = failure
     ? String(
         failure.meta.reason ||
-          "Capture producer marked this state not-provable",
+          (failure.meta.dirty || failure.meta.rendererDirty
+            ? "Capture was produced from uncommitted source changes"
+            : failure.meta.errors?.length || failure.meta.blocked?.length
+              ? "Capture had runtime errors or blocked network requests"
+              : "Capture producer marked this state not-provable"),
       )
     : unavailable.length
       ? "Capture lacks visual properties: " + unavailable.join(", ")
@@ -199,7 +210,20 @@ export function compare(
       root: code.meta.root ?? null,
     },
     provable: !reason,
-    ...(reason ? { reason } : {}),
+    ...(reason
+      ? {
+          reason,
+          notProvable: {
+            reason,
+            detail: failure?.meta.notProvable?.detail ?? reason,
+            fix:
+              failure?.meta.notProvable?.fix ??
+              (failure
+                ? "Provide a renderable fixture for the requested state without changing its meaning."
+                : "Recapture both sides with the shared visual property list."),
+          },
+        }
+      : {}),
     styles: { properties, unavailable },
     matching: {
       algorithm: "hungarian",

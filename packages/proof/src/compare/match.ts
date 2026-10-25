@@ -43,14 +43,66 @@ function contexts(nodes: CaptureNode[]) {
   }
   return result;
 }
+function anchorContexts(
+  nodes: CaptureNode[],
+  other: CaptureNode[],
+  context: Map<string, Set<string>>,
+) {
+  const count = (list: CaptureNode[]) => {
+    const result = new Map<string, number>();
+    for (const n of list) {
+      const t = n.text?.trim();
+      if (t) result.set(t, (result.get(t) ?? 0) + 1);
+    }
+    return result;
+  };
+  const counts = count(nodes),
+    otherCounts = count(other),
+    unique = new Set(
+      [...counts]
+        .filter(([t, n]) => n === 1 && otherCounts.get(t) === 1)
+        .map(([t]) => t),
+    ),
+    anchors = new Map<string, Set<string>>();
+  for (const n of nodes) {
+    const parts = n.path.split("/");
+    for (let i = parts.length - 1; i >= 1; i--) {
+      const candidates = new Set(
+        [...(context.get(parts.slice(0, i).join("/")) ?? [])].filter(
+          (t) => unique.has(t) && t !== n.text?.trim(),
+        ),
+      );
+      if (candidates.size) {
+        anchors.set(n.path, candidates);
+        break;
+      }
+    }
+  }
+  return { counts, anchors };
+}
 function cost(
   a: CaptureNode,
   b: CaptureNode,
   dc: Map<string, Set<string>>,
   cc: Map<string, Set<string>>,
+  da: ReturnType<typeof anchorContexts>,
+  ca: ReturnType<typeof anchorContexts>,
 ) {
   const text = (a.text || a.name || "").trim(),
     other = (b.text || b.name || "").trim();
+  if (
+    text &&
+    text === other &&
+    ((da.counts.get(text) ?? 0) > 1 || (ca.counts.get(text) ?? 0) > 1)
+  ) {
+    // Repeated type labels such as ACTION are not identities across rearranged rows.
+    if (/^[A-Z\s]+$/.test(text) && iou(a, b) < 0.75) return 1;
+    const left = da.anchors.get(a.path),
+      right = ca.anchors.get(b.path);
+    if (left?.size && right?.size) {
+      if (![...left].some((t) => right.has(t))) return 1;
+    } else if (iou(a, b) < 0.75) return 1;
+  }
   let textDistance = text && text === other ? 0 : text && other ? 1 : 0.7;
   if (!text && !other) {
     const left = dc.get(a.path) ?? new Set<string>(),
@@ -189,11 +241,13 @@ export function matchNodes(
     }
   const dc = contexts(design),
     cc = contexts(code);
+  const da = anchorContexts(design, code, dc),
+    ca = anchorContexts(code, design, cc);
   const left = d.filter((n) => !usedD.has(n)),
     right = c.filter((n) => !usedC.has(n));
   if (left.length) {
     const matrix = left.map((a) => [
-      ...right.map((b) => cost(a, b, dc, cc)),
+      ...right.map((b) => cost(a, b, dc, cc, da, ca)),
       ...left.map(() => 0.48),
     ]);
     const assignment = assign(matrix);

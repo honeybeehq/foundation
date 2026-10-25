@@ -248,6 +248,19 @@ if (
   throw Error("Capture failure was lost");
 await run("capture-not-provable", unavailableReport, 1);
 await writeFile(unavailableMeta, JSON.stringify(availableMeta));
+await writeFile(
+  unavailableMeta,
+  JSON.stringify({ ...availableMeta, dirty: true }),
+);
+const dirtyCapture = await compareDirectories(
+  path.join(scratch, "design"),
+  path.join(scratch, "code"),
+  path.join(scratch, "replay"),
+);
+if (dirtyCapture.verdict !== "not-provable")
+  throw Error("Dirty capture was accepted");
+await run("dirty-capture", dirtyCapture, 1);
+await writeFile(unavailableMeta, JSON.stringify(availableMeta));
 const shaHead = createHash("sha256")
   .update(await readFile(path.join(root, "boards/tracks-pane.fdn.html.chain")))
   .digest("hex");
