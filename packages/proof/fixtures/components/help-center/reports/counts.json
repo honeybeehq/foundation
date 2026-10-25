@@ -1,24 +1,24 @@
 [
   {
     "ids": true,
-    "uniqueDefects": 125,
+    "uniqueDefects": 124,
     "accepted": 0,
-    "raw": 584,
-    "uncertainMatches": 4,
+    "raw": 576,
+    "uncertainMatches": 7,
     "environment": 0,
     "uncertain": 31,
-    "matches": 30,
-    "compareMs": 858.0458060000001
+    "matches": 26,
+    "compareMs": 836.4079099999999
   },
   {
     "ids": false,
-    "uniqueDefects": 121,
+    "uniqueDefects": 119,
     "accepted": 0,
-    "raw": 594,
-    "uncertainMatches": 5,
+    "raw": 586,
+    "uncertainMatches": 8,
     "environment": 0,
-    "uncertain": 40,
-    "matches": 30,
-    "compareMs": 661.037534
+    "uncertain": 39,
+    "matches": 26,
+    "compareMs": 698.1878320000001
   }
 ]

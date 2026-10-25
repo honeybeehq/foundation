@@ -1,6 +1,6 @@
 {
   "schema": "fdn-capture/0",
-  "rendererSourceHash": "62c88b6959c04a7d7f2d61fa365667dbd6a6d7f399fadf88bb9d49b54d0e37a1",
+  "rendererSourceHash": "93c6f566b93af848e58782f40603f61eb7819279ac481904364fcd8f5e515b1c",
   "rendererSources": [
     {
       "file": "package.json",
@@ -168,7 +168,7 @@
     },
     {
       "file": "packages/proof/src/capture/cli.ts",
-      "sha256": "a7be6d90868fbc54f1929427ca7190a6de4132d07e08ab7ef37a7fe54b4f5756"
+      "sha256": "a0b4c94670be83a74ac03cefcb781b776d88dec36e292ed28b8976784c55a255"
     },
     {
       "file": "packages/proof/src/capture/code-cli.ts",
@@ -219,7 +219,7 @@
       "sha256": "65b137b164da0eabf320bd8ad051d2e75dc1b210019746c3be72a78d3db92f37"
     }
   ],
-  "rendererCommit": "843cc541317354bd5d13a74dc29cc503b543a6d6",
+  "rendererCommit": "44174b74590d48bbf7300aec76ca869b5aa63540",
   "rendererDirty": false,
   "provable": true,
   "source": "design",
@@ -554,6 +554,6 @@
   "blocked": [],
   "errors": [],
   "timingsMs": {
-    "capture": 1739
+    "capture": 1901
   }
 }
