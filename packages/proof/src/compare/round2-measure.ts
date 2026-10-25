@@ -8,7 +8,7 @@ import { canonical } from "./canonical.ts";
 const root = process.argv[2] ?? "packages/proof/fixtures/sample-captures";
 const out = process.argv[3] ?? ".audit/round2";
 await mkdir(out, { recursive: true });
-const baseline = process.argv[4];
+const baseline = process.argv[4] === "-" ? undefined : process.argv[4];
 const compareFn: typeof compare = baseline
   ? (await import(pathToFileURL(path.resolve(baseline)).href)).compare
   : compare;
@@ -24,7 +24,11 @@ const audit = (
   .map((r) => r.split("\t"))
   .filter((r) => r[9] === "false-correspondence");
 const rows = [];
-for (const state of ["track-selected", "proposal-pending", "empty"]) {
+for (const state of process.argv[5]?.split(",") ?? [
+  "track-selected",
+  "proposal-pending",
+  "empty",
+]) {
   const base = path.join(root, "tracks-pane", state, "1416x720@1");
   const [design, code] = await Promise.all([
     readCapture(path.join(base, "design")),

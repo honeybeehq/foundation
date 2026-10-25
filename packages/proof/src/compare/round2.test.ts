@@ -51,6 +51,30 @@ describe("correspondence regressions", () => {
       ),
     ).toBe(true);
   });
+  it("uses reserved descendant identity to infer uncertain wrapper correspondence", () => {
+    const design = [
+      node("0/0"),
+      node("0/0/0", { fdnId: "title", text: "Repeated" }),
+      node("0/0/1", { text: "old metadata" }),
+      node("0/4", { fdnId: "other", text: "Repeated" }),
+    ];
+    const code = [
+      node("0/1", { box: [200, 0, 100, 100] }),
+      node("0/1/0", {
+        fdnId: "title",
+        text: "Repeated",
+        box: [200, 0, 100, 100],
+      }),
+      node("0/1/1", { text: "new metadata", box: [200, 0, 100, 100] }),
+      node("0/5", { fdnId: "other", text: "Repeated" }),
+    ];
+    const result = matchNodes(design, code);
+    expect(
+      result.matches.find(
+        (m) => m.design.path === "0/0" && m.code.path === "0/1",
+      )?.uncertain,
+    ).toBe(true);
+  });
   it("does not identify unrelated icon primitives by their overlapping box", () => {
     const result = matchNodes(
       [node("0", { tag: "svg" }), node("0/0", { tag: "circle" })],
@@ -99,6 +123,106 @@ describe("causal grouping", () => {
     );
     expect(defects).toHaveLength(1);
     expect(defects[0]?.findings).toEqual(["d1", "d2"]);
+  });
+  it("reports a structurally replaced region once and keeps its environment findings separate", () => {
+    const a = node("0/0"),
+      b = node("0/0"),
+      at = node("0/0/0", { text: "First" }),
+      bt = node("0/0/0", { text: "First" }),
+      au = node("0/0/1", { text: "Second" }),
+      bu = node("0/0/1", { text: "Second" });
+    const old = node("0/0/2", { text: "old panel" }),
+      fresh = node("0/0/2", { text: "new graph" });
+    bt.style.position = bu.style.position = fresh.style.position = "absolute";
+    const shell = node("0");
+    const raw: Drift[] = [
+      {
+        id: "d1",
+        kind: "missing",
+        designNode: old.path,
+        property: "node",
+        confidence: 0,
+      },
+      {
+        id: "d2",
+        kind: "extra",
+        codeNode: fresh.path,
+        property: "node",
+        confidence: 0,
+      },
+      {
+        id: "d3",
+        kind: "layout",
+        designNode: at.path,
+        codeNode: bt.path,
+        property: "x",
+        design: 10,
+        code: 20,
+        confidence: 1,
+      },
+    ];
+    const pairs = [
+      { design: shell, code: shell, kind: "id" as const, confidence: 1 },
+      {
+        design: a,
+        code: b,
+        kind: "heuristic" as const,
+        confidence: 0.7,
+        uncertain: true as const,
+        reason: "different structure",
+      },
+      { design: at, code: bt, kind: "heuristic" as const, confidence: 1 },
+      { design: au, code: bu, kind: "heuristic" as const, confidence: 1 },
+    ];
+    const defects = groupDefects(
+      raw,
+      pairs,
+      cap([shell, a, at, au, old]),
+      cap([shell, b, bt, bu, fresh]),
+    );
+    expect(defects).toHaveLength(1);
+    expect(defects[0]?.cause).toBe("layout:region-structure");
+    expect(defects[0]?.classification).toBe("product");
+    expect(defects[0]?.findings).toEqual(["d1", "d2", "d3"]);
+  });
+  it("folds a following sibling shift into the size change that explains it", () => {
+    const a = node("0/0", { box: [0, 0, 50, 100] }),
+      b = node("0/0", { box: [0, 0, 70, 100] }),
+      c = node("0/1", { box: [50, 0, 100, 100] }),
+      d = node("0/1", { box: [70, 0, 100, 100] });
+    const raw: Drift[] = [
+      {
+        id: "size",
+        kind: "layout",
+        designNode: a.path,
+        codeNode: b.path,
+        property: "width",
+        design: 50,
+        code: 70,
+        confidence: 1,
+      },
+      {
+        id: "shift",
+        kind: "layout",
+        designNode: c.path,
+        codeNode: d.path,
+        property: "x",
+        design: 50,
+        code: 70,
+        confidence: 1,
+      },
+    ];
+    expect(
+      groupDefects(
+        raw,
+        [
+          { design: a, code: b, kind: "id", confidence: 1 },
+          { design: c, code: d, kind: "id", confidence: 1 },
+        ],
+        cap([a, c]),
+        cap([b, d]),
+      ),
+    ).toHaveLength(1);
   });
   it("counts a missing subtree once and preserves every raw finding", () => {
     const ds = [node("0"), node("0/0"), node("0/0/0")];

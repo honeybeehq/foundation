@@ -360,6 +360,74 @@ export function matchNodes(
       }
     });
   }
+  // A moved component may have unrelated wrappers while its already reserved
+  // text descendants still identify it. Infer the enclosing pair, but keep the
+  // boundary uncertainty explicit rather than creating separate missing/extra trees.
+  const textPairs = matches.filter(
+    (m) =>
+      !m.uncertain &&
+      m.design.text?.trim() &&
+      m.design.text.trim() === m.code.text?.trim(),
+  );
+  const containers = (nodes: CaptureNode[], used: Set<CaptureNode>) =>
+    nodes.filter(
+      (n) => !used.has(n) && !n.text?.trim() && !n.name && n.tag !== "svg",
+    );
+  const inferred: { a: CaptureNode; b: CaptureNode; score: number }[] = [];
+  for (const a of containers(d, usedD))
+    for (const b of containers(c, usedC)) {
+      const underA = textPairs.filter((m) =>
+        m.design.path.startsWith(a.path + "/"),
+      );
+      const underB = textPairs.filter((m) =>
+        m.code.path.startsWith(b.path + "/"),
+      );
+      if (
+        !underA.length ||
+        underA.length !== underB.length ||
+        !underA.every((m) => underB.includes(m))
+      )
+        continue;
+      if (
+        matches.some(
+          (m) =>
+            m.kind === "id" &&
+            a.path.startsWith(m.design.path + "/") !==
+              b.path.startsWith(m.code.path + "/"),
+        )
+      )
+        continue;
+      if (
+        [2, 3].some(
+          (i) =>
+            Math.max(a.box[i]!, b.box[i]!) /
+              Math.max(1, Math.min(a.box[i]!, b.box[i]!)) >
+            4,
+        )
+      )
+        continue;
+      const score = [2, 3].reduce(
+        (sum, i) =>
+          sum +
+          Math.abs(Math.log(Math.max(1, a.box[i]!) / Math.max(1, b.box[i]!))),
+        0,
+      );
+      inferred.push({ a, b, score });
+    }
+  for (const { a, b } of inferred.sort((x, y) => x.score - y.score)) {
+    if (usedD.has(a) || usedC.has(b)) continue;
+    matches.push({
+      design: a,
+      code: b,
+      kind: "heuristic",
+      confidence: 0.5,
+      uncertain: true,
+      reason:
+        "Matched descendant content identifies a region, but its wrapper correspondence is uncertain",
+    });
+    usedD.add(a);
+    usedC.add(b);
+  }
   // Transparent, coextensive single-child wrappers are one correspondence.
   // Keep their paths for audit rather than reporting a missing/extra subtree.
   for (const m of matches) {

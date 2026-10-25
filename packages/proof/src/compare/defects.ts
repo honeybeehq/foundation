@@ -7,7 +7,7 @@ const inside = (child: CaptureNode, parent: CaptureNode) =>
 const inherited =
   /^(font-|color$|line-height$|letter-spacing$|text-align$|white-space$)/;
 const layoutProperty =
-  /^(padding-|margin-|border-.*-width$|gap$|row-gap$|column-gap$|display$|position$|box-sizing$|overflow-|flex-|align-|justify-)/;
+  /^(padding-|margin-|border-.*-width$|gap$|row-gap$|column-gap$|line-height$|display$|position$|box-sizing$|overflow-|flex-|align-|justify-)/;
 const family = (p: string) =>
   /^padding-/.test(p)
     ? "padding"
@@ -30,6 +30,109 @@ export function groupDefects(
   const cn = new Map(code.nodes.map((n) => [identity(n), n]));
   const pairs = new Map(matches.map((m) => [identity(m.design), m]));
   const groups = new Map<string, Defect>();
+  const record = (
+    layer: Defect["layer"],
+    kind: Defect["kind"],
+    cause: string,
+    classification: Defect["classification"],
+    finding: string,
+  ) => {
+    const key = canonical({ layer, kind, cause, classification });
+    let group = groups.get(key);
+    if (!group) {
+      group = {
+        id: "def-" + hash({ layer, kind, cause }).slice(0, 20),
+        layer,
+        kind,
+        cause,
+        classification,
+        findings: [],
+        summary:
+          classification === "environment"
+            ? "Font family differs under the declared Linux substitution"
+            : `${cause.replace(":", " ")} differs at ${layer.design ?? layer.code}`,
+      };
+      groups.set(key, group);
+    }
+    group.findings.push(finding);
+  };
+  // Uncertain leaf correspondence inside a changed region is not N proven
+  // independent defects. Shared matched text anchors locate the region; two
+  // distinct anchors support a product region discrepancy, one only uncertainty.
+  const within = (n: CaptureNode | undefined, root: CaptureNode) =>
+    !!n && (n === root || inside(n, root));
+  const regionAnchors = (m: Match) =>
+    new Set(
+      matches
+        .filter(
+          (x) =>
+            x !== m &&
+            !x.uncertain &&
+            x.design.text?.trim() &&
+            x.design.text.trim() === x.code.text?.trim() &&
+            /[a-z]/i.test(x.design.text) &&
+            within(x.design, m.design) &&
+            within(x.code, m.code),
+        )
+        .map((x) => x.design.text!.trim()),
+    );
+  const replacedLayout = (m: Match) => {
+    const absolute = (nodes: CaptureNode[], root: CaptureNode) =>
+      nodes.filter((n) => inside(n, root) && n.style.position === "absolute")
+        .length;
+    return (
+      Math.abs(
+        absolute(design.nodes, m.design) - absolute(code.nodes, m.code),
+      ) >= 3
+    );
+  };
+  const regions = matches
+    .filter((m) => {
+      if (!m.uncertain || m.design.text?.trim() || m.code.text?.trim())
+        return false;
+      // Never let an ungrounded broad root swallow the pane. The enclosing pair
+      // must agree on both trees, and the proposed region cannot span unlike scales.
+      if (
+        !matches.some(
+          (parent) =>
+            !parent.uncertain &&
+            inside(m.design, parent.design) &&
+            inside(m.code, parent.code),
+        )
+      )
+        return false;
+      if (
+        [2, 3].some(
+          (i) =>
+            Math.max(m.design.box[i]!, m.code.box[i]!) /
+              Math.max(1, Math.min(m.design.box[i]!, m.code.box[i]!)) >
+            4,
+        )
+      )
+        return false;
+      const anchors = regionAnchors(m);
+      const absent = drifts.filter(
+        (d) =>
+          (d.kind === "missing" &&
+            within(dn.get(d.designNode ?? ""), m.design)) ||
+          (d.kind === "extra" && within(cn.get(d.codeNode ?? ""), m.code)),
+      );
+      return (
+        absent.length >= 2 &&
+        (anchors.size === 1 || (anchors.size >= 2 && replacedLayout(m)))
+      );
+    })
+    .filter(
+      (m, _, all) =>
+        !all.some(
+          (child) =>
+            child !== m &&
+            inside(child.design, m.design) &&
+            inside(child.code, m.code) &&
+            regionAnchors(child).size / regionAnchors(m).size >= 0.75,
+        ),
+    )
+    .sort((a, b) => a.design.path.length - b.design.path.length);
   for (const d of drifts) {
     let a = d.designNode ? dn.get(d.designNode) : undefined;
     let b = d.codeNode ? cn.get(d.codeNode) : undefined;
@@ -53,6 +156,46 @@ export function groupDefects(
     ) {
       classification = "environment";
       cause = "declared-linux-font-substitution";
+    }
+    const region =
+      classification !== "environment" &&
+      regions.find(
+        (m) =>
+          (a ? within(a, m.design) : true) &&
+          (b ? within(b, m.code) : true) &&
+          !!(a || b),
+      );
+    if (region) {
+      const anchors = new Set(
+        matches
+          .filter(
+            (x) =>
+              !x.uncertain &&
+              x.design.text?.trim() &&
+              x.design.text.trim() === x.code.text?.trim() &&
+              within(x.design, region.design) &&
+              within(x.code, region.code),
+          )
+          .map((x) => x.design.text!.trim()),
+      );
+      record(
+        { design: identity(region.design), code: identity(region.code) },
+        "layout",
+        "layout:region-structure",
+        anchors.size >= 2 && replacedLayout(region) ? "product" : "uncertain",
+        d.id,
+      );
+      continue;
+    }
+    // These computed forms cannot establish an independent visible alignment bug
+    // without captured direction. Preserve the evidence as uncertainty.
+    if (
+      d.property === "text-align" &&
+      ["start", "left"].includes(String(d.design)) &&
+      ["start", "left"].includes(String(d.code))
+    ) {
+      classification = "uncertain";
+      cause = "computed-directional-alignment";
     }
     if (a && b && inherited.test(d.property)) {
       // Find the highest pair carrying exactly the same computed inherited values.
@@ -119,6 +262,36 @@ export function groupDefects(
         layer = { design: root.designNode!, code: root.codeNode! };
         cause = `layout:${root.property}`;
       }
+      if (d.property === "x" || d.property === "y") {
+        const axis = d.property === "x" ? 0 : 1,
+          size = axis + 2;
+        const shiftedA = dn.get(layer.design ?? "") ?? a,
+          shiftedB = cn.get(layer.code ?? "") ?? b;
+        const parent = (n: CaptureNode) =>
+          n.path.slice(0, n.path.lastIndexOf("/"));
+        const previous = drifts.find((x) => {
+          if (
+            x.kind !== "layout" ||
+            x.property !== (axis === 0 ? "width" : "height") ||
+            Math.abs(Number(x.code) - Number(x.design) - delta) >= 0.05
+          )
+            return false;
+          const pa = dn.get(x.designNode ?? ""),
+            pb = cn.get(x.codeNode ?? "");
+          return (
+            !!pa &&
+            !!pb &&
+            parent(pa) === parent(shiftedA) &&
+            parent(pb) === parent(shiftedB) &&
+            Math.abs(pa.box[axis]! - pb.box[axis]!) < 0.05 &&
+            Math.abs(shiftedA.box[axis]! - pa.box[axis]! - pa.box[size]!) <
+              0.05 &&
+            Math.abs(shiftedB.box[axis]! - pb.box[axis]! - pb.box[size]!) < 0.05
+          );
+        });
+        if (previous)
+          layer = { design: previous.designNode!, code: previous.codeNode! };
+      }
       // x/y consequences of an ancestor padding change are one size/layout cause.
       const padding = drifts.find(
         (x) =>
@@ -143,6 +316,14 @@ export function groupDefects(
         cause = `${padding.kind}:padding`;
       }
     }
+    if (
+      classification === "product" &&
+      /^(background-|box-shadow$|border-.*-(color|style|radius)$)/.test(
+        d.property,
+      )
+    ) {
+      cause = "style:surface";
+    }
     // Geometry and its layout configuration form one candidate cause at a layer.
     // This does not assert a particular CSS declaration caused the discrepancy.
     if (
@@ -152,14 +333,16 @@ export function groupDefects(
       cause = "layout:configuration";
     }
     const kind =
-      cause === "layout:configuration"
-        ? "layout"
-        : cause.includes(":padding")
-          ? (drifts.find(
-              (x) =>
-                x.designNode === layer.design && /^padding-/.test(x.property),
-            )?.kind ?? d.kind)
-          : d.kind;
+      cause === "style:surface"
+        ? "style"
+        : cause === "layout:configuration"
+          ? "layout"
+          : cause.includes(":padding")
+            ? (drifts.find(
+                (x) =>
+                  x.designNode === layer.design && /^padding-/.test(x.property),
+              )?.kind ?? d.kind)
+            : d.kind;
     if (classification === "environment") {
       // Substitution is one declared capture-wide policy, not one defect per label.
       layer = {
@@ -167,24 +350,7 @@ export function groupDefects(
         code: identity(code.nodes[0]!),
       };
     }
-    const key = canonical({ layer, kind, cause, classification });
-    let group = groups.get(key);
-    if (!group) {
-      group = {
-        id: "def-" + hash({ layer, kind, cause }).slice(0, 20),
-        layer,
-        kind,
-        cause,
-        classification,
-        findings: [],
-        summary:
-          classification === "environment"
-            ? "Font family differs under the declared Linux substitution"
-            : `${cause.replace(":", " ")} differs at ${layer.design ?? layer.code}`,
-      };
-      groups.set(key, group);
-    }
-    group.findings.push(d.id);
+    record(layer, kind, cause, classification, d.id);
   }
   return [...groups.values()];
 }
