@@ -28,6 +28,9 @@ Champion has the exact permission/acceptance instructions.
 
 The temporary19488 proxy and both temporary service units are stopped/removed.
 Both client helpers stopped their owned sessions, control listeners and daemons.
+Review/delete retained private stub namespaces by **2026-11-01 08:00 UTC**; if
+still needed, record a dated extension. Delete complete owned test namespaces,
+not only a Mac helper cache. Production and unused real-phase state are separate.
 The private test Keychains/vaults/recovery files remain outside repos for proof
 verification. No installed Apiary bundle or Design panel code changed.
 
@@ -217,7 +220,8 @@ from source control request to actual target session marker AND envelope:
 | metal-3 → Studio |421.2ms|1011.1ms|1238.3ms|
 
 These meet the existing S3c p50≤1000/p95≤1500 targets, but two reverse upper
-bounds exceed1s; **no all-edits-subsecond claim**. Studio load was23–25; this is a
+bounds exceed1s; **no all-edits-subsecond claim**. Under a strict p95<1000ms
+interpretation of H3, the reverse upper-bound p95 did not meet that threshold. Studio load was23–25; this is a
 shared-host recipe and different backend/collector from S5, with no historical
 improvement claim. The current descriptor-gated build has not yet been measured
 with real App authorization. Recordings are actual terminal/session output paced
