@@ -1,72 +1,85 @@
-# H3: netcup team share deployment
+# H3 — private team share service on netcup-1
 
-Deployment in progress; real GitHub App creation and extra accounts are pending.
-No claim of real multi-account acceptance yet.
+The service is deployed at **https://netcup-1.tailff9529.ts.net:19487/**, with a
+pinned Foundation install, native Comb bridge, user systemd supervision, nightly
+complete local-store backups and seven-day retention. It is reachable only on
+the tailnet. No public/Funnel endpoint was created.
 
-## Placement and installed components
+**Live App activation is pending one human action:** enable Single file: read
+for exactly `.foundation/share.json`, then accept the installation permission
+update. The real private App config is already present outside the repository at
+0600. Its current Metadata-only grant fails the new `--single-file` preflight.
+Production has not enabled that credential or served a live space. Foundation
+Champion has the exact permission/acceptance instructions.
 
-The service runs as `trmd` on netcup-1. User systemd is available and lingering is
-already enabled. HTTPS is **tailnet only**:
-`https://netcup-1.tailff9529.ts.net:19487/` via Tailscale Serve to loopback
-`127.0.0.1:19487`. No Funnel or public listener was configured.
+## What passed, and what remains
 
-Foundation was installed with the supported `foundation install --from CELL --sha
-a99b5773b3429d286108aec2b5f16e04e7e40a40` into an isolated runtime HOME at
-`/home/trmd/.config/foundation-share/data/runtime-home`. The node's ordinary
-Foundation launcher and gateway registry were not replaced. This integrated revision includes the independently reviewed H2 relay-hint fix.
-Both clients are pinned to the same revision before measurement.
-Comb was freshly cloned inside this Cell, checked out at
-`b73e9bb3ff5e8850a77f36a95df40428fc722891` and built with
-`cargo build -p combctl --bin comb-bridge --release`. Its installed executable is
+| Check | Evidence and scope |
+| --- | --- |
+| Deployment and HTTPS | Healthy user service; canonical origin and `honeybeehq` owner restriction configured. A live wrong-owner challenge returns403. |
+| Real App initial setup | Studio verified private metadata/admin and Contents403, public Contents-grant422; config transferred directly over SSH, never in messages or Project files. New single-file acceptance remains pending. |
+| Same-account enrollment | Studio and metal-3 used real `trmdy` GitHub identity and SSH keys; automatic epoch1 grant passed without a manual grant. **Server repo permissions were labelled STUB.** |
+| Two-host edits | 6 warmups +40 measured actual-session marker/envelope matches, then identical48-change HTML/chain bytes. Measured build8848c86, endpoint19488 with STUB server permissions. |
+| Outage | Both actual sessions saved local edits with service502 (20.6ms/31.1ms local control upper bounds). Both converged to identical50-change bytes and shared/pending0. |
+| Populated restore | Stopped-store backup; metadata +1551 files restored exactly into a new directory; same endpoint resumed; one edit each way produced identical52-change bytes, shared/pending0. Retained clients, not fresh-device recovery. |
+| Raw store |1615 object files: no plaintext/hex marker, node-id or doc-id matches. A real retained ciphertext record rejected an independent random key at AEAD authentication. |
+| Refusal/removal/rotation | Actual CLI/crypto/Comb local drill passes, with **labelled loopback identities/membership**. Real additional-account denial/removal still needs accounts. |
+| New committed-file gate | Integrated70 tests and root tsc pass. Actual-Comb local drill verifies no space/token before commit, uncommitted412, committed activation, removal412 and quiet relay closure. Its GitHub is a labelled stub reading actual Git HEAD. Real App version awaits the permission update. |
+
+The temporary19488 proxy and both temporary service units are stopped/removed.
+Both client helpers stopped their owned sessions, control listeners and daemons.
+The private test Keychains/vaults/recovery files remain outside repos for proof
+verification. No installed Apiary bundle or Design panel code changed.
+
+## Source and placement
+
+Current deployed Foundation source:
+`a68d273d35a65e2c08ef5f827fae1ba2255a323a`, based on reviewed rollout
+`d5949a478916a553c90caec7eebd25f3aaa26fe0`. It includes the descriptor gate,
+space/repo uniqueness fix, Single-file helper and H3 renewable App/vault seams.
+The rebase preserved `request(path, false, repo)` for descriptor fetches; static
+fixture credentials never replace the production token provider.
+
+Foundation uses the supported `foundation install --from CELL --sha SHA` into
+an isolated runtime HOME, `~/.config/foundation-share/data/runtime-home`.
+The normal user Foundation launcher/gateway registry was not replaced. One
+upgrade used `--force` because the source history was rebased; the installer
+retained its runtime-independent rollback command. Runtime installs are immutable
+version directories outside the Cell.
+
+Comb was freshly built from
+`b73e9bb3ff5e8850a77f36a95df40428fc722891` with
+`cargo build -p combctl --bin comb-bridge --release`, and copied to
 `~/.config/foundation-share/data/bin/comb-bridge`.
 
-Use the local Comb filesystem backend for this single server. H2's built-in
-backup covers a stopped local backend and matching metadata together; S3 would
-need a separate coordinated snapshot mechanism. No Comb semantic changes.
-`~/.local/share` is read-only from this Cell; the writable private config tree is
-outside the repository and persists independently of the Cell.
+Netcup-1 is suitable: user systemd works, lingering was already enabled, tailnet
+HTTPS works, and local disk capacity is sufficient. `~/.local/share` is read-only
+inside this Cell, so durable service files use the writable private config tree.
+No other checkout or canonical repository was accessed.
 
-Private paths, all outside repositories:
+Use the local Comb filesystem backend on this single server. Built-in backups
+cover stopped metadata and local objects together; S3 would need separate
+coordinated provider snapshots. No Comb semantics changed.
 
-- `~/.config/foundation-share/service.json`: loopback service configuration, 0600.
-- `~/.config/foundation-share/github-app.json`: expected real App config, 0600;
-  not provisioned yet. Studio H2c agent transfers directly via tailnet SSH/scp,
-  refusing overwrite. No private values in messages or Project files.
-- `~/.config/foundation-share/data/comb/config.toml`: tenant/digest/backend, 0600.
-- `~/.config/foundation-share/data/metadata` and `objects`: service registry and
-  encrypted local backend. Parent directories 0700, unit umask 0077.
-- `~/.config/foundation-share/data/backups`: separate snapshot directory, 0700,
-  seven-day retention. It is on the same host/disk; this does not protect against
-  server/disk loss. Matching private Comb config is copied into each snapshot.
+## Private files and units
 
-The production service currently has no GitHub credential and fails closed on
-private-repo authorization. The separate one-machine multi-account drill is
-explicitly labelled a loopback GitHub stub, never production authentication.
+All secrets are outside repos; directory modes are0700, private files0600 and
+service umask0077. No private values appear in the recordings.
 
-## App auth seam
+| Path below `~/.config/foundation-share/` | Purpose |
+| --- | --- |
+| `service.json` | Loopback bind19487, canonical `publicUrl`, `allowedRepoOwners:["honeybeehq"]`, storage paths. App path is added only after preflight. |
+| `github-app.json` | Private RSA App config, transferred directly from Studio with exclusive create. |
+| `data/comb/config.toml` | Local backend tenant/digest/root. |
+| `data/metadata`, `data/objects` | Production registry and encrypted objects; no live space yet. |
+| `data/runtime-home` | Isolated pinned Foundation installation. |
+| `data/backups` | Nightly snapshots, separate directory, same host/disk. This protects against logical loss, not host/disk loss. |
+| `data/bin` | Installed backup/health/restore/activation shell scripts. |
 
-Commit `65946e3` adds `githubAppConfig`, an absolute private config path, to service
-auth. All API metadata/identity/permission requests receive a repository-scoped
-Metadata-only installation token through H2c's `metadataToken`. SSH keys remain
-credential-free. H2c mints and caches tokens, refreshing before expiration.
-App/static-token/stub mixtures are refused; static token remains for fixtures.
-Errors from the provider are redacted. H2 lead reviewed the patch with no findings
-(source review; did not independently rerun our tests).
+User units are `foundation-share.service`, `foundation-share-backup.service` and
+`.timer`, and `foundation-share-health.service` and `.timer`.
 
-Verification: 35 share tests in seven files pass, and `tsc --noEmit` passes. The
-actual Comb/CLI two-HOME drill passes key handover, subsecond edits both ways,
-outsider refusal, removal/rotation, raw-store plaintext and docId grep, tamper and
-rollback refusals, outage/recovery and stopped-store backup. GitHub identities in
-that drill are **stubs**, and it runs on one host.
-
-## Operations
-
-Re-render units with `scripts/share-deploy/deploy.py`, supplying the absolute
-pinned Foundation launcher, installed Comb bridge, and Node bin directory. It
-preserves existing operator configuration. For a brand-new empty registry, stop
-the service before rendering. Units use the actual Node directory in PATH.
-
-Restart and inspect:
+## Restart and health
 
 ```sh
 systemctl --user restart foundation-share.service
@@ -75,210 +88,153 @@ journalctl --user -u foundation-share.service --since '10 minutes ago'
 curl --fail https://netcup-1.tailff9529.ts.net:19487/v1/oauth
 ```
 
-The service restarts after an unexpected exit after three seconds; an explicit systemctl stop remains stopped. The minute health check
-probes HTTP `/v1/oauth` while the service is running and restarts on HTTP failure.
-An intentionally stopped service stays stopped. This is process/HTTP liveness, not
-a GitHub or durable backend write probe. Health and backup share a filesystem lock; health skips the entire stopped backup window, including oneshot activating state. A real stopped-service lock probe verifies health does not restart it.
+Restart=always restarts unexpected exits after3s; `systemctl stop` stays stopped.
+A real whole-cgroup SIGKILL test recovered automatically. The minute health check
+repairs a running service that fails HTTP; it leaves intentional stops alone.
+Health and backup use the same flock, so health cannot start a stopped writer
+during a snapshot. Both held-lock and intentional-stop probes passed.
 
-Nightly backup runs at 03:15 server local time plus up to ten minutes jitter,
-with Persistent=true. Run/test it manually:
+HTTP health does not prove GitHub or storage write availability. App diagnostics
+in the journal contain fixed allowlisted messages; arbitrary provider errors are
+redacted. Use the App preflight for permission diagnosis.
+
+Re-render from this checkout with existing absolute executable paths:
+
+```sh
+python3 scripts/share-deploy/deploy.py \
+  --foundation /ABS/PINNED_VERSION/foundation \
+  --comb-bridge /home/trmd/.config/foundation-share/data/bin/comb-bridge \
+  --node-bin /opt/node-v24.18.0-linux-x64/bin \
+  --public-url https://netcup-1.tailff9529.ts.net:19487 \
+  --owner honeybeehq
+systemctl --user daemon-reload
+```
+
+It preserves existing App/storage config, atomically adds the URL/owner pins,
+and refuses conflicting pins or nonexistent executables.
+
+## Enable the real App, then add a repo
+
+After Tormod accepts the Single file grant, run:
+
+```sh
+scripts/share-deploy/activate-app.sh /ABS/PINNED_VERSION/foundation \
+  /home/trmd/.config/foundation-share/github-app.json \
+  honeybeehq/foundation-share-test
+```
+
+This helper is **not yet exercised with the new accepted grant**. It first mints
+a fresh repo-scoped token, verifies metadata, exact single-file path/read and
+Contents refusal, then atomically sets `githubAppConfig` and restarts. HTTP after
+restart proves startup; token mint/scope is proved by the preflight. Failure
+restores its0600 service-config backup. Each run leaves a private
+`service-before-app-*.json`; retain the latest useful rollback copy. A stale
+`service.json.new` causes safe refusal: ensure no activation is running, inspect
+it privately, remove only that temporary file and retry.
+
+The App must be installed for the repo, with only Metadata:read and
+Single file:read scoped to `.foundation/share.json`. No user GitHub token goes to
+the service. Tokens mint/cache/refresh in the service. Restart after accepting
+new permissions or rotating the App key to clear old cached tokens.
+
+On a member's machine, use two-step initialization:
+
+```sh
+foundation share init --service https://netcup-1.tailff9529.ts.net:19487 \
+  --repo-root /PRIVATE/REPO --ssh-key /PRIVATE/GITHUB_SSH_KEY
+# Commit the prepared secret-free .foundation/share.json to the DEFAULT branch.
+foundation share init --repo-root /PRIVATE/REPO --ssh-key /PRIVATE/GITHUB_SSH_KEY
+```
+
+The first invocation creates no server space, token or live data. The service
+checks the committed default-branch descriptor before registration and every
+access; positive checks cache for at most30s. Removing the file stops existing
+token access and quiet relays after that bounded cache interval. The descriptor
+must name this configured origin, repo, space and encryption mode. Public repos
+admit collaborators/organization members with repo access; public repo-read is
+refused. Private repo-read remains a compatibility alias.
+
+Peers run `share login` and `sync serve`, using their own local GitHub credentials
+and SSH key. Keep recovery codes outside the repo. For the real drill, Studio has
+a fresh `h3-real-app` branch/design prepared but has not changed the default
+branch or initialized it yet. The actual scratch repo is private
+`honeybeehq/foundation-share-test`. An earlier empty
+`trmdy/foundation-share-h3-test` remains untouched.
+
+Rotate the App key by creating a new key in GitHub, updating/validating the
+private config on Studio and transferring directly to a new0600 file. Replace
+atomically, restart, verify fresh login, then revoke the old key. Never put keys
+or tokens in arguments, repo files or messages.
+
+## Nightly backup and scratch restore
+
+Backup runs at03:15 server local time plus up to10min jitter, Persistent=true.
+It waits for the shared lock, stops the service, runs `foundation share backup`,
+copies matching private Comb config and restarts via EXIT trap if previously
+active. Only successful complete snapshots older than7days are pruned.
 
 ```sh
 systemctl --user start foundation-share-backup.service
 journalctl --user -u foundation-share-backup.service -n 20
 systemctl --user list-timers 'foundation-share-*'
-```
-
-`backup.sh` serializes snapshots, stops the service, runs `foundation share
-backup`, copies matching private Comb config, and restarts via EXIT trap if it
-was previously active. Only successful complete snapshots older than seven days
-are pruned. Never start a second writer against the production backend.
-
-Restore into a new scratch directory first:
-
-```sh
 scripts/share-deploy/restore-scratch.sh /ABS/BACKUP /ABS/NEW_SCRATCH
 ```
 
-It refuses an existing target, copies registry and objects, rewrites only the
-scratch Comb root and keeps private config mode 0600. Test the scratch backend
-and service before a production restore. To restore production, stop both `foundation-share-health.timer` and `foundation-share-backup.timer`, wait for any active backup job to finish, then stop the service,
-preserve the current registry/objects/config in another private directory, copy
-one matching snapshot into the configured paths, restore matching tenant/digest
-config, then start the service and both timers. Hold the shared `.backup.lock` throughout any scripted production restore. Never mix snapshot times. Clients with newer epoch pins
-refuse an old restored registry; retain local chains and follow H2's fresh-space
-reseed procedure if a matching current registry cannot be recovered.
+Scratch restore refuses an existing target, restores matching registry/objects
+and rewrites only the scratch Comb root. Production restore: stop both timers,
+wait for any running backup to finish, stop the service, hold `.backup.lock`,
+preserve current metadata/objects/config, restore ONE matching snapshot, then
+restart service and both timers. Never run another writer against that backend.
+Clients with newer epoch pins refuse older registry state. Retain current local
+chains; follow [SERVICE.md](../packages/cli/src/share/SERVICE.md) fresh-space reseed
+if a matching current snapshot cannot be recovered.
 
-Rotate the App key: create/download a new private key through GitHub's App
-settings; rebuild/validate the private config on Studio; transfer directly to a
-new 0600 file, then atomically replace the service config file and restart. H2c's
-cache keys include app id/repo/path, so restart is required on private-key
-rotation. Verify a fresh real login before revoking the previous key. Never put
-private keys or installation tokens in command arguments, logs or repo files.
+## Mac vault fix and evidence limits
 
-Add a repo: install the Metadata-only App on the chosen repo; on a member's
-machine run `foundation share init --service URL --ssh-key KEY --repo-root REPO`
-and commit its secret-free `.foundation/share.json`. Peers use their own GitHub
-sign-in and SSH keys. Keep the recovery code outside the repo. Public-repo policy
-is Tormod's decision; this task uses a private scratch repo only.
+The real two-host drill exposed `security -i`'s4096-byte line limit. Small
+updates passed;8KiB/20KiB updates hung, blocking key handover and SIGTERM. The
+native Swift Security.framework helper now uses raw stdin/stdout, a10s timeout,
+noninteractive failure and a private source/binary-hash-checked cache. Real Mac
+65KiB create/192KiB update and full wrapper24KiB/65KiB tests passed. Linux vault
+behavior is unchanged. The older SecKeychain APIs are deprecated platform debt.
 
-## Drill status and evidence
+The native item is separate from the legacy security-created item. First-use
+migration copies legacy data read-only and verifies exact bytes. A fsynced0600
+marker prevents missing native state from resurrecting stale legacy keys.
+**Never delete `~/.foundation/share/helpers` while its Keychain vault is in use.**
+Normal Foundation upgrades reuse the same cached helper for unchanged Swift
+source. Cache loss, another toolchain or changed helper code can require explicit
+recovery; preserve helper, marker and Keychain together. User defaults/search
+were unchanged. A shutdown143/stale dead-owner lock remains a lifecycle follow-up;
+a subsequent native restart after that exact final lock was not tested.
 
-Studio created PRIVATE `honeybeehq/foundation-share-test`, confirmed ADMIN. An
-initial private user repo `trmdy/foundation-share-h3-test` was also created before
-the App ownership constraint was discovered; it remains empty and untouched.
-The org repo is the actual H3 target because the private org App cannot install
-on a different owning account.
+Measured pre-gate build8848c86, 20 samples/direction, one Studio monotonic clock
+from source control request to actual target session marker AND envelope:
 
-Studio and metal-3 both verified trmdy's real GitHub identity and local SSH
-signature against GitHub `.keys`; no credential was printed or exported to the
-service. Both helpers own fresh Cells and will use isolated runtime/vault HOMEs.
-Real App init, automatic same-account key handover, cross-host edit timing,
-service outage and populated snapshot restore still await App and final H2 build.
-Second-account denial and membership removal/rotation need additional real
-GitHub accounts. Stub checks do not substitute for those live claims.
+| Direction | p50 upper bound | p95 upper bound | Maximum |
+| --- | ---: | ---: | ---: |
+| Studio → metal-3 |333.5ms|461.5ms|558.4ms|
+| metal-3 → Studio |421.2ms|1011.1ms|1238.3ms|
 
-Local evidence under `.audit/`: H3-share-tests.txt, H3-typecheck.txt,
-H3-install.txt, H3-labelled-stub-drill.txt, H3-restore.txt, H3-service-restart.txt,
-H3-decisions.tsv. The first scheduled backup failed before the new empty registry
-had been initialized; after initialization the real backup unit passed and
-restored to a separate scratch directory with a successful Comb handshake.
-This first deployment restore contains an empty registry; populated proof is
-pending. Deployment scripts now initialize an empty registry before first start.
+These meet the existing S3c p50≤1000/p95≤1500 targets, but two reverse upper
+bounds exceed1s; **no all-edits-subsecond claim**. Studio load was23–25; this is a
+shared-host recipe and different backend/collector from S5, with no historical
+improvement claim. The current descriptor-gated build has not yet been measured
+with real App authorization. Recordings are actual terminal/session output paced
+from retained logs; the side-by-side shows independent condensed timelines,
+not synchronized screens.
 
-## Deployment review and updated receipts
+Primary evidence under `.audit/`:
 
-Independent claude-opus-5-5 reviewed the auth seam, scripts and decision trail.
-It found a health/maintenance race and missing safe App diagnostics. Both were
-fixed; it independently reran all 35 share tests, TypeScript and shell syntax
-checks at `99bdffd`, with no Medium-or-higher findings remaining. Follow-up low
-risks prompted Restart=always (explicit systemctl stop still stays stopped),
-backup lock waiting and stopping both timers during a restore.
+- `H3-proof/two-machine-stub.webm`, `studio-session.webm`, `studio-series.webm`,
+  `metal3-session.webm`; raw data under `H3-evidence/Studio` and `H3-evidence/metal3`.
+- `H3-twohost-backup-restore.txt`, `H3-raw-store-probe.txt`, outage journal and
+  `H3-service-teardown.txt`.
+- `H3-gate-tests.txt/.exit`, `H3-gate-local-drill.txt`, `H3-real-app-preflight.txt`.
+- Decision trail `.audit/H3-decisions.tsv`; independent Opus reviews covered
+  App/ops/native seams, and af916bea covered H2 hint/policy/descriptor changes.
 
-`H3-service-restart.txt` records SIGKILL of the full process group, automatic
-restart after three seconds, NRestarts=1 and healthy HTTPS.
-`H3-health-backup-lock.txt` proves health skips a stopped service while backup
-holds its lock. `H3-health-intentional-stop.txt` separately proves an intentional
-stop remains stopped even without that lock. The backup unit was rerun after
-these fixes and passed.
-
-The populated **labelled stub** snapshot was restored to a scratch tree: registry
-and all 148 object files matched SHA256, and the actual Comb bridge replayed
-8 and 5 records from its two feeds. This is populated stub-store recovery, not
-real-App production recovery.
-
-`scripts/share-deploy/activate-app.sh PINNED_FOUNDATION PRIVATE_CONFIG OWNER/REPO`
-will verify Metadata-only permission and Contents refusal, then atomically set
-the production config's absolute App path and restart. It refuses a stub/static
-production configuration. Run it only after H2c reports private file transfer
-complete; the private file never enters the repo.
-
-A separate temporary service at tailnet HTTPS port19488 runs
-`scripts/share-deploy/h3-labelled-stub.ts`. Its ONLY granted login is trmdy;
-server repo permissions are explicitly stubbed. It fetches real public GitHub
-identity/SSH keys and the clients retain direct real GitHub checks. Its state and
-Comb credentials are private outside the repo under
-`~/.config/foundation-share/h3-stub`. Production19487 remains separate and
-unconfigured. Disable its proxy and stop `foundation-share-h3-stub.service`
-after the transport drill.
-
-## Dedicated macOS drill Keychain
-
-The Studio scratch HOME has no default Keychain; a harmless initial canary timed
-out and created no item. Commit `9bf6723` adds optional
-`FOUNDATION_SHARE_KEYCHAIN`: an absolute, single-line, private regular 0600
-Keychain file, with symlinks refused. Both security read/write commands select
-that file explicitly; no user default/search-list mutation and no plaintext Mac
-fallback. The two mock tests pass. A strict-indexing test typo initially made
-tsc fail while a chained shell command masked that exit; `b806e27` fixes it, and
-a standalone root tsc exits0. The earlier tsc-pass claim for9bf6723 is retracted.
-
-Studio then performed a real macOS canary: explicit isolated Keychain add/find/
-delete all succeeded; private comparison passed; find after deletion returned44;
-file remained0600 after securityd writes. The user's default/search list remained
-identical. Password was generated in memory and stored only in a0600 file under
-its private OS-temp root outside repos; no value was output. This establishes
-Keychain storage isolation, not yet the real share login/key handover result.
-
-App activation preserves a private service-config backup and checks HTTP after
-restart, restoring that backup on failure. A stale service.json.new causes safe
-refusal: inspect the private file and ensure no activation is running before
-removing only that temporary file and retrying. This helper targets task member
-trmdy explicitly. Its real App execution is still pending App creation.
-
-## Integrated transport verification
-
-H2 author commits3c49364+723891d applied with git am without conflicts as
-`d163d5e`+`a99b577`. Reviewer af916bea (claude-opus-5-5) reviewed the author's
-exact hint delta and independently reran held-storage/control/all-relay-lost
-checks; no claim that the ops reviewer reviewed this delta. Our integrated
-share/sync run passes59tests/16files and root tsc, with separate exit receipts.
-
-The integrated actual-Comb held-storage drill on netcup-1 passes five visibility
-samples49–53ms, unchanged durable cursor before release, durable convergence
-after release, refusal/rotation/cryptographic negatives, outage and backup.
-Compact receipt packages/cli/performance/H3-held-netcup.json retains every sample.
-Its original collector hard-coded a metal3 series label; the compact receipt
-corrects only that metadata to netcup1, retaining the original raw receipt.
-This is local labelled-GitHub-stub recipe proof, not two-host/App acceptance.
-
-Performance-map drift now has zero unaccounted/dead entries. The original S5
-cross-host and capability startup receipts stay explicitly stale (four changed
-owner hashes); no old S5 timing is treated as the H3 baseline. Cold GitHub App
-setup/token refresh has explicit unmeasured gaps outside warm relay timing.
-
-Studio has completed real client GitHub identity/SSH share init against the
-labelled service19488, reaching shared epoch1. Metal-3 real same-account login
-succeeds but automatic key handover is under investigation. No two-host timing
-claim until both clients hold the key and run final daemons.
-
-## macOS vault size bug found by the real drill
-
-Key handover exposed a real Mac-only bug in the original H2 vault. The daemon
-blocked inside `security -i` while holding its vault lock; SIGTERM could not run
-because that child call was synchronous and unbounded. Direct reads succeeded.
-A controlled size-only reproduction passed64B/2KiB updates but hung at8KiB and
-20,019B under a bounded timeout. Apple's SecurityTool source defines an
-interactive line maximum of4096 bytes:
-https://github.com/apple-oss-distributions/Security/blob/main/SecurityTool/macOS/security.c
-The real stored JSON was3509B and its escaped update command4009B before adding
-the pending peer. No secret value was printed during diagnosis.
-
-`8848c86` replaces interactive writes with a small Swift Security.framework helper,
-compiled lazily once from pinned source using Xcode Command Line Tools. The
-source SHA256 selects a private per-HOME cache under
-`~/.foundation/share/helpers`; each call checks user ownership, permissions,
-symlinks and source/binary hash manifest. Compilation publishes an atomic cache
-directory under a lock. Compiler input contains code only. Vault payloads travel
-on helper stdin/stdout, never in arguments; native operations time out after10s.
-The helper disables user interaction only inside its own process, so denied or
-locked Keychains fail visibly instead of opening an unattended dialog. Linux's
-private-file vault is unchanged. These older SecKeychain APIs are deprecated;
-replacing them is future platform work.
-
-Native apps have different Keychain ACLs from `/usr/bin/security`. The new item
-uses `foundation-share-native-v1`. Only on first missing native item can the
-wrapper read the old `foundation-share-v1` item using a bounded, read-only
-security command, then copy and verify exact bytes through the native helper.
-The old item remains untouched. A fsynced0600 marker records any successful
-native read/write; if the native item disappears later, the wrapper refuses to
-resurrect stale legacy keys. Migration/writes share a per-scope lock. Unit checks
-cover payload size, command secrecy, timeout, missing items, cache corruption,
-legacy copy and missing-native-after-migration refusal.
-
-**Keep the cached helper with its Keychain and migration marker. Never delete
-`~/.foundation/share/helpers` on a machine with a vault.** The Keychain trusts the
-compiled helper's code identity. Ordinary Foundation upgrades with identical
-Swift source reuse that executable; changing helper source, losing the cache or
-rebuilding with another toolchain can require explicit recovery. Preserve the
-old helper until any future helper migration is verified. No ACL weakening or
-stale-legacy fallback was introduced. Native-item loss is intentionally loud.
-
-Studio's actual native test created65555B, updated192019B and read both back
-exactly; Keychain mode stayed0600 and user defaults/search remained unchanged.
-A dummy-account legacy-to-native exact-copy test also passed. The wrapper and
-marker have independent Opus review with no Medium-or-higher findings; it reran
-root tsc and share tests on Linux. These raw Swift/dummy tests do not yet establish
-the real wrapper migration or automatic peer key grant; the actual two-host run
-is retrying that step on exact8848c86. Full integrated tests65/17files and root
-tsc pass with separate exit receipts.
+No repository verification skill exists (removed42594d8). Installed
+astack-principles, show-me-your-work, perf, diagnosing-bugs, tdd and
+technical-writing were used. Actual extra-account membership refusal/removal and
+real-App/two-host gate acceptance remain open; labelled stubs do not replace them.
