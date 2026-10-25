@@ -4,6 +4,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { scan, probe } from './check.ts';
 import { createServer } from 'node:http';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+import { resolve } from 'node:path';
 
 test('scan follows a relative closure and exposes unresolved aliases',()=>{
  const dir=mkdtempSync(join(tmpdir(),'doctor-'));
@@ -17,14 +20,21 @@ test('scan follows a relative closure and exposes unresolved aliases',()=>{
 });
 
 test('runtime distinguishes stable, blocked I/O, provider errors and nondeterminism',async()=>{
- const server=createServer((req,res)=>{res.setHeader('content-type','text/html');res.end(`<div id="root">fixture</div><script>${req.url==='/io'?"fetch('/api').catch(()=>{})":req.url==='/error'?"setTimeout(()=>{throw Error('Provider missing')},0)":req.url==='/random'?"document.querySelector('#root').textContent=crypto.randomUUID()":""};setTimeout(()=>{window.__foundationReady=true},20)</script>`);});
+ const server=createServer((req,res)=>{res.setHeader('content-type','text/html');res.end(`<div id="root">fixture</div><script>const cancelled=setTimeout(()=>{},60000);clearTimeout(cancelled);${req.url==='/io'?"fetch('/api').catch(()=>{})":req.url==='/error'?"setTimeout(()=>{throw Error('Provider missing')},0)":req.url==='/random'?"document.querySelector('#root').textContent=crypto.randomUUID()":""};setTimeout(()=>{window.__foundationReady=true},20)</script>`);});
  await new Promise<void>(r=>server.listen(0,'127.0.0.1',r));
  const address=server.address(); if (!address || typeof address==='string') throw Error('No server address');
  const url=`http://127.0.0.1:${address.port}`;
  try {
-  expect((await probe(url)).verdict).toBe('probe-passed');
+  expect((await probe(url,'#root','fixture')).verdict).toBe('probe-passed');
+  const dir=mkdtempSync(join(tmpdir(),'doctor-cli-'));
+  try {
+   writeFileSync(join(dir,'View.ts'),'export const View=()=>null');
+   const cli=await promisify(execFile)(process.execPath,['--import','tsx',resolve('packages/proof/src/doctor/cli.ts'),dir,'View.ts#View',url,'#root','fixture','1280x800@1']);
+   expect(JSON.parse(cli.stdout).runtime.verdict).toBe('probe-passed');
+  } finally {rmSync(dir,{recursive:true});}
+  const wrongState=await probe(url,'#root','missing track'); expect(wrongState.verdict).toBe('not-provable'); expect(wrongState.reason).toContain('Expected fixture text absent');
   const io=await probe(url+'/io'); expect(io.verdict).toBe('not-provable'); expect(io.runs[0]?.events.some(e=>e.includes('blocked-network'))).toBe(true);
   expect((await probe(url+'/error')).verdict).toBe('not-provable');
-  expect((await probe(url+'/random')).deterministic).toBe(false);
+  const random=await probe(url+'/random'); expect(random.deterministic).toBe(false); expect(random.verdict).toBe('not-provable');
  } finally {server.close();}
 },60000);
