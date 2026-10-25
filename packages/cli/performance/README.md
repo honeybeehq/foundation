@@ -67,3 +67,30 @@ Final startup-only correction125cdeb is later than the measured30bea85 runtime.
 transport/save/session files. The supervisor retry path was independently reviewed
 and tested with a busy lock and corrupt checkpoint, plus a new real local-backend
 two-process CLI run. Two-host performance numbers remain explicitly attributed to30.
+
+## H2 encrypted relay with held storage
+
+`share-proof.ts ... --held-store` reuses the two-HOME CLI driver and an actual
+Comb bridge. A wrapper deliberately holds the first document append. Five later
+local saves must reach the other local chain before release; feed cursors and
+durable acknowledgement stay unchanged. The control disables independent hints:
+
+```sh
+FOUNDATION_SHARE_HINTS=0 FOUNDATION_HELD_RECEIPT=.audit/control.json pnpm exec tsx packages/cli/scripts/share-proof.ts /path/comb-bridge --held-store
+FOUNDATION_HELD_RECEIPT=.audit/hints.json pnpm exec tsx packages/cli/scripts/share-proof.ts /path/comb-bridge --held-store
+node packages/cli/scripts/perf-map.mjs check .audit/control.json
+node packages/cli/scripts/perf-map.mjs check .audit/hints.json
+```
+
+The control fails the delivery invariant at its second save. Hint-on passes all
+five saves before storage release; this is a bounded local regression recipe on
+a shared metal-3 host, with a proposed 1000ms maximum, not a new operator ruling
+or a population/cross-host p95 claim. Driver hashes, source commit, runtime, host
+load and every sample are retained. A2ms same-host timestamp quantization guard
+makes the observed polling interval conservative. H3 owns the actual two-host
+latency series. Earlier S3c and capability receipts remain historical; current
+owner changes are marked stale instead of transferring their numbers to H2.
+
+`FOUNDATION_SHARE_RELAY=0` drops every client relay receipt while leaving durable
+Comb replay active; the normal drill must still converge. These diagnostic switches
+never disable encryption or authorization. Production defaults enable hints and relay.

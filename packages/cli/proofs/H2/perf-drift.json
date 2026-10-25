@@ -1,0 +1,34 @@
+{
+  "unaccounted": [],
+  "dead": [],
+  "staleOwners": [
+    {
+      "workload": "doctor-capabilities",
+      "path": "packages/cli/src/main.ts",
+      "problem": "content changed (25d28fdd -> 03a82371)"
+    },
+    {
+      "workload": "sync-save-to-session",
+      "path": "packages/cli/src/sync/daemon.ts",
+      "problem": "content changed (c8f0697a -> 29ea84bc)"
+    },
+    {
+      "workload": "sync-save-to-session",
+      "path": "packages/cli/src/session/session.ts",
+      "problem": "content changed (9e0d61ff -> 65bb9a1f)"
+    },
+    {
+      "workload": "sync-save-to-session",
+      "path": "packages/engine/src/chain/chain.ts",
+      "problem": "content changed (72b55be6 -> 27f855fb)"
+    }
+  ],
+  "summary": {
+    "census": 173,
+    "accounted": 105,
+    "gaps": 68,
+    "unaccounted": 0,
+    "dead": 0,
+    "staleOwners": 4
+  }
+}

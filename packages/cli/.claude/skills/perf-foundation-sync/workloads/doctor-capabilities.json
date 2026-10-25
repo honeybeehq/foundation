@@ -134,7 +134,7 @@
       "collector": "process.hrtime.bigint in parent; include startup and Git query; no profiler",
       "aggregation": "p95",
       "kind": "actual",
-      "status": "recipe-only",
+      "status": "stale",
       "states": [
         "repeated"
       ],
@@ -152,6 +152,6 @@
       "noise": "Shared Studio load varied19-40; receipts are observed recipe proof, not a stable baseline."
     }
   ],
-  "readiness": "Studio built39ms/installed67ms and metal3 built53ms pass. Source shim single-process route passes Studio141ms and metal3 257ms; original metal3 source309ms miss retained. Twenty samples per series, shared-host observations only; no stable baseline.",
+  "readiness": "Earlier startup receipts are historical; lazy share dispatch changed main. Startup has not been remeasured for H2.",
   "updatedAt": "2026-10-24"
 }

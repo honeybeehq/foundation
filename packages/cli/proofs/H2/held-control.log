@@ -1,0 +1,22 @@
+2026-10-25T06:10:35.845Z LABELLED STUB: GitHub identities, repo membership and SSH public keys served by loopback fixture; actual CLI/crypto/HTTP/Comb/disk are real
+2026-10-25T06:10:36.298Z init created secret-free share.json; recovery code withheld from transcript
+2026-10-25T06:10:36.650Z second member login: Live sharing: waiting for key — Waiting for a teammate's machine to share the key
+2026-10-25T06:10:37.023Z automatic signed-device key handover with no designs open: 366ms
+2026-10-25T06:10:38.767Z genesis durably acknowledged: 337ms
+2026-10-25T06:10:39.273Z alice edit visible on other member: 144ms
+2026-10-25T06:10:39.273Z save-to-remote visibility alice: 163.599365234375ms
+2026-10-25T06:10:39.719Z bob edit visible on other member: 48ms
+2026-10-25T06:10:39.720Z save-to-remote visibility bob: 78.569580078125ms
+2026-10-25T06:10:39.781Z both replicas caught up before held store: 61ms
+2026-10-25T06:10:40.526Z held save 0 imports before release: 30ms
+2026-10-25T06:10:40.526Z HELD-STORE local save visibility 0: 54.522705078125ms
+2026-10-25T06:10:40.567Z actual Comb append deliberately held: 40ms
+/home/trmd/.hive/v2/cells/fdnx-h2-share-service-490244f656d9/github-com-honeybeehq-foundation-ddad6d63099e-space-490244f656d9/packages/cli/scripts/share-proof.ts:180
+    if (Date.now() - start > timeout) throw new Error(`timeout ${label}`)
+                                            ^
+
+Error: timeout held save 1 imports before release
+    at until (/home/trmd/.hive/v2/cells/fdnx-h2-share-service-490244f656d9/github-com-honeybeehq-foundation-ddad6d63099e-space-490244f656d9/packages/cli/scripts/share-proof.ts:180:45)
+    at async <anonymous> (/home/trmd/.hive/v2/cells/fdnx-h2-share-service-490244f656d9/github-com-honeybeehq-foundation-ddad6d63099e-space-490244f656d9/packages/cli/scripts/share-proof.ts:301:9)
+
+Node.js v24.18.0
