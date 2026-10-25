@@ -8,6 +8,7 @@ import {
   loadChain,
 } from "../../../engine/src/index.ts";
 import { properties } from "./style.ts";
+import { collectDom } from "../capture/dom.ts";
 import { compare } from "./index.ts";
 import type { Capture } from "./types.ts";
 const input = process.argv[2] || "boards/tracks-pane.fdn.html";
@@ -31,35 +32,11 @@ const htmlSha256 = createHash("sha256")
   .update(await readFile(input))
   .digest("hex");
 async function capture(): Promise<Capture> {
-  const nodes = await page.evaluate((props) => {
-    const walk = (e: Element, path: string): any[] => {
-      const s = getComputedStyle(e),
-        r = e.getBoundingClientRect();
-      return [
-        {
-          path,
-          tag: e.tagName.toLowerCase(),
-          fdnId: e.getAttribute("data-fdn-id"),
-          role: e.getAttribute("role") || "",
-          name: e.getAttribute("aria-label") || "",
-          text: Array.from(e.childNodes)
-            .filter((n) => n.nodeType === 3)
-            .map((n) => n.textContent)
-            .join("")
-            .trim(),
-          box: [r.x, r.y, r.width, r.height],
-          style: Object.fromEntries(
-            props.map((p) => [p, s.getPropertyValue(p)]),
-          ),
-        },
-        ...Array.from(e.children).flatMap((c, i) => walk(c, `${path}/${i}`)),
-      ];
-    };
-    return walk(document.body, "0");
-  }, properties);
+  const { nodes } = await collectDom(page, "body");
   return {
-    nodes,
+    nodes: nodes as Capture["nodes"],
     meta: {
+      frame: {width:1280,height:800},
       artboard: "tracks-pane/default",
       state: "default",
       viewport: { width: 1280, height: 800, dpr: 1 },
@@ -107,6 +84,7 @@ for (const scenario of [
   "original-padding",
   "original-colour",
   "original-text",
+  "offscreen",
 ]) {
   const saved = await page.content();
   if (scenario === "padding" || scenario === "no-id-padding")
@@ -123,6 +101,8 @@ for (const scenario of [
     await page
       .locator('[data-fdn-id="probe-remove"]')
       .evaluate((e) => e.remove());
+  if (scenario === "offscreen")
+    await page.locator('[data-fdn-id="n92"]').evaluate(e => ((e as HTMLElement).style.transform = "translateY(1000px)"));
   if (scenario === "original-padding")
     await page
       .locator('[data-fdn-id="n92"]')
@@ -165,7 +145,7 @@ for (const scenario of [
     await writeFile(`${dir}/meta.json`, JSON.stringify(code.meta));
     await writeFile(`${dir}/screenshot.png`, code.screenshot);
   }
-  const expected = scenario.endsWith("padding")
+  const expected = scenario === "offscreen" ? "offscreen" : scenario.endsWith("padding")
     ? "padding-left"
     : scenario.endsWith("colour")
       ? scenario.startsWith("original-")
@@ -178,7 +158,7 @@ for (const scenario of [
           : scenario.endsWith("text")
             ? "text"
             : null;
-  const tp = r.report.drifts.filter(
+  const tp = scenario === "offscreen" ? r.report.defects.filter(d=>d.cause === "offscreen").length : r.report.drifts.filter(
     (d) =>
       d.property === expected &&
       d.designNode ===
@@ -186,12 +166,15 @@ for (const scenario of [
           ? "n92"
           : `probe-${scenario.endsWith("colour") ? "color" : scenario.endsWith("remove") ? "remove" : "padding"}`),
   ).length;
-  const fp = r.report.drifts.length - tp,
+  const fp = scenario === "offscreen" ? 0 : r.report.drifts.length - tp,
     fn = expected ? 1 - tp : 0;
+  const offscreen = r.report.defects.filter(d => d.cause === "offscreen");
+  if (offscreen.length !== (scenario === "offscreen" ? 1 : 0)) throw Error(`${scenario}: unexpected offscreen count ${offscreen.length}`);
   results.push({
+    offscreen: offscreen.length,
     scenario,
     expected: expected ? 1 : 0,
-    found: r.report.drifts.length,
+    found: scenario === "offscreen" ? offscreen.length : r.report.drifts.length,
     tp,
     fp,
     fn,

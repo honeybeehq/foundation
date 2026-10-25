@@ -1,5 +1,9 @@
 export type Box = [number, number, number, number];
 export interface CaptureNode {
+  visibility?: {
+    eligible: boolean;
+    clips: {path: string; box: number[]; x: boolean; y: boolean; scrollX: boolean; scrollY: boolean; pan?: boolean}[];
+  };
   path: string;
   tag: string;
   fdnId?: string | null;
@@ -53,6 +57,7 @@ export interface Defect {
   cause: string;
   findings: string[];
   summary: string;
+  offscreen?: {box: Box; frame: number[]; elements: string[]; clips: NonNullable<CaptureNode["visibility"]>["clips"]};
   accepted?: { entryId: string; reason: string };
 }
 export interface Match {

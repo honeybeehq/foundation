@@ -1,3 +1,4 @@
+import { captureFullExtent } from "./extent.ts";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -268,6 +269,7 @@ try {
           path: join(destination, "screenshot.png"),
           animations: "disabled",
         });
+        await captureFullExtent(page, "#foundation-root", join(destination, "full-extent.png"));
         await writeFile(
           join(destination, "dom.json"),
           JSON.stringify(dom, null, 2) + "\n",
@@ -283,6 +285,7 @@ try {
           artboard: board.id,
           state: state.name,
           viewport: board.viewport,
+          extent: dom.extent,
           frame,
           url,
           fonts,

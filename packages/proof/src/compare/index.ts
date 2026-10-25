@@ -4,6 +4,7 @@ import { readFile, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { PNG } from "pngjs";
 import pixelmatch from "pixelmatch";
+import { offscreenDefects } from "./offscreen.ts";
 import { groupDefects } from "./defects.ts";
 import { matchNodes } from "./match.ts";
 import { properties, equal, token } from "./style.ts";
@@ -207,7 +208,7 @@ export function compare(
         ? "Capture lacks visual properties: " + unavailable.join(", ")
         : null;
   const meta = design.meta;
-  const defects = groupDefects(drifts, matches, design, code);
+  const defects = [...groupDefects(drifts, matches, design, code), ...offscreenDefects(design, code, matches)];
   const report = {
     schema: "fdn-drift/0",
     artboard: meta.artboard ?? "unknown",
@@ -283,7 +284,7 @@ export function compare(
     })),
     verdict: reason
       ? "not-provable"
-      : drifts.length || count / (a.width * a.height) > t.pixelRatio
+      : defects.length || drifts.length || count / (a.width * a.height) > t.pixelRatio
         ? "drift"
         : "match",
     timingsMs: { compare: performance.now() - start },
