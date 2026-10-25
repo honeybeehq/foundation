@@ -4,7 +4,6 @@
 
  Test Files  5 passed (5)
       Tests  53 passed (53)
-   Start at  20:12:47
-   Duration  2.22s (transform 669ms, setup 0ms, import 1.30s, tests 2.67s, environment 1ms)
+   Start at  20:23:07
+   Duration  2.23s (transform 752ms, setup 0ms, import 1.40s, tests 2.71s, environment 1ms)
 
-$ tsc --noEmit

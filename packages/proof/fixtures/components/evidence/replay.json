@@ -1,26 +1,66 @@
 [
   {
-    "file": "packages/proof/fixtures/components/keycap/captures/keycap/default/160x60@1/design/screenshot.png",
-    "same": true
+    "component": "keycap",
+    "state": "default",
+    "side": "design",
+    "pngEqual": true,
+    "nodeArraysEqual": true,
+    "sha256": "a1664cd51bb5abd7ca659c6a2b1bd7e8182bfbcbd57fb7915c393d43f218aba7"
   },
   {
-    "file": "packages/proof/fixtures/components/keycap/captures/keycap/default/160x60@1/code/screenshot.png",
-    "same": true
+    "component": "keycap",
+    "state": "default",
+    "side": "code",
+    "pngEqual": true,
+    "nodeArraysEqual": true,
+    "sha256": "d62859680d81769cee5017fe573c1a79e99d553d6b79985fc284ad274e099a71"
   },
   {
-    "file": "packages/proof/fixtures/components/inbox-row/captures/inbox-row/failed/340x100@1/design/screenshot.png",
-    "same": true
+    "component": "inbox-row",
+    "state": "selected",
+    "side": "design",
+    "pngEqual": true,
+    "nodeArraysEqual": true,
+    "sha256": "82eec1b1a3abffd5bbab75252b9069b07aa820efdd662b660f7e2c83b2ff3779"
   },
   {
-    "file": "packages/proof/fixtures/components/inbox-row/captures/inbox-row/failed/340x100@1/code/screenshot.png",
-    "same": true
+    "component": "inbox-row",
+    "state": "selected",
+    "side": "code",
+    "pngEqual": true,
+    "nodeArraysEqual": true,
+    "sha256": "df6d33333f0f18574676dce3261f19b27faedf960491b17a70056b9ead8e4ff5"
   },
   {
-    "file": "packages/proof/fixtures/components/inbox-row/captures/inbox-row/selected/340x100@1/design/screenshot.png",
-    "same": true
+    "component": "inbox-row",
+    "state": "failed",
+    "side": "design",
+    "pngEqual": true,
+    "nodeArraysEqual": true,
+    "sha256": "01cbbacf681cbe3dbc02b81bbb7d7b85bb053f765e6d058906f661e0423273bb"
   },
   {
-    "file": "packages/proof/fixtures/components/inbox-row/captures/inbox-row/selected/340x100@1/code/screenshot.png",
-    "same": true
+    "component": "inbox-row",
+    "state": "failed",
+    "side": "code",
+    "pngEqual": true,
+    "nodeArraysEqual": true,
+    "sha256": "d707d6d37766f52d5eba94f2acbdca9aa561dc80ec3081ec945abb9e40bb82b4"
+  },
+  {
+    "component": "help-center",
+    "state": "agent-run",
+    "side": "design",
+    "pngEqual": true,
+    "nodeArraysEqual": true,
+    "sha256": "4ee964fda6847af06c300201bca86a2c8aea1ead16eccade8bff3896d374895f"
+  },
+  {
+    "component": "help-center",
+    "state": "agent-run",
+    "side": "code",
+    "pngEqual": true,
+    "nodeArraysEqual": true,
+    "sha256": "c0d684e6c5b877299cb706706035c349711cc9ee27280b3b1c8fd0868b3f31ea"
   }
 ]
