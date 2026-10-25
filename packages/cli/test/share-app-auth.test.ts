@@ -36,3 +36,20 @@ it('rejects relative App config and ambiguous production credential sources befo
   await expect(startShareService({ ...config, githubAppConfig: '/private/app.json', githubPermissionToken: 'STATIC' })).rejects.toThrow('cannot be combined')
   await expect(startShareService({ ...config, githubAppConfig: '/private/app.json', githubApiUrl: 'http://127.0.0.1:1' })).rejects.toThrow('cannot be combined')
 })
+
+it('uses the renewable repo credential for the committed descriptor and caches only its verified match', async () => {
+  vi.mocked(metadataToken).mockResolvedValue('DESCRIPTOR_INSTALLATION')
+  const repo = 'github.com/honeybeehq/test', service = 'https://share.example.test', space = 'sp_' + 'a'.repeat(32)
+  const descriptor = { version: 1, mode: 'self-hosted', encryption: 'e2e-v1', repo, service, space }
+  const fetcher = vi.fn(async (_url: string, init: RequestInit) => {
+    expect(new Headers(init.headers).get('authorization')).toBe('Bearer DESCRIPTOR_INSTALLATION')
+    return Response.json({ type: 'file', path: '.foundation/share.json', encoding: 'base64', content: Buffer.from(JSON.stringify(descriptor)).toString('base64') })
+  })
+  vi.stubGlobal('fetch', fetcher)
+  const auth = new ShareAuth({ githubAppConfig: '/private/app.json' })
+  await auth.descriptor(repo, service, space)
+  await auth.descriptor(repo, service, space)
+  expect(metadataToken).toHaveBeenCalledWith(repo, '/private/app.json')
+  expect(fetcher).toHaveBeenCalledTimes(1)
+  expect(fetcher.mock.calls[0]![0]).toBe('https://api.github.com/repos/honeybeehq/test/contents/.foundation/share.json')
+})

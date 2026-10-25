@@ -6,7 +6,7 @@ foundation=$1
 app_config=$2
 repo=$3
 # This prints only fixed permission/refusal results, never the installation token.
-"$foundation" share github-app check --user trmdy --config "$app_config" --repo "$repo"
+"$foundation" share github-app check --user trmdy --config "$app_config" --repo "$repo" --single-file
 backup_file=$(python3 - "$app_config" <<'PY'
 import json, os, pathlib, stat, sys, tempfile
 app = pathlib.Path(sys.argv[1])
