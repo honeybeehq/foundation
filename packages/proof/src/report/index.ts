@@ -2,6 +2,8 @@ import {
   readAccepted,
   evaluateAccepted,
   hasUnacceptedDrift,
+  withAcceptanceInputs,
+  residualPixels,
   scopeOf,
   defectsOf,
 } from "../accept/index.ts";
@@ -76,6 +78,7 @@ export interface VerifyPolicy {
     captures: Record<string, string>;
   };
   tool?: { file: string; sha256: string };
+  environmentCauses?: string[];
 }
 export async function verify(
   manifestFile: string,
@@ -133,6 +136,7 @@ export async function verify(
     try {
       const file = path.resolve(path.dirname(manifestFile), entry.path),
         r = JSON.parse(await readFile(file, "utf8"));
+      let replayResidual: number | undefined;
       seenScopes.add(canonical(scopeOf(r)));
       const acceptance = evaluateAccepted(r, acceptedList);
       errors.push(...acceptance.errors.map((e) => `${entry.path}: ${e}`));
@@ -262,7 +266,26 @@ export async function verify(
             errors.push(
               `${entry.path}: capture environment differs from reviewed policy`,
             );
-          const actual = compare(d, c, r.tolerances).report;
+          const actual = withAcceptanceInputs(
+            compare(d, c, r.tolerances).report,
+            { design: d, code: c },
+          );
+          const pixels = residualPixels(actual, acceptedList, {
+            design: d,
+            code: c,
+          });
+          replayResidual = pixels.residualRatio;
+          if (r.acceptedPixels !== undefined || acceptance.accepted.length) {
+            if (canonical(r.acceptedPixels ?? null) !== canonical(pixels))
+              errors.push(
+                `${entry.path}: accepted pixel residual replay mismatch`,
+              );
+            if (
+              canonical(r.acceptanceSubtrees ?? null) !==
+              canonical(actual.acceptanceSubtrees)
+            )
+              errors.push(`${entry.path}: accepted subtree replay mismatch`);
+          }
           if (
             actual.code.commit !== r.code.commit ||
             actual.design.head !== r.design.head ||
@@ -294,7 +317,12 @@ export async function verify(
             errors.push(`${entry.path}: defect replay mismatch`);
           if (
             actual.verdict !== "match" &&
-            hasUnacceptedDrift(actual, acceptedList)
+            hasUnacceptedDrift(
+              actual,
+              acceptedList,
+              replayResidual,
+              policy.environmentCauses,
+            )
           )
             errors.push(
               `${entry.path}: replay found drift or incomplete captures`,
@@ -312,11 +340,17 @@ export async function verify(
         ) ||
         !["match", "drift"].includes(r.verdict) ||
         !Array.isArray(r.drifts) ||
-        hasUnacceptedDrift(r, acceptedList) ||
+        hasUnacceptedDrift(
+          r,
+          acceptedList,
+          replayResidual,
+          policy.environmentCauses,
+        ) ||
         !Number.isFinite(r.pixels?.diffRatio) ||
         !Number.isFinite(r.tolerances?.pixelRatio) ||
-        (r.pixels.diffRatio > r.tolerances.pixelRatio &&
-          !acceptance.accepted.length)
+        (acceptance.accepted.length
+          ? (replayResidual ?? Infinity)
+          : r.pixels.diffRatio) > r.tolerances.pixelRatio
       )
         errors.push(`${entry.path}: drift exceeds tolerance`);
     } catch (e) {
