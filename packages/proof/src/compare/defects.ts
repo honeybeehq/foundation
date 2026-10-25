@@ -160,6 +160,13 @@ export function groupDefects(
                 x.designNode === layer.design && /^padding-/.test(x.property),
             )?.kind ?? d.kind)
           : d.kind;
+    if (classification === "environment") {
+      // Substitution is one declared capture-wide policy, not one defect per label.
+      layer = {
+        design: identity(design.nodes[0]!),
+        code: identity(code.nodes[0]!),
+      };
+    }
     const key = canonical({ layer, kind, cause, classification });
     let group = groups.get(key);
     if (!group) {

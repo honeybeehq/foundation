@@ -88,7 +88,14 @@ function cost(
   da: ReturnType<typeof anchorContexts>,
   ca: ReturnType<typeof anchorContexts>,
   shapes: Map<CaptureNode, string>,
+  boundaries: Match[],
 ) {
+  // Explicit anchors are tree boundaries, not only isolated reservations.
+  for (const m of boundaries) {
+    const belowDesign = a.path.startsWith(m.design.path + "/");
+    const belowCode = b.path.startsWith(m.code.path + "/");
+    if (belowDesign !== belowCode) return 1;
+  }
   if ((a.tag === "svg") !== (b.tag === "svg")) return 1;
   if (
     ["circle", "path", "rect", "line", "polygon"].includes(a.tag) &&
@@ -113,6 +120,13 @@ function cost(
       if (![...left].some((t) => right.has(t))) return 1;
     } else if (iou(a, b) < 0.75) return 1;
   }
+  if (
+    text === other &&
+    /^\d+[.,]?\d*$/.test(text) &&
+    a.path !== b.path &&
+    iou(a, b) < 0.75
+  )
+    return 1;
   let textDistance = text && text === other ? 0 : text && other ? 1 : 0.7;
   if (!text && !other) {
     const left = dc.get(a.path) ?? new Set<string>(),
@@ -127,7 +141,21 @@ function cost(
         )
           textDistance = 0.5;
         else return 1;
-      } else textDistance = 1 - (2 * common) / (left.size + right.size);
+      } else {
+        textDistance = 1 - (2 * common) / (left.size + right.size);
+        // Distinctive descendant text survives layout changes and added metadata.
+        if (
+          [...left].some(
+            (t) =>
+              right.has(t) &&
+              /[a-z]/i.test(t) &&
+              t.length >= 3 &&
+              da.counts.get(t) === 1 &&
+              ca.counts.get(t) === 1,
+          )
+        )
+          textDistance = Math.min(textDistance, 0.3);
+      }
     } else {
       if (iou(a, b) === 0) return 1;
       textDistance = 0.5;
@@ -273,7 +301,18 @@ export function matchNodes(
     right = c.filter((n) => !usedC.has(n));
   if (left.length) {
     const matrix = left.map((a) => [
-      ...right.map((b) => cost(a, b, dc, cc, da, ca, shapes)),
+      ...right.map((b) =>
+        cost(
+          a,
+          b,
+          dc,
+          cc,
+          da,
+          ca,
+          shapes,
+          matches.filter((m) => m.kind === "id"),
+        ),
+      ),
       ...left.map(() => 0.48),
     ]);
     const assignment = assign(matrix);
@@ -293,12 +332,22 @@ export function matchNodes(
             da.counts.get(a.text.trim()) === 1 &&
             ca.counts.get(a.text.trim()) === 1
           );
+        const leftText = dc.get(a.path) ?? new Set<string>(),
+          rightText = cc.get(b.path) ?? new Set<string>();
+        const sharedText = [...leftText].filter((t) => rightText.has(t)).length;
+        const sparseContext =
+          !a.text?.trim() &&
+          !b.text?.trim() &&
+          a.path !== b.path &&
+          leftText.size + rightText.size > 0 &&
+          (2 * sharedText) / (leftText.size + rightText.size) < 0.5;
         matches.push({
-          ...(ambiguous
+          ...(ambiguous || sparseContext
             ? {
                 uncertain: true as const,
-                reason:
-                  "Several candidates have indistinguishable correspondence evidence",
+                reason: sparseContext
+                  ? "Container content overlaps only partially; its boundary is uncertain"
+                  : "Several candidates have indistinguishable correspondence evidence",
               }
             : {}),
           design: a,

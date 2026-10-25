@@ -33,8 +33,23 @@ describe("correspondence regressions", () => {
     expect(result.matches[0]?.wrappers?.code).toEqual(["0"]);
   });
   it("uses unique descendant text to identify a relocated row with different metadata", () => {
-    const result = matchNodes([node("0/0"),node("0/0/0",{text:"unique title"}),node("0/0/1",{text:"old metadata"})], [node("0/1",{box:[200,0,100,100]}),node("0/1/0",{text:"unique title",box:[200,0,100,100]}),node("0/1/1",{text:"new metadata",box:[200,0,100,100]})]);
-    expect(result.matches.some(m=>m.design.path==="0/0"&&m.code.path==="0/1")).toBe(true);
+    const result = matchNodes(
+      [
+        node("0/0"),
+        node("0/0/0", { text: "unique title" }),
+        node("0/0/1", { text: "old metadata" }),
+      ],
+      [
+        node("0/1", { box: [200, 0, 100, 100] }),
+        node("0/1/0", { text: "unique title", box: [200, 0, 100, 100] }),
+        node("0/1/1", { text: "new metadata", box: [200, 0, 100, 100] }),
+      ],
+    );
+    expect(
+      result.matches.some(
+        (m) => m.design.path === "0/0" && m.code.path === "0/1",
+      ),
+    ).toBe(true);
   });
   it("does not identify unrelated icon primitives by their overlapping box", () => {
     const result = matchNodes(
