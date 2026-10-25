@@ -1,0 +1,32 @@
+{
+  "workload": "share-held-store",
+  "seriesId": "netcup1-native-local-held-v1",
+  "commit": "8848c86a2412087ddd7c5c417e5ccfdb21c3a191",
+  "machine": "netcup-1",
+  "runtime": "v24.18.0",
+  "buildMode": "source-tsx",
+  "load": [
+    0.6,
+    0.45,
+    0.85
+  ],
+  "independentHints": true,
+  "relay": true,
+  "driverSha256": "df220883aa7ced8dfa8d4d87d432e372ad8d4b74df5f5a25640082086c89b07b",
+  "failure": null,
+  "results": [
+    {
+      "metric": "heldSaveVisibilityMax",
+      "samples": [
+        47.83251953125,
+        50.809326171875,
+        45.78662109375,
+        47.764892578125,
+        45.742431640625
+      ],
+      "invariantHolds": true
+    }
+  ],
+  "collectorSeriesId": "metal3-local-held-v1",
+  "note": "Raw driver hard-coded metal3 series label; normalized to actual netcup-1 without sample changes. Linux local labelled GitHub stub; Mac native Keychain cost excluded."
+}

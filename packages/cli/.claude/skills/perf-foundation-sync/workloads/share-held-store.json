@@ -12,7 +12,7 @@
     "packages/cli/src/share/service.ts@ea25180270e891b89de13145d1f2466ebb310765",
     "packages/cli/src/share/client.ts@9698b86e75063db70e629cec7ab3fc2cea0ab3b9",
     "packages/cli/src/share/crypto.ts@af49d98d1743aefb04a65b26c1f1f3ce359abb12",
-    "packages/cli/src/share/vault.ts@1b95c4ed49b656806df8bed6457867ca1b8d2638",
+    "packages/cli/src/share/vault.ts@f9c0892ea39d5669ce393405bebe2ce36f1c3bff",
     "packages/cli/src/share/github.ts@2f79ebecb4c10d38c2dce202adb7b845795d68ff",
     "packages/cli/src/share/config.ts@67d151b4857b7f0b23c83fa6cf7a43bda9c2ed3a",
     "packages/cli/src/sync/daemon.ts@29ea84bca1a5fb7e8f0d1b6a1c35da2dd939127c"
@@ -255,5 +255,5 @@
   ],
   "updatedAt": "2026-10-25",
   "updatedBy": "H3 deployment",
-  "readiness": "Integrated H3 source rerun on netcup-1: five held saves49–53ms, cursor unchanged before release; recipe proof only, no cross-host or population-tail claim."
+  "readiness": "Integrated native-vault source rerun on netcup-1; five held saves and durable cursor invariant pass. Linux recipe does not exercise Mac native Keychain cost or establish cross-host tails."
 }
