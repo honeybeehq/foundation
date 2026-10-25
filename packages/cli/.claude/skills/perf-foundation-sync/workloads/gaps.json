@@ -271,6 +271,46 @@
     {
       "key": "spawn:packages/cli/src/share/auth.ts#1",
       "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:appJwt",
+      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:checkContentsRefusal",
+      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:githubJson",
+      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:githubRepo",
+      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:githubRequest",
+      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:metadataToken",
+      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:mintMetadataToken",
+      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:parseGithubAppConfig",
+      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:readGithubAppConfig",
+      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:requireMetadataOnly",
+      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
     }
   ]
 }

@@ -1,0 +1,32 @@
+{
+  "workload": "share-held-store",
+  "seriesId": "netcup1-local-held-v1",
+  "commit": "a99b5773b3429d286108aec2b5f16e04e7e40a40",
+  "machine": "netcup-1",
+  "runtime": "v24.18.0",
+  "buildMode": "source-tsx",
+  "load": [
+    0.35,
+    0.41,
+    1.06
+  ],
+  "independentHints": true,
+  "relay": true,
+  "driverSha256": "df220883aa7ced8dfa8d4d87d432e372ad8d4b74df5f5a25640082086c89b07b",
+  "failure": null,
+  "results": [
+    {
+      "metric": "heldSaveVisibilityMax",
+      "samples": [
+        53.053466796875,
+        52.02685546875,
+        50.00048828125,
+        48.977294921875,
+        48.953857421875
+      ],
+      "invariantHolds": true
+    }
+  ],
+  "collectorSeriesId": "metal3-local-held-v1",
+  "note": "Collector hard-coded metal3 series label; normalized to actual netcup-1 host without changing samples. Raw receipt retained in .audit/share-run-xjKAbn/held-store.json. Local labelled GitHub stub; not two-host or real-App evidence."
+}
