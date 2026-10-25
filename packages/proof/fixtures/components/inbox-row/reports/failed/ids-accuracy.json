@@ -302,5 +302,295 @@
       }
     ]
   },
+  "strictDefects": {
+    "tp": 4,
+    "fp": 13,
+    "fn": 2,
+    "precision": 0.23529411764705882,
+    "recall": 0.6666666666666666,
+    "predicted": 17,
+    "labelled": 6,
+    "agreement": [
+      {
+        "defect": "def-638ef1b23690ca5395b5",
+        "label": "IF-05",
+        "description": "Rows are taller in code: line 1 is 19px and line 2 19px/17px (line-height 1.45) vs 16px and 15px in design, so the row is 54px instead of 49px, the dot, \"failed\" and note sit 3-4px lower and the row overruns the 49px design frame by 5px"
+      },
+      {
+        "defect": "def-bada26d8ab3de86b3112",
+        "label": "IF-02",
+        "description": "Title ink is pure black in the design (var(--color-text-primary) is undefined on the board) vs warm near-black #2E2B27 in code"
+      },
+      {
+        "defect": "def-5769f1cb79bdec263df8",
+        "label": "IF-01",
+        "description": "Title and note render in a serif face in the design but in Hanken Grotesk (sans) in code: the inbox board uses var(--font-sans) but never defines it, so the design falls back to the default serif"
+      },
+      {
+        "defect": "def-4e2802b2bf1d526f7922",
+        "label": "IF-03",
+        "description": "Leading glyph is the agent hexagon in muted #8A877F in design; code shows the agent's model logo (OpenAI mark) in lighter #A29D93"
+      }
+    ],
+    "falsePositives": [
+      {
+        "cause": "token:font-size",
+        "classification": "product",
+        "findings": [
+          "d4",
+          "d26"
+        ],
+        "id": "def-79f9f7d9a9771f3d590b",
+        "kind": "token",
+        "layer": {
+          "code": "n249#0::n249::n17",
+          "design": "n249#0::n249::n17"
+        },
+        "summary": "token font-size differs at n249#0::n249::n17"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d9",
+          "d20",
+          "d21",
+          "d22"
+        ],
+        "id": "def-b919377e038fdadbfb42",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/0",
+          "design": "n249#0::n249::n18"
+        },
+        "summary": "layout configuration differs at n249#0::n249::n18"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d14"
+        ],
+        "id": "def-e5b37030d619cb7b839c",
+        "kind": "layout",
+        "layer": {
+          "code": "n249#0::n249::n20",
+          "design": "n249#0::n249::n20"
+        },
+        "summary": "layout configuration differs at n249#0::n249::n20"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d15",
+          "d17",
+          "d19"
+        ],
+        "id": "def-a8d225dfe68a3986bc94",
+        "kind": "layout",
+        "layer": {
+          "code": "n249#0::n249::n21",
+          "design": "n249#0::n249::n21"
+        },
+        "summary": "layout configuration differs at n249#0::n249::n21"
+      },
+      {
+        "cause": "style:font-family",
+        "classification": "product",
+        "findings": [
+          "d16"
+        ],
+        "id": "def-eb11a06c57bfcb504b12",
+        "kind": "style",
+        "layer": {
+          "code": "n249#0::n249::n21",
+          "design": "n249#0::n249::n21"
+        },
+        "summary": "style font-family differs at n249#0::n249::n21"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d23",
+          "d29"
+        ],
+        "id": "def-a1eff6c6f2da917703ae",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/0/0/0/0",
+          "design": "n249#0::n249::n19::n1"
+        },
+        "summary": "layout configuration differs at n249#0::n249::n19::n1"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d30",
+          "d31",
+          "d32",
+          "d33"
+        ],
+        "id": "def-3c562f75dad54095a88b",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/1",
+          "design": "n249#0::n249::n22"
+        },
+        "summary": "layout configuration differs at n249#0::n249::n22"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d34",
+          "d35"
+        ],
+        "id": "def-79e0a3cfddedf3721c2a",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/1/0",
+          "design": "n249#0::n249::n23::n13"
+        },
+        "summary": "layout configuration differs at n249#0::n249::n23::n13"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d36",
+          "d37",
+          "d39",
+          "d41"
+        ],
+        "id": "def-8a0f3c56a99b3de8528b",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/1/1",
+          "design": "n249#0::n249::n24"
+        },
+        "summary": "layout configuration differs at n249#0::n249::n24"
+      },
+      {
+        "cause": "style:font-family",
+        "classification": "product",
+        "findings": [
+          "d38"
+        ],
+        "id": "def-385565412984144d1ced",
+        "kind": "style",
+        "layer": {
+          "code": "0/0/1/1",
+          "design": "n249#0::n249::n24"
+        },
+        "summary": "style font-family differs at n249#0::n249::n24"
+      },
+      {
+        "cause": "missing:subtree",
+        "classification": "product",
+        "findings": [
+          "d42"
+        ],
+        "id": "def-f4300db2cfbd7437a002",
+        "kind": "missing",
+        "layer": {
+          "design": "n249#0::n249::n25"
+        },
+        "summary": "missing subtree differs at n249#0::n249::n25"
+      },
+      {
+        "cause": "extra:subtree",
+        "classification": "product",
+        "findings": [
+          "d43",
+          "d44"
+        ],
+        "id": "def-6a903a4fcda7a02aa6b4",
+        "kind": "extra",
+        "layer": {
+          "code": "0"
+        },
+        "summary": "extra subtree differs at 0"
+      },
+      {
+        "cause": "offscreen",
+        "classification": "product",
+        "findings": [
+          "d45"
+        ],
+        "id": "def-100d1a4a6a5d08034f99",
+        "kind": "layout",
+        "layer": {
+          "code": "n249#0::n249::n17"
+        },
+        "offscreen": {
+          "box": [
+            0,
+            0,
+            340,
+            54.234375
+          ],
+          "clips": [
+            {
+              "box": [
+                0,
+                0,
+                340,
+                49
+              ],
+              "pan": false,
+              "path": "0",
+              "scrollX": false,
+              "scrollY": false,
+              "x": true,
+              "y": true
+            }
+          ],
+          "elements": [
+            "0/0"
+          ],
+          "frame": [
+            0,
+            0,
+            340,
+            49
+          ],
+          "viewport": [
+            0,
+            0,
+            340,
+            100
+          ]
+        },
+        "summary": "rendered outside the visible pane: button · pay-webhooks · 1h44 · failed · runtime died un-commanded — revive"
+      }
+    ],
+    "falseNegatives": [
+      {
+        "id": "IF-04",
+        "design_layer": "0/0/1/2",
+        "code_layer": "0/0/1/2",
+        "kind": "text",
+        "description": "Note copy differs: \"tmux host died mid-write — revive\" in design vs \"runtime died un-commanded — revive\" in code",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "[failed-note-copy] probably fixture data or reworded failure reason",
+        "properties": "text"
+      },
+      {
+        "id": "IF-06",
+        "design_layer": "0/0/0/0/0",
+        "code_layer": "0/0/0/0/0/0",
+        "kind": "layout",
+        "description": "Leading glyph sits 3px lower relative to the title (y 11 vs 8): code nudges marks down 2px to the title baseline on top of the taller line",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[glyph-offset] rowGlyphDown translateY(2px) is a deliberate optical-baseline tweak",
+        "properties": "transform"
+      }
+    ]
+  },
   "compareMs": 40.02693400000001
 }

@@ -1,0 +1,5 @@
+ts	phase	decision	why	evidence	result
+2026-10-25T19:03:23Z	setup	Use real exports and frozen comparison	Keep independent labels unseen until candidate counts are committed	research/renderable-contract.md	open
+2026-10-25T19:10:40Z	captures	Freeze each component before independent labels	Prevent matcher tuning to the hand check	48009b4,7e6f966,2f08c46	all three frozen
+2026-10-25T19:10:40Z	capture	Add explicit crop boundary and preserve scroll	Absolute n45 offset clipped isolated card; reparent initially reset scroll	843cc54,44174b7,2f08c46	corrected screenshot shows agent-run
+2026-10-25T19:10:40Z	scoring	Use frozen scorer on independent labels	Count accuracy requires both misses and false candidates	packages/proof/fixtures/components/keycap/reports/ids-accuracy.json	Keycap P50 R66.7; Inbox selected P31.25 R71.4

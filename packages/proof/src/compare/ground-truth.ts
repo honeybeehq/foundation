@@ -134,6 +134,19 @@ function inScope(actual: string | undefined, scope: string | undefined) {
     return a.length >= p.length && p.every((s, i) => s === "*" || s === a[i]);
   });
 }
+const sides = ['top', 'right', 'bottom', 'left'];
+const shorthandProperties: Record<string, string[]> = {
+  ...Object.fromEntries(['color', 'width', 'style'].map(p => [`border-${p}`, sides.map(side => `border-${side}-${p}`)])),
+  padding: sides.map(side => `padding-${side}`),
+  margin: sides.map(side => `margin-${side}`),
+  inset: sides,
+  gap: ['row-gap', 'column-gap'],
+  'border-radius': ['top-left', 'top-right', 'bottom-right', 'bottom-left'].map(corner => `border-${corner}-radius`),
+  font: ['font-family', 'font-size', 'font-style', 'font-weight', 'font-stretch', 'font-variant', 'line-height'],
+};
+export function expandLabelProperties(properties: string[]): string[] {
+  return [...new Set(properties.flatMap(property => [property, ...(shorthandProperties[property] ?? [])]))];
+}
 /** One-to-one assignment prevents many checker rows claiming one labelled cause. */
 export function defectMetrics(
   defects: Defect[],
@@ -141,6 +154,7 @@ export function defectMetrics(
   labels: Record<string, string>[],
   design: CaptureNode[],
   code: CaptureNode[],
+  options: { expandShorthands?: boolean } = {},
 ) {
   const truth = labels.filter((l) => l.kind !== "environment");
   const predicted = defects.filter((d) => d.classification === "product");
@@ -150,7 +164,8 @@ export function defectMetrics(
   const candidates = predicted.map((d) =>
     truth
       .map((l, i) => {
-        const properties = l.properties?.split(";") ?? [];
+        const original = l.properties?.split(";").map(p => p.trim()) ?? [];
+        const properties = options.expandShorthands === false ? original : expandLabelProperties(original);
         const support = d.findings
           .map((id) => raw.get(id)!)
           .filter(Boolean)

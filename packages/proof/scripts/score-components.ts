@@ -12,7 +12,7 @@ for(const name of ['ids','no-ids']) {
  const report=JSON.parse(await readFile(join(reports,name+'.json'),'utf8'))
  const strip=(nodes:typeof d.nodes)=>nodes.map(n=>({...n,fdnId:null}))
  const dn=name==='ids'?d.nodes:strip(d.nodes),cn=name==='ids'?c.nodes:strip(c.nodes)
- const result={component,state,mode:name,correspondence:correspondenceMetrics(report,correspondence,dn,cn),defects:defectMetrics(report.defects,report.drifts,defects,dn,cn),compareMs:report.timingsMs.compare}
+ const result={component,state,mode:name,correspondence:correspondenceMetrics(report,correspondence,dn,cn),defects:defectMetrics(report.defects,report.drifts,defects,dn,cn),strictDefects:defectMetrics(report.defects,report.drifts,defects,dn,cn,{expandShorthands:false}),compareMs:report.timingsMs.compare}
  await writeFile(join(reports,name+'-accuracy.json'),JSON.stringify(result,null,2)+'\n')
  console.log(component,state,name,JSON.stringify({correspondence:result.correspondence,defects:{...result.defects,agreement:undefined,falsePositives:undefined,falseNegatives:undefined}}))
 }

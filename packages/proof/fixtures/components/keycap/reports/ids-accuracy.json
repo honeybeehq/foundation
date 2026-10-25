@@ -13,6 +13,49 @@
     "errors": []
   },
   "defects": {
+    "tp": 3,
+    "fp": 1,
+    "fn": 0,
+    "precision": 0.75,
+    "recall": 1,
+    "predicted": 4,
+    "labelled": 3,
+    "agreement": [
+      {
+        "defect": "def-db1dff5c581fd8abccd0",
+        "label": "K-01",
+        "description": "Key cap is 18px tall in code but 21px in design (both author height 18px; design adds the 1px top and 2px bottom border outside it, code's border-box puts them inside), so the cap looks squatter and the \"⌘T\" sits about 1.5px higher"
+      },
+      {
+        "defect": "def-a90f8172b6dec2f6c6d6",
+        "label": "K-02",
+        "description": "Key label ink is lighter in code: #6B6862 (inkSoft token) vs the design's #5A564E"
+      },
+      {
+        "defect": "def-38c91ede9c3543fac351",
+        "label": "K-03",
+        "description": "Key border is #E2E0DB (ghostBorder) in code vs --color-border #E7E5E0 in design, a barely visible shade darker"
+      }
+    ],
+    "falsePositives": [
+      {
+        "cause": "style:font-family",
+        "classification": "product",
+        "findings": [
+          "d7"
+        ],
+        "id": "def-f9d3f7a1a2de447ef05b",
+        "kind": "style",
+        "layer": {
+          "code": "n203::n1",
+          "design": "n203::n1"
+        },
+        "summary": "style font-family differs at n203::n1"
+      }
+    ],
+    "falseNegatives": []
+  },
+  "strictDefects": {
     "tp": 2,
     "fp": 2,
     "fn": 1,
