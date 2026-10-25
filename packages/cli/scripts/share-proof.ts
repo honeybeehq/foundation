@@ -1,9 +1,21 @@
 /** One-machine real CLI/daemon/Comb drill. GitHub multi-account/SSH responses are a LABELLED loopback stub. */
 import { createServer } from 'node:http'
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process'
-import { mkdirSync, mkdtempSync, writeFileSync, readFileSync, copyFileSync, statSync, readdirSync } from 'node:fs'
+import {
+  mkdirSync,
+  mkdtempSync,
+  writeFileSync,
+  readFileSync,
+  copyFileSync,
+  statSync,
+  readdirSync,
+  existsSync,
+  unlinkSync
+} from 'node:fs'
 import { join, resolve } from 'node:path'
-import { randomBytes } from 'node:crypto'
+import { randomBytes, createHash } from 'node:crypto'
+import { execFileSync } from 'node:child_process'
+import { loadavg, hostname } from 'node:os'
 import assert from 'node:assert/strict'
 import { loadChain } from 'foundation-engine'
 import { startShareService, backupShareService } from '../src/share/service.js'
@@ -11,6 +23,11 @@ import { decrypt, opaqueName, ready } from '../src/share/crypto.js'
 const root = mkdtempSync(resolve('.audit/share-run-')),
   main = resolve('packages/cli/src/main.ts'),
   binary = resolve(process.argv[2] ?? '.audit/comb-source/target/debug/comb-bridge')
+const heldMode = process.argv.includes('--held-store'),
+  holdFile = join(root, 'hold-append'),
+  heldFeed = join(root, 'held-feed'),
+  heldNotice = join(root, 'append-is-held'),
+  releaseFile = join(root, 'release-append')
 const children: ChildProcess[] = [],
   lines: string[] = []
 function log(text: string) {
@@ -100,9 +117,17 @@ writeFileSync(
   join(comb, 'config.toml'),
   `tenant = "share-proof"\ndigest_key = "${randomBytes(32).toString('hex')}"\n[backend]\nkind = "local"\nroot = "${objects}"\n`
 )
+const wrapper = join(root, 'hold-comb.mjs')
+if (heldMode)
+  writeFileSync(
+    wrapper,
+    `import{spawn}from'node:child_process';import{createInterface}from'node:readline';import{readFileSync,existsSync,writeFileSync}from'node:fs';const child=spawn(${JSON.stringify(binary)},process.argv.slice(2),{stdio:'pipe'});child.stdout.pipe(process.stdout);child.stderr.pipe(process.stderr);const held=[];const timer=setInterval(()=>{if(existsSync(${JSON.stringify(releaseFile)})||!existsSync(${JSON.stringify(holdFile)}))for(const line of held.splice(0))child.stdin.write(line+String.fromCharCode(10))},10);const input=createInterface({input:process.stdin});input.on('line',line=>{const request=JSON.parse(line);if(request.op==='append'&&existsSync(${JSON.stringify(holdFile)})&&request.log===readFileSync(${JSON.stringify(heldFeed)},'utf8')){held.push(line);writeFileSync(${JSON.stringify(heldNotice)},'held')}else child.stdin.write(line+String.fromCharCode(10))});input.on('close',()=>{clearInterval(timer);child.stdin.end()});`
+  )
 const serviceConfig = {
   stateDir,
-  comb: { binary, args: ['--dir', comb, '--lease', '3'] },
+  comb: heldMode
+    ? { binary: process.execPath, args: [wrapper, '--dir', comb, '--lease', '3'] }
+    : { binary, args: ['--dir', comb, '--lease', '3'] },
   githubApiUrl: github,
   githubPermissionToken: 'operator',
   backupLocalStore: objects
@@ -234,6 +259,96 @@ try {
     const elapsed = Date.now() - saved
     log(`save-to-remote visibility ${ids[from]}: ${elapsed}ms`)
     assert.ok(elapsed < 1000, `sub-second visibility ${elapsed}`)
+  }
+  if (heldMode) {
+    await until(
+      async () =>
+        [0, 1].every((i) => {
+          try {
+            const files = readdirSync(join(homes[i]!, 'replicas')).filter((f) => f.endsWith('.json'))
+            return files.some((f) => {
+              const r = JSON.parse(readFileSync(join(homes[i]!, 'replicas', f), 'utf8'))
+              return Array.isArray(r.published) && r.pending === 0
+            })
+          } catch {
+            return false
+          }
+        }),
+      'both replicas caught up before held store'
+    )
+    const heldKey = vault(0)[space].keys.at(-1),
+      logName = opaqueName(JSON.stringify(['foundation-share-document-v1', chain(0).docId()]), heldKey.feedKey)
+    writeFileSync(heldFeed, `share-${space}-${logName}`)
+    writeFileSync(holdFile, 'hold')
+    const cursorBefore = JSON.parse(await ok(1, 'sync', 'status', '--json'))[0].cursor
+    const samples: number[] = []
+    let invariant = false,
+      failure: string | null = null
+    const receiptPath = process.env.FOUNDATION_HELD_RECEIPT ?? join(root, 'held-store.json')
+    try {
+      for (let i = 0; i < 5; i++) {
+        const marker = `HELD-STORE-SAVE-${i}`
+        await ok(
+          0,
+          'edit',
+          files[0]!,
+          '--ops',
+          JSON.stringify([{ op: 'set-text', id: 'n1', text: marker }]),
+          '--author',
+          'alice'
+        )
+        const saved = statSync(`${files[0]}.chain`).mtimeMs
+        await until(() => text(1, 'n1') === marker, `held save ${i} imports before release`, 2000)
+        const elapsed = Date.now() - saved + 2
+        samples.push(elapsed)
+        log(`HELD-STORE local save visibility ${i}: ${elapsed}ms`)
+        assert.ok(elapsed < 1000, `held save ${i} exceeds local1000ms gate: ${elapsed}`)
+        if (i === 0) await until(() => existsSync(heldNotice), 'actual Comb append deliberately held')
+      }
+      const heldStatus = JSON.parse(await ok(1, 'sync', 'status', '--json'))[0]
+      assert.equal(heldStatus.cursor, cursorBefore)
+      assert.notEqual(heldStatus.status, 'shared')
+      invariant = true
+      log('HELD-STORE: all5 saves visible, durable cursor unchanged before release')
+    } catch (error) {
+      failure = String(error)
+      throw error
+    } finally {
+      writeFileSync(
+        receiptPath,
+        JSON.stringify(
+          {
+            workload: 'share-held-store',
+            seriesId: 'metal3-local-held-v1',
+            commit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
+            machine: hostname(),
+            runtime: process.version,
+            buildMode: 'source-tsx',
+            load: loadavg(),
+            independentHints: process.env.FOUNDATION_SHARE_HINTS !== '0',
+            relay: process.env.FOUNDATION_SHARE_RELAY !== '0',
+            driverSha256: createHash('sha256')
+              .update(readFileSync(new URL(import.meta.url)))
+              .digest('hex'),
+            failure,
+            results: [{ metric: 'heldSaveVisibilityMax', samples, invariantHolds: invariant }]
+          },
+          null,
+          2
+        ) + '\n'
+      )
+      if (existsSync(holdFile)) unlinkSync(holdFile)
+      writeFileSync(releaseFile, 'release')
+    }
+    await until(
+      async () => {
+        const a = JSON.parse(await ok(0, 'sync', 'status', '--json'))[0],
+          b = JSON.parse(await ok(1, 'sync', 'status', '--json'))[0]
+        return a.status === 'shared' && b.status === 'shared'
+      },
+      'held-store durable drain after release',
+      30000
+    )
   }
   const denied = await cli(2, 'share', 'login', '--repo-root', repos[2]!, '--ssh-key', keys[2]!, '--token-stdin')
   assert.equal(denied.code, 1)

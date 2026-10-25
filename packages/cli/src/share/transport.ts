@@ -87,12 +87,12 @@ class ShareBridge implements Bridge {
   async request(op: string, fields: Frame = {}): Promise<Frame> {
     if (this.closed) throw new Error('share transport closed')
     await ready
-    if (op === 'append') await refreshKeys(this.config)
+    const publishing = op === 'append' || op === 'hint'
+    if (publishing) await refreshKeys(this.config)
     else await prepareSharingRead(this.config)
     const session = await authorizedSession(this.config),
-      state = await stateFor(this.config, session, op !== 'append')
-    const key =
-      session.keys.find((key) => key.epoch === state.epoch) ?? (op !== 'append' ? session.keys.at(-1) : undefined)
+      state = await stateFor(this.config, session, !publishing)
+    const key = session.keys.find((key) => key.epoch === state.epoch) ?? (!publishing ? session.keys.at(-1) : undefined)
     if (!key) {
       await refreshKeys(this.config)
       throw new Error(`waiting for key epoch ${state.epoch}`)
@@ -100,7 +100,7 @@ class ShareBridge implements Bridge {
     const logical = String(fields.log),
       log = opaqueName(this.address ?? logical, key.feedKey)
     const request: Frame = { ...fields, space: this.config.space, op, log }
-    if (op === 'append') {
+    if (publishing) {
       if (session.rotationRequired || Date.now() - (key.createdAt ?? 0) >= 24 * 60 * 60 * 1000)
         throw new Error('rotation required before sending')
       if (!session.membershipCheckedAt || Date.now() - session.membershipCheckedAt >= 3600000)
@@ -121,7 +121,7 @@ class ShareBridge implements Bridge {
       )
       Object.assign(request, { idempotency_key: encrypted.dedup, payload_hex: encrypted.hex, epoch: key.epoch })
     }
-    const response = await api<Frame>(this.config, 'rpc', session.token, request)
+    const response = await api<Frame>(this.config, 'rpc', session.token, request, op === 'hint' ? 2000 : 35000)
     if (response.log !== undefined && response.log !== log) throw new Error('share response feed mismatch')
     if (Array.isArray(response.events))
       response.events = await Promise.all(
@@ -288,5 +288,59 @@ export async function prepareSharingRead(config: ShareConfig): Promise<void> {
     await refreshKeys(config)
   } catch (error) {
     if (!sessionFor(config.space).keys.length) throw error
+  }
+}
+
+/** Bounded best-effort hints run independently of the durable publisher. The chain remains the outbox. */
+export class ShareHints {
+  private pending = new Map<string, string>()
+  private bytes = 0
+  private stopped = false
+  private task: Promise<void> | undefined
+  private bridge: Bridge
+  constructor(
+    config: CombConfig,
+    private log: string
+  ) {
+    this.bridge = createBridge(config)
+  }
+  push(changes: { hash: string; hex: string }[]): string[] {
+    if (this.stopped) return []
+    const accepted: string[] = []
+    for (const change of changes) {
+      const next = this.bytes + change.hex.length / 2 - (this.pending.get(change.hash)?.length ?? 0) / 2
+      if ((this.pending.size >= 32 && !this.pending.has(change.hash)) || next > 1048576) break
+      this.pending.set(change.hash, change.hex)
+      this.bytes = next
+      accepted.push(change.hash)
+    }
+    this.start()
+    return accepted
+  }
+  private start(): void {
+    if (this.task || this.stopped || !this.pending.size) return
+    this.task = this.drain().finally(() => {
+      this.task = undefined
+      this.start()
+    })
+  }
+  private async drain(): Promise<void> {
+    while (!this.stopped && this.pending.size) {
+      const [hash, hex] = this.pending.entries().next().value!
+      this.pending.delete(hash)
+      this.bytes -= hex.length / 2
+      try {
+        await this.bridge.request('hint', { log: this.log, idempotency_key: hash, payload_hex: hex })
+      } catch {
+        /* Durable publication repairs any lost hint. */
+      }
+    }
+  }
+  async close(): Promise<void> {
+    this.stopped = true
+    this.pending.clear()
+    this.bytes = 0
+    this.bridge.close()
+    await this.task
   }
 }

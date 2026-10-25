@@ -39,7 +39,7 @@ import {
 } from '../src/share/crypto.js'
 import { maintainKeys, sharingStatus, type ShareState } from '../src/share/client.js'
 import { saveSession, sessionFor, type Session } from '../src/share/vault.js'
-import { createBridge } from '../src/share/transport.js'
+import { createBridge, ShareHints } from '../src/share/transport.js'
 import type { ShareConfig } from '../src/share/config.js'
 let root: string, config: ShareConfig, state: ShareState, alice: DeviceSecret, bob: DeviceSecret, dave: DeviceSecret
 let readEvents: { seq: string; payload_hex: string }[] = []
@@ -264,4 +264,38 @@ it('keeps current writer checks when the service rolls back an epoch for reads',
   await bridge.hello()
   await expect(bridge.request('read', { log: 'catalogue', cursor: '1' })).rejects.toThrow(/not from a repo writer/)
   bridge.close()
+})
+
+it('bounds queued hints while a request is in flight and stops without draining queued frames', async () => {
+  saveSession(config.space, local(alice, [key]))
+  const base = globalThis.fetch
+  let started!: (value?: unknown) => void,
+    release!: (value?: unknown) => void,
+    calls = 0
+  const pending = new Promise((r) => {
+      started = r
+    }),
+    gate = new Promise((r) => {
+      release = r
+    })
+  vi.stubGlobal('fetch', async (input: unknown, init?: RequestInit) => {
+    const body = JSON.parse(String(init?.body ?? '{}'))
+    if (body.op === 'hint') {
+      calls++
+      started()
+      await gate
+      return Response.json({ ok: true, log: body.log, accepted: true })
+    }
+    return base(input as string, init)
+  })
+  const hints = new ShareHints({ binary: '', args: [], share: config, shareLog: 'doc' }, 'logical')
+  expect(hints.push([{ hash: 'first', hex: 'aa' }])).toEqual(['first'])
+  await pending
+  const queued = hints.push(Array.from({ length: 80 }, (_, i) => ({ hash: `change-${i}`, hex: 'ab'.repeat(32768) })))
+  expect(queued).toHaveLength(32)
+  const stopped = hints.close()
+  release()
+  await stopped
+  expect(calls).toBe(1)
+  expect(hints.push([{ hash: 'after-close', hex: 'aa' }])).toEqual([])
 })

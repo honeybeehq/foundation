@@ -182,3 +182,15 @@ it('accepts a fresh SSH attestation for immutable device keys and publishes it t
  expect((await f.api('token',await f.tokenBody(renewed))).status).toBe(200)
  const state=await f.api('state',undefined,f.token);expect(state.body.devices.find((d:any)=>d.id===reader.id).signature).toBe(renewed.signature)
 })
+
+it('authenticates encrypted hints without durable append or a cursor receipt',async()=>{
+ const f=await fixture();await f.keys()
+ const reader=f.device('reader'),read=(await f.api('token',await f.tokenBody(reader))).body.token
+ const hint={...f.append(),op:'hint'}
+ expect((await f.api('rpc',hint,read)).status).toBe(403)
+ expect((await f.api('rpc',{...hint,epoch:0},f.token)).status).toBe(409)
+ expect((await f.api('rpc',{...hint,payload_hex:'706c61696e74657874'},f.token)).status).toBe(400)
+ const result=await f.api('rpc',hint,f.token);expect(result.status).toBe(200);expect(result.body.accepted).toBe(true);expect(result.body.cursor).toBeUndefined()
+ const page=await f.api('rpc',{op:'read',log:'a'.repeat(64),cursor:'1'},f.token)
+ expect(page.body.events).toHaveLength(0);expect(page.body.next_cursor).toBe('1')
+})
