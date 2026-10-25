@@ -35,3 +35,12 @@ One row per user-visible difference, filed the way a designer would: one cause p
 
 `tools/` holds the scripts that write these files from the hand-written rules (`label.py`, `defects.py`) and the
 DOM dump used while labelling (`dump.py`). Run with `python3 -I tools/label.py <sample-captures/tracks-pane> <out>`.
+
+## Round 3 components (L1)
+
+`keycap/default.*`, `inbox-row/{selected,failed}.*` and `help-center/agent-run.*` use the same columns, labelled
+blind from `../components/<component>/captures/**/{design,code}` plus the .fdn.html and the Apiary
+`proto/design-to-code-components` source. Id prefixes: `K-` Keycap, `IS-`/`IF-` InboxRow selected/failed, `H-` HelpCenter.
+HelpCenter correspondence is written by `tools/help_center.py`; only design layers whose box intersects the
+1064×720 frame are labelled. `evidence/r3-*.png` are annotated crops (`tools/annotate_round3.py`).
+Slugs shared across components name the same cause: `[box-sizing]` = Keycap `[cap-height]`, `[cap-ink]`, `[cap-border]`, `[harness-bg]`.
