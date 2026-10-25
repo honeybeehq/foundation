@@ -1,7 +1,7 @@
 import { createServer } from 'node:http'
 import { createHash, generateKeyPairSync, sign, type KeyObject } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
-import { mkdtemp, writeFile, readFile, rm } from 'node:fs/promises'
+import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, expect, it, vi } from 'vitest'
@@ -24,6 +24,7 @@ async function fixture(options: {isPublic?: boolean; publicAccess?: 'repo-read'|
     if (/^\/[a-z]+\.keys$/.test(path)) { res.end(identities.get(path.slice(1,-5))?.publicSSH ?? ''); return }
     res.setHeader('Content-Type','application/json')
     if (path.startsWith('/users/')) { const login=path.slice(7); res.end(JSON.stringify({login,id:identities.get(login)?.id})); return }
+    if(path.includes('/collaborators?')){if(ambiguous.size){res.writeHead(403).end('{}');return}res.end(JSON.stringify(['writer','reader'].filter(login=>!denied.has(login)).map(login=>({login,id:identities.get(login)!.id,permissions:{push:login==='writer'}}))));return}
     const match = path.match(/\/collaborators\/([^/]+)\/permission$/)
     if (match) {
       const login=match[1]!
@@ -160,11 +161,13 @@ it('rotates with CAS, validates recovery and revokes tokens and relay', async ()
   expect((await f.api('keys',{expectedEpoch:2,epoch:2,recoveryPublicKey:Buffer.alloc(32,4).toString('base64'),wraps:[]},f.token)).status).toBe(400)
   expect((await f.api('keys',{expectedEpoch:2,epoch:3,recoveryPublicKey:Buffer.alloc(32,4).toString('base64'),wraps:[f.wrap(f.writer.id,3),f.wrap('recovery',3)]},f.token)).status).toBe(200)
 })
-it('exports metadata-only backups and refuses remote GitHub overrides', async () => {
+it('exports complete stopped local backups and refuses remote GitHub overrides', async () => {
   const f=await fixture();await f.keys()
   await expect(startShareService({...f.config,stateDir:join(f.dir,'other'),githubApiUrl:'https://example.com'})).rejects.toThrow('loopback')
   await expect(backupShareService(f.config,join(f.dir,'backup'))).rejects.toThrow('stop service')
+  const backend=join(f.dir,'objects');await mkdir(backend);await writeFile(join(backend,'encrypted-object'),'ciphertext')
+  f.config.backupLocalStore=backend
   await f.service.close();await backupShareService(f.config,join(f.dir,'backup'))
-  const manifest=JSON.parse(await readFile(join(f.dir,'backup','BACKUP.json'),'utf8'));expect(manifest.backendIncluded).toBe(false)
+  const manifest=JSON.parse(await readFile(join(f.dir,'backup','BACKUP.json'),'utf8'));expect(manifest.backendIncluded).toBe(true);expect(await readFile(join(f.dir,'backup/comb-store/encrypted-object'),'utf8')).toBe('ciphertext')
   const metadata=await readFile(join(f.dir,'backup','metadata.json'),'utf8');expect(metadata).toContain(f.writer.id);expect(metadata).not.toContain(f.token);expect(metadata).not.toContain('operator-metadata-only')
 })
