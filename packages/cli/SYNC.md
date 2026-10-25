@@ -165,9 +165,9 @@ foundation share status --json
 `--oauth` performs GitHub device sign-in locally using the service's configured
 OAuth App client id. `--token-stdin` accepts a local GitHub token without putting
 it in process arguments. `--repo-root` selects a checkout explicitly. `share init`
-can take `--repo github.com/OWNER/REPO` instead of inferring origin. Public repos
-follow repo read access by default; `--public-access collaborators` instead limits
-live keys to explicitly listed collaborators. Every peer enforces that committed
+can take `--repo github.com/OWNER/REPO` instead of inferring origin. New spaces default to `collaborators`, including public repos, so live drafts
+reach explicitly listed collaborators. `--public-access repo-read` deliberately
+allows every GitHub reader of a public repo to receive live keys. Every peer enforces that committed
 policy independently. Read members receive keys and fetch; only writers append.
 
 The descriptor adds public `recoveryPublicKey` and `publicAccess` fields to the
@@ -182,7 +182,9 @@ member. `share grant` runs the same independent checks immediately.
 `share status` distinguishes git-only, sign in, no access, waiting for key, shared,
 and unavailable with a reason. `sync status --json` adds `sharing` for consumers
 such as the Design panel. No Design panel code is changed here. Missing keys or
-service/GitHub failures leave ordinary git and local editing available.
+service/GitHub failures leave ordinary git and local editing available. Maintenance
+failures pause sending; existing-key reads and the relay keep working. A grace
+warning appears in both CLI and daemon status.
 
 The OS Keychain holds device secrets and local GitHub tokens on macOS. Headless
 Linux uses a 0600 file in a 0700 `~/.foundation/share` directory; symlink/insecure
@@ -194,12 +196,21 @@ updated descriptor and have teammates pull it. An old descriptor produces a
 visible pin-mismatch alarm until updated. Keep the recovery holder trusted until
 rotation. `share revoke-device DEVICE_ID` rotates and revokes immediately; for a
 stolen machine also remove its SSH key from GitHub and revoke its GitHub tokens.
+After ordinary SSH-key rotation, use `share login --reattest --ssh-key PATH`.
+It re-signs the same public keys; a revoked device or renamed account gets fresh
+device keys after access is verified again. Old or invalid devices are excluded
+individually, with a re-attest warning, rather than pausing teammates. Obsolete
+untrusted wraps are skipped so a newer verified epoch can still arrive.
 
 Clients verify GitHub SSH bindings and current permissions independently before
 handing over a sealed key or accepting a writer-certified epoch. Signed recipient
 lists remain in local epoch packages; hiding a device from service state does not
 erase known recipients. Full checks run before sending after startup and every
-120 seconds. GitHub failures never imply removal; a successful check has a one-hour
+120 seconds. Numeric account lookups use the local authenticated GitHub token;
+positive member checks cache for 120 seconds and SSH bindings for ten minutes.
+Concurrent identical lookups coalesce; forced re-attestation bypasses the binding
+cache. Definite invalid bindings cache briefly as invalid, never as outages.
+GitHub failures never imply removal; a successful check has a one-hour
 grace, after which appends pause with the last-check time. Writers self-rotate
 at 24 hours before another append. Local monotonic epochs reject service rollback;
 key identifiers produce explicit fork errors. A malicious service can still deny
@@ -212,7 +223,8 @@ before network/storage; the generic feed transport also encrypts future presence
 fact payloads. This change does not add a separate presence publisher. Symmetric
 content uses libsodium XChaCha20-Poly1305; keys use sealed boxes and signed writer
 certificates. New records carry device signatures; current-epoch signers must
-currently have write access. Historical record signatures remain checkable after
+have independently verified write access. Previously verified writers remain
+readable during GitHub outages; unknown writers require a fresh check. Historical record signatures remain checkable after
 removal, while historical authorization relies on the service's original append
 permission check. Feed pseudonyms stay stable across epochs (removed members can
 link known feeds), while dedup keys rotate and are feed-specific. Plaintext S1b
