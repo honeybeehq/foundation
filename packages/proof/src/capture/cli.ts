@@ -32,6 +32,9 @@ const fontAssets = await Promise.all((links.fonts ?? []).map(async font => {
 const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim()
 const dirty = execFileSync('git', ['status', '--porcelain'], { cwd: repo, encoding: 'utf8' }).trim()
 if (dirty && !args.includes('--allow-dirty')) throw new Error('Code checkout is dirty; commit it or use --allow-dirty for exploratory captures')
+const rendererRepo = resolve(import.meta.dirname, '../../../..')
+const rendererCommit = execFileSync('git', ['rev-parse', 'HEAD'], {cwd: rendererRepo, encoding:'utf8'}).trim()
+const rendererDirty = Boolean(execFileSync('git', ['status', '--porcelain'], {cwd: rendererRepo, encoding:'utf8'}).trim())
 const target = await startCodeServer(repo, links)
 const browser = await getBrowser()
 try {
@@ -47,6 +50,16 @@ try {
       const context = await browser.newContext({ viewport: { width: board.viewport.width, height: board.viewport.height }, deviceScaleFactor: board.viewport.dpr, colorScheme: 'light', reducedMotion: 'reduce', forcedColors: 'none', timezoneId: 'UTC', locale: 'en-US', serviceWorkers: 'block' })
       await context.addInitScript(() => {
         ;(window as any).__name = (fn: unknown) => fn
+        const pending = new Set<number>()
+        const nativeSetTimeout = window.setTimeout.bind(window)
+        const nativeClearTimeout = window.clearTimeout.bind(window)
+        window.setTimeout = ((callback: any, delay?: number, ...params: any[]) => {
+          const id = nativeSetTimeout(() => { pending.delete(id); callback(...params) }, delay)
+          pending.add(id)
+          return id
+        }) as typeof window.setTimeout
+        window.clearTimeout = id => { pending.delete(Number(id)); nativeClearTimeout(id) }
+        Object.defineProperty(window, '__foundationPendingTimers', {get: () => pending.size})
         const epoch = Date.parse('2026-07-31T12:00:00Z')
         const RealDate = Date
         window.Date = new Proxy(RealDate, { construct: (target, args) => args.length ? Reflect.construct(target, args) : new target(epoch), apply: () => new RealDate(epoch).toString() })
@@ -89,6 +102,8 @@ try {
         }
         await page.addStyleTag({ content: fontAssets.map(font => font.css).join('\n') + '\n*{animation:none!important;transition:none!important;caret-color:transparent!important} #foundation-root{width:100vw;height:100vh;overflow:hidden}' })
         await page.evaluate(() => document.fonts.ready)
+        await page.waitForFunction(() => (window as any).__foundationPendingTimers === 0, undefined, {timeout:5000})
+        await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
         const dom = await collectDom(page, '#foundation-root')
         if (errors.length || blocked.length) throw new Error(JSON.stringify({ errors, blocked }))
         const fonts = await page.evaluate(() => [...new Set(Array.from(document.querySelectorAll('#foundation-root *')).map(el => getComputedStyle(el).fontFamily))].sort())
@@ -97,7 +112,7 @@ try {
         await mkdir(destination, { recursive: true })
         await page.screenshot({ path: join(destination, 'screenshot.png'), animations: 'disabled' })
         await writeFile(join(destination, 'dom.json'), JSON.stringify(dom, null, 2) + '\n')
-        const meta = { schema: 'fdn-capture/0', source: side, artboard: board.id, state: state.name, viewport: board.viewport, url, fonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
+        const meta = { schema: 'fdn-capture/0', rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, url, fonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
         await writeFile(join(destination, 'meta.json'), JSON.stringify(meta, null, 2) + '\n')
         console.log(`${board.id}/${state.name} ${side}: ${dom.nodes.length} nodes, ${meta.timingsMs.capture} ms`)
       } finally { await context.close() }

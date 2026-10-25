@@ -3,6 +3,8 @@ export interface StateLink {
   fixture: string
   designState: string
   designNode?: string
+  provable?: boolean
+  reason?: string
 }
 
 export interface ArtboardLink {
