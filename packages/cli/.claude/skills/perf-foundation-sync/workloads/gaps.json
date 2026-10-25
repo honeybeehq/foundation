@@ -318,23 +318,103 @@
     },
     {
       "key": "entry:packages/cli/src/share/github-app.ts:checkSingleFileRead",
-      "reason": "App permission/path verification and preflight are cold work; current single-file real-App authorization latency is not measured by the pre-gate stub series"
+      "reason": "App permission/path verification and preflight are cold work; current single-file real-App authorization latency is not measured by the pre-gate stub series. Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
     },
     {
       "key": "entry:packages/cli/src/share/github-app.ts:requireDescriptorPath",
-      "reason": "App permission/path verification and preflight are cold work; current single-file real-App authorization latency is not measured by the pre-gate stub series"
+      "reason": "App permission/path verification and preflight are cold work; current single-file real-App authorization latency is not measured by the pre-gate stub series. Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
     },
     {
       "key": "entry:packages/cli/src/share/github-app.ts:requireSharePermissions",
-      "reason": "App permission/path verification and preflight are cold work; current single-file real-App authorization latency is not measured by the pre-gate stub series"
+      "reason": "App permission/path verification and preflight are cold work; current single-file real-App authorization latency is not measured by the pre-gate stub series. Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
     },
     {
       "key": "entry:packages/cli/src/share/crypto.ts:recoveryPublicKey",
-      "reason": "Two-step initialization derives the public recovery pin before live sharing; cold bootstrap cost is unmeasured"
+      "reason": "Two-step initialization derives the public recovery pin before live sharing; cold bootstrap cost is unmeasured. Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
     },
     {
       "key": "poll:packages/cli/src/share/service.ts#2",
-      "reason": "Bearer-expiry relay lifecycle timer is outside the bounded warm edit series; descriptor recheck moved the existing timer ordinal"
+      "reason": "Bearer-expiry relay lifecycle timer is outside the bounded warm edit series; descriptor recheck moved the existing timer ordinal. Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/share/share-path.ts:shareStateDir",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/catalogue-follower.ts:followLocalCatalogues",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/local-model.ts:catalogueCachePath",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/local-model.ts:catalogueContactPath",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/local-model.ts:catalogueSnapshot",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/local-model.ts:foldCatalogue",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/local-model.ts:modelRoot",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/local-model.ts:newCatalogueCache",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/local-model.ts:persistModel",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/local-model.ts:readCatalogueCache",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/local-model.ts:recordCatalogueContact",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/materialize-jobs.ts:acceptMaterialize",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/materialize-jobs.ts:materializeConfig",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/materialize-jobs.ts:materializeStatus",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/materialize-jobs.ts:processMaterializeJobs",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "poll:packages/cli/src/sync/catalogue-follower.ts#1",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "poll:packages/cli/src/sync/daemon.ts#6",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "poll:packages/cli/src/sync/materialize-jobs.ts#1",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "rpc:packages/cli/src/sync/catalogue-follower.ts:head",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "rpc:packages/cli/src/sync/catalogue-follower.ts:read",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
     }
   ]
 }

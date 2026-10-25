@@ -43,6 +43,10 @@
     {
       "inventory": "entry-points",
       "key": "entry:packages/cli/src/sync/activity-journal.ts:closeActivityJournal"
+    },
+    {
+      "inventory": "work-triggers",
+      "key": "poll:packages/cli/src/sync/activity-journal.ts#1"
     }
   ],
   "states": {
