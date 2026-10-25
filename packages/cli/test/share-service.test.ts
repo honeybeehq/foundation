@@ -241,3 +241,17 @@ it('pins the operator service origin and optionally restricts repository owners'
   expect(response.status).toBe(403)
   expect(await response.text()).toContain('configured publicUrl')
 })
+
+it('atomically rejects a requested space already bound to another repository', async () => {
+  const f=await fixture()
+  const repo='github.com/team/other'
+  const creation=(await f.api(`challenge?repo=${repo}&requestedSpace=${f.space.space}`)).body
+  const binding={space:creation.space,repo}
+  const writer=f.device('writer',binding)
+  f.setCommitted({...f.committed,repo})
+  const signature=sign(null,Buffer.from(JSON.stringify(['foundation-auth-v1',writer.service,binding.space,writer.id,creation.challenge])),f.identities.get('writer')!.ed.privateKey).toString('base64')
+  const result=await f.api('spaces',{repo,device:writer,challenge:creation.challenge,proof:signature})
+  expect(result.status).toBe(409)
+  expect(JSON.stringify(result.body)).toContain('space is already bound to another repository')
+  expect((await f.api('challenge?space='+f.space.space)).body.repo).toBe(f.space.repo)
+})
