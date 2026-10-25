@@ -8,10 +8,12 @@ import { acquireDocumentLock } from '../document-lock.js'
 import { updateDocument } from '../disk.js'
 import { liveDesigns, replicaRoot, readSyncState, writeSyncState, type LiveDesign } from '../sync-store.js'
 import { CatalogueQueue } from './catalogue.js'
-import { CombBridge, validateAppendReceipt, type Frame } from './bridge.js'
+import { validateAppendReceipt, type Frame } from './bridge.js'
+import { createBridge, configForDesign, shareRelay, maintainKnownRepos, type Bridge } from '../share/transport.js'
+import type { ShareConfig } from '../share/config.js'
 import { DirectChanges, writeDirectStatus, type DirectConfig } from './direct.js'
 
-export interface CombConfig { binary: string; args: string[]; node?: { id: string; name: string }; direct?: DirectConfig }
+export interface CombConfig { binary: string; args: string[]; node?: { id: string; name: string }; direct?: DirectConfig; share?: ShareConfig; shareLog?: string }
 export function feedName(design: LiveDesign): string { return `foundation/${design.workspace}/${design.product}/${design.docId}` }
 // Comb's supported log names exclude '/'. Keep the logical address and map it without collisions.
 export function combLog(design: LiveDesign): string { return `foundation-${createHash('sha256').update(feedName(design)).digest('hex')}` }
@@ -56,14 +58,18 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
     writeDirectStatus(direct ? 'enabled' : 'disabled', direct ? null : 'not configured')
   } catch (error) { log(`direct sync unavailable: ${String(error)}`); direct = undefined; writeDirectStatus('disabled', String(error)) }
   const catalogueQueue = new CatalogueQueue(config, signal, log)
+  let keyMaintenance:Promise<void>|undefined
+  const maintain=():void=>{if(!config.binary&&!keyMaintenance)keyMaintenance=maintainKnownRepos().catch(error=>log(`sharing: ${String(error)}`)).finally(()=>{keyMaintenance=undefined})}
+  const keyTimer=setInterval(maintain,2000);maintain()
   const workers = new Map<string, { controller: AbortController; done: Promise<void>; registration: string }>()
   async function run(design: LiveDesign, signal: AbortSignal): Promise<void> {
+    const transport = configForDesign(config, design)
     updateDocument(design.file, chain => {
       if (chain.docId() !== design.docId) throw new Error('live path now holds another design')
       chain.upgradeStorage()
     }, true)
     const key = copyKey(design), state = readSyncState(key), feed = combLog(design)
-    let bridge: CombBridge | undefined, watcher: FSWatcher | undefined, wake: (() => void) | undefined
+    let bridge: Bridge | undefined, watcher: FSWatcher | undefined, wake: (() => void) | undefined
     const retry = { receive: 250, publish: 250, connection: 250 }
     if (state.lastError && !state.receiveError && !state.publishError && !state.connectionError) state.connectionError = state.lastError
     const updateError = (side: 'receive' | 'publish' | 'connection', error: string | null): void => {
@@ -105,6 +111,12 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
         if (batch.length === changes.length) hintSignature = signature
       } catch { /* Atomic replacement or an unavailable optional peer never blocks Comb. */ }
     }
+    const relayController = new AbortController()
+    const relay = transport.share ? shareRelay(transport.share, transport.shareLog??feed, AbortSignal.any([signal,relayController.signal]), bytes => {
+      updateDocument(design.file, chain => { if(chain.docId()!==design.docId)throw new Error('document identity mismatch');importChangeBlobs(chain,[bytes]) },true)
+      const received=directReceived.get(key)??new Map<string,number>(); const hash=decodeBlob(bytes).envelope.hash
+      if(!received.has(hash))received.set(hash,Date.now()+5000);directReceived.set(key,received);wake?.()
+    }) : undefined
     const stop = (): void => { bridge?.close(); wake?.() }
     signal.addEventListener('abort', stop)
     try {
@@ -113,7 +125,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
       while (!signal.aborted) {
         let receiveError: unknown, publishingHash: string | undefined
         try {
-          bridge = new CombBridge(config.binary, config.args); await bridge.hello()
+          bridge = createBridge(transport); await bridge.hello()
           const active = bridge
           let failed: unknown
           const follow = (async () => {
@@ -157,7 +169,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
                 // A persistent bridge renews exclusive feed ownership. Bound each writer
                 // batch and send clean EOF, so other nodes can publish through the same log.
                 publishingHash = pending[0]!.envelope.hash
-                const writer = new CombBridge(config.binary, config.args)
+                const writer = createBridge(transport)
                 try {
                   await writer.hello()
                   for (const change of pending.slice(0, 16)) {
@@ -198,7 +210,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
           await delay(Math.round(retry[side] * (0.5 + Math.random() / 2))); retry[side] = Math.min(retry[side] * 2, 5000)
         }
       }
-    } finally { if (directPoll) clearInterval(directPoll); watcher?.close(); signal.removeEventListener('abort', stop) }
+    } finally { relayController.abort();await relay; if (directPoll) clearInterval(directPoll); watcher?.close(); signal.removeEventListener('abort', stop) }
   }
   try {
     while (!signal.aborted) {
@@ -238,5 +250,5 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
     }
     await Promise.all([...workers.values()].map(worker => worker.done))
     await catalogueQueue.close()
-  } finally { await direct?.close(); writeDirectStatus('disabled', 'daemon stopped'); release() }
+  } finally { clearInterval(keyTimer);await keyMaintenance;await direct?.close(); writeDirectStatus('disabled', 'daemon stopped'); release() }
 }

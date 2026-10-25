@@ -1,6 +1,9 @@
 import { readDirectStatus } from '../sync/direct.js'
 import { materialize, MaterializeError } from '../sync/materialize.js'
 import { readFileSync } from 'node:fs'
+import { join, dirname } from 'node:path'
+import { findShareRoot, readShareConfig } from '../share/config.js'
+import { replicaRoot } from '../sync-store.js'
 import { loadChain } from 'foundation-engine'
 import { parseArgs, flagString } from '../argv.js'
 import type { CliIO } from '../io.js'
@@ -45,21 +48,23 @@ export async function runSync(args: string[], io: CliIO): Promise<number> {
       case 'status': {
         const direct = readDirectStatus()
         const rows = liveDesigns().map(design => {
+          const root=design.repoRoot??findShareRoot(dirname(design.file));const share=root?readShareConfig(root):null
+          let sharing:unknown={state:'git-only'}
+          if(share){try{sharing=JSON.parse(readFileSync(join(replicaRoot(),'sharing',`${share.space}.json`),'utf8'))}catch{sharing={state:'sign in'}}}
           let state
           try { state = readSyncState(copyKey(design)) } catch (err) {
-            return { ...design, direct, feed: feedName(design), status: 'saved locally', pending: null, cursor: null, lastError: `replica state: ${String(err)}`, lastErrorAt: null, catalogueError: null, updatedAt: '' }
+            return { ...design, direct, sharing, feed: feedName(design), status: 'saved locally', pending: null, cursor: null, lastError: `replica state: ${String(err)}`, lastErrorAt: null, catalogueError: null, updatedAt: '' }
           }
           let pending: number | null = null, localError: string | null = null
           try { const known = new Set(state.published); pending = loadChain(readFileSync(`${design.file}.chain`)).changes().filter(c => !known.has(c.envelope.hash)).length } catch (err) { localError = String(err) }
-          return { ...design, direct, feed: feedName(design), status: (localError ?? state.lastError) && pending === 0 ? 'blocked' : pending === 0 ? 'shared' : state.updatedAt ? 'waiting to upload' : 'saved locally', pending, cursor: state.cursor, lastError: localError ?? state.lastError, lastErrorAt: state.lastErrorAt ?? null, catalogueError: state.catalogueError ?? null, updatedAt: state.updatedAt }
+          return { ...design, direct, sharing, feed: feedName(design), status: (localError ?? state.lastError) && pending === 0 ? 'blocked' : pending === 0 ? 'shared' : state.updatedAt ? 'waiting to upload' : 'saved locally', pending, cursor: state.cursor, lastError: localError ?? state.lastError, lastErrorAt: state.lastErrorAt ?? null, catalogueError: state.catalogueError ?? null, updatedAt: state.updatedAt }
         })
         io.stdout(flags.json ? JSON.stringify(rows) : rows.map(row => `${row.file}: ${row.status} [direct ${row.direct.state}${row.direct.reason ? `: ${row.direct.reason}` : ''}] (${row.pending ?? '?'} waiting)${row.lastError ? ` — ${row.lastError}` : ''}${row.catalogueError ? ` — catalogue: ${row.catalogueError}` : ''}`).join('\n'))
         return 0
       }
       case 'serve': {
         const file = flagString(flags, 'comb-config') ?? process.env.FOUNDATION_COMB_CONFIG
-        if (!file) throw new Error('sync serve requires --comb-config <file> (or FOUNDATION_COMB_CONFIG)')
-        const raw: unknown = JSON.parse(readFileSync(file, 'utf8'))
+        const raw: unknown = file ? JSON.parse(readFileSync(file, 'utf8')) : {binary:'',args:[]}
         const config = raw as CombConfig
         if (!config || typeof config.binary !== 'string' || !Array.isArray(config.args) || config.args.some(arg => typeof arg !== 'string')) throw new Error('Comb config requires {binary: string, args: string[]}')
         if (config.node && (typeof config.node.id !== 'string' || !config.node.id || typeof config.node.name !== 'string' || !config.node.name)) throw new Error('Comb config node requires id and name')
