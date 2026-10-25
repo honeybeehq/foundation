@@ -31,12 +31,12 @@ Prefer `TracksView({tracks, selection, onSelect})` beneath a production `TracksC
 
 ## Harness and fixtures
 
-Agreed with T2: `foundation.harness.tsx` exports optional `prepare()` and `mount({Component,fixture,root,state})`, returning a cleanup function, possibly asynchronously. The runner imports the harness first, awaits prepare, then dynamically imports the fixture and linked component. Harness top-level imports must themselves be safe; do not eagerly import a production bridge through a convenience barrel. The runner loads the target app's Vite config so aliases, StyleX transforms and CSS match production. A bundler adapter is infrastructure, not permission to bypass the linked implementation.
+Agreed with T2: `foundation.harness.tsx` exports optional `prepare({state})` and `mount({Component,fixture,root,state})`, returning a cleanup function, possibly asynchronously. The runner imports the harness first, awaits prepare, then dynamically imports the fixture and linked component. Harness top-level imports must themselves be safe; do not eagerly import a production bridge through a convenience barrel. The runner loads the target app's Vite config so aliases, StyleX transforms and CSS match production. A bundler adapter is infrastructure, not permission to bypass the linked implementation.
 
 ```tsx
 // Illustrative repo-owned harness; these provider names are app-specific.
-export async function prepare() {
-  installFixtureBridge(); // before ANY production module can read the preload bridge
+export async function prepare({ state }) {
+  installFixtureBridge(state); // before ANY production module can read the preload bridge
 }
 export async function mount({ Component, fixture, root, state }) {
   const store = createStore(fixture.store); // fresh, no singleton carry-over
@@ -59,7 +59,7 @@ After mount and fixture readiness the runner awaits `document.fonts.ready` and t
 
 Serve static code/assets from the fixture server. Default-deny application requests, including localhost and same-origin API endpoints. MSW (unhandled request = error) or Playwright routes return named finite responses, including error and latency cases; record matched/unmatched requests. Configure interception before loading the app. Block service workers that would bypass routing; intercept/reject WebSocket/EventSource separately. A read-only API is still live I/O and can change a proof. Do not depend on a developer’s authentication cookies or desktop backend. No proof render should start a real server action, payment, file write or IPC request.
 
-Fix the date and timezone, seeded randomness (including UUID/crypto through an injected id service), locale and all generated timestamps. Drive timers to a chosen logical instant using the runner’s clock; report pending recurring work and fail unbounded readiness. Disable CSS transitions/animations and freeze Web Animations at a declared frame. Freeze animated media too, or declare the region/state unsupported; do not silently mask it. Use the same controls for design and implementation. Playwright provides clock controls, but the prototype doctor currently fixes Date/Math.random, records real timeouts and blocks intervals: that narrower scope is reported rather than called full clock virtualization. [Playwright clock](https://playwright.dev/docs/clock).
+Fix the date and timezone, seeded randomness (including UUID/crypto through an injected id service), locale and all generated timestamps. Drive timers to a chosen logical instant using the runner’s clock; report pending recurring work and fail unbounded readiness. Disable CSS transitions/animations and freeze Web Animations at a declared frame. Freeze animated media too, or declare the region/state unsupported; do not silently mask it. Use the same controls for design and implementation. Playwright provides clock controls, but the prototype doctor currently uses `page.clock.setFixedTime` for Date and fixes Math.random, records and awaits real-time timeouts (15s bound) and blocks intervals: that narrower scope is reported rather than called full clock virtualization. [Playwright clock](https://playwright.dev/docs/clock).
 
 ## Effects and browser/native boundaries
 
@@ -98,9 +98,22 @@ A Next server component cannot simply be imported into a generic browser gallery
 
 Prototype source: `packages/proof/src/doctor/`; invocation and limitations: [README](../packages/proof/src/doctor/README.md). Proposed public commands: `foundation doctor` explains isolation failures, `foundation check` gates complete proof results. Neither command is wired into the top-level CLI by T7; this is a runnable prototype under the owning subfolder.
 
+The rule list is the required product contract. This prototype implements only part of its checks:
+
+| Rule | Current enforcement and remaining work |
+|---|---|
+| 1 | T2 link reader/mount resolves entries; doctor does not validate named exports/design ids. |
+| 2 | Doctor lexical relative-import scan + sampled runtime; bundler-resolved AST graph remains future work. |
+| 3 | Doctor records runtime/provider errors; T2 supplies stores. Cross-state leak tests remain future work. |
+| 4 | Doctor blocks non-asset requests/bridges; T2 provides aliases/fixtures. Dedicated static asset server/manifest remains required for stronger isolation. |
+| 5 | Doctor fixes Date/Math.random, locale/timezone, freezes CSS/Web Animations and awaits fonts. Full font-face/asset hashes and crypto id fixtures remain runner responsibilities. |
+| 6 | Doctor observes/awaits pending timeouts and rejects intervals; T2 returns cleanup. Doctor does not currently exercise same-context cleanup/remount. |
+| 7 | Doctor captures declared root only; portal inventory/coverage assertion remains future work. |
+| 8 | Doctor failure includes reason; T4 report helper and CI verifier enforce not-provable failure. |
+
 The source scanner follows relative imports/re-exports, flags fetch/IPC/websocket/native modules, moving time/randomness, storage and timers, and reports external/unresolved edges. Production tooling should use the target bundler’s resolved import graph plus AST phase analysis to distinguish render calls, module initialization, effects and handlers. A `Date.now` in a click handler is a warning, not proof of impure render. A forbidden module that the target bundler replaces with a fixture is a documented seam, not automatically an error. The prototype is lexical, does not resolve package aliases and can flag comments/strings. It cannot certify a clean closure.
 
-The Chromium probe installs controls before imports, loads the harness URL in two fresh contexts, reports blocked network/native calls, page/provider errors, interval attempts and timeout registrations, waits readiness/fonts, and hashes the capture root DOM and screenshot. Different hashes fail repeatability. Same hashes establish two sampled runs only. Fixed time/randomness explains away intended environmental variation; crypto ids, storage and observer policies remain explicit harness responsibilities. Full check must inspect all requested states/viewports, assert the expected state, and bind all controls and diagnostics into the proof. Do not gate CI solely on absence of lexical warnings or doctor process exit code.
+The Chromium probe installs controls before imports, loads the harness URL in two fresh contexts, reports blocked network/native calls, page/provider errors, interval attempts and timeout call stacks, waits readiness/fonts and zero pending timers, and hashes the capture root DOM and screenshot. Expected fixture text is required for a successful probe; a nonempty root alone cannot distinguish the intended populated state from a stable fallback. Different hashes or timer/effect event-count multisets fail repeatability. Same hashes establish two sampled runs only. Fixed time/randomness explains away intended environmental variation; crypto ids, storage and observer policies remain explicit harness responsibilities. Full check must inspect all requested states/viewports, assert the expected state, and bind all controls and diagnostics into the proof. Do not gate CI solely on absence of lexical warnings or doctor process exit code.
 
 Diagnostics should name the operation, source/import path where available, failing fixture/state, and smallest suggested next rung: “bridge tracks.list was not mocked; add a prepare fixture,” “AppContext missing; wrap AppProvider,” or “two captures differ; inject timestamp/id inputs.” Unavailable Chromium, missing fonts or a missing harness is `not-provable`, not drift.
 
@@ -116,4 +129,33 @@ pnpm exec tsx packages/proof/src/doctor/cli.ts /tmp/foundation-t7-apiary-readonl
 
 Actual output: [tracks-doctor-before.json](tracks-doctor-before.json). It visited **171 files**, reported **106 advisory findings**, and exposed **36 external/unresolved imports**. TracksPane itself contains eight bridge references (lines 345, 428–429, 441, 570–571, 609–610) and two timer call sites (151, 265). The closure includes app stores/sidecars: wrapping only a props object does not isolate it. These are lexical findings across the entire closure, including handlers; they are not 106 proven render failures. No pre-adaptation harness URL was supplied, so its runtime result is honestly **not-provable**, not a failed screenshot comparison.
 
-T2's actual adaptation measurements and runtime doctor result will be appended after its harness is available. No rung or lines-changed count is claimed from the source scan alone.
+The actual adaptation needed **rung 2: a fixture adapter**, without a production view split. I inspected published Apiary commit `395cdc1c413eb640e3d25db303803bdd342d728d` against base `f017553ad6f2b25b0d03215426a946a731e2db9a` using `git diff --numstat <base> <commit>` and the production TracksRail diff.
+
+That diff adds **485 lines, removes zero**: **one production line** (`data-foundation-track-row` in TracksRail), and **484 proof setup lines**. Breakdown: 278 design-data JSON, 29 fixture, 14 infrastructure adapter, 20 harness, 19 Vite config, 74 links, 15 live-preview entry, 35 TypeScript configuration/declaration. T2's later capture commit `aaf313b` adds one links metadata line (486 total); the runtime evidence here remains bound to inspected commit `395cdc1`.
+
+The adapter substitutes exactly five infrastructure modules (`state`, `sessionsStore`, `tracksMirror`, `tracksProposal`, `keybindings`) through Vite aliases. It supplies inert layout persistence/commands, fixture sessions/mirror/proposal and inert shortcuts/list navigation. No visible component is mocked. A fail-closed IPC proxy rejects unexpected bridge calls; `active:false` and `focused:false` suppress live activity. Real StyleX tokens and bundled fonts remain; no router/i18n mock was needed. These findings agree with [T2's application measurements](tracks-pane-application.md). T2 also records fidelity gaps: at-rest and selected map to identical Classic code output, and auxiliary track bodies are reconstructed. The lexical scan ignores Vite aliases, so its unchanged 106 warnings are not an adaptation improvement metric.
+
+### Real runtime result
+
+The final run used committed doctor `66bcac221b6cb318972b993b91e01a367c2fa49a` with `doctorDirty:false`, on the production-built Vite harness served statically by Nectar (HMR absent):
+
+```sh
+pnpm exec tsx packages/proof/src/doctor/cli.ts /tmp/foundation-t7-apiary-readonly apps/desktop/src/renderer/src/panes/TracksPane.tsx#TracksPane 'https://trmd-metal-1.tailff9529.ts.net:8466/?state=track-selected' '#foundation-root' 'Read the diff' '1416x600@1'
+```
+
+Actual output: [tracks-doctor-after.json](tracks-doctor-after.json), committed repository evidence and a Project file. Scope: **Classic, track-selected, 1416×600 at DPR 1, static non-live props**, two fresh contexts on the same machine/browser process. The single-string assertion found “Read the diff”; it establishes populated content, not every field's semantic correctness.
+
+- Result: **probe-passed**, rendered repeatability true, timer/effect-count repeatability true.
+- Both DOM SHA256: `a63287539e3ec5147ed839509204478990c3397a76a17f0a31f3d95c1acb4e28`.
+- Both screenshot SHA256: `adb21a2ef8f673ff0ac25ff681d9f55fa951cef940cedd9f31783dcfc77268ce`.
+- No blocked application network/IPC, page errors or console errors observed. Each run registered timers **250, 300, 300 ms**, all settled; **zero pending** at capture.
+
+The 250 ms timeout originates in `TracksCanvas.tsx:289` (persist viewport to local pane state); the 300 ms timeout in `TracksPane.tsx:265` forwards pane parameters to the inert fixture layout. Updating viewport state retriggers the latter. An earlier sample reached matching pixels while recording 3 versus 2 timers; **that result is superseded**, because sampling before the chain settled was insufficient. The final probe tracks timeout handles/clearTimeout, waits zero pending, two frames, then zero again; remaining timers report their stacks and fail after 15 seconds. Matching final hashes show this particular settling chain did not change the sampled root output, though the earlier sample alone could not establish that.
+
+The first CLI run caught a doctor defect (`__name is not defined` from tsx's serialized helper), returning not-provable. Browser init is now literal self-contained JS; a subprocess CLI regression check verifies the actual execution path. Two tests pass, covering scanning and stable/blocked-I/O/error/random/wrong-state browser cases, cancelled timers and that subprocess. HTML fixtures do not establish React/provider correctness; the real run above supplies the Tracks evidence. Final typecheck passes.
+
+[Live mounted harness](https://trmd-metal-1.tailff9529.ts.net:8466/?state=track-selected), Nectar reference `nectar://trmd-metal-1/dtc-tracks-live--static--web`. T7 introduces no UI changes. This establishes sampled isolated repeatability, **not design equality**, cross-machine stability, every state, live subscriptions, cross-state cleanup, portal coverage or full font/asset verification. See the enforcement table before treating the contract as fully automated.
+
+### Attention from independent review
+
+Reviewed by Claude Opus 5.5 (`f260aed7-456b-4861-a8f0-b9f7939c5a73`). Review checked Project documents and transcript, not code execution. Findings led to required failure reasons, expected-state checks, the enforcement table, timer settling and a CLI regression check. Remaining limits are the sampled static state and unenforced checks listed above; the doctor is a prototype, not a complete CI contract implementation.

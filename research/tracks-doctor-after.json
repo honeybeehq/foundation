@@ -1,0 +1,755 @@
+{
+  "schema": "fdn-doctor/0",
+  "doctorCommit": "66bcac221b6cb318972b993b91e01a367c2fa49a",
+  "doctorDirty": false,
+  "repoCommit": "395cdc1c413eb640e3d25db303803bdd342d728d",
+  "entry": "apps/desktop/src/renderer/src/panes/TracksPane.tsx#TracksPane",
+  "source": {
+    "files": 171,
+    "findings": [
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/panes/TracksPane.tsx",
+        "line": 151,
+        "detail": "setTimeout("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/panes/TracksPane.tsx",
+        "line": 345,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/panes/TracksPane.tsx",
+        "line": 428,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/panes/TracksPane.tsx",
+        "line": 429,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/panes/TracksPane.tsx",
+        "line": 441,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/panes/TracksPane.tsx",
+        "line": 570,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/panes/TracksPane.tsx",
+        "line": 571,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/panes/TracksPane.tsx",
+        "line": 609,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/panes/TracksPane.tsx",
+        "line": 610,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/panes/TracksPane.tsx",
+        "line": 265,
+        "detail": "setTimeout("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/state.tsx",
+        "line": 160,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/state.tsx",
+        "line": 162,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/state.tsx",
+        "line": 170,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/state.tsx",
+        "line": 179,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/state.tsx",
+        "line": 180,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/state.tsx",
+        "line": 196,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/state.tsx",
+        "line": 201,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/computeStore.ts",
+        "line": 33,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/computeStore.ts",
+        "line": 47,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/computeStore.ts",
+        "line": 55,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/computeStore.ts",
+        "line": 67,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/computeStore.ts",
+        "line": 69,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/computeStore.ts",
+        "line": 73,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/computeStore.ts",
+        "line": 42,
+        "detail": "setTimeout("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/transcriptCommands.ts",
+        "line": 24,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/transcriptCommands.ts",
+        "line": 36,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/settings.ts",
+        "line": 11,
+        "detail": "localStorage"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/settings.ts",
+        "line": 202,
+        "detail": "localStorage"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/settings.ts",
+        "line": 234,
+        "detail": "localStorage"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/settings.ts",
+        "line": 235,
+        "detail": "localStorage"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/settings.ts",
+        "line": 247,
+        "detail": "localStorage"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/settings.ts",
+        "line": 248,
+        "detail": "localStorage"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/settings.ts",
+        "line": 258,
+        "detail": "localStorage"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/transcriptPreferences.ts",
+        "line": 33,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/transcriptPreferences.ts",
+        "line": 42,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/transcriptPreferences.ts",
+        "line": 60,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/transcriptPreferences.ts",
+        "line": 63,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/transcriptPreferences.ts",
+        "line": 87,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/transcriptPreferences.ts",
+        "line": 105,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/transcriptPreferences.ts",
+        "line": 116,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/lagRecorder.ts",
+        "line": 33,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/lagRecorder.ts",
+        "line": 138,
+        "detail": "setInterval("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/lagRecorder.ts",
+        "line": 192,
+        "detail": "setInterval("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/lagRecorder.ts",
+        "line": 328,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/lagRecorder.ts",
+        "line": 102,
+        "detail": "Date.now("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/shared/lag.ts",
+        "line": 2,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/beeActionsFeed.ts",
+        "line": 68,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/beeActionsFeed.ts",
+        "line": 69,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/beeActionsFeed.ts",
+        "line": 83,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/beeActionsFeed.ts",
+        "line": 99,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/waggle/beeActionQueueActions.ts",
+        "line": 36,
+        "detail": "Date.now("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/composerQueueFeed.ts",
+        "line": 147,
+        "detail": "setTimeout("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/waggle/messageActions.ts",
+        "line": 254,
+        "detail": "localStorage"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/commandBridge.ts",
+        "line": 93,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/commandBridge.ts",
+        "line": 104,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/state/mirrorFeeds.tsx",
+        "line": 32,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/state/useHiveMirrorFeed.ts",
+        "line": 44,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/state/useHiveMirrorFeed.ts",
+        "line": 44,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/state/useHiveMirrorFeed.ts",
+        "line": 90,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/waggle/index.ts",
+        "line": 222,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/waggle/index.ts",
+        "line": 266,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/waggle/index.ts",
+        "line": 275,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/waggle/accountAuthorityActions.ts",
+        "line": 41,
+        "detail": "Date.now("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/waggle/reconnectToolsAction.ts",
+        "line": 20,
+        "detail": "setTimeout("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/waggle/agentActions.ts",
+        "line": 174,
+        "detail": "Date.now("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/waggle/agentActions.ts",
+        "line": 371,
+        "detail": "Math.random("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/waggle/hiveAccountActions.ts",
+        "line": 23,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/waggle/hiveConfigActions.ts",
+        "line": 22,
+        "detail": "crypto.randomUUID("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/transcriptFeed.ts",
+        "line": 531,
+        "detail": "setTimeout("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/transcriptFeed.ts",
+        "line": 552,
+        "detail": "setTimeout("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/transcriptFeed.ts",
+        "line": 629,
+        "detail": "setTimeout("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/transcriptFeed.ts",
+        "line": 643,
+        "detail": "setTimeout("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/transcriptFeed.ts",
+        "line": 764,
+        "detail": "setTimeout("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/transcriptFeed.ts",
+        "line": 773,
+        "detail": "setTimeout("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/transcriptFeed.ts",
+        "line": 793,
+        "detail": "setTimeout("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/transcriptFeed.ts",
+        "line": 1020,
+        "detail": "setTimeout("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/transcriptFeed.ts",
+        "line": 1054,
+        "detail": "setTimeout("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/useNamedAgentRecords.ts",
+        "line": 78,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/panes/agentSurfaces.ts",
+        "line": 201,
+        "detail": "localStorage"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/workspaceStorage.ts",
+        "line": 9,
+        "detail": "localStorage"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/workspaceStorage.ts",
+        "line": 52,
+        "detail": "localStorage"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/workspaceStorage.ts",
+        "line": 70,
+        "detail": "localStorage"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/waggle/messageCommandDispatch.ts",
+        "line": 50,
+        "detail": "Date.now("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/state/viewCommands.ts",
+        "line": 60,
+        "detail": "crypto.randomUUID("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/state/agentViewCommands.ts",
+        "line": 51,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/state/agentViewCommands.ts",
+        "line": 231,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/panes/agentWorkCommands.ts",
+        "line": 22,
+        "detail": "Date.now("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/panes/agentWorkCommands.ts",
+        "line": 60,
+        "detail": "Date.now("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/panes/editor/editorSettings.ts",
+        "line": 29,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/panes/editor/editorSettings.ts",
+        "line": 40,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/panes/editor/editorSettings.ts",
+        "line": 69,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/state/contentPaneCommands.ts",
+        "line": 68,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/state/contentPaneCommands.ts",
+        "line": 102,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/state/contentPaneCommands.ts",
+        "line": 112,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/browserPaneState.ts",
+        "line": 103,
+        "detail": "localStorage"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/browserPaneState.ts",
+        "line": 401,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/browserPaneState.ts",
+        "line": 404,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/shared/api.ts",
+        "line": 143,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/tracksMirror.ts",
+        "line": 37,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/tracksMirror.ts",
+        "line": 38,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/tracksProposal.ts",
+        "line": 28,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/tracksProposal.ts",
+        "line": 31,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/tracksSidecarChat.ts",
+        "line": 62,
+        "detail": "window.apiary"
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/panes/TracksCanvas.tsx",
+        "line": 289,
+        "detail": "setTimeout("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/panes/tracks/TracksTypePalette.tsx",
+        "line": 197,
+        "detail": "setTimeout("
+      },
+      {
+        "kind": "ambient-api",
+        "file": "apps/desktop/src/renderer/src/panes/tracks/TracksLiveOverlay.tsx",
+        "line": 189,
+        "detail": "setInterval("
+      }
+    ],
+    "externalOrUnresolved": [
+      ") return false\n  const payload = record.payload\n  if (payload === null || typeof payload !== ",
+      ",\n    entityKey: (payload) => hiveAccountEntityKey(payload.accountId),\n    project: (account) => account,\n    execute: async (payload, context) =>\n      requireOk(await api.hiveAccountConfigImport({ accountId: payload.accountId }, context.dedupKey), ",
+      "@apiary/core",
+      "@apiary/layout",
+      "@apiary/next-desktop-beta/accounts/model",
+      "@apiary/plugin-api",
+      "@apiary/plugin-git-log/commands",
+      "@apiary/plugin-git-log/manifest",
+      "@apiary/plugin-git-log/renderer",
+      "@apiary/plugin-release-notes/commands",
+      "@apiary/plugin-release-notes/manifest",
+      "@apiary/plugin-release-notes/renderer",
+      "@apiary/store",
+      "@apiary/transcript-ui/interpret",
+      "@apiary/ui",
+      "@apiary/ui/diff",
+      "@apiary/ui/icons",
+      "@apiary/ui/keys",
+      "@apiary/ui/pane-styles",
+      "@apiary/ui/theme",
+      "@apiary/ui/tokens.stylex",
+      "@apiary/waggle",
+      "@codemirror/lang-markdown",
+      "@codemirror/lang-python",
+      "@codemirror/language",
+      "@codemirror/language-data",
+      "@codemirror/lint",
+      "@codemirror/state",
+      "@codemirror/view",
+      "@dnd-kit/core",
+      "@lezer/highlight",
+      "@stylexjs/stylex",
+      "codemirror",
+      "content box almost\n * fully off the start edge",
+      "react",
+      "the user closed everything"
+    ],
+    "limitation": "Lexical scan; relative imports only; packages/aliases are coverage gaps. Findings include handlers and effects. Runtime required."
+  },
+  "runtime": {
+    "url": "https://trmd-metal-1.tailff9529.ts.net:8466/?state=track-selected",
+    "root": "#foundation-root",
+    "expectedText": "Read the diff",
+    "environment": {
+      "viewport": {
+        "width": 1416,
+        "height": 600
+      },
+      "dpr": 1,
+      "clock": "2023-11-14T22:13:20Z",
+      "random": 0.314159265
+    },
+    "runs": [
+      {
+        "hash": "a63287539e3ec5147ed839509204478990c3397a76a17f0a31f3d95c1acb4e28",
+        "screenshotHash": "adb21a2ef8f673ff0ac25ff681d9f55fa951cef940cedd9f31783dcfc77268ce",
+        "events": [
+          "timer: timeout 250",
+          "timer: timeout 300",
+          "timer: timeout 300"
+        ],
+        "pendingTimers": [],
+        "timers": [
+          {
+            "delay": 250,
+            "stack": "Error\n    at window.setTimeout (<anonymous>:8:109)\n    at https://trmd-metal-1.tailff9529.ts.net:8466/assets/TracksPane-Bf58Pph4.js:38:43427\n    at https://trmd-metal-1.tailff9529.ts.net:8466/assets/TracksPane-Bf58Pph4.js:38:43971\n    at Ju (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:92335)\n    at Z1 (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:96836)\n    at Da (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:105664)\n    at Z1 (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:96823)\n    at Da (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:105664)\n    at Z1 (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:97392)\n    at Da (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:105664)"
+          },
+          {
+            "delay": 300,
+            "stack": "Error\n    at window.setTimeout (<anonymous>:8:109)\n    at https://trmd-metal-1.tailff9529.ts.net:8466/assets/TracksPane-Bf58Pph4.js:38:148319\n    at Ju (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:92335)\n    at L1 (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:107510)\n    at la (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:107394)\n    at L1 (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:107556)\n    at hv (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:120483)\n    at https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:117866\n    at MessagePort._t (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:1:1771)"
+          },
+          {
+            "delay": 300,
+            "stack": "Error\n    at window.setTimeout (<anonymous>:8:109)\n    at https://trmd-metal-1.tailff9529.ts.net:8466/assets/TracksPane-Bf58Pph4.js:38:148319\n    at Ju (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:92335)\n    at L1 (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:107510)\n    at la (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:107394)\n    at L1 (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:107556)\n    at hv (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:120483)\n    at https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:117866\n    at MessagePort._t (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:1:1771)"
+          }
+        ]
+      },
+      {
+        "hash": "a63287539e3ec5147ed839509204478990c3397a76a17f0a31f3d95c1acb4e28",
+        "screenshotHash": "adb21a2ef8f673ff0ac25ff681d9f55fa951cef940cedd9f31783dcfc77268ce",
+        "events": [
+          "timer: timeout 250",
+          "timer: timeout 300",
+          "timer: timeout 300"
+        ],
+        "pendingTimers": [],
+        "timers": [
+          {
+            "delay": 250,
+            "stack": "Error\n    at window.setTimeout (<anonymous>:8:109)\n    at https://trmd-metal-1.tailff9529.ts.net:8466/assets/TracksPane-Bf58Pph4.js:38:43427\n    at https://trmd-metal-1.tailff9529.ts.net:8466/assets/TracksPane-Bf58Pph4.js:38:43971\n    at Ju (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:92335)\n    at Z1 (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:96836)\n    at Da (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:105664)\n    at Z1 (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:96823)\n    at Da (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:105664)\n    at Z1 (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:97392)\n    at Da (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:105664)"
+          },
+          {
+            "delay": 300,
+            "stack": "Error\n    at window.setTimeout (<anonymous>:8:109)\n    at https://trmd-metal-1.tailff9529.ts.net:8466/assets/TracksPane-Bf58Pph4.js:38:148319\n    at Ju (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:92335)\n    at L1 (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:107510)\n    at la (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:107394)\n    at L1 (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:107556)\n    at hv (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:120483)\n    at https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:117866\n    at MessagePort._t (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:1:1771)"
+          },
+          {
+            "delay": 300,
+            "stack": "Error\n    at window.setTimeout (<anonymous>:8:109)\n    at https://trmd-metal-1.tailff9529.ts.net:8466/assets/TracksPane-Bf58Pph4.js:38:148319\n    at Ju (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:92335)\n    at L1 (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:107510)\n    at la (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:107394)\n    at L1 (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:107556)\n    at hv (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:120483)\n    at https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:8:117866\n    at MessagePort._t (https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js:1:1771)"
+          }
+        ]
+      }
+    ],
+    "deterministic": true,
+    "effectsRepeatable": true,
+    "verdict": "probe-passed",
+    "limitation": "Timeouts observed and awaited until none pending (15s limit), intervals blocked. Storage, observers and portal targets remain harness responsibilities. Asset allowlist is same-origin GET; not a hostile-code sandbox. Two samples cannot prove all states; without expectedText no fixture-state assertion is made."
+  }
+}
