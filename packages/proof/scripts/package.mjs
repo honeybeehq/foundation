@@ -49,7 +49,7 @@ await writeFile(
   JSON.stringify(
     {
       name: "foundation-proof",
-      version: "0.2.0-proto.3",
+      version: "0.2.0-proto.4",
       type: "module",
       bin: { "foundation-proof": "cli.mjs" },
       dependencies: {
