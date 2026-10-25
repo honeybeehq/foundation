@@ -1,5 +1,6 @@
 import { createServer, type ServerResponse } from 'node:http'
 import { createHash, randomBytes } from 'node:crypto'
+import { mkdir } from 'node:fs/promises'
 import { resolve, join } from 'node:path'
 import { acquireDocumentLock } from '../document-lock.js'
 import { CombBridge, validateAppendReceipt, type Frame } from '../sync/bridge.js'
@@ -60,8 +61,10 @@ export async function startShareService(config: ShareServiceConfig) {
     requireThat(url.protocol === 'http:' && ['127.0.0.1', '[::1]'].includes(url.hostname) && !url.username && !url.password && url.pathname === '/' && !url.search && !url.hash, 'development GitHub stub must use literal loopback HTTP origin')
     github = url.origin
   }
-  const store = await ShareServiceStore.open(stateDir)
+  await mkdir(stateDir, {recursive: true, mode: 0o700})
   const release = acquireDocumentLock(join(stateDir, 'service'), 100)
+  let store: ShareServiceStore
+  try { store = await ShareServiceStore.open(stateDir) } catch (error) { release(); throw error }
   const accessLost = new Map<string, Set<string>>()
   const tokens = new Map<string, Token>()
   const relays = new Map<ServerResponse, { token: string; timer: NodeJS.Timeout }>()
