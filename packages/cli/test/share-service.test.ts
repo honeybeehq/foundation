@@ -121,13 +121,23 @@ it('persists confirmed access loss, closes old tokens and blocks appends until r
   expect((await f.api('state',undefined,token)).body.accessLost).toEqual([])
   expect((await f.api('rpc',f.append(2),token)).status).toBe(200)
 })
-it('allows explicit public repo read and defaults new spaces to collaborators', async () => {
-  const f=await fixture({isPublic:true,publicAccess:'repo-read'});const stranger=f.device('stranger')
-  expect((await f.api('token',await f.tokenBody(stranger))).body.permission).toBe('read')
+it('refuses public repo-read creation and renewal but preserves private compatibility', async () => {
   const strict=await fixture({isPublic:true})
+  const challenge=(await strict.api('challenge?repo='+strict.space.repo)).body.challenge
+  const refused=await strict.api('spaces',{repo:strict.space.repo,device:strict.writer,challenge,proof:strict.proof(strict.writer,challenge),publicAccess:'repo-read'})
+  expect(refused.status).toBe(400)
+  expect(JSON.stringify(refused.body)).toContain('repo-read is only allowed for private repositories')
   expect((await strict.api('token',await strict.tokenBody(strict.device('stranger')))).status).toBe(403)
+  expect((await strict.api('token',await strict.tokenBody(strict.device('reader')))).body.permission).toBe('read')
   await strict.restart();const token=(await strict.api('token',await strict.tokenBody())).body.token
   expect((await strict.api('state',undefined,token)).body.publicAccess).toBe('collaborators')
+  const legacy=await fixture({publicAccess:'repo-read'})
+  expect((await legacy.api('token',await legacy.tokenBody(legacy.device('reader')))).body.permission).toBe('read')
+  expect((await legacy.api('token',await legacy.tokenBody(legacy.device('stranger')))).status).toBe(403)
+  // A previously private repo becoming public must fail closed on the next token issue.
+  const { ShareAuth } = await import('../src/share/auth.js')
+  const auth=new ShareAuth({githubApiUrl:strict.config.githubApiUrl,githubPermissionToken:'operator-metadata-only'})
+  await expect(auth.permission(strict.space.repo,'writer','repo-read')).rejects.toThrow('repo-read is only allowed for private repositories')
 })
 it('rejects malformed ciphertext and preserves durable receipts and replay', async () => {
   const f=await fixture();await f.keys()
