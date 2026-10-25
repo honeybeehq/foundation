@@ -1,6 +1,6 @@
 /** Immutable design-relative image files. Chunk payloads use the ordinary signed,
  * encrypted share transport; neither the content hash nor path reaches the store. */
-import { constants } from 'node:fs'
+import { constants, readFileSync, mkdirSync } from 'node:fs'
 import { open, lstat, mkdir, realpath, readdir, link, unlink, copyFile } from 'node:fs/promises'
 import { createHash, randomUUID } from 'node:crypto'
 import { dirname, join, relative, isAbsolute } from 'node:path'
@@ -8,6 +8,8 @@ import type { FdnChain } from 'foundation-engine'
 import type { CombConfig } from '../sync/daemon.js'
 import { createBridge } from './transport.js'
 import { validateAppendReceipt } from '../sync/bridge.js'
+import { replicaRoot } from '../sync-store.js'
+import { writeAtomic } from '../disk.js'
 
 export const MAX_ASSET = 20 * 1024 * 1024
 const CHUNK = 128 * 1024
@@ -26,9 +28,9 @@ export function assetReferences(document: unknown): AssetRef[] {
   const visit = (value: unknown): void => {
     if (typeof value === 'string') {
       const pattern = /(?:^|[\s("'])(\.foundation\/assets\/[^\s)"']+)(?=$|[\s)"'])/g
-      for (const match of value.matchAll(pattern)) { const ref = assetRef(match[1]!); refs.set(ref.path, ref) }
+      for (const match of value.matchAll(pattern)) { if(!NAME.test(match[1]!.slice(PREFIX.length)))continue;const ref = assetRef(match[1]!); refs.set(ref.path, ref) }
     } else if (Array.isArray(value)) value.forEach(visit)
-    else if (value && typeof value === 'object') Object.values(value).forEach(visit)
+    else if (value && typeof value === 'object') Object.entries(value).forEach(([key,item])=>{if(!['text','title','message','data-fdn-source-url'].includes(key))visit(item)})
   }
   visit(document)
   return [...refs.values()]
@@ -40,7 +42,9 @@ export function sniffAsset(bytes: Uint8Array): string {
   if (['GIF87a','GIF89a'].includes(b.subarray(0,6).toString('ascii'))) return 'gif'
   if (b.subarray(0,4).toString()==='RIFF' && b.subarray(8,12).toString()==='WEBP') return 'webp'
   if (b.subarray(4,8).toString()==='ftyp' && /avif|avis/.test(b.subarray(8,64).toString('ascii'))) return 'avif'
-  const text=b.toString('utf8').replace(/^\uFEFF/,'').trimStart()
+  const xml=b.toString('utf8')
+  if(/<!ENTITY/i.test(xml))throw new Error('SVG entity declarations are refused')
+  const text=xml.replace(/^\uFEFF/,'').replace(/<!DOCTYPE\s+svg(?:[^\[>]*|\[[\s\S]*?\])>/i,'').trimStart()
   if (/^(?:<\?xml[^>]*>\s*)?(?:<!--[\s\S]*?-->\s*)*<svg(?:\s|>)/i.test(text)) return 'svg'
   throw new Error('unsupported asset image signature')
 }
@@ -62,9 +66,10 @@ async function verifyFile(path: string, ref: AssetRef): Promise<number> {
     const stat=await handle.stat()
     if(!stat.isFile()||stat.size<1||stat.size>MAX_ASSET)throw new Error('asset exceeds20MiB or is not a regular image file')
     const hash=createHash('sha256'), first=Buffer.alloc(4096)
-    let size=0, firstSize=0
+    let size=0, firstSize=0, xmlTail=''
     for await(const bytes of handle.createReadStream({autoClose:false,highWaterMark:CHUNK})) {
       hash.update(bytes);size+=bytes.length
+      if(ref.ext==='svg'){const xml=xmlTail+bytes.toString('utf8');if(/<!ENTITY/i.test(xml))throw new Error('SVG entity declarations are refused');xmlTail=xml.slice(-16)}
       if(size>MAX_ASSET)throw new Error('asset exceeds20MiB')
       if(firstSize<first.length){const count=Math.min(first.length-firstSize,bytes.length);bytes.copy(first,firstSize,0,count);firstSize+=count}
     }
@@ -89,52 +94,86 @@ function decode(bytes:Buffer,ref:AssetRef):{size:number;index:number;count:numbe
   if(data.length!==Math.min(CHUNK,h.size-h.index*CHUNK))throw new Error('asset chunk length mismatch')
   return {size:h.size,index:h.index,count:h.count,bytes:data}
 }
+export interface AssetStatus {path:string;state:'pending'|'error'|'ready';reason:string|null}
+const statusPath=(file:string):string=>join(replicaRoot(),'assets',createHash('sha256').update(file).digest('hex')+'.json')
+export function readAssetStatus(file:string):AssetStatus[]{try{const rows=JSON.parse(readFileSync(statusPath(file),'utf8')).assets;return Array.isArray(rows)?rows.filter(r=>r&&typeof r.path==='string'&&['pending','error','ready'].includes(r.state)&&(r.reason===null||typeof r.reason==='string')).slice(-256):[]}catch{return []}}
+interface AssetJob {promise:Promise<void>;at:number;running:boolean}
 export class AssetSharing {
   private uploaded=new Set<string>()
   private available=new Set<string>()
+  private jobs=new Map<string,AssetJob>()
+  private statuses=new Map<string,AssetStatus>()
+  private polledAt=0
   constructor(private config:CombConfig,private file:string,private root:string) {}
-  /** Retained directory files include old references needed by undo. Never GC. */
-  async publish(chain:FdnChain):Promise<void> {
+  private status(ref:AssetRef,state:AssetStatus['state'],reason:string|null):void {
+    const row={path:ref.path,state,reason:reason?.slice(0,512)??null},previous=this.statuses.get(ref.path)
+    if(previous?.state===state&&previous.reason===row.reason)return
+    this.statuses.set(ref.path,row)
+    try{mkdirSync(dirname(statusPath(this.file)),{recursive:true,mode:0o700});writeAtomic(statusPath(this.file),JSON.stringify({version:1,assets:[...this.statuses.values()].slice(-256)}))}catch{/* status never blocks document editing */}
+  }
+  private job(ref:AssetRef,direction:string,work:()=>Promise<void>):Promise<void> {
+    const key=direction+ref.path,old=this.jobs.get(key)
+    if(old&&(old.running||Date.now()-old.at<5000))return old.promise
+    this.status(ref,'pending',null)
+    const job:AssetJob={promise:Promise.resolve(),at:Date.now(),running:true}
+    job.promise=work().then(()=>this.status(ref,'ready',null),error=>{this.status(ref,'error',String(error));throw error}).finally(()=>{job.running=false;job.at=Date.now()})
+    void job.promise.catch(()=>{});this.jobs.set(key,job);return job.promise
+  }
+  private async wait(jobs:Promise<void>[],strict:boolean):Promise<void> {
+    if(!jobs.length)return
+    let timer:NodeJS.Timeout|undefined
+    try{await Promise.race([strict?Promise.all(jobs):Promise.allSettled(jobs),new Promise<void>((resolve,reject)=>{timer=setTimeout(()=>strict?reject(new Error('images still pending; retry materialize when assets are available')):resolve(),strict?60000:200)})])}finally{if(timer)clearTimeout(timer)}
+  }
+  /** Retained directory files include old references needed by undo. Never GC.
+   * A bad image is isolated; document publication waits at most200ms. */
+  async publish(chain:FdnChain,strict=true):Promise<void> {
     if(!this.config.share)return
-    // Undo on a newly materialized replica may reintroduce a historical image.
-    // Fetch that immutable blob before publishing its reference again.
-    await this.receive(chain)
     const refs=new Map(assetReferences(chain.doc()).map(ref=>[ref.path,ref]))
-    const dir=join(dirname(this.file),PREFIX)
-    try { for(const name of await readdir(dir))if(NAME.test(name)){const ref=assetRef(PREFIX+name);refs.set(ref.path,ref)} }
-    catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error}
+    try{for(const name of await readdir(join(dirname(this.file),PREFIX)))if(NAME.test(name)){const ref=assetRef(PREFIX+name);refs.set(ref.path,ref)}}catch(error){if(strict&&(error as NodeJS.ErrnoException).code!=='ENOENT')throw error}
+    const local=this.receive(chain,strict);void local.catch(()=>{})
+    const jobs:Promise<void>[]=[local]
     for(const ref of refs.values()) {
       const ack=JSON.stringify([this.config.share.space,this.config.share.service,this.root,ref.path])
       if(this.uploaded.has(ref.path)||acknowledged.has(ack)){this.uploaded.add(ref.path);continue}
-      await transfer(async()=>{
-      const path=await confinedPath(this.file,this.root,ref,false),size=await verifyFile(path,ref)
-      const handle=await open(path,constants.O_RDONLY|constants.O_NOFOLLOW)
-      try {
-          let index=0,total=0;const hash=createHash('sha256')
-          for await(const bytes of handle.createReadStream({autoClose:false,highWaterMark:CHUNK})) {
-            if(total+bytes.length>size)throw new Error('asset changed during upload')
-            const bridge=createBridge({...this.config,shareLog:address(ref,index)}),log=logFor(ref,index)
-            const payload=chunk(ref,size,index++,bytes);total+=bytes.length;hash.update(bytes)
-            const identity=createHash('sha256').update(payload).digest('hex')
-            try{await bridge.hello();validateAppendReceipt(await bridge.request('append',{log,idempotency_key:identity,payload_hex:payload.toString('hex')}),log)}finally{await bridge.finish()}
-          }
-          if(total!==size||hash.digest('hex')!==ref.hash)throw new Error('asset changed during upload')
-      } finally {await handle.close()}
+      jobs.push(this.job(ref,'upload',async()=>{
+        try{await transfer(()=>this.upload(ref))}catch(error){
+          if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error
+          const target=await confinedPath(this.file,this.root,ref,true);await fetchAsset(this.config,target,ref)
+        }
         this.uploaded.add(ref.path);acknowledged.add(ack)
-      })
+      }))
     }
+    await this.wait(jobs,strict)
+  }
+  private async upload(ref:AssetRef):Promise<void> {
+    const path=await confinedPath(this.file,this.root,ref,false),size=await verifyFile(path,ref),handle=await open(path,constants.O_RDONLY|constants.O_NOFOLLOW)
+    try {
+      let index=0,total=0;const hash=createHash('sha256')
+      for await(const bytes of handle.createReadStream({autoClose:false,highWaterMark:CHUNK})) {
+        if(total+bytes.length>size)throw new Error('asset changed during upload')
+        const bridge=createBridge({...this.config,shareLog:address(ref,index)}),log=logFor(ref,index),payload=chunk(ref,size,index++,bytes)
+        total+=bytes.length;hash.update(bytes)
+        const identity=createHash('sha256').update(payload).digest('hex')
+        try{await bridge.hello();validateAppendReceipt(await bridge.request('append',{log,idempotency_key:identity,payload_hex:payload.toString('hex')}),log)}finally{await bridge.finish()}
+      }
+      if(total!==size||hash.digest('hex')!==ref.hash)throw new Error('asset changed during upload')
+    }finally{await handle.close()}
   }
   hintsReady(chain:FdnChain):boolean {return assetReferences(chain.doc()).every(ref=>this.uploaded.has(ref.path))}
-  async receive(chain:FdnChain):Promise<void> {
+  async receive(chain:FdnChain,strict=true):Promise<void> {
     if(!this.config.share)return
-    for(const ref of assetReferences(chain.doc())) {
-      if(this.available.has(ref.path))continue
+    const jobs=assetReferences(chain.doc()).filter(ref=>!this.available.has(ref.path)).map(ref=>this.job(ref,'fetch',async()=>{
       const target=await confinedPath(this.file,this.root,ref,true)
-      try {await verifyFile(target,ref);this.available.add(ref.path);continue}
-      catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error}
-      await fetchAsset(this.config,target,ref)
+      try{await transfer(()=>verifyFile(target,ref))}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;await fetchAsset(this.config,target,ref)}
       this.available.add(ref.path)
-    }
+    }))
+    await this.wait(jobs,strict)
+  }
+  /** The daemon calls this while idle, so a failed image can recover without a
+   * new document edit. The foreground document never waits for the retry. */
+  retry(chain:FdnChain):void {
+    if(Date.now()-this.polledAt<5000)return
+    this.polledAt=Date.now();void this.receive(chain,false).catch(()=>{});void this.publish(chain,false).catch(()=>{})
   }
 }
 // A large image never opens unbounded streams or monopolizes every connection.
@@ -170,11 +209,21 @@ async function download(config:CombConfig,target:string,ref:AssetRef):Promise<vo
         await bridge.hello()
         const head=await bridge.request('head',{log})
         if(head.log!==log||typeof head.cursor!=='string'||!/^\d+$/.test(head.cursor)||BigInt(head.cursor)<2n||BigInt(head.cursor)>65n)throw new Error('asset chunk missing or history too large')
-        const page=await bridge.request('read',{log,cursor:'1',max_events:1,max_bytes:491520}),events=page.events as {seq:string;payload_hex:string}[]
-        if(page.log!==log||!Array.isArray(events)||events.length!==1||events[0]!.seq!=='1'||page.next_cursor!=='2')throw new Error('asset chunk cursor gap')
-        const item=decode(Buffer.from(events[0]!.payload_hex,'hex'),ref)
-        if(item.index!==index)throw new Error('asset chunk missing or reordered')
-        if(size!==undefined&&(item.size!==size||item.count!==count))throw new Error('asset metadata changed')
+        let item:ReturnType<typeof decode>|undefined,lastError:unknown
+        const newest=BigInt(head.cursor)-1n
+        // Prefer the newest valid copy so a later repaired upload can recover a
+        // bad first event. Bound hostile histories to eight alternatives.
+        for(let seq=newest;seq>=1n&&newest-seq<8n;seq--) {
+          try {
+            const page=await bridge.request('read',{log,cursor:String(seq),max_events:1,max_bytes:491520}),events=page.events as {seq:string;payload_hex:string}[]
+            if(page.log!==log||!Array.isArray(events)||events.length!==1||events[0]!.seq!==String(seq)||page.next_cursor!==String(seq+1n))throw new Error('asset chunk cursor gap')
+            const candidate=decode(Buffer.from(events[0]!.payload_hex,'hex'),ref)
+            if(candidate.index!==index)throw new Error('asset chunk missing or reordered')
+            if(size!==undefined&&(candidate.size!==size||candidate.count!==count))throw new Error('asset metadata changed')
+            item=candidate;break
+          }catch(error){lastError=error}
+        }
+        if(!item)throw new Error(`asset chunk unavailable: ${String(lastError)}`)
         size=item.size;count=item.count
         await handle.writeFile(item.bytes);hash.update(item.bytes);index++
       }finally{bridge.close()}

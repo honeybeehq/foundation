@@ -151,7 +151,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
     }
     const relayController = new AbortController()
     const relay = transport.share&&process.env.FOUNDATION_SHARE_RELAY!=='0' ? shareRelay(transport.share, transport.shareLog??feed, AbortSignal.any([signal,relayController.signal]), async (bytes,signatureVerified,source) => {
-      if (assets) { const candidate=loadChain(readFileSync(design.file+'.chain'));importChangeBlobs(candidate,[bytes]);await assets.receive(candidate) }
+      if (assets) { const candidate=loadChain(readFileSync(design.file+'.chain'));importChangeBlobs(candidate,[bytes]);await assets.receive(candidate,false) }
       let imported=0
       const importedChain=updateDocument(design.file, chain => { if(chain.docId()!==design.docId)throw new Error('document identity mismatch');const hash=decodeBlob(bytes).envelope.hash;const present=chain.log().some(c=>c.hash===hash);imported=importChangeBlobs(chain,[bytes]);if(!present)importedHashes.add(hash);return chain },true)
       const factHash=decodeBlob(bytes).envelope.hash
@@ -181,12 +181,13 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
               const decode = syncTraceSpan('receive.page', () => ({ docId: design.docId, cursor: state.cursor }))
               const incoming = page(response, state.cursor); decode({ count: incoming.blobs.length })
               if (incoming.blobs.length) {
-                if (assets) {const candidate=loadChain(readFileSync(design.file+'.chain'));importChangeBlobs(candidate,incoming.blobs);await assets.receive(candidate)}
+                if (assets) {const candidate=loadChain(readFileSync(design.file+'.chain'));importChangeBlobs(candidate,incoming.blobs);await assets.receive(candidate,false)}
                 const done = syncTraceSpan('receive.locked-import', () => ({ docId: design.docId, cursor: state.cursor, hashes: incoming.blobs.map(blob => decodeBlob(blob).envelope.hash) }))
                 let imported = 0, ok = false, importedChain: FdnChain | undefined
                 const freshHashes:string[]=[]
                 try { importedChain=updateDocument(design.file, chain => {
                   if (chain.docId() !== design.docId) throw new Error('live path now holds another design')
+              assets?.retry(chain)
                   const previousHashes=new Set(chain.log().map(c=>c.hash))
                   imported = importChangeBlobs(chain, incoming.blobs, syncTraceEnabled ? (stage, durationMs) => syncTrace(`receive.${stage}`, () => ({ docId: design.docId, durationMs })) : undefined)
                   for(const blob of incoming.blobs){const hash=decodeBlob(blob).envelope.hash;if(!previousHashes.has(hash)){importedHashes.add(hash);freshHashes.push(hash)}}
@@ -208,6 +209,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
             while (!signal.aborted && !failed) {
               const chain = loadChain(readFileSync(`${design.file}.chain`))
               if (chain.docId() !== design.docId) throw new Error('live path now holds another design')
+              assets?.retry(chain)
               const published = new Set(state.published)
               const receivedHistory = directReceived.get(key)
               for (const hash of published) { hinted.delete(hash); receivedHistory?.delete(hash) }
@@ -218,7 +220,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
               // changes() is in Lamport order: never publish a descendant past a held parent.
               const pending = publishablePrefix(unshared, received)
               if (pending.length) {
-                await assets?.publish(chain)
+                await assets?.publish(chain,false)
                 syncTrace('publish.pending', () => ({ docId: design.docId, hashes: pending.map(change => change.envelope.hash) }))
                 // A persistent bridge renews exclusive feed ownership. Bound each writer
                 // batch and send clean EOF, so other nodes can publish through the same log.

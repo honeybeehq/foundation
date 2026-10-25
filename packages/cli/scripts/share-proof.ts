@@ -302,11 +302,13 @@ try {
     assert.ok(bytes.length>=5*1024*1024);proofAsset={path,hash,bytes}
     mkdirSync(join(repos[0]!,'.foundation/assets'),{recursive:true});writeFileSync(join(repos[0]!,path),bytes)
     await ok(0,'edit',files[0]!,'--ops',JSON.stringify([{op:'insert-node',parent:null,index:2,node:{id:'asset-image',tag:'img',attrs:{src:path,alt:'Encrypted shared five megabyte image','data-asset-proof':'true'},style:{width:'640px',height:'512px'},styleStates:{},children:[]}}]),'--author','alice')
-    await until(()=>{const present=chain(1).doc().body.some(n=>n.id==='asset-image');if(present)assert.ok(existsSync(join(repos[1]!,path)),'reference imported before asset installation');return present},'5MB image reference imports only with installed bytes',120000)
+    await ok(0,'edit',files[0]!,'--ops',JSON.stringify([{op:'set-text',id:'n1',text:'A1-DURING-IMAGE'}]),'--author','alice')
+    await until(()=>text(1,'n1')==='A1-DURING-IMAGE','text changes sync while image is pending',3000)
+    await until(()=>chain(1).doc().body.some(n=>n.id==='asset-image')&&existsSync(join(repos[1]!,path)),'5MB image fetched and verified in background',120000)
     assert.deepEqual(readFileSync(join(repos[1]!,path)),bytes)
     const browser=await chromium.launch({headless:true,args:['--no-sandbox']})
     try{const page=await browser.newPage({viewport:{width:1000,height:900}});await page.goto('file://'+files[1]);await page.waitForFunction(()=>{const image=document.querySelector('img[data-asset-proof]') as HTMLImageElement|null;return image?.complete&&image.naturalWidth===1280});await page.screenshot({path:join(root,'received-image.png'),fullPage:true});log('IMAGE RENDER: second HOME actual browser img naturalWidth1280/naturalHeight1024; screenshot '+join(root,'received-image.png'))}finally{await browser.close()}
-    log(`ASSET: ${bytes.length}byte PNG transferred byte-exact before reference import`)
+    log(`ASSET: ${bytes.length}byte PNG transferred byte-exact; pending reference remains a consistent chain`)
     await ok(0,'edit',files[0]!,'--ops',JSON.stringify([{op:'set-text',id:'n1',text:'A1-AFTER-IMAGE'}]),'--author','alice');await until(()=>text(1,'n1')==='A1-AFTER-IMAGE','ordinary edit on image design still relays promptly',1000)
     const state=vault(1)[space],current=state.keys.at(-1),opaque=opaqueName(`foundation-share-asset-v1:${hash}.png:0`,current.feedKey)
     const counts:number[]=[]
@@ -319,6 +321,22 @@ try {
     const result=await new Promise<{code:number;err:string}>(resolve=>{const child=spawn(process.execPath,['--import','tsx',script],{env:{...process.env,HOME:homes[1],FOUNDATION_SHARE_STATE_DIR:join(homes[1]!,'.foundation/share'),FOUNDATION_SHARE_TEST_GITHUB:github,FOUNDATION_REPLICA_STORE:join(homes[1]!,'replicas')},stdio:['ignore','ignore','pipe']});let err='';child.stderr.on('data',v=>err+=v);child.on('exit',code=>resolve({code:code??1,err}))})
     unlinkSync(assetFault);assert.notEqual(result.code,0);assert.match(result.err,/signature|decrypt|authentication/i);assert.equal(existsSync(join(dir,path)),false);assert.deepEqual(readdirSync(join(dir,'.foundation/assets')),[])
     log('ASSET TAMPER REFUSED: real Comb read ciphertext bit-flip rejected; no installed file or partial temp')
+    const invalids:[string,Buffer|null,string?][]=[['missing',null,'f'.repeat(64)],['oversize',Buffer.alloc(20*1024*1024+1,7)],['hash-mismatch',Buffer.from('not the named content'),'e'.repeat(64)],['unsupported',Buffer.from('not an image signature')]]
+    for(const [name,content,forced]of invalids){
+      const badHash=forced??createHash('sha256').update(content!).digest('hex'),badPath=`.foundation/assets/${badHash}.png`
+      if(content)writeFileSync(join(repos[0]!,badPath),content)
+      await ok(0,'edit',files[0]!,'--ops',JSON.stringify([{op:'set-attr',id:'asset-image',key:'src',value:badPath},{op:'set-text',id:'n1',text:`A1-${name}`}]),'--author','alice')
+      await until(()=>text(1,'n1')===`A1-${name}`,`${name} image does not block forward text sync`,5000)
+      await ok(1,'edit',files[1]!,'--ops',JSON.stringify([{op:'set-text',id:'n2',text:`reply-${name}`}]),'--author','bob')
+      await until(()=>text(0,'n2')===`reply-${name}`,`${name} image does not block reverse text sync`,5000)
+      await until(async()=>JSON.parse(await ok(1,'sync','status','--json')).some((r:any)=>r.assets?.some((a:any)=>a.path===badPath&&['pending','error'].includes(a.state))),`${name} image status is visible`,5000)
+      assert.equal(existsSync(join(repos[1]!,badPath)),false)
+      log(`ASSET ISOLATION: ${name} image pending/error visible; both directions still sync; no invalid local file`)
+    }
+    await ok(0,'edit',files[0]!,'--ops',JSON.stringify([{op:'set-attr',id:'asset-image',key:'src',value:path},{op:'set-text',id:'n1',text:'see .foundation/assets/logo.png'}]),'--author','alice')
+    await until(()=>text(1,'n1')==='see .foundation/assets/logo.png','asset-like prose does not block sync',5000)
+    log('ASSET PROSE: non-contract names in text ignored; original verified image restored')
+
   }
   if(localModelMode) {
     await until(()=>activity!.records.some(r=>r.entry?.author==='alice'&&r.delivery==='live'),'signed ephemeral hint yields live imported activity')
@@ -662,7 +680,7 @@ try {
   assert.equal(relayCheck.status,200)
   const relayReader=relayCheck.body!.getReader();await relayReader.read()
   let relayClosed=false
-  const observeClose=(async()=>{while(!(await relayReader.read()).done){};relayClosed=true})()
+  const observeClose=(async()=>{try{while(!(await relayReader.read()).done){}}catch(error){log('quiet relay socket closed: '+String(error))}finally{relayClosed=true}})()
   assert.equal(spawnSync('git',['rm','--cached','-q','.foundation/share.json'],{cwd:repos[0]!}).status,0)
   assert.equal(spawnSync('git',['-c','user.name=Share Proof','-c','user.email=proof@example.invalid','commit','-qm','Disable live sharing'],{cwd:repos[0]!}).status,0)
   log('DESCRIPTOR REMOVED from default-branch git HEAD; waiting for bounded cache expiry')
