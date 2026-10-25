@@ -12,6 +12,11 @@ import { jobSummary } from "../report/summary.ts";
 const [command, ...args] = process.argv.slice(2);
 const opt = (k: string, f?: string) =>
   args.includes(k) ? args[args.indexOf(k) + 1] : f;
+if (
+  command === "check" &&
+  !["advisory", "required"].includes(opt("--mode", "advisory")!)
+)
+  throw Error("--mode must be advisory or required");
 if (command === "capture-code") {
   process.argv = [...process.argv.slice(0, 2), ...args];
   await import("../capture/code-cli.ts");
@@ -54,7 +59,10 @@ if (command === "capture-code") {
         policy.tolerances,
       );
     const file = path.join(destination, "drift-report.json");
-    const bound = bindAccepted(r, accepted);
+    const bound = bindAccepted(r, accepted, {
+      design: await readCapture(path.join(destination, "design-capture")),
+      code: await readCapture(path.join(destination, "code-capture")),
+    });
     await writeReport(file, bound);
     reports.push(bound);
     files.push(file);

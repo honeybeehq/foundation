@@ -6,6 +6,7 @@ The code repository owns `.foundation/accepted.json`. Its root is
 - `id`: stable unique-defect id, never a raw `dN` sequence number.
 - `scope`: exact `artboard`, `state`, and `viewport: {width,height,dpr}`.
 - `layer`: design id and code `data-fdn-id` or captured DOM path.
+- `code.component`: the linked code export path; changing it requires review.
 - `kind` and `values`: the kind plus all constituent findings' layer, property,
   design/code values (and missing/extra boxes), sorted independently of raw ids.
 - `reason`, `reviewer`, and ISO `date`.
@@ -39,9 +40,7 @@ duplicate entries and malformed lists also fail. Removed differences require
 removing the old entry rather than leaving a silent exemption. Uncertain and
 environment findings cannot be accepted. The list cannot cover an unmeasured
 state or unexplained pixel-only drift. Pixel results are retained: no masking or
-screenshot repainting occurs. Acceptance of all measured product causes can
-explain a nonzero screenshot difference; uncertain or ungrouped findings still
-block verification.
+screenshot repainting occurs. Verification counts residual pixel changes outside the union of accepted findings’ design/code boxes and still applies the pixel tolerance there. A text acceptance cannot waive unrelated image/canvas drift. Missing/extra acceptances also hash the entire present-side subtree (descendant tags, text, boxes and painted styles); same-box content edits go stale. Missing snapshots refuse acceptance. Environment findings require an explicit trusted cause allowlist; uncertain or ungrouped findings still block verification.
 
 Old reports without `defects[]` have a deterministic per-layer/property fallback
 prefixed `legacy-`; regenerate reports with the current comparison tool before

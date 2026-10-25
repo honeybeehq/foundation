@@ -2,7 +2,6 @@ name: Foundation design proof (prototype)
 on:
   push:
     branches: [proto/design-to-code-tracks]
-    paths: ['.foundation/**', '.github/workflows/foundation-proof.yml', 'apps/desktop/src/renderer/src/panes/tracks/**']
   workflow_dispatch:
     inputs:
       mode:
@@ -18,8 +17,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
-      # Reviewed base revision. Candidate commits cannot loosen these values.
-      POLICY_REF: 9dfaac66c
+      # Reviewed base revision. Protect workflow edits before adopting a required PR check.
+      POLICY_REF: 9dfaac66c49da5bc94e0889f03b42277a2a08d42
       MODE: ${{ inputs.mode || 'advisory' }}
       ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
@@ -58,7 +57,6 @@ jobs:
             app/packages/*/node_modules
             app/packages/plugins/*/node_modules
             app/services/*/node_modules
-            ${{ runner.temp }}/fdn-tool/node_modules
             .cache/ms-playwright
           key: fdn-linux-24-${{ hashFiles('app/pnpm-lock.yaml') }}-${{ env.TOOL_SHA }}
       - name: Install frozen app and versioned proof CLI
@@ -66,6 +64,8 @@ jobs:
           INSTALL_START=$(date +%s)
           pnpm --dir app install --frozen-lockfile --ignore-scripts
           npm install --prefix "$RUNNER_TEMP/fdn-tool" "$RUNNER_TEMP/fdn-trusted/tool.tgz" --ignore-scripts --no-audit --no-fund
+          CLI_SHA=$(node -p "require(process.env.RUNNER_TEMP + '/fdn-trusted/policy.json').tool.cliSha256")
+          echo "$CLI_SHA  $RUNNER_TEMP/fdn-tool/node_modules/foundation-proof/cli.mjs" | sha256sum -c -
           "$RUNNER_TEMP/fdn-tool/node_modules/.bin/playwright" install --with-deps chromium
           echo "INSTALL_SECONDS=$(( $(date +%s) - INSTALL_START ))" >> "$GITHUB_ENV"
       - name: Capture real Classic Tracks with pinned browser and fonts
@@ -79,7 +79,7 @@ jobs:
         env:
           GITHUB_STEP_SUMMARY: /dev/null
         run: |
-          node "$RUNNER_TEMP/fdn-tool/node_modules/foundation-proof/cli.mjs" check --code app --baseline app/.foundation/baseline --captures "$RUNNER_TEMP/captures" --out "$RUNNER_TEMP/proof" --policy "$RUNNER_TEMP/fdn-trusted/policy.json" --mode "$MODE" --artifact-url ARTIFACT_URL
+          node "$RUNNER_TEMP/fdn-tool/node_modules/foundation-proof/cli.mjs" check --code app --baseline app/.foundation/baseline --captures "$RUNNER_TEMP/captures" --out "$RUNNER_TEMP/proof" --policy "$RUNNER_TEMP/fdn-trusted/policy.json" --mode "$MODE" --artifact-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID#artifacts"
       - name: Upload captures, reports and diff images
         id: artifact
         if: always()
@@ -105,4 +105,6 @@ jobs:
           echo "Pinned candidate: $GITHUB_SHA. Trusted base policy: $POLICY_REF. Tool SHA256: $TOOL_SHA." >> "$GITHUB_STEP_SUMMARY"
       - name: Enforce required mode
         if: always() && steps.check.outcome == 'failure'
-        run: exit 1
+        run: |
+          echo 'Required design proof failed: remaining drift, stale acceptance, or incomplete coverage. See the summary and verification.json.'
+          exit 1

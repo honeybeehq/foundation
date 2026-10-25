@@ -9,6 +9,7 @@ import {
 } from "./index.ts";
 const report = () => ({
   provable: true,
+  code: { root: "component.tsx#View" },
   artboard: "tracks",
   state: "empty",
   viewport: { width: 100, height: 100, dpr: 1 },
@@ -54,7 +55,7 @@ test("acceptance records reviewer, exact values and design revision in hashed pr
   expect(r.defects[0].accepted.reason).toContain("Classic");
   expect(evaluateAccepted(r, accepted()).accepted).toEqual(["f1"]);
   expect(r.acceptedListHash).toHaveLength(64);
-  expect(hasUnacceptedDrift(r, accepted())).toBe(false);
+  expect(hasUnacceptedDrift(r, accepted(), 0)).toBe(false);
 });
 test("changed design is stale with actionable message", () => {
   const r = report();
@@ -87,7 +88,7 @@ test("acceptance cannot cross state scope", () => {
   const r = report();
   r.state = "selected";
   expect(evaluateAccepted(r, accepted()).accepted).toEqual([]);
-  expect(hasUnacceptedDrift(r, accepted())).toBe(true);
+  expect(hasUnacceptedDrift(r, accepted(), 0)).toBe(true);
 });
 test("environment and uncertain findings cannot be accepted", () => {
   for (const classification of ["environment", "uncertain"]) {
@@ -104,4 +105,114 @@ test("invalid metadata and duplicate entries fail", () => {
   expect(() => parseList(l)).toThrow("Duplicate");
   expect(() => makeAcceptance(report(), "f1", "", "")).toThrow();
   expect(hasUnacceptedDrift(report(), emptyList())).toBe(true);
+});
+
+test("accepted text never waives unrelated pixel drift", async () => {
+  const { PNG } = await import("pngjs");
+  const { residualPixels } = await import("./index.ts");
+  const a = new PNG({ width: 100, height: 100 });
+  a.data.fill(255);
+  const b = PNG.sync.read(PNG.sync.write(a));
+  // One accepted glyph-sized change, then a separate image/canvas pixel.
+  b.data[0] = 0;
+  b.data[1] = 0;
+  b.data[2] = 0;
+  const r: any = report();
+  r.drifts[0].designBox = [0, 0, 20, 20];
+  r.drifts[0].codeBox = [0, 0, 20, 20];
+  r.tolerances.pixelThreshold = 0.1;
+  r.tolerances.pixelRatio = 0;
+  const list = {
+    schema: "fdn-accepted/0" as const,
+    entries: [makeAcceptance(r, "f1", "Keep text", "Reviewer")],
+  };
+  const capture = (png: any) => ({
+    nodes: [],
+    meta: {},
+    screenshot: PNG.sync.write(png),
+  });
+  let pixels = residualPixels(r, list, {
+    design: capture(a),
+    code: capture(b),
+  });
+  expect(pixels.residualPixels).toBe(0);
+  const offset = (80 * 100 + 80) * 4;
+  b.data[offset] = 0;
+  b.data[offset + 1] = 0;
+  b.data[offset + 2] = 0;
+  pixels = residualPixels(r, list, { design: capture(a), code: capture(b) });
+  expect(pixels.residualPixels).toBe(1);
+  expect(hasUnacceptedDrift(r, list, pixels.residualRatio)).toBe(true);
+  expect(hasUnacceptedDrift(r, list)).toBe(true);
+});
+test("same-box extra subtree content change makes acceptance stale", async () => {
+  const { withAcceptanceInputs } = await import("./index.ts");
+  const r: any = report();
+  r.drifts = [
+    {
+      id: "d1",
+      kind: "extra",
+      codeNode: "extra",
+      property: "node",
+      codeBox: [0, 0, 20, 20],
+    },
+  ];
+  r.defects = [
+    {
+      id: "f1",
+      layer: { code: "extra" },
+      kind: "extra",
+      cause: "extra:subtree",
+      classification: "product",
+      findings: ["d1"],
+    },
+  ];
+  const n = {
+    path: "div[0]",
+    fdnId: "extra",
+    tag: "div",
+    box: [0, 0, 20, 20] as [number, number, number, number],
+    style: { color: "red" },
+  };
+  const child = {
+    ...n,
+    path: "div[0]/span[0]",
+    fdnId: "child",
+    tag: "span",
+    text: "Before",
+  };
+  const design = { nodes: [], meta: {}, screenshot: Buffer.alloc(0) },
+    code = { nodes: [n, child], meta: {}, screenshot: Buffer.alloc(0) };
+  expect(() => makeAcceptance(r, "f1", "Keep subtree", "Reviewer")).toThrow(
+    "without captured contents",
+  );
+  const initial = withAcceptanceInputs(r, { design, code }),
+    list = {
+      schema: "fdn-accepted/0" as const,
+      entries: [makeAcceptance(initial, "f1", "Keep subtree", "Reviewer")],
+    };
+  child.text = "After";
+  const changed = withAcceptanceInputs(r, { design, code });
+  expect(evaluateAccepted(changed, list).errors[0]).toContain(
+    "code or measured value changed",
+  );
+});
+test("environment classification requires a trusted cause allowlist", () => {
+  const r: any = report();
+  r.defects[0].classification = "environment";
+  r.defects[0].cause = "declared-linux-font-substitution";
+  r.pixels.diffRatio = 0;
+  expect(hasUnacceptedDrift(r, emptyList())).toBe(true);
+  expect(
+    hasUnacceptedDrift(r, emptyList(), undefined, [
+      "declared-linux-font-substitution",
+    ]),
+  ).toBe(false);
+});
+test("a different linked component invalidates acceptance", () => {
+  const r = report();
+  r.code.root = "different.tsx#View";
+  expect(evaluateAccepted(r, accepted()).errors[0]).toContain(
+    "code or measured value changed",
+  );
 });
