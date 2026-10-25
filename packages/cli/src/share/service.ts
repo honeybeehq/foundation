@@ -207,7 +207,7 @@ export async function startShareService(config: ShareServiceConfig) {
         exact(body, ['expectedEpoch', 'epoch', 'wraps', 'revoke', 'recoveryPublicKey'])
         const result = await store.update(spaces => {
           const current = spaces.find(s => s.space === space.space)! as ServiceSpace
-          requireThat(!current.revoked.includes(token.device), 'device revoked', 403)
+          requireThat(!current.revoked.includes(token.device) && !current.accessLost?.includes(token.device), 'device revoked or access lost', 403)
           requireThat(token.permission === 'write' || (body.epoch === current.epoch && current.epoch > 0), 'write permission required for rotation', 403)
           requireThat(body.expectedEpoch === current.epoch, 'epoch conflict', 409)
           requireThat(Number.isSafeInteger(body.epoch) && body.epoch >= 1 && (body.epoch === current.epoch || body.epoch === current.epoch + 1), 'invalid epoch')
@@ -222,7 +222,7 @@ export async function startShareService(config: ShareServiceConfig) {
           }
           const wraps: ShareWrap[] = body.wraps.map((value: unknown) => {
             const w = object(value); exact(w, ['epoch','deviceId','senderId','box','signature'])
-            requireThat(w.epoch === body.epoch && w.senderId === token.device && (w.deviceId === 'recovery' ? !!current.recoveryPublicKey : current.devices.some(d => d.id === w.deviceId)) && !current.revoked.includes(w.deviceId) && !revoke.includes(w.deviceId) && base64(w.box) && Buffer.from(w.box, 'base64').length >= 48 && base64(w.signature, 64), 'invalid wrap or sender binding')
+            requireThat(w.epoch === body.epoch && w.senderId === token.device && (w.deviceId === 'recovery' ? !!current.recoveryPublicKey : current.devices.some(d => d.id === w.deviceId)) && !current.revoked.includes(w.deviceId) && !current.accessLost?.includes(w.deviceId) && !revoke.includes(w.deviceId) && base64(w.box) && Buffer.from(w.box, 'base64').length >= 48 && base64(w.signature, 64), 'invalid wrap or sender binding')
             return w as ShareWrap
           })
           requireThat(new Set(wraps.map(w => w.deviceId)).size === wraps.length, 'duplicate wrap recipient')
