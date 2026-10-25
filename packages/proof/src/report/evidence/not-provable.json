@@ -1,0 +1,26 @@
+{
+  "artboard": "tracks-pane/default",
+  "state": "default",
+  "viewport": {
+    "width": 1280,
+    "height": 800,
+    "dpr": 1
+  },
+  "design": {
+    "file": "boards/tracks-pane.fdn.html",
+    "head": "da6f965fcc33d4ac33d47ffd1cc04da2d288cd113b5ed263501dc50b2bac189d",
+    "binding": "chain-head",
+    "htmlSha256": "5fd37f92bb3d214b73a36786dce7ae89d9552db29efd262cc88699de01694431"
+  },
+  "code": {
+    "repo": "fixture",
+    "root": "TracksPane",
+    "commit": "aea41a67ed9d2d13f2049a0dc98a24fc62eb7661"
+  },
+  "schema": "fdn-drift/0",
+  "provable": false,
+  "verdict": "not-provable",
+  "reason": "Component requires an unstubbed server connection",
+  "drifts": [],
+  "reportHash": "0fbd60c1a69b7fba7cceda682c75fbbd2dfff66ea8bb84ad29c93efce7908a73"
+}

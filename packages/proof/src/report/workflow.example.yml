@@ -1,0 +1,43 @@
+# Copy into .github/workflows only after configuring the two checkouts and capture step.
+# This example is intentionally outside .github/workflows and is not enabled.
+name: Design proof
+on: [pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: foundation
+          fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          repository: honeybeehq/apiary
+          # Set to the actual app revision to capture; never use this repo's PR SHA.
+          ref: ${{ vars.APP_PROOF_REF }}
+          token: ${{ secrets.APP_READ_TOKEN }}
+          path: app
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      # Policy must come from the trusted base revision, not PR-controlled content.
+      - run: git show '${{ github.event.pull_request.base.sha }}:proof-policy.json' > ../trusted-policy.json
+        working-directory: foundation
+      - run: pnpm install --frozen-lockfile
+        working-directory: foundation
+      # Produce paired captures for every required artboard/state/viewport using
+      # the app's linked deterministic harness before comparing and sealing.
+      - run: pnpm exec tsx packages/proof/src/compare/cli.ts ../captures/design ../captures/code ../proof/default
+        working-directory: foundation
+      - run: pnpm exec tsx packages/proof/src/report/cli.ts seal ../proof/proof-manifest.json ../proof/default/drift-report.json
+        working-directory: foundation
+      - run: pnpm exec tsx packages/proof/src/report/cli.ts verify ../proof/proof-manifest.json ../app . ../trusted-policy.json
+        working-directory: foundation
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: design-proof
+          path: proof/

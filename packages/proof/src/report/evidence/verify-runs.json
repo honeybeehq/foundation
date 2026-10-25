@@ -1,0 +1,73 @@
+[
+  {
+    "name": "match",
+    "exitCode": 0,
+    "stdout": "{\n  \"passed\": true,\n  \"errors\": [],\n  \"reports\": 1\n}",
+    "stderr": ""
+  },
+  {
+    "name": "pixel-drift",
+    "exitCode": 1,
+    "stdout": "{\n  \"passed\": false,\n  \"errors\": [\n    \"replay/drift-report.json: measurement replay mismatch\",\n    \"replay/drift-report.json: drift exceeds tolerance\"\n  ],\n  \"reports\": 1\n}",
+    "stderr": ""
+  },
+  {
+    "name": "stale-code",
+    "exitCode": 1,
+    "stdout": "{\n  \"passed\": false,\n  \"errors\": [\n    \"replay/drift-report.json: stale code binding\",\n    \"replay/drift-report.json: capture source binding mismatch\"\n  ],\n  \"reports\": 1\n}",
+    "stderr": ""
+  },
+  {
+    "name": "stale-design",
+    "exitCode": 1,
+    "stdout": "{\n  \"passed\": false,\n  \"errors\": [\n    \"replay/drift-report.json: stale design binding\",\n    \"replay/drift-report.json: capture source binding mismatch\"\n  ],\n  \"reports\": 1\n}",
+    "stderr": ""
+  },
+  {
+    "name": "not-provable",
+    "exitCode": 1,
+    "stdout": "{\n  \"passed\": false,\n  \"errors\": [\n    \"replay/drift-report.json: not-provable: Component requires an unstubbed server connection\"\n  ],\n  \"reports\": 1\n}",
+    "stderr": ""
+  },
+  {
+    "name": "loose-policy",
+    "exitCode": 1,
+    "stdout": "{\n  \"passed\": false,\n  \"errors\": [\n    \"replay/drift-report.json: tolerance pixelRatio exceeds policy or is missing\"\n  ],\n  \"reports\": 1\n}",
+    "stderr": ""
+  },
+  {
+    "name": "missing-html-hash",
+    "exitCode": 1,
+    "stdout": "{\n  \"passed\": false,\n  \"errors\": [\n    \"replay/drift-report.json: missing design HTML binding\",\n    \"replay/drift-report.json: capture source binding mismatch\"\n  ],\n  \"reports\": 1\n}",
+    "stderr": ""
+  },
+  {
+    "name": "missing-state",
+    "exitCode": 1,
+    "stdout": "{\n  \"passed\": false,\n  \"errors\": [\n    \"Missing required capture: {\\\"artboard\\\":\\\"tracks-pane/default\\\",\\\"state\\\":\\\"missing-state\\\",\\\"viewport\\\":{\\\"dpr\\\":1,\\\"height\\\":800,\\\"width\\\":1280}}\"\n  ],\n  \"reports\": 1\n}",
+    "stderr": ""
+  },
+  {
+    "name": "dirty-source",
+    "exitCode": 1,
+    "stdout": "{\n  \"passed\": false,\n  \"errors\": [\n    \"Code checkout is dirty\"\n  ],\n  \"reports\": 1\n}",
+    "stderr": ""
+  },
+  {
+    "name": "chain-sha256-match",
+    "exitCode": 0,
+    "stdout": "{\n  \"passed\": true,\n  \"errors\": [],\n  \"reports\": 1\n}",
+    "stderr": ""
+  },
+  {
+    "name": "chain-sha256-stale",
+    "exitCode": 1,
+    "stdout": "{\n  \"passed\": false,\n  \"errors\": [\n    \"replay/drift-report.json: stale design binding\",\n    \"replay/drift-report.json: capture source binding mismatch\"\n  ],\n  \"reports\": 1\n}",
+    "stderr": ""
+  },
+  {
+    "name": "tampered-report",
+    "exitCode": 1,
+    "stdout": "{\n  \"passed\": false,\n  \"errors\": [\n    \"replay/drift-report.json: report hash mismatch\",\n    \"replay/drift-report.json: manifest identity mismatch\",\n    \"replay/drift-report.json: capture source binding mismatch\"\n  ],\n  \"reports\": 1\n}"
+  }
+]
