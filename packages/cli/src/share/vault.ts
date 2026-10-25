@@ -1,6 +1,6 @@
 import { acquireDocumentLock } from '../document-lock.js'
 import { homedir } from 'node:os'
-import { join } from 'node:path'
+import { join, isAbsolute } from 'node:path'
 import { mkdirSync, lstatSync, readFileSync, writeFileSync, renameSync, chmodSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import type { Device, DeviceSecret, EpochKey } from './crypto.js'
@@ -31,11 +31,22 @@ function location(): string {
   if (stat.isSymbolicLink() || stat.mode & 0o077) throw new Error('share key directory must be private (0700)')
   return join(dir, 'keys.json')
 }
+/** Optional dedicated macOS keychain for isolated service/test HOMEs. Never changes defaults. */
+function keychainPath(): string | undefined {
+  const path = process.env.FOUNDATION_SHARE_KEYCHAIN
+  if (!path) return undefined
+  if (!isAbsolute(path) || /[\r\n]/.test(path)) throw new Error('share keychain path must be absolute and single-line')
+  const stat = lstatSync(path)
+  if (!stat.isFile() || stat.isSymbolicLink() || stat.mode & 0o077)
+    throw new Error('share keychain must be a private regular file (0600)')
+  return path
+}
 export function readVault(): Vault {
   if (process.platform === 'darwin') {
+    const keychain = keychainPath()
     try {
       return JSON.parse(
-        execFileSync('security', ['find-generic-password', '-a', homedir(), '-s', 'foundation-share-v1', '-w'], {
+        execFileSync('security', ['find-generic-password', '-a', homedir(), '-s', 'foundation-share-v1', '-w', ...(keychain ? [keychain] : [])], {
           encoding: 'utf8',
           stdio: ['ignore', 'pipe', 'pipe']
         })
@@ -106,8 +117,9 @@ export function saveSession(space: string, session: Session, replaceDevice = fal
     const text = JSON.stringify(vault)
     if (process.platform === 'darwin') {
       const quote = (s: string): string => '"' + s.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"'
+      const keychain = keychainPath()
       execFileSync('security', ['-i'], {
-        input: `add-generic-password -U -a ${quote(homedir())} -s foundation-share-v1 -w ${quote(text)}\n`,
+        input: `add-generic-password -U -a ${quote(homedir())} -s foundation-share-v1 -w ${quote(text)}${keychain ? ` ${quote(keychain)}` : ''}\n`,
         stdio: ['pipe', 'pipe', 'pipe']
       })
       return
