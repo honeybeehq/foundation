@@ -1,0 +1,3 @@
+ts	phase	decision	why	evidence	result
+2026-10-25T04:47:42Z	matching	Use unique ids then global assignment	Code wrappers and absent ids need a fallback with inspectable confidence	packages/proof/src/compare/match.ts	implemented; typecheck passes
+2026-10-25T04:47:42Z	measurement	Measure isolated mutations over baked Tracks design	Isolated absolute probes let us count injected drifts without layout cascades	packages/proof/src/compare/evidence/measurements.json	Nine scenarios; zero false positives or missed injections

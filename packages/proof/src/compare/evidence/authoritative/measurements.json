@@ -1,0 +1,110 @@
+[
+  {
+    "scenario": "unchanged",
+    "expected": 0,
+    "found": 0,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "pixelRatio": 0,
+    "ms": 108.89113100000031
+  },
+  {
+    "scenario": "padding",
+    "expected": 1,
+    "found": 1,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "pixelRatio": 0,
+    "ms": 65.83644899999945
+  },
+  {
+    "scenario": "colour",
+    "expected": 1,
+    "found": 1,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "pixelRatio": 0.00234375,
+    "ms": 80.41507100000035
+  },
+  {
+    "scenario": "remove",
+    "expected": 1,
+    "found": 1,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "pixelRatio": 0.00234375,
+    "ms": 101.81810000000041
+  },
+  {
+    "scenario": "strip-ids",
+    "expected": 0,
+    "found": 0,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "pixelRatio": 0,
+    "ms": 153.30051500000081
+  },
+  {
+    "scenario": "no-id-padding",
+    "expected": 1,
+    "found": 1,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "pixelRatio": 0,
+    "ms": 109.1987280000003
+  },
+  {
+    "scenario": "no-id-colour",
+    "expected": 1,
+    "found": 1,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "pixelRatio": 0.00234375,
+    "ms": 123.88637200000085
+  },
+  {
+    "scenario": "no-id-remove",
+    "expected": 1,
+    "found": 1,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "pixelRatio": 0.00234375,
+    "ms": 114.43009200000051
+  },
+  {
+    "scenario": "wrapper",
+    "expected": 0,
+    "found": 0,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "pixelRatio": 0,
+    "ms": 57.76169300000038
+  }
+]
