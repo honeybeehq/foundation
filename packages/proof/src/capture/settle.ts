@@ -6,7 +6,8 @@ export async function settleRoot(page: Page) {
     let stable = 0
     let frames = 0
     const check = () => {
-      const current = document.querySelector('#foundation-root')!.innerHTML
+      const rules = Array.from(document.styleSheets).map(sheet => {try{return sheet.cssRules.length}catch{return -1}})
+      const current = document.querySelector('#foundation-root')!.innerHTML + document.head.innerHTML + JSON.stringify(rules) + document.fonts.status
       stable = current === previous && (window as any).__foundationPendingTimers === 0 ? stable + 1 : 0
       previous = current
       if (stable >= 3) resolve()

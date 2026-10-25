@@ -3,7 +3,7 @@ import {createHash} from 'node:crypto'
 import {join} from 'node:path'
 
 export async function rendererSources(root: string) {
-  const files = ['package.json','pnpm-lock.yaml','packages/proof/src/compare/style.ts']
+  const files = ['package.json','pnpm-lock.yaml','packages/proof/package.json','packages/engine/package.json','tsconfig.json','packages/proof/src/compare/style.ts']
   async function visit(directory: string) {
     for (const item of await readdir(join(root,directory), {withFileTypes:true})) {
       const file = join(directory,item.name)

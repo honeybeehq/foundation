@@ -4,9 +4,12 @@ import type { Links } from './types.js'
 export async function pinFontStacks(page: Page, policy: Links['fontPolicy']) {
   if (!policy) return []
   const substitutions = await page.evaluate(policy => {
+    const authored = new WeakMap<Element,string>()
+    ;(window as any).__foundationAuthoredFontFamilies = authored
     const replacements = new Map<string, string>()
     const rows = Array.from(document.querySelectorAll<HTMLElement>('#foundation-root, #foundation-root *')).map(el => ({el, family: getComputedStyle(el).fontFamily}))
     for (const {el, family} of rows) {
+      authored.set(el, family)
       const names = family.split(',').map(value => value.trim().replace(/^['"]|['"]$/g, ''))
       const normalized = [...new Set(names.map(name => {
         if (/^(ui-monospace|monospace|SF Mono|Menlo|Monaco|Consolas|Courier New)$/i.test(name)) return policy.mono
