@@ -101,3 +101,10 @@ it('a read-only member retries availability without attempting uploads',async()=
  expect(publish).not.toHaveBeenCalled();expect(store.size).toBe(0)
  const {readAssetStatus}=await import('../src/share/assets.js');expect(readAssetStatus(f.b)).toContainEqual({path:f.path,state:'ready',reason:null})
 })
+it('keeps retained images readable after more than64 historical chunk copies',async()=>{
+ const f=await fixture();await new AssetSharing(config,f.a,root).publish(f.chain)
+ const rows=[...store.values()][0]!,original={...rows[0]!}
+ for(let i=1;i<70;i++)rows.push({...original,seq:String(i+1)})
+ await new AssetSharing(config,f.b,root).receive(f.chain)
+ expect(await readFile(join(root,'b',f.path))).toEqual(f.bytes)
+})
