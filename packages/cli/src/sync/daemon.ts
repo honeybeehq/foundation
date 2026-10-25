@@ -13,7 +13,7 @@ import { createBridge, configForDesign, shareRelay, maintainKnownRepos, ShareHin
 import { findShareRoot, readShareConfig, type ShareConfig } from '../share/config.js'
 import { followLocalCatalogues } from './catalogue-follower.js'
 import { processMaterializeJobs } from './materialize-jobs.js'
-import { initializeActivityJournal, recordActivity } from './local-model.js'
+import { initializeActivityJournal, recordActivity, closeActivityJournal } from './local-model.js'
 import type { FdnChain } from 'foundation-engine'
 import { DirectChanges, writeDirectStatus, type DirectConfig } from './direct.js'
 
@@ -43,7 +43,7 @@ function page(frame: Frame, cursor: string): { blobs: Uint8Array[]; next: string
 export async function serveSync(config: CombConfig, signal: AbortSignal, log: (text: string) => void): Promise<void> {
   mkdirSync(replicaRoot(), { recursive: true })
   const release = acquireDocumentLock(join(replicaRoot(), 'daemon'), 100)
-  try { initializeActivityJournal() } catch (error) { log(`activity journal: ${String(error)}`) }
+  try { initializeActivityJournal(message=>log(message)) } catch (error) { log(`activity journal: ${String(error)}`) }
   const catalogueFollower = followLocalCatalogues(config, signal, log)
   const materializeJobs = processMaterializeJobs(signal, log)
   const ownerNodeId = config.node?.id ?? process.env.FOUNDATION_NODE_ID ?? ''
@@ -118,6 +118,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
     let catalogueHead: string | undefined
     const shareHints=transport.share&&process.env.FOUNDATION_SHARE_HINTS!=='0'?new ShareHints(transport,feed):undefined
     const hinted = new Set<string>(transport.share?baseline.changes().map(c=>c.envelope.hash):[])
+    const freshFacts=new Map<string,number>()
     let hintSignature = '', directPoll: NodeJS.Timeout | undefined
     const pushDirect = (): void => {
       if ((!direct&&!shareHints) || signal.aborted) return
@@ -139,7 +140,8 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
           syncTrace('direct.notice', () => ({ docId: design.docId, hashes: batch.map(change => change.hash) }))
           direct?.push({ workspace: design.workspace, product: design.product, docId: design.docId, blobs: batch.map(change => change.hex) })
           const accepted=shareHints?shareHints.push(batch):batch.map(c=>c.hash)
-          for (const hash of accepted) hinted.add(hash)
+          for (const hash of accepted) {hinted.add(hash);freshFacts.set(hash,Date.now()+4000)}
+          for(const [hash,until]of freshFacts)if(until<Date.now())freshFacts.delete(hash)
         }
         if (batch.length === changes.length&&batch.every(c=>hinted.has(c.hash))) hintSignature = signature
       } catch { /* Atomic replacement or an unavailable optional peer never blocks Comb. */ }
@@ -148,7 +150,9 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
     const relay = transport.share&&process.env.FOUNDATION_SHARE_RELAY!=='0' ? shareRelay(transport.share, transport.shareLog??feed, AbortSignal.any([signal,relayController.signal]), (bytes,signatureVerified,source) => {
       let imported=0
       const importedChain=updateDocument(design.file, chain => { if(chain.docId()!==design.docId)throw new Error('document identity mismatch');const hash=decodeBlob(bytes).envelope.hash;const present=chain.log().some(c=>c.hash===hash);imported=importChangeBlobs(chain,[bytes]);if(!present)importedHashes.add(hash);return chain },true)
-      if(source==='hint')observe(design,importedChain,[decodeBlob(bytes).envelope.hash],receivingLive?'live':'baseline',signatureVerified,importedHashes)
+      const factHash=decodeBlob(bytes).envelope.hash
+      if(imported)freshFacts.set(factHash,Date.now()+220)
+      if(source==='hint'&&(imported||(freshFacts.get(factHash)??0)>Date.now()))observe(design,importedChain,[factHash],receivingLive?'live':'baseline',signatureVerified,importedHashes)
       else baselineLater(design,importedChain,[decodeBlob(bytes).envelope.hash],signatureVerified,importedHashes)
       if(!imported)return
       const received=directReceived.get(key)??new Map<string,number>(); const hash=decodeBlob(bytes).envelope.hash
@@ -175,13 +179,15 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
               if (incoming.blobs.length) {
                 const done = syncTraceSpan('receive.locked-import', () => ({ docId: design.docId, cursor: state.cursor, hashes: incoming.blobs.map(blob => decodeBlob(blob).envelope.hash) }))
                 let imported = 0, ok = false, importedChain: FdnChain | undefined
+                const freshHashes:string[]=[]
                 try { importedChain=updateDocument(design.file, chain => {
                   if (chain.docId() !== design.docId) throw new Error('live path now holds another design')
                   const previousHashes=new Set(chain.log().map(c=>c.hash))
                   imported = importChangeBlobs(chain, incoming.blobs, syncTraceEnabled ? (stage, durationMs) => syncTrace(`receive.${stage}`, () => ({ docId: design.docId, durationMs })) : undefined)
-                  for(const blob of incoming.blobs){const hash=decodeBlob(blob).envelope.hash;if(!previousHashes.has(hash))importedHashes.add(hash)}
+                  for(const blob of incoming.blobs){const hash=decodeBlob(blob).envelope.hash;if(!previousHashes.has(hash)){importedHashes.add(hash);freshHashes.push(hash)}}
                   return chain
                 }, true); ok = true } finally { done({ imported, ok }) }
+                for(const hash of freshHashes)freshFacts.set(hash,Date.now()+220)
                 if(importedChain)baselineLater(design,importedChain,incoming.blobs.map(blob=>decodeBlob(blob).envelope.hash),transport.share?incoming.signatures:false,importedHashes)
                 // Delivery itself proves durable sharing, even when the append acknowledgement was lost.
                 const shared = new Set(state.published)
@@ -293,5 +299,5 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
     }
     await Promise.all([...workers.values()].map(worker => worker.done))
     await catalogueQueue.close()
-  } finally { clearInterval(keyTimer);await keyMaintenance;await catalogueFollower;await materializeJobs;for(const timer of pendingFacts)clearTimeout(timer);await direct?.close(); writeDirectStatus('disabled', 'daemon stopped'); release() }
+  } finally { clearInterval(keyTimer);await keyMaintenance;await catalogueFollower;await materializeJobs;for(const timer of pendingFacts)clearTimeout(timer);try{closeActivityJournal()}catch(error){log(`activity shutdown: ${String(error)}`)};await direct?.close(); writeDirectStatus('disabled', 'daemon stopped'); release() }
 }

@@ -252,7 +252,7 @@ try {
   let a = daemon(0)
   const second = await ok(1, 'share', 'login', '--repo-root', repos[1]!, '--ssh-key', keys[1]!, '--token-stdin')
   log(`second member login: ${second.trim()}`)
-  const b = daemon(1)
+  let b = daemon(1)
   await until(
     () => Object.values(vault(1)).some((s: any) => s.keys.length > 0),
     'automatic signed-device key handover with no designs open'
@@ -268,6 +268,7 @@ try {
     return rows[0]?.status === 'shared'
   }, 'genesis durably acknowledged')
   let activity:ReturnType<typeof activityFollow>|undefined
+  let outageHash:string|undefined,materialized:{docId:string;headHash:string}|undefined
   if(localModelMode){activity=activityFollow(1,'machine-B');await until(()=>activity!.records.some(r=>r.type==='ready'),'activity baseline caught-up marker');assert.ok(activity.records.filter(r=>r.entry).every(r=>r.delivery==='baseline'))}
   for (const [from, to, id, word] of [
     [0, 1, 'n1', 'SECRET-ALICE-TEXT'],
@@ -299,9 +300,16 @@ try {
     const resumed=activityFollow(1,'machine-B',token)
     await until(()=>resumed.records.some(r=>r.type==='ready'),'activity cursor resume caught-up marker')
     assert.ok(resumed.records.filter(r=>r.entry).every(r=>r.delivery==='baseline'));resumed.child.kill('SIGTERM')
+    activity=activityFollow(1,'machine-B',resumed.records.find(r=>r.type==='ready').cursor)
+    await until(()=>activity!.records.some(r=>r.type==='ready'),'persistent activity observer ready for outage')
+    const remoteOnly=join(repos[0]!,'remote-only.fdn.html')
+    await ok(0,'new',remoteOnly)
+    await ok(0,'sync','close',remoteOnly)
+    await ok(0,'sync','open',remoteOnly,'--repo-root',repos[0]!,'--workspace','machine-A','--product','local-A')
+    const remoteDocId=loadChain(readFileSync(remoteOnly+'.chain')).docId()
     const snapshot=async()=>JSON.parse(await ok(1,'sync','catalogue','--workspace','machine-A','--json'))
-    await until(async()=>(await snapshot()).records.some((r:any)=>r.docId===chain(0).docId()),'remote-only catalogue persisted on second HOME')
-    const index=await snapshot(),record=index.records.find((r:any)=>r.docId===chain(0).docId())
+    await until(async()=>(await snapshot()).records.some((r:any)=>r.docId===remoteDocId),'remote-only catalogue persisted on second HOME')
+    const index=await snapshot(),record=index.records.find((r:any)=>r.docId===remoteDocId)
     assert.equal(index.version,1);assert.equal(index.localReplicas.length,0)
     log(`CATALOGUE: cached remote-only row ${record.docId}; origin ${record.originNode.id}; revision ${index.revision}`)
     const key='S7-open-'+record.docId
@@ -309,8 +317,28 @@ try {
     assert.equal(accepted.state,'accepted')
     let settled:any
     await until(async()=>{settled=JSON.parse(await ok(1,'sync','materialize-status',key,'--json'));if(settled.state==='refused')throw new Error(JSON.stringify(settled));return settled.state==='ready'},'encrypted materialization accepted then ready')
-    assert.equal(settled.path,join(repos[1]!,'remote-open.fdn.html'));assert.equal(loadChain(readFileSync(settled.path+'.chain')).docId(),record.docId)
-    log('MATERIALIZE: asynchronous accepted/ready; verified encrypted history; confined local path; original document identity')
+    assert.equal(settled.path,join(repos[1]!,'remote-open.fdn.html'));assert.equal(loadChain(readFileSync(settled.path+'.chain')).docId(),record.docId);assert.notEqual(settled.fromCache,true)
+    materialized={docId:record.docId,headHash:settled.headHash}
+    log('MATERIALIZE: asynchronous accepted/ready; actual encrypted network history (no local candidate); confined path; original document identity')
+    const verified=JSON.parse(await ok(1,'sync','verify',settled.path,'--doc-id',record.docId,'--expected-head',record.headHash,'--json'))
+    assert.equal(verified.state,'verified')
+    const wrong=await cli(1,'sync','verify',settled.path,'--doc-id','foreign','--json')
+    assert.equal(wrong.code,1);assert.equal(JSON.parse(wrong.out).code,'identity-mismatch')
+    const conflict=join(repos[1]!,'foreign.fdn.html')
+    await ok(1,'new',conflict)
+    await ok(1,'sync','close',conflict)
+    const original=readFileSync(conflict),originalChain=readFileSync(conflict+'.chain')
+    const conflictKey='S7-conflict-'+record.docId
+    await ok(1,'sync','materialize',record.docId,'foreign.fdn.html','--repo-root',repos[1]!,'--workspace','machine-A','--product','local-A','--expected-head',record.headHash,'--request-key',conflictKey,'--accept','--json')
+    let refusal:any
+    await until(async()=>{refusal=JSON.parse(await ok(1,'sync','materialize-status',conflictKey,'--json'));return refusal.state!=='pending'},'foreign target refusal settles')
+    assert.equal(refusal.state,'refused');assert.equal(refusal.code,'path-conflict')
+    assert.deepEqual(readFileSync(conflict),original);assert.deepEqual(readFileSync(conflict+'.chain'),originalChain)
+    log('REFUSAL: wrong docId verification and foreign target refused; both foreign files remain exact')
+    const cacheDir=join(homes[1]!,'replicas/read-model/catalogues')
+    let cacheMtime=0,stableAt=Date.now()
+    await until(()=>{const name=readdirSync(cacheDir).find(f=>f.endsWith('.json'))!;const mtime=statSync(join(cacheDir,name)).mtimeMs;if(mtime!==cacheMtime){cacheMtime=mtime;stableAt=Date.now()};return Date.now()-stableAt>2200},'idle catalogue data checkpoint stays unchanged across contact polls',15000)
+    log('IDLE: follower contact remains fresh without rewriting the durable catalogue data checkpoint')
   }
   if (heldMode) {
     await until(
@@ -544,6 +572,9 @@ try {
     await until(async()=>JSON.parse(await ok(1,'sync','catalogue','--workspace','machine-A','--json')).freshness.state==='stale','catalogue marks service outage stale')
     const cached=JSON.parse(await ok(1,'sync','catalogue','--workspace','machine-A','--json'))
     assert.ok(cached.records.length>0);log('OFFLINE CACHE: cached remote rows retained; read succeeds with service stopped, no scan/network wait')
+    const offline=JSON.parse(await ok(1,'sync','materialize',materialized!.docId,'offline-copy.fdn.html','--repo-root',repos[1]!,'--workspace','machine-A','--product','local-A','--expected-head',materialized!.headHash,'--json'))
+    assert.equal(offline.state,'ready');assert.equal(offline.fromCache,true)
+    log('OFFLINE MATERIALIZE: complete local history opens another confined replica with service stopped')
   }
   await ok(
     0,
@@ -555,6 +586,7 @@ try {
     'alice'
   )
   assert.equal(text(0, 'n2'), 'LOCAL-DURING-OUTAGE')
+  outageHash=chain(0).head().hash
   log('local edit saved during outage')
   service = await startShareService({ ...serviceConfig, port })
   await until(
@@ -574,6 +606,21 @@ try {
     're-attested replacement device receives current key'
   )
   log('RE-ATTEST: renewed SSH binding and replaced revoked device keys; current access checked again')
+  if(localModelMode){
+    await until(()=>activity!.records.some(r=>r.entry?.hash===outageHash),'outage history arrives as baseline imported fact')
+    const replay=activity!.records.filter(r=>r.entry?.hash===outageHash)
+    assert.equal(replay.length,1);assert.equal(replay[0].delivery,'baseline');assert.equal(replay[0].source,'import')
+    log('REPLAY: delayed outage edit is exactly one imported baseline fact, never a live lease')
+    const prior=JSON.parse(readFileSync(join(homes[1]!,'replicas/read-model/activity-index.json'),'utf8'))
+    b.kill('SIGTERM');await until(()=>b.exitCode!==null,'daemon stops before journal restart')
+    b=daemon(1);await wait(1200)
+    const after=JSON.parse(readFileSync(join(homes[1]!,'replicas/read-model/activity-index.json'),'utf8'))
+    assert.equal(after.id,prior.id)
+    const facts=(await ok(1,'sync','activity','--workspace','machine-B','--json')).trim().split('\n').filter(Boolean).map(line=>JSON.parse(line))
+    assert.equal(facts.filter((r:any)=>r.entry.hash===outageHash).length,1)
+    log('RESTART: durable activity cursor and cross-copy hash dedup retained')
+    activity!.child.kill('SIGTERM')
+  }
   const validToken=vault(0)[space].token
   const relayCheck=await fetch(`${service.url}/v1/relay?space=${space}`,{headers:{Authorization:`Bearer ${validToken}`}})
   assert.equal(relayCheck.status,200)

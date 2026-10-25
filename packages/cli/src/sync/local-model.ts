@@ -25,6 +25,14 @@ export function persistModel(path: string, value: unknown): void {
   try { fsyncSync(directory) } finally { closeSync(directory) }
 }
 export function catalogueCachePath(space: string): string { return join(modelRoot(), 'catalogues', `${digest(space)}.json`) }
+export interface CatalogueContact { following: boolean; lastContactAt: number | null; error: string | null }
+export function catalogueContactPath(space: string): string { return join(modelRoot(), 'catalogue-contact', `${digest(space)}.json`) }
+/** Contact is rebuildable telemetry, not a durable feed cursor or document acknowledgement. */
+export function recordCatalogueContact(space: string, contact: CatalogueContact): void {
+  const path=catalogueContactPath(space), temp=`${path}.${process.pid}.tmp`
+  mkdirSync(dirname(path),{recursive:true,mode:0o700})
+  writeFileSync(temp,JSON.stringify(contact),{mode:0o600});renameSync(temp,path)
+}
 export function newCatalogueCache(space: string, repo: string, repoRoot: string): CatalogueCache {
   return { version: 1, space, repo, repoRoot, cursor: '1', records: [], localReplicas: [], lastContactAt: null, error: null, errors: [] }
 }
@@ -81,11 +89,20 @@ export function catalogueSnapshot(workspace?: string, repoRoot?: string) {
   } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error }
   const records = caches.flatMap(c => c.records).filter(r => !workspace || r.workspaceId === workspace)
   const localReplicas = caches.flatMap(c => c.localReplicas).filter(r => !workspace || r.workspaceId === workspace)
-  const lastContactAt = caches.length ? Math.min(...caches.map(c => c.lastContactAt ?? 0)) || null : null
-  const reasons = [...errors, ...caches.flatMap(c => [c.error, ...c.errors].filter((e): e is string => !!e))].slice(-20)
-  const stale = !!reasons.length || (lastContactAt !== null && Date.now() - lastContactAt > 5000)
-  const freshness = { state: stale ? 'stale' as const : !lastContactAt ? 'starting' as const : 'fresh' as const, lastContactAt, reason: reasons[0] ?? (stale ? 'local sync follower has not contacted the service recently' : null) }
-  return { version: 1 as const, records, localReplicas, revision: digest([records, localReplicas, freshness.state, reasons]), freshness, errors: reasons }
+  const contacts=caches.map(cache=>{
+    try { const value=JSON.parse(readFileSync(catalogueContactPath(cache.space),'utf8')) as CatalogueContact
+      if(typeof value.following!=='boolean'||!(value.lastContactAt===null||typeof value.lastContactAt==='number')||!(value.error===null||typeof value.error==='string'))throw new Error('invalid contact')
+      return value
+    }catch{return {following:true,lastContactAt:cache.lastContactAt,error:cache.error}}
+  })
+  const active=contacts.filter(c=>c.following)
+  const lastContactAt = (active.length ? Math.min(...active.map(c => c.lastContactAt ?? 0)) : Math.max(0,...contacts.map(c=>c.lastContactAt??0))) || null
+  const connectionErrors=[...errors,...active.flatMap(c=>c.error?[c.error]:[])]
+  const diagnostics=[...connectionErrors,...caches.flatMap(c=>c.errors)].slice(-20)
+  const stale = !!connectionErrors.length || (caches.length>0&&!active.length) || (lastContactAt !== null && Date.now() - lastContactAt > 5000)
+  const reason=connectionErrors[0]??(!active.length&&caches.length?'local catalogue followers are stopped':stale?'local sync follower has not contacted the service recently':null)
+  const freshness = { state: stale ? 'stale' as const : !lastContactAt ? 'starting' as const : 'fresh' as const, lastContactAt, reason }
+  return { version: 1 as const, records, localReplicas, revision: digest([records, localReplicas, freshness.state, diagnostics]), freshness, errors: diagnostics }
 }
 
 export interface ImportedFact {
@@ -93,62 +110,4 @@ export interface ImportedFact {
   originNode: NodeRef | null; originAssurance: 'writer-stated' | null; signatureVerified: boolean
   source: 'local' | 'import'; entry: ChainLogEntry & { boardKeys: string[] }; delivery: 'baseline' | 'live'; observedAt: number
 }
-interface Journal { version: 1; id: string; next: number; seen: Record<string, string[]>; events: ImportedFact[] }
-function journalPath(): string { return join(modelRoot(), 'activity.json') }
-function journal(): Journal {
-  try {
-    const value = JSON.parse(readFileSync(journalPath(), 'utf8')) as Journal
-    if (value.version !== 1 || typeof value.id !== 'string' || !Number.isSafeInteger(value.next) || value.next < 1 || !Array.isArray(value.events) || !value.seen || typeof value.seen !== 'object') throw new Error('invalid local activity journal; establish a new baseline')
-    return value
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
-    return { version: 1, id: randomUUID(), next: 1, seen: {}, events: [] }
-  }
-}
-export function initializeActivityJournal(): void {
-  const state=journal();persistModel(journalPath(),state)
-}
-const cursor = (state: Journal, seq: number): string => `sync-activity1:${state.id}:${seq}`
-/** Called only with a successfully validated local chain, after import or publish. */
-export function recordActivity(design: LiveDesign, chain: FdnChain, hashes: readonly string[], options: { ownerNodeId: string; repo: string | null; delivery: 'baseline' | 'live'; signatureVerified?: boolean; signatures?: ReadonlySet<string>; source?: 'local'|'import'; importedHashes?: ReadonlySet<string> }): void {
-  if (!options.ownerNodeId || chain.docId() !== design.docId) return
-  const document = { workspaceId: design.workspace, productId: design.product, docId: design.docId, ownerNodeId: options.ownerNodeId }
-  const state = journal(), key = address(document), seen = new Set(state.seen[key] ?? [])
-  const wanted = new Set(hashes.filter(hash => !seen.has(hash)))
-  if (!wanted.size) return
-  let before: string | undefined
-  const entries: ChainLogEntry[] = []
-  do {
-    const page = chain.logPage({ limit: 200, ...(before ? { before } : {}) })
-    for (const entry of page.entries) if (wanted.delete(entry.hash)) entries.push(entry)
-    before = page.nextCursor ?? undefined
-  } while (before && wanted.size)
-  if (wanted.size) throw new Error('validated activity hashes absent from chain')
-  for (const raw of entries.reverse()) {
-    const verified = options.signatureVerified === true || options.signatures?.has(raw.hash) === true, origin = verified ? raw.originNode : null
-    const entry = { ...raw, originNode: origin, boardKeys: (raw as ChainLogEntry & {boardKeys?:string[]}).boardKeys ?? [] }
-    state.events.push({ version: 1, source: options.source ?? (options.importedHashes ? (options.importedHashes.has(raw.hash) ? 'import' : 'local') : 'local'), cursor: cursor(state, state.next++), document, repo: options.repo, originNode: origin ? { id: origin, name: origin } : null, originAssurance: origin ? 'writer-stated' : null, signatureVerified: verified, entry, delivery: options.delivery, observedAt: Date.now() })
-    seen.add(raw.hash)
-  }
-  state.seen[key] = [...seen]
-  state.events = state.events.slice(-10000)
-  persistModel(journalPath(), state)
-}
-let activityReadCache: { signature: string; state: Journal } | undefined
-export function activityBatch(token?: string, workspace?: string): { events: ImportedFact[]; cursor: string } {
-  // The daemon establishes the journal id; readers never create local state.
-  const stat=statSync(journalPath())
-  const signature=JSON.stringify([journalPath(),stat.ino,stat.mtimeMs,stat.size])
-  if(activityReadCache?.signature!==signature)activityReadCache={signature,state:journal()}
-  const state = activityReadCache.state
-  let after = 0
-  if (token) {
-    const prefix = `sync-activity1:${state.id}:`
-    if (!token.startsWith(prefix) || !/^\d+$/.test(token.slice(prefix.length))) throw new Error('invalid or stale activity cursor; establish a new baseline')
-    after = Number(token.slice(prefix.length))
-    const oldest = state.events[0] ? Number(state.events[0].cursor.split(':').at(-1)) : state.next
-    if (!Number.isSafeInteger(after) || after < oldest - 1 || after >= state.next) throw new Error('invalid or stale activity cursor; establish a new baseline')
-  }
-  const events = state.events.filter(e => Number(e.cursor.split(':').at(-1)) > after && (!workspace || e.document.workspaceId === workspace))
-  return { events, cursor: cursor(state, state.next - 1) }
-}
+export { initializeActivityJournal, recordActivity, activityBatch, flushActivityJournal, closeActivityJournal } from './activity-journal.js'

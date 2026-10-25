@@ -17,9 +17,14 @@ generations. Tombstones remain explicit per-replica records. Missing rows, faile
 reads, closing a design and stale service contact never imply deletion. Unsupported
 records and invalid paths are quarantined with bounded errors; valid rows remain.
 `localReplicas` contains `{workspaceId,productId,docId,path,repoPath,headHash}` for
-actual registered local copies. A remote record never has an invented absolute path.
+actual registered local copies. A remote record never has an invented absolute path. Any authorized repository
+writer can claim catalogue metadata for another replica: the catalogue is a
+discovery hint, never document truth or proof that a named machine authored it.
 `freshness` is `{state:'starting'|'fresh'|'stale',lastContactAt:number|null,reason:string|null}`.
 Revision changes with rows and meaningful status, not successful contact alone.
+Quarantine messages remain bounded diagnostics, not failed connection contact.
+Only currently followed repositories contribute to the contact minimum; stopped
+repo caches remain available without pinning unrelated active repos stale.
 `lastAgentEdit` remains null until authenticated agent provenance is available.
 
 Activity is NDJSON. Facts contain `{version:1,cursor,document,repo,source,originNode,
@@ -41,11 +46,20 @@ their receive time for observation leases.
 Cold/resumed stream backlog is always baseline. A live fact requires a fresh
 ephemeral hint while caught up; durable replay/outbox recovery is baseline.
 Startup history is not hinted, and queued hints expire after two seconds. Older
-services without the SSE source tag produce conservative baseline facts. Hash
+services without the SSE source tag produce conservative baseline facts. The tag
+is service-stated transport timing, not a signed proof of freshness; a service can
+delay unseen changes. Persistent hash dedup still prevents a known hash renewing
+a lease. Hash
 dedup is persisted per DesignRef across local copies. After the initial snapshot,
 even an empty one, a control row `{version:1,type:'ready',workspaceId,cursor}` marks
 local journal catch-up; it is not service contact or presence. A stale cursor exits
-2 with a visible baseline instruction. The local journal retains 10,000 fact rows.
+2 with a visible baseline instruction. The local journal retains up to 10,000 fact rows in append-only segments. A
+separate append-only hash index preserves dedup after payload eviction; the recent
+seen cache and pending queue are bounded at 10,000. Imports only enqueue metadata;
+queued 20ms flushes process at most 32 facts per turn, prioritizing fresh live facts.
+Observations delayed over five seconds are baseline. Only a published, fsynced
+index advances the resume cursor. Unflushed observations after a stop/crash are
+reconstructed from the saved chain as baseline, never replayed as fresh leases.
 
 ## Explicit materialization
 
@@ -62,6 +76,9 @@ requestKey. `--accept` durably queues locally and returns
 `{version:1,state:'accepted',requestKey}` before network/history work. Status returns
 pending, ready or refused. Ready includes workspaceId/productId/docId, path,
 repoPath, headHash and requestKey; refused includes code/message and optional path.
+Transient transport/setup failures use code `unavailable`, distinct from
+`history-unavailable` for missing retained history. Refusals settle permanently;
+a user retry supplies a new key, with no uncancellable background writes.
 Repeating the same key/request is idempotent; using it for another request refuses.
 Without `--accept`, the existing blocking command returns ready/refused directly.
 
@@ -90,3 +107,7 @@ On macOS also set FOUNDATION_SHARE_KEYCHAIN to a private scratch Keychain and us
 the native Keychain implementation; state-dir alone does not isolate the default
 Keychain/account. Set FOUNDATION_NODE_ID to the real local replica owner id, and
 FOUNDATION_ORIGIN_NODE for the writer's chosen machine label.
+
+State isolation validates the final state-root component and private modes. Ancestor
+path ownership/resolution belongs to the local OS/account trust boundary; it does
+not defend a compromised local account or maliciously substituted parent path.
