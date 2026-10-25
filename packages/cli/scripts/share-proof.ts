@@ -63,6 +63,14 @@ const stub = createServer((req, res) => {
     return
   }
   const access = who === 'operator' || who === 'alice' || (who === 'bob' && !removed)
+  if (req.url?.includes('/collaborators?')) {
+    res.end(
+      JSON.stringify(
+        ids.slice(0, removed ? 1 : 2).map((login, i) => ({ login, id: i + 1, permissions: { push: true } }))
+      )
+    )
+    return
+  }
   if (req.url?.includes('/collaborators/')) {
     const login = req.url.split('/')[5],
       i = ids.indexOf(login ?? '')
@@ -327,20 +335,40 @@ try {
   }
 
   // Refused rotation must stay required on the next attempt; it must never fall through to the old key.
-  a.kill('SIGTERM');if(a.exitCode===null)await new Promise<void>(r=>a.once('exit',()=>r()))
-  const homeBefore=process.env.HOME,githubBefore=process.env.FOUNDATION_SHARE_TEST_GITHUB,fetchBefore=globalThis.fetch
-  process.env.HOME=homes[0];process.env.FOUNDATION_SHARE_TEST_GITHUB=github
-  let refusedRotations=0
-  globalThis.fetch=async(input,init)=>{if(String(input)===service.url+'/v1/keys'){refusedRotations++;return new Response('{"error":"rotation deliberately refused"}',{status:503})}return fetchBefore(input,init)}
-  try{const {maintainKeys}=await import('../src/share/client.js')
-    await assert.rejects(()=>maintainKeys(config,['f'.repeat(64)]),/503/)
-    assert.equal(vault(0)[space].rotationRequired,true)
-    await assert.rejects(()=>maintainKeys(config),/503/)
-    assert.equal(refusedRotations,2);assert.equal(vault(0)[space].rotationRequired,true)
+  a.kill('SIGTERM')
+  if (a.exitCode === null) await new Promise<void>((r) => a.once('exit', () => r()))
+  const homeBefore = process.env.HOME,
+    githubBefore = process.env.FOUNDATION_SHARE_TEST_GITHUB,
+    fetchBefore = globalThis.fetch
+  process.env.HOME = homes[0]
+  process.env.FOUNDATION_SHARE_TEST_GITHUB = github
+  let refusedRotations = 0
+  globalThis.fetch = async (input, init) => {
+    if (String(input) === service.url + '/v1/keys') {
+      refusedRotations++
+      return new Response('{"error":"rotation deliberately refused"}', { status: 503 })
+    }
+    return fetchBefore(input, init)
+  }
+  try {
+    const { maintainKeys } = await import('../src/share/client.js')
+    await assert.rejects(() => maintainKeys(config, ['f'.repeat(64)]), /503/)
+    assert.equal(vault(0)[space].rotationRequired, true)
+    await assert.rejects(() => maintainKeys(config), /503/)
+    assert.equal(refusedRotations, 2)
+    assert.equal(vault(0)[space].rotationRequired, true)
     log('REFUSED ROTATION: requirement persisted across retries; old-key sending stays paused')
-    globalThis.fetch=fetchBefore;await maintainKeys(config);assert.equal(vault(0)[space].rotationRequired,false)
-  }finally{globalThis.fetch=fetchBefore;if(homeBefore===undefined)delete process.env.HOME;else process.env.HOME=homeBefore;if(githubBefore===undefined)delete process.env.FOUNDATION_SHARE_TEST_GITHUB;else process.env.FOUNDATION_SHARE_TEST_GITHUB=githubBefore}
-  a=daemon(0)
+    globalThis.fetch = fetchBefore
+    await maintainKeys(config)
+    assert.equal(vault(0)[space].rotationRequired, false)
+  } finally {
+    globalThis.fetch = fetchBefore
+    if (homeBefore === undefined) delete process.env.HOME
+    else process.env.HOME = homeBefore
+    if (githubBefore === undefined) delete process.env.FOUNDATION_SHARE_TEST_GITHUB
+    else process.env.FOUNDATION_SHARE_TEST_GITHUB = githubBefore
+  }
+  a = daemon(0)
   // Outage: stop service, local edit remains available; restart same store/port, daemon renews invalid token.
   const port = (service.server.address() as { port: number }).port
   await service.close()
@@ -362,6 +390,18 @@ try {
     'outbox recovered after service restart',
     40000
   )
+  // A still-authorized user can re-attest after SSH rotation even when the old device id was revoked.
+  removed = false
+  const replacementSSH = join(homes[1]!, 'replacement-ssh')
+  assert.equal(spawnSync('ssh-keygen', ['-q', '-t', 'ed25519', '-N', '', '-f', replacementSSH]).status, 0)
+  keys[1] = replacementSSH
+  await ok(1, 'share', 'login', '--repo-root', repos[1]!, '--ssh-key', replacementSSH, '--reattest', '--token-stdin')
+  assert.notEqual(vault(1)[space].device.device.id, bobId)
+  await until(
+    () => vault(1)[space].keys.some((k: any) => k.epoch >= 3),
+    're-attested replacement device receives current key'
+  )
+  log('RE-ATTEST: renewed SSH binding and replaced revoked device keys; current access checked again')
   for (const child of [a, b]) child.kill('SIGTERM')
   await wait(1000)
   await service.close()

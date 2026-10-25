@@ -32,11 +32,13 @@ foundation share serve --config /etc/foundation-share.json
 ```
 
 Read access fetches and hands over the current epoch; write access creates spaces,
-appends, rotates keys and manages recovery. Public repos default to repo read
-access for anyone with a verified GitHub device; a space can instead require
-explicit collaborators. Devices bind their public service origin, repo, space,
+appends, rotates keys and manages recovery. New spaces default to explicit collaborators, including public repositories.
+An explicitly selected repo-read policy permits every verified GitHub reader of
+a public repo to receive live keys. Devices bind their public service origin, repo, space,
 GitHub numeric id and login to both public keys. The service validates possession
-and direct GitHub identity/key ownership. Peers separately verify all key handovers.
+and direct GitHub identity/key ownership. A successful explicit client
+re-attestation updates the SSH signature without changing immutable device keys;
+a revoked id requires a fresh device. Peers separately verify all key handovers.
 Storage contains public registry metadata and opaque sealed boxes/ciphertexts.
 Revocation closes relay connections immediately. Confirmed renewal loss blocks
 old-epoch appends until a writer rotates. Ambiguous GitHub failures are not loss.
