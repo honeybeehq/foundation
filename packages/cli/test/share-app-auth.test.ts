@@ -22,10 +22,13 @@ it('uses renewable repo-scoped App credentials for metadata and permission check
 })
 it('fails closed without leaking credential provider errors', async () => {
   vi.mocked(metadataToken).mockRejectedValue(new Error('SECRET'))
+  const journal = vi.spyOn(console, 'error').mockImplementation(() => {})
   const fetcher = vi.fn(); vi.stubGlobal('fetch', fetcher)
   await expect(new ShareAuth({ githubAppConfig: '/private/app.json' }).permission('github.com/team/repo', 'alice', 'collaborators'))
     .rejects.toThrow('GitHub App metadata credential unavailable')
   expect(fetcher).not.toHaveBeenCalled()
+  expect(journal).toHaveBeenCalledWith('Share GitHub App: credential provider failed')
+  journal.mockRestore()
 })
 it('rejects relative App config and ambiguous production credential sources before startup', async () => {
   const config = { stateDir: '/unused', comb: { binary: '/unused', args: [] } }

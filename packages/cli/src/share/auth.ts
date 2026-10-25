@@ -52,7 +52,21 @@ export class ShareAuth {
       let token = this.config.githubPermissionToken
       if (this.config.githubAppConfig && repo) {
         try { token = await metadataToken(repo, this.config.githubAppConfig) }
-        catch { throw new ShareAuthError(502, 'GitHub App metadata credential unavailable') }
+        catch (error) {
+          // Only fixed provider diagnostics enter the journal, never arbitrary errors/keys.
+          const message = error instanceof Error ? error.message : ''
+          const diagnostic = /^GitHub request refused \(HTTP [0-9]{3}\)$/.test(message) ||
+            ['GitHub App must have only Metadata: read permission; remove all other permissions',
+             'GitHub App config must be a private file (chmod 600)',
+             'Invalid JSON in private GitHub App config', 'Invalid GitHub App config',
+             'GitHub App config requires an RSA private key',
+             'GitHub request failed; check network connectivity',
+             'GitHub returned an invalid response', 'GitHub returned an invalid installation',
+             'GitHub returned an invalid installation token'].includes(message)
+            ? message : 'credential provider failed'
+          console.error(`Share GitHub App: ${diagnostic}`)
+          throw new ShareAuthError(502, 'GitHub App metadata credential unavailable')
+        }
       }
       if (token) headers.Authorization = `Bearer ${token}`
     }
