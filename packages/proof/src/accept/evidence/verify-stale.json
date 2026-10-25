@@ -1,0 +1,22 @@
+{
+  "accepted": [],
+  "passed": false,
+  "errors": [
+    "Code checkout is dirty",
+    "at-rest/drift-report.json: accepted list hash/content mismatch; regenerate the proof",
+    "at-rest/drift-report.json: not-provable: Classic TracksPane always selects a track; dedicated at-rest view is unavailable",
+    "track-selected/drift-report.json: accepted list hash/content mismatch; regenerate the proof",
+    "track-selected/drift-report.json: replay found drift or incomplete captures",
+    "track-selected/drift-report.json: drift exceeds tolerance",
+    "proposal-pending/drift-report.json: accepted list hash/content mismatch; regenerate the proof",
+    "proposal-pending/drift-report.json: replay found drift or incomplete captures",
+    "proposal-pending/drift-report.json: drift exceeds tolerance",
+    "empty/drift-report.json: def-70fa105a918ce9890316: design changed since this difference was accepted; re-review or update the design",
+    "empty/drift-report.json: accepted list hash/content mismatch; regenerate the proof",
+    "empty/drift-report.json: accepted defect annotations mismatch",
+    "empty/drift-report.json: summary replay mismatch",
+    "empty/drift-report.json: replay found drift or incomplete captures",
+    "empty/drift-report.json: drift exceeds tolerance"
+  ],
+  "reports": 4
+}

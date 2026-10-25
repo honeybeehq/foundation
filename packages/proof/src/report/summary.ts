@@ -24,6 +24,11 @@ export function jobSummary(
     lines.push(
       `| ${cell(r.state)} | ${r.provable ? (r.summary?.accepted ? `${r.verdict} (accepted differences recorded)` : r.verdict) : "not-provable"} | ${r.provable ? (r.summary?.uniqueDefects ?? defectsOf(r).length) : "—"} | ${r.summary?.accepted ?? 0} | ${r.drifts?.length ?? 0} |`,
     );
+  lines.push("", "## Accepted differences");
+  for (const a of verification.accepted ?? [])
+    lines.push(`- ${cell(a.state)}: ${cell(a.id)} — ${cell(a.reason)}`);
+  if (!verification.accepted?.length) lines.push("None.");
+  lines.push("", "Candidate groups need review; their count is not a count of confirmed product bugs.");
   for (const r of reports) {
     lines.push("", `## ${cell(r.state)}`);
     if (!r.provable) {
@@ -31,7 +36,7 @@ export function jobSummary(
       continue;
     }
     lines.push(
-      `Images in artifact: \`${cell(r.state)}/design.png\`, \`${cell(r.state)}/code.png\`, \`${cell(r.state)}/diff.png\`. [Open artifact](${artifactUrl})`,
+      `Images: [Design](${artifactUrl}) (\`${cell(r.state)}/design.png\`), [Code](${artifactUrl}) (\`${cell(r.state)}/code.png\`), [Diff](${artifactUrl}) (\`${cell(r.state)}/diff.png\`). Links download the image artifact.`,
       "",
       "| Layer (design → code) | What differs | Design → code values | Status |",
       "|---|---|---|---|",
@@ -51,10 +56,6 @@ export function jobSummary(
           )} | ${d.accepted ? `Accepted: ${cell(d.accepted.reason)}` : d.classification === "environment" ? "Environment" : d.classification === "uncertain" ? "Uncertain" : "Drift"} |`,
       );
   }
-  lines.push("", "## Accepted differences");
-  for (const a of verification.accepted ?? [])
-    lines.push(`- ${cell(a.state)}: ${cell(a.id)} — ${cell(a.reason)}`);
-  if (!verification.accepted?.length) lines.push("None.");
   lines.push(
     "",
     "## Verification",
