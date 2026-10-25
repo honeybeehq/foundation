@@ -18,9 +18,7 @@ also covering workflow_dispatch. It checks out the exact event commit, loads
 policy **and tool** from a fixed previously reviewed base commit, installs frozen
 app dependencies, captures the actual Classic components, compares and verifies,
 uploads all captures/reports/images, then writes the summary. The base SHA is
-changed only after review. A candidate change to its policy JSON or vendor file
-cannot loosen the current run. GitHub branch protection/review must also protect
-workflow edits before treating this as an adversarial required PR check.
+changed only after review. With the workflow unchanged, a candidate change to policy JSON or vendor files cannot loosen that run. The push candidate still controls the workflow, links, fixtures and accepted list. This is an advisory prototype, not an adversarial required PR check: adoption requires CODEOWNERS/rulesets over workflows, .foundation/** and linked fixture paths, a trusted pull_request workflow, and required status configuration. Reviewer strings alone do not authenticate approval.
 
 The push mode is advisory: measured drift and not-provable states warn and exit
 zero; setup/capture failures still fail. Dispatch with mode `required` exits one
@@ -38,3 +36,5 @@ the design renderer and the code capture CLI are identical binaries.
 This workflow runs in Apiary because it is private. Running in Foundation with a
 private Apiary checkout is an optional alternative requiring a separately
 configured read-only token; no repository secrets are created by this prototype.
+
+The tarball records its Foundation source commit and per-input digests in source.json, includes npm-shrinkwrap.json, and the workflow hash-checks the installed cli.mjs after installation. Local --tool-hash metadata is self-asserted; the workflow’s measured package and installed-binary checks establish the binding. The required prototype is permanently red while the required at-rest fixture is unavailable.
