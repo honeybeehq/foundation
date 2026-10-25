@@ -1,0 +1,14 @@
+$ tsx src/capture/cli.ts --code /var/tmp/dtc-t2-apiary --links .foundation/links.json --out fixtures/sample-captures
+tracks-pane/at-rest design: 198 nodes, 585 ms
+tracks-pane/at-rest code: 192 nodes, 3616 ms
+PAIR /home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/packages/proof/fixtures/sample-captures/tracks-pane/at-rest/1416x600@1 4377 ms
+tracks-pane/track-selected design: 408 nodes, 702 ms
+tracks-pane/track-selected code: 192 nodes, 1602 ms
+PAIR /home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/packages/proof/fixtures/sample-captures/tracks-pane/track-selected/1416x600@1 2445 ms
+tracks-pane/proposal-pending design: 438 nodes, 749 ms
+tracks-pane/proposal-pending code: 220 nodes, 1614 ms
+PAIR /home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/packages/proof/fixtures/sample-captures/tracks-pane/proposal-pending/1416x600@1 2499 ms
+tracks-pane/empty design: 79 nodes, 336 ms
+tracks-pane/empty code: 24 nodes, 1009 ms
+PAIR /home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/packages/proof/fixtures/sample-captures/tracks-pane/empty/1416x600@1 1490 ms
+Captured 4 pairs in 11655 ms

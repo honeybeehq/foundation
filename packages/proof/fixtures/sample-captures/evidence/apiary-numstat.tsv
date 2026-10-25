@@ -1,0 +1,11 @@
+278	0	.foundation/design-data.json
+14	0	.foundation/environment.ts
+29	0	.foundation/fixtures.ts
+77	0	.foundation/links.json
+1	0	.foundation/preview.html
+14	0	.foundation/preview.ts
+34	0	.foundation/tsconfig.json
+1	0	.foundation/types.d.ts
+1	0	apps/desktop/src/renderer/src/panes/tracks/TracksRail.tsx
+19	0	apps/next-desktop-beta/foundation.vite.config.ts
+20	0	foundation.harness.tsx

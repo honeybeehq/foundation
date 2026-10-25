@@ -1,0 +1,4 @@
+
+> @apiary/next-desktop-beta@0.0.1 typecheck /var/tmp/dtc-t2-apiary/apps/next-desktop-beta
+> node ../../scripts/tsc7.cjs -p tsconfig.json --pretty false && node ../../scripts/tsc7.cjs -p tsconfig.node.json --pretty false
+

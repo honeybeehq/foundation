@@ -1,0 +1,559 @@
+diff --git a/.foundation/design-data.json b/.foundation/design-data.json
+new file mode 100644
+index 000000000..6765a0c2d
+--- /dev/null
++++ b/.foundation/design-data.json
+@@ -0,0 +1,278 @@
++{
++  "tracks": [
++    {
++      "id": "review-and-ship",
++      "blocked": "0",
++      "exceptions": "1",
++      "idle": "false",
++      "lastactivity": "12m",
++      "name": "review-and-ship",
++      "queued": "2",
++      "review": "1",
++      "running": "2",
++      "shape": "6 items \u00b7 1 branch \u00b7 9 nodes",
++      "version": "v3",
++      "waiting": "0"
++    },
++    {
++      "id": "pr-triage",
++      "blocked": "0",
++      "exceptions": "0",
++      "idle": "false",
++      "lastactivity": "3m",
++      "name": "pr-triage",
++      "queued": "0",
++      "review": "0",
++      "running": "1",
++      "shape": "4 items \u00b7 6 nodes",
++      "version": "v7",
++      "waiting": "0"
++    },
++    {
++      "id": "spec-round",
++      "blocked": "0",
++      "exceptions": "0",
++      "idle": "false",
++      "lastactivity": "41m",
++      "name": "spec-round",
++      "queued": "1",
++      "review": "1",
++      "running": "0",
++      "shape": "5 items \u00b7 1 review gate",
++      "version": "v2",
++      "waiting": "0"
++    },
++    {
++      "id": "board-draw",
++      "blocked": "0",
++      "exceptions": "0",
++      "idle": "false",
++      "lastactivity": "6m",
++      "name": "board-draw",
++      "queued": "0",
++      "review": "0",
++      "running": "1",
++      "shape": "7 items \u00b7 1 branch \u00b7 10 nodes",
++      "version": "v1",
++      "waiting": "0"
++    },
++    {
++      "id": "flaky-hunt",
++      "blocked": "1",
++      "exceptions": "2",
++      "idle": "false",
++      "lastactivity": "1h04",
++      "name": "flaky-hunt",
++      "queued": "0",
++      "review": "0",
++      "running": "0",
++      "shape": "5 items \u00b7 8 nodes",
++      "version": "v4",
++      "waiting": "0"
++    },
++    {
++      "id": "dep-bump",
++      "blocked": "0",
++      "exceptions": "0",
++      "idle": "true",
++      "lastactivity": "2d",
++      "name": "dep-bump",
++      "queued": "0",
++      "review": "0",
++      "running": "0",
++      "shape": "3 items",
++      "version": "v2",
++      "waiting": "0"
++    },
++    {
++      "id": "nectar-preview",
++      "blocked": "0",
++      "exceptions": "0",
++      "idle": "true",
++      "lastactivity": "5d",
++      "name": "nectar-preview",
++      "queued": "0",
++      "review": "0",
++      "running": "0",
++      "shape": "4 items \u00b7 1 deploy",
++      "version": "v1",
++      "waiting": "0"
++    }
++  ],
++  "spinerows": [
++    {
++      "id": "n1",
++      "arm": "",
++      "depth": "0",
++      "detail": "every changed file, plus the packet it hangs off",
++      "lane": "",
++      "name": "Read the diff",
++      "state": "done",
++      "type": "action"
++    },
++    {
++      "id": "n2",
++      "arm": "",
++      "depth": "0",
++      "detail": "max 3 \u00b7 claude \u00b7 one lens each",
++      "lane": "",
++      "name": "Fan out reviewers",
++      "state": "done",
++      "type": "orchestrate"
++    },
++    {
++      "id": "n3",
++      "arm": "",
++      "depth": "0",
++      "detail": "both lanes must land before the gate",
++      "lane": "",
++      "name": "Parallel",
++      "state": "done",
++      "type": "branch"
++    },
++    {
++      "id": "n3a",
++      "arm": "",
++      "depth": "1",
++      "detail": "pnpm -w typecheck && lint",
++      "lane": "A",
++      "name": "Typecheck & lint",
++      "state": "done",
++      "type": "action"
++    },
++    {
++      "id": "n3b",
++      "arm": "",
++      "depth": "1",
++      "detail": "pnpm test \u2014 352 tests",
++      "lane": "B",
++      "name": "Run the suite",
++      "state": "pending",
++      "type": "action"
++    },
++    {
++      "id": "n4",
++      "arm": "",
++      "depth": "0",
++      "detail": "a human verdict on the packet",
++      "lane": "",
++      "name": "Verdict gate",
++      "state": "pending",
++      "type": "review"
++    },
++    {
++      "id": "n4d",
++      "arm": "DENIED",
++      "depth": "1",
++      "detail": "then back to the gate",
++      "lane": "",
++      "name": "Fix findings",
++      "state": "pending",
++      "type": "action"
++    },
++    {
++      "id": "n5",
++      "arm": "",
++      "depth": "0",
++      "detail": "nectar \u00b7 label review",
++      "lane": "",
++      "name": "Publish preview",
++      "state": "pending",
++      "type": "deploy"
++    },
++    {
++      "id": "n6",
++      "arm": "",
++      "depth": "0",
++      "detail": "blocking \u2014 the agent stops here",
++      "lane": "",
++      "name": "Ship it?",
++      "state": "pending",
++      "type": "ask"
++    }
++  ],
++  "attached": [
++    {
++      "id": "drone-12",
++      "age": "12m",
++      "at": "Run the suite",
++      "exceptions": "1",
++      "harness": "claude \u00b7 opus 4.8",
++      "name": "drone-12",
++      "note": "skipped Typecheck & lint \u2014 ran the suite first",
++      "position": "5",
++      "state": "running",
++      "total": "9"
++    },
++    {
++      "id": "wren-2",
++      "age": "3m",
++      "at": "Fan out reviewers",
++      "exceptions": "0",
++      "harness": "claude \u00b7 sonnet 5",
++      "name": "wren-2",
++      "note": "",
++      "position": "2",
++      "state": "running",
++      "total": "9"
++    },
++    {
++      "id": "scout-4",
++      "age": "41m",
++      "at": "Verdict gate",
++      "exceptions": "0",
++      "harness": "codex",
++      "name": "scout-4",
++      "note": "waiting on a human verdict",
++      "position": "6",
++      "state": "review",
++      "total": "9"
++    }
++  ],
++  "exceptions": [
++    {
++      "id": "x1",
++      "age": "9m",
++      "at": "Typecheck & lint",
++      "bee": "drone-12",
++      "what": "ran the suite first, then came back \u2014 lint was still installing"
++    }
++  ],
++  "queued": [
++    {
++      "id": "bumble-7",
++      "behind": "pr-triage",
++      "name": "bumble-7",
++      "position": "1"
++    },
++    {
++      "id": "mite-3",
++      "behind": "spec-round",
++      "name": "mite-3",
++      "position": "2"
++    }
++  ],
++  "proposal": [
++    {
++      "id": "p1",
++      "detail": "nectar \u00b7 label review \u2014 after the gate, before the ask",
++      "mark": "+",
++      "name": "Publish preview",
++      "type": "deploy"
++    },
++    {
++      "id": "p2",
++      "detail": "denied arm gains \u2192 Fix findings",
++      "mark": "~",
++      "name": "Verdict gate",
++      "type": "review"
++    },
++    {
++      "id": "p3",
++      "detail": "superseded by the preview",
++      "mark": "\u2212",
++      "name": "Manual smoke test",
++      "type": "action"
++    }
++  ]
++}
+diff --git a/.foundation/environment.ts b/.foundation/environment.ts
+new file mode 100644
+index 000000000..70088c5cb
+--- /dev/null
++++ b/.foundation/environment.ts
+@@ -0,0 +1,14 @@
++let fixture: any
++const noop = () => undefined
++const app = { layout: { setPaneMeta: noop, updatePaneParams: noop }, commands: { onDidExecute: () => noop, execute: noop } }
++export function setFixture(value: any): void { fixture = value }
++export const useApp = () => app
++export const useAllSessions = () => fixture.sessions
++export const useTracksMirror = () => ({ mirror: fixture.mirror, loading: false, error: null })
++export const useTracksProposal = () => ({ proposal: fixture.proposal, loading: false })
++export const useContextualCreateShortcut = noop
++export const useWindowKeybindings = noop
++export const useSelectableListNavigation = () => ({ rowProps: () => ({}), onKeyDown: noop })
++export const isEditableTarget = () => false
++export const listScopeAllowsTarget = () => true
++export const yieldsToNativeActivation = () => false
+diff --git a/.foundation/fixtures.ts b/.foundation/fixtures.ts
+new file mode 100644
+index 000000000..05fb31081
+--- /dev/null
++++ b/.foundation/fixtures.ts
+@@ -0,0 +1,29 @@
++import type { TrackDefinitionV2, TrackItem, TrackNode, TrackAttachment, TrackStateItem } from '../packages/core/src/index'
++import data from './design-data.json'
++const rows = data.spinerows
++function node(row: typeof rows[number]): TrackNode {
++  const base = { id: row.id, name: row.name }
++  switch (row.type) {
++    case 'review': return { ...base, type: 'review', denied: rows.filter(r => r.arm === 'DENIED').map(node) }
++    case 'deploy': return { ...base, type: 'deploy', target: { kind: 'nectar', label: 'review' } }
++    case 'ask': return { ...base, type: 'ask', question: row.detail, blocking: true }
++    case 'orchestrate': return { ...base, type: 'orchestrate', instruction: row.detail, subAgents: { max: 3, harness: 'claude' } }
++    default: return { ...base, type: 'action', instruction: row.detail }
++  }
++}
++const items: TrackItem[] = rows.filter(r => r.depth === '0').map(r => r.type === 'branch' ? { branch: ['A', 'B'].map(lane => rows.filter(r => r.lane === lane).map(node)) } : node(r))
++const definitions: TrackDefinitionV2[] = data.tracks.map((row, i) => ({ schemaVersion: 2, name: row.name, version: Number(row.version.slice(1)), items: i === 0 ? items : items.slice(0, i === 5 ? 3 : 4) }))
++const epoch = Date.parse('2026-07-31T12:00:00Z')
++const age = (minutes: number) => new Date(epoch - minutes * 60000).toISOString()
++const attachments: TrackAttachment[] = data.attached.map((bee, i) => {
++  const current = ['n3b', 'n2', 'n4'][i]
++  const runtimeNode = (entry: TrackNode): any => ({ ...entry, status: entry.id === current ? 'pending' : ['n1', 'n2', 'n3a'].includes(entry.id) ? 'done' : 'pending', updatedAt: age(Number.parseInt(bee.age)), history: [], subTasks: [], ...(entry.type === 'review' ? { denied: entry.denied?.map(runtimeNode) } : {}) })
++  return { schemaVersion: 2, track: 'review-and-ship', version: 3, bee: bee.name, beeId: bee.id, attachedAt: age(60), updatedAt: age(Number.parseInt(bee.age)), items: items.map(item => 'branch' in item ? { branch: item.branch.map(lane => lane.map(runtimeNode)) } : runtimeNode(item)) as TrackStateItem[], steps: [], exceptions: i === 0 ? [{ note: data.exceptions[0]!.what, at: age(9), stepId: 'n3a' }] : [], queue: i === 0 ? data.queued.map(q => ({ track: q.behind, queuedAt: age(2), queuedBy: q.name })) : [] }
++})
++const props = { pane: { id: 'foundation-tracks', viewType: 'hive.tracks', params: { track: 'review-and-ship' } }, focused: false, active: false }
++const base = { props, mirror: { definitions, attachments }, sessions: [], proposal: null }
++export const atRest = { ...base }
++export const trackSelected = { ...base }
++const beforeItems = items.map(item => 'branch' in item ? item : item.id === 'n5' ? { id: 'n5old', type: 'action' as const, name: 'Manual smoke test', instruction: 'superseded by the preview' } : item.type === 'review' ? { ...item, denied: undefined } : item)
++export const proposalPending = { ...base, mirror: { ...base.mirror, definitions: [{ ...definitions[0]!, items: beforeItems }, ...definitions.slice(1)] }, proposal: { definition: definitions[0], rationale: 'Publish preview after the gate; add Fix findings on denial; replace Manual smoke test', proposedAt: age(2), baseVersion: 3 } }
++export const empty = { ...base, mirror: { definitions: [], attachments: [] }, props: { ...props, pane: { ...props.pane, params: {} } } }
+diff --git a/.foundation/links.json b/.foundation/links.json
+new file mode 100644
+index 000000000..c06e8340a
+--- /dev/null
++++ b/.foundation/links.json
+@@ -0,0 +1,77 @@
++{
++  "schema": "fdn-links/0",
++  "designFile": "packages/proof/fixtures/design/tracks-pane.fdn.html",
++  "designHead": "da6f965fcc33d4ac33d47ffd1cc04da2d288cd113b5ed263501dc50b2bac189d",
++  "viteConfig": "apps/next-desktop-beta/foundation.vite.config.ts",
++  "harness": "foundation.harness.tsx",
++  "artboards": [
++    {
++      "id": "tracks-pane",
++      "component": "apps/desktop/src/renderer/src/panes/TracksPane.tsx#TracksPane",
++      "designNode": "n97::n71",
++      "viewport": {
++        "width": 1416,
++        "height": 600,
++        "dpr": 1
++      },
++      "states": [
++        {
++          "name": "at-rest",
++          "fixture": ".foundation/fixtures.ts#atRest",
++          "designState": "at-rest",
++          "designNode": "n97::n71",
++          "provable": false,
++          "reason": "Classic TracksPane always selects a track; dedicated at-rest view is unavailable"
++        },
++        {
++          "name": "track-selected",
++          "fixture": ".foundation/fixtures.ts#trackSelected",
++          "designState": "track-selected",
++          "designNode": "n212::n136"
++        },
++        {
++          "name": "proposal-pending",
++          "fixture": ".foundation/fixtures.ts#proposalPending",
++          "designState": "proposal-pending",
++          "designNode": "n212::n136"
++        },
++        {
++          "name": "empty",
++          "fixture": ".foundation/fixtures.ts#empty",
++          "designState": "at-rest",
++          "designNode": "n284::n265"
++        }
++      ],
++      "components": [
++        {
++          "designComponent": "TrackRow",
++          "code": "apps/desktop/src/renderer/src/panes/tracks/TracksRail.tsx#TracksRail",
++          "selector": "[data-foundation-track-row]"
++        }
++      ]
++    }
++  ],
++  "fonts": [
++    {
++      "family": "Hanken Grotesk",
++      "weight": "400",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-400-normal.woff2"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "500",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-500-normal.woff2"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "600",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-600-normal.woff2"
++    },
++    {
++      "family": "IBM Plex Mono",
++      "weight": "400",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2"
++    }
++  ],
++  "binding": "chain-head"
++}
+diff --git a/.foundation/preview.html b/.foundation/preview.html
+new file mode 100644
+index 000000000..6eea9dad6
+--- /dev/null
++++ b/.foundation/preview.html
+@@ -0,0 +1 @@
++<!doctype html><html><head><meta charset="utf-8"><title>Real TracksPane harness</title></head><body style="margin:0"><div id="foundation-root" style="width:100vw;height:100vh;overflow:hidden"></div><script type="module" src="./preview.ts"></script></body></html>
+diff --git a/.foundation/preview.ts b/.foundation/preview.ts
+new file mode 100644
+index 000000000..bf34add2c
+--- /dev/null
++++ b/.foundation/preview.ts
+@@ -0,0 +1,14 @@
++async function start(): Promise<void> {
++  const harness = await import('../foundation.harness')
++  const state = new URLSearchParams(location.search).get('state') ?? 'track-selected'
++  harness.prepare()
++  const fixtures = await import('./fixtures')
++  const key = ({ 'at-rest': 'atRest', 'track-selected': 'trackSelected', 'proposal-pending': 'proposalPending', empty: 'empty' } as const)[state as 'track-selected']
++  if (!key) throw new Error(`Unknown fixture ${state}`)
++  const { TracksPane } = await import('../apps/desktop/src/renderer/src/panes/TracksPane')
++  await harness.mount({ Component: TracksPane, fixture: fixtures[key], root: document.getElementById('foundation-root')!, state })
++  await document.fonts.ready
++  await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
++  Object.assign(window, { __foundationReady: true })
++}
++void start().catch(error => { Object.assign(window, { __foundationError: String(error) }); console.error(error) })
+diff --git a/.foundation/tsconfig.json b/.foundation/tsconfig.json
+new file mode 100644
+index 000000000..65899542c
+--- /dev/null
++++ b/.foundation/tsconfig.json
+@@ -0,0 +1,34 @@
++{
++  "extends": "../tsconfig.base.json",
++  "compilerOptions": {
++    "noEmit": true,
++    "lib": [
++      "ES2022",
++      "DOM",
++      "DOM.Iterable"
++    ],
++    "types": [
++      "node",
++      "react",
++      "react-dom"
++    ],
++    "resolveJsonModule": true,
++    "allowImportingTsExtensions": true,
++    "typeRoots": [
++      "../apps/next-desktop-beta/node_modules/@types",
++      "../apps/desktop/node_modules/@types"
++    ],
++    "paths": {
++      "@apiary/core": [
++        "../packages/core/src/index.ts"
++      ]
++    }
++  },
++  "include": [
++    "../foundation.harness.tsx",
++    "fixtures.ts",
++    "environment.ts",
++    "../apps/next-desktop-beta/foundation.vite.config.ts",
++    "types.d.ts"
++  ]
++}
+diff --git a/.foundation/types.d.ts b/.foundation/types.d.ts
+new file mode 100644
+index 000000000..ef6d741f6
+--- /dev/null
++++ b/.foundation/types.d.ts
+@@ -0,0 +1 @@
++declare module "*.css" {}
+diff --git a/apps/desktop/src/renderer/src/panes/tracks/TracksRail.tsx b/apps/desktop/src/renderer/src/panes/tracks/TracksRail.tsx
+index 965a19b3e..ce41958c3 100644
+--- a/apps/desktop/src/renderer/src/panes/tracks/TracksRail.tsx
++++ b/apps/desktop/src/renderer/src/panes/tracks/TracksRail.tsx
+@@ -155,6 +155,7 @@ export function TracksRail({
+           return (
+             <button
+               key={definition.name}
++              data-foundation-track-row={definition.name}
+               {...rowProps}
+               type="button"
+               {...stylex.props(styles.trackRow, active && styles.trackRowActive)}
+diff --git a/apps/next-desktop-beta/foundation.vite.config.ts b/apps/next-desktop-beta/foundation.vite.config.ts
+new file mode 100644
+index 000000000..6354fbd47
+--- /dev/null
++++ b/apps/next-desktop-beta/foundation.vite.config.ts
+@@ -0,0 +1,19 @@
++import base from './vite.config'
++import { resolve, dirname } from 'node:path'
++import { fileURLToPath } from 'node:url'
++const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
++const sources = ['state', 'sessionsStore', 'tracksMirror', 'tracksProposal', 'keybindings']
++export default {
++  ...base,
++  root,
++  build: { rollupOptions: { input: resolve(root, '.foundation/preview.html') } },
++  resolve: { ...base.resolve, dedupe: ['react', 'react-dom'], alias: [{ find: 'react', replacement: resolve(root, 'apps/next-desktop-beta/node_modules/react') }, { find: 'react-dom', replacement: resolve(root, 'apps/next-desktop-beta/node_modules/react-dom') }, ...sources.map(name => ({ find: resolve(root, `apps/desktop/src/renderer/src/${name}`), replacement: resolve(root, '.foundation/environment.ts') }))] },
++  plugins: [...base.plugins ?? [], {
++    name: 'foundation-boundaries', enforce: 'pre',
++    resolveId(source: string, importer?: string) {
++      if (!importer || !source.startsWith('.')) return
++      const full = resolve(dirname(importer.split('?')[0]!), source).replace(/\.tsx?$/, '')
++      if (sources.some(name => full === resolve(root, `apps/desktop/src/renderer/src/${name}`))) return resolve(root, '.foundation/environment.ts')
++    },
++  }],
++}
+diff --git a/foundation.harness.tsx b/foundation.harness.tsx
+new file mode 100644
+index 000000000..00c12fc0b
+--- /dev/null
++++ b/foundation.harness.tsx
+@@ -0,0 +1,20 @@
++import { createElement, type ComponentType } from 'react'
++import { createRoot } from 'react-dom/client'
++import './packages/ui/src/base.css'
++import './apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/latin-400.css'
++import './apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/latin-500.css'
++import './apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/latin-600.css'
++import './apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/latin-400.css'
++import { setFixture } from './.foundation/environment'
++
++export function prepare(): void {
++  Object.defineProperty(window, 'apiary', { configurable: true, value: new Proxy({}, { get: (_, method) => { throw new Error(`Unconfigured IPC: ${String(method)}`) } }) })
++}
++
++export async function mount({ Component, fixture, root }: { Component: ComponentType<any>; fixture: any; root: HTMLElement; state: string }): Promise<() => void> {
++  setFixture(fixture)
++  root.style.display = 'flex'
++  const renderer = createRoot(root)
++  renderer.render(createElement(Component, fixture.props))
++  return () => renderer.unmount()
++}

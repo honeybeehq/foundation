@@ -1,0 +1,30 @@
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 371 modules transformed.
+
+(!) outDir /home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/.artifacts/t2/live-harness is not inside project root and will not be emptied.
+Use --emptyOutDir to override.
+
+rendering chunks...
+computing gzip size...
+../../../home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/.artifacts/t2/live-harness/.foundation/preview.html                                 0.29 kB │ gzip:   0.23 kB
+../../../home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/.artifacts/t2/live-harness/assets/ibm-plex-mono-latin-400-normal-CvHOgSBP.woff     13.14 kB
+../../../home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/.artifacts/t2/live-harness/assets/hanken-grotesk-latin-400-normal-BG6hkEXj.woff2   13.46 kB
+../../../home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/.artifacts/t2/live-harness/assets/hanken-grotesk-latin-600-normal-CIXX6EOa.woff2   13.78 kB
+../../../home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/.artifacts/t2/live-harness/assets/hanken-grotesk-latin-500-normal-DrDcrrxK.woff2   13.80 kB
+../../../home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/.artifacts/t2/live-harness/assets/ibm-plex-mono-latin-400-normal-DMJ8VG8y.woff2    14.71 kB
+../../../home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/.artifacts/t2/live-harness/assets/hanken-grotesk-latin-400-normal-CjyVwvJV.woff    17.24 kB
+../../../home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/.artifacts/t2/live-harness/assets/hanken-grotesk-latin-600-normal-NEn2C4Q3.woff    17.51 kB
+../../../home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/.artifacts/t2/live-harness/assets/hanken-grotesk-latin-500-normal-Bo-NxEKf.woff    17.52 kB
+../../../home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/.artifacts/t2/live-harness/assets/foundation-CQXceQtr.css                           1.81 kB │ gzip:   0.66 kB
+../../../home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/.artifacts/t2/live-harness/assets/preview-DqBS7Yge.js                               2.91 kB │ gzip:   1.41 kB
+../../../home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/.artifacts/t2/live-harness/assets/fixtures-Bjn_8JRr.js                              5.45 kB │ gzip:   1.99 kB
+../../../home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/.artifacts/t2/live-harness/assets/environment-y47Ok0QS.js                          11.74 kB │ gzip:   4.28 kB
+../../../home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/.artifacts/t2/live-harness/assets/foundation.harness-DU9EYc4O.js                  180.71 kB │ gzip:  56.87 kB
+../../../home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/.artifacts/t2/live-harness/assets/TracksPane-Bf58Pph4.js                          785.44 kB │ gzip: 241.70 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 4.46s
