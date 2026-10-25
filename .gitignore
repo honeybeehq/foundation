@@ -1,6 +1,7 @@
 node_modules/
 dist/
 *.png
+!**/.foundation/assets/**
 !spikes/render/fixtures/**
 spikes/render/out/
 .artifacts/verification/
