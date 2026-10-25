@@ -144,6 +144,10 @@ export async function stateFor(config: ShareConfig, session: Session): Promise<S
     Object.assign(session, await renew(config, session))
     state = await api<ShareState>(config, `state?space=${encodeURIComponent(config.space)}`, session.token)
   }
+  const highest = Math.max(0, ...session.keys.map((k) => k.epoch))
+  if (state.epoch < highest) throw new Error(`service rolled back epoch ${highest} to ${state.epoch}`)
+  if (config.recoveryPublicKey && state.recoveryPublicKey !== config.recoveryPublicKey)
+    throw new Error('recovery key differs from committed share.json')
   if (state.space !== config.space || state.repo.toLowerCase() !== config.repo.toLowerCase())
     throw new Error('share space/repo mismatch')
   return state
@@ -227,12 +231,6 @@ export async function maintainKeys(
       throw new Error('epoch issuer no longer has write access')
     if (key.space !== config.space || key.repo !== config.repo || !Array.isArray(key.recipients))
       throw new Error('epoch package context mismatch')
-    if (
-      key.epoch > highest &&
-      highest > 0 &&
-      (await memberAccess(config, sender.login, sender.githubId, session.githubToken)) !== 'write'
-    )
-      throw new Error('new epoch requires a writer')
     const prior = session.keys.find((k) => k.epoch === key.epoch)
     if (prior && keyId(prior) !== keyId(key)) throw new Error(`key fork at epoch ${key.epoch}`)
     if (session.keys.length && session.keys.some((k) => k.feedKey !== key.feedKey))

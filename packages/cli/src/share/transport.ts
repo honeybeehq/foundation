@@ -97,6 +97,13 @@ class ShareBridge implements Bridge {
       log = opaqueName(this.address ?? logical, key.feedKey)
     const request: Frame = { ...fields, space: this.config.space, op, log }
     if (op === 'append') {
+      if (session.rotationRequired || Date.now() - (key.createdAt ?? 0) >= 24 * 60 * 60 * 1000)
+        throw new Error('rotation required before sending')
+      if (!session.membershipCheckedAt || Date.now() - session.membershipCheckedAt >= 3600000)
+        throw new Error(
+          `Live sharing paused: cannot confirm members with GitHub since ${session.membershipCheckedAt ? new Date(session.membershipCheckedAt).toISOString() : 'startup'}`
+        )
+
       if (Buffer.byteLength(String(fields.payload_hex), 'hex') > 350000)
         throw new Error('change exceeds encrypted sharing limit (350000 bytes)')
       if (session.permission !== 'write') throw new Error('Live sharing: read only')
