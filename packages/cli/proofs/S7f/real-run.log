@@ -1,0 +1,53 @@
+2026-10-25T08:43:15.360Z LABELLED STUB: GitHub identities, repo membership and SSH public keys served by loopback fixture; actual CLI/crypto/HTTP/Comb/disk are real
+2026-10-25T08:43:15.658Z PREPARE: no server space or token before descriptor commit
+2026-10-25T08:43:16.113Z UNCOMMITTED DESCRIPTOR REFUSED: init cannot enable sharing
+2026-10-25T08:43:16.610Z COMMITTED DESCRIPTOR ACCEPTED: default branch stub reads actual git HEAD, not working tree
+2026-10-25T08:43:16.611Z init created secret-free share.json; recovery code withheld from transcript
+2026-10-25T08:43:17.027Z second member login: Live sharing: waiting for key — Waiting for a teammate's machine to share the key
+2026-10-25T08:43:17.415Z automatic signed-device key handover with no designs open: 384ms
+2026-10-25T08:43:19.203Z genesis durably acknowledged: 348ms
+2026-10-25T08:43:19.542Z activity baseline caught-up marker: 333ms
+2026-10-25T08:43:19.992Z alice edit visible on other member: 87ms
+2026-10-25T08:43:19.992Z save-to-remote visibility alice: 111.947021484375ms
+2026-10-25T08:43:20.375Z bob edit visible on other member: 28ms
+2026-10-25T08:43:20.375Z save-to-remote visibility bob: 46.921875ms
+2026-10-25T08:43:20.375Z signed ephemeral hint yields live imported activity: 0ms
+2026-10-25T08:43:20.377Z ACTIVITY: signed writer-stated trmd-metal-3 origin retained on bob-owned replica; touched n1; no owner substitution
+2026-10-25T08:43:20.704Z activity cursor resume caught-up marker: 322ms
+2026-10-25T08:43:21.013Z persistent activity observer ready for outage: 305ms
+2026-10-25T08:43:23.086Z remote-only catalogue persisted on second HOME: 1019ms
+2026-10-25T08:43:23.414Z CATALOGUE: cached remote-only row b45c426e-1eb1-4a95-a2fd-e63afa50203a; origin alice; revision 3d5e6bf2e5312129aea84693036cdc20145594a8dcc04dba6758ed9e93505f43
+2026-10-25T08:43:24.094Z encrypted materialization accepted then ready: 331ms
+2026-10-25T08:43:24.095Z MATERIALIZE: asynchronous accepted/ready; actual encrypted network history (no local candidate); confined path; original document identity
+2026-10-25T08:43:26.139Z foreign target refusal settles: 319ms
+2026-10-25T08:43:26.140Z REFUSAL: wrong docId verification and foreign target refused; both foreign files remain exact
+2026-10-25T08:43:28.360Z idle catalogue data checkpoint stays unchanged across contact polls: 2220ms
+2026-10-25T08:43:28.360Z IDLE: follower contact remains fresh without rewriting the durable catalogue data checkpoint
+2026-10-25T08:43:28.771Z NO ACCESS REFUSED: Live sharing: no access
+2026-10-25T08:43:29.178Z removal causes epoch rotation: 0ms
+2026-10-25T08:43:29.178Z removed device token revoked and relay disconnected
+2026-10-25T08:43:29.901Z new epoch change durably acknowledged: 353ms
+2026-10-25T08:43:30.085Z RAW STORE CIPHERTEXT: removed member old keys and nonmember empty keys cannot decrypt latest event
+2026-10-25T08:43:30.087Z REMOVED TOKEN REFUSED: HTTP 403
+2026-10-25T08:43:30.101Z RAW-STORE GREP: exit 1, no plaintext matches in Comb objects or service metadata
+2026-10-25T08:43:30.103Z TAMPER REFUSED: changed encrypted record fails authentication
+2026-10-25T08:43:30.443Z ROLLBACK REFUSED: {"state":"unavailable","reason":"service rolled back epoch 2 to 1"}
+2026-10-25T08:43:30.784Z RECOVERY SUBSTITUTION REFUSED: {"state":"unavailable","reason":"recovery key differs from committed share.json"}
+2026-10-25T08:43:31.000Z REFUSED ROTATION: requirement persisted across retries; old-key sending stays paused
+2026-10-25T08:43:31.029Z OUTAGE: service stopped
+2026-10-25T08:43:31.372Z catalogue marks service outage stale: 343ms
+2026-10-25T08:43:31.703Z OFFLINE CACHE: cached remote rows retained; read succeeds with service stopped, no scan/network wait
+2026-10-25T08:43:32.098Z OFFLINE MATERIALIZE: complete local history opens another confined replica with service stopped
+2026-10-25T08:43:32.490Z local edit saved during outage
+2026-10-25T08:43:34.422Z outbox recovered after service restart: 1929ms
+2026-10-25T08:43:36.243Z re-attested replacement device receives current key: 1328ms
+2026-10-25T08:43:36.243Z RE-ATTEST: renewed SSH binding and replaced revoked device keys; current access checked again
+2026-10-25T08:43:40.380Z outage history arrives as baseline imported fact: 4137ms
+2026-10-25T08:43:40.381Z REPLAY: delayed outage edit is exactly one imported baseline fact, never a live lease
+2026-10-25T08:43:42.060Z RESTART: durable activity cursor and cross-copy hash dedup retained
+2026-10-25T08:43:42.081Z DESCRIPTOR REMOVED from default-branch git HEAD; waiting for bounded cache expiry
+2026-10-25T08:44:13.092Z REMOVED DESCRIPTOR REFUSED existing token: HTTP 412
+2026-10-25T08:44:32.564Z quiet relay closes after descriptor removal: 19471ms
+2026-10-25T08:44:32.565Z DESCRIPTOR REMOVAL: existing token refused and quiet SSE disconnected
+2026-10-25T08:44:33.760Z complete stopped local-store backup includes metadata and Comb objects
+2026-10-25T08:44:33.760Z PASS real two-HOME CLI/daemon/Comb encrypted sharing, handover, subsecond bidirectional visibility, refusal, removal/rotation, raw-store grep, outage and backup

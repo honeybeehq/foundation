@@ -1,0 +1,26 @@
+{
+  "workload": "local-activity-journal",
+  "seriesId": "metal3-journal-10k-v1",
+  "verdict": "pass",
+  "results": [
+    {
+      "workload": "local-activity-journal",
+      "metric": "journalNoticeMax",
+      "unit": "ms",
+      "kind": "upper-bound",
+      "aggregation": "max",
+      "samples": 5,
+      "discardedSamples": 0,
+      "aggregate": 0.34822699999995166,
+      "findings": [],
+      "budget": {
+        "value": 10,
+        "unit": "ms",
+        "comparator": "<=",
+        "status": "proposed",
+        "ok": true
+      },
+      "verdict": "pass"
+    }
+  ]
+}
