@@ -972,7 +972,7 @@ export const TOOLS: ToolDefinition[] = [
     handler: async (args: Record<string, unknown>) => {
       const op = operation === 'import-image' ? { op: operation, id: requireString(args, 'nodeId'), source: requireString(args, 'source'), property: optionalString(args, 'property') ?? 'src' } : { op: operation, nodeIds: args.nodeIds }
       const result = await editDocument(requireString(args, 'path'), [op], optionalString(args, 'label') ?? 'Store images', optionalString(args, 'author') ?? defaultAuthor(), optionalString(args, 'id'), { durable: args.durable === true, expectedDocId: optionalString(args, 'expectedDocId'), expectedHead: args.expectedHead === null ? null : optionalString(args, 'expectedHead') })
-      return { ...ok({ path: args.path, ...result }), ...(!result.ok ? { isError: true } : {}) }
+      return { ...ok({ path: args.path, ...result }), ...(!result.ok || result.images?.some(image => image.status === 'failed') ? { isError: true } : {}) }
     },
   })),
   {
@@ -982,7 +982,7 @@ export const TOOLS: ToolDefinition[] = [
     handler: async args => {
       if (!Array.isArray(args.ops)) return fail('ops must be an array')
       const result = await editDocument(requireString(args, 'path'), args.ops, optionalString(args, 'label') ?? 'Edit', optionalString(args, 'author') ?? defaultAuthor(), optionalString(args, 'id'), { durable: args.durable === true, expectedDocId: optionalString(args, 'expectedDocId'), expectedHead: args.expectedHead === null ? null : optionalString(args, 'expectedHead') })
-      return { ...ok({ path: args.path, ...result }), ...(!result.ok ? { isError: true } : {}) }
+      return { ...ok({ path: args.path, ...result }), ...(!result.ok || result.images?.some(image => image.status === 'failed') ? { isError: true } : {}) }
     },
   },
   {

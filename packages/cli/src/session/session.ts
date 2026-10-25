@@ -75,6 +75,8 @@ export function createSession(options: SessionOptions): Session {
 class DesignSession implements Session {
   readonly done: Promise<number>
   private finish!: (code: number) => void
+  private imagePending = false
+  private imageQueue: string[] = []
   private readonly path: string
   private readonly displayPath: string
   private readonly chainPath: string
@@ -137,11 +139,12 @@ class DesignSession implements Session {
       this.fault('protocol', `malformed message: ${line.slice(0, 200)}`, this.phase === 'waiting' ? 2 : null)
       return
     }
+    if (this.imagePending && ['commit', 'undo', 'redo', 'anchor'].includes(message.t)) { this.imageQueue.push(line); return }
     if (message.t === 'hello' && !isSessionProtocol(message.protocol)) return this.fault('protocol', `protocol ${message.protocol} is not supported; use ${LEGACY_SESSION_PROTOCOL} or ${SESSION_PROTOCOL}`, 2)
     if (this.phase === 'waiting' && message.t === 'hello') this.readMode ||= message.mode === 'read'
     try {
       if (message.t === 'hello' && this.options.create && !this.readMode) mkdirSync(dirname(this.path), { recursive: true })
-      if (message.t === 'commit' && this.phase === 'open' && hasImageOperations(message.ops)) { void this.prepareImages(message); return }
+      if (message.t === 'commit' && this.phase === 'open' && hasImageOperations(message.ops)) { this.imagePending = true; void this.prepareImages(message); return }
       this.inTransaction(() => this.dispatch(message), message.t === 'hello' ? 0 : 100)
     } catch (err) {
       if (err instanceof DocumentBusyError && this.phase === 'waiting') {
@@ -623,6 +626,9 @@ class DesignSession implements Session {
       })
     } catch (err) {
       if (this.phase === 'open') this.reject(message.id, { code: 'invalid-op', message: err instanceof Error ? err.message : String(err) })
+    } finally {
+      this.imagePending = false
+      while (!this.imagePending && this.imageQueue.length) this.receive(this.imageQueue.shift()!)
     }
   }
 

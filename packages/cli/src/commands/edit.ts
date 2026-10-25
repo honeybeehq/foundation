@@ -15,6 +15,6 @@ export async function runEdit(args: string[], io: CliIO): Promise<number> {
     if (!Array.isArray(ops)) throw new Error('ops must be an array')
     const result = await editDocument(path, ops, flagString(flags, 'label') ?? 'Edit', flagString(flags, 'author') ?? defaultAuthor(), flagString(flags, 'id'), { durable: flags.durable === true, expectedDocId: flagString(flags, 'expected-doc-id'), expectedHead: flagString(flags, 'expected-head') })
     io.stdout(JSON.stringify({ path, ...result }))
-    return result.ok ? 0 : 1
+    return result.ok && !result.images?.some(image => image.status === 'failed') ? 0 : 1
   } catch (err) { io.stderr(String(err)); return 1 }
 }

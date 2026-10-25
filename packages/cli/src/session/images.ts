@@ -16,7 +16,8 @@ export async function prepareImageOperations(doc: FdnDocument, ops: SessionOp[],
       if (property === 'src') node.attrs.src = asset.src
       else if (node.style[property]?.includes(source)) node.style[property] = node.style[property]!.replace(source, asset.src)
       else node.style[property] = `url("${asset.src}")`
-      node.attrs['data-fdn-source-url'] = source
+      if (/^https?:\/\//i.test(source)) node.attrs['data-fdn-source-url'] = source
+      else delete node.attrs['data-fdn-source-url']
       images.push({ nodeId: node.id, property, source, status: 'stored', asset })
     } catch (err) { images.push({ nodeId: node.id, property, source, status: 'failed', reason: err instanceof Error ? err.message : String(err) }) }
   }

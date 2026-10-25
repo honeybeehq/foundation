@@ -19,6 +19,6 @@ export async function runImages(args: string[], io: CliIO, mode = 'images'): Pro
     if (mode === 'import-image' && (!node || !positionals[1])) throw new Error('import-image requires SOURCE and --node ID')
     const result = await editDocument(path, ops, flagString(flags, 'label') ?? 'Store images', flagString(flags, 'author') ?? defaultAuthor(), flagString(flags, 'id'), { durable: flags.durable === true, expectedDocId: flagString(flags, 'expected-doc-id'), expectedHead: flagString(flags, 'expected-head') })
     io.stdout(JSON.stringify({ path, ...result }))
-    return result.ok ? 0 : 1
+    return result.ok && !result.images?.some(image => image.status === 'failed') ? 0 : 1
   } catch (err) { io.stderr(String(err)); return 1 }
 }
