@@ -2,7 +2,7 @@ import { acquireDocumentLock } from '../document-lock.js'
 import { homedir } from 'node:os'
 import { join, isAbsolute } from 'node:path'
 import { mkdirSync, lstatSync, readFileSync, writeFileSync, renameSync, chmodSync } from 'node:fs'
-import { execFileSync } from 'node:child_process'
+import { readKeychain, writeKeychain } from './keychain.js'
 import type { Device, DeviceSecret, EpochKey } from './crypto.js'
 export interface Session {
   deviceWarnings?: string[]
@@ -43,18 +43,9 @@ function keychainPath(): string | undefined {
 }
 export function readVault(): Vault {
   if (process.platform === 'darwin') {
-    const keychain = keychainPath()
-    try {
-      return JSON.parse(
-        execFileSync('security', ['find-generic-password', '-a', homedir(), '-s', 'foundation-share-v1', '-w', ...(keychain ? [keychain] : [])], {
-          encoding: 'utf8',
-          stdio: ['ignore', 'pipe', 'pipe']
-        })
-      )
-    } catch (e) {
-      if ((e as { status?: number }).status === 44) return { sessions: {} }
-      throw new Error('cannot read Foundation sharing keys from Keychain')
-    }
+    const text = readKeychain(keychainPath())
+    if (text === undefined) return { sessions: {} }
+    try { return JSON.parse(text) } catch { throw new Error('cannot read Foundation sharing keys from Keychain') }
   }
   const path = location()
   try {
@@ -116,12 +107,7 @@ export function saveSession(space: string, session: Session, replaceDevice = fal
     vault.sessions[space] = session
     const text = JSON.stringify(vault)
     if (process.platform === 'darwin') {
-      const quote = (s: string): string => '"' + s.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"'
-      const keychain = keychainPath()
-      execFileSync('security', ['-i'], {
-        input: `add-generic-password -U -a ${quote(homedir())} -s foundation-share-v1 -w ${quote(text)}${keychain ? ` ${quote(keychain)}` : ''}\n`,
-        stdio: ['pipe', 'pipe', 'pipe']
-      })
+      writeKeychain(text, keychainPath())
       return
     }
     const path = location(),
