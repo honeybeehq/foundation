@@ -337,12 +337,264 @@ index 000000000..05fb31081
 +const beforeItems = items.map(item => 'branch' in item ? item : item.id === 'n5' ? { id: 'n5old', type: 'action' as const, name: 'Manual smoke test', instruction: 'superseded by the preview' } : item.type === 'review' ? { ...item, denied: undefined } : item)
 +export const proposalPending = { ...base, mirror: { ...base.mirror, definitions: [{ ...definitions[0]!, items: beforeItems }, ...definitions.slice(1)] }, proposal: { definition: definitions[0], rationale: 'Publish preview after the gate; add Fix findings on denial; replace Manual smoke test', proposedAt: age(2), baseVersion: 3 } }
 +export const empty = { ...base, mirror: { definitions: [], attachments: [] }, props: { ...props, pane: { ...props.pane, params: {} } } }
+diff --git a/.foundation/fonts/DEJAVU-LICENSE b/.foundation/fonts/DEJAVU-LICENSE
+new file mode 100644
+index 000000000..b3d93a123
+--- /dev/null
++++ b/.foundation/fonts/DEJAVU-LICENSE
+@@ -0,0 +1,78 @@
++Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
++Upstream-Name: DejaVu fonts
++Upstream-Author: Stepan Roh <src@users.sourceforge.net> (original author),
++                  see /usr/share/doc/fonts-dejavu-core/AUTHORS for full list
++Source: https://dejavu-fonts.github.io/
++
++Files: *
++Copyright: Copyright (c) 2003 by Bitstream, Inc. All Rights Reserved. 
++ Bitstream Vera is a trademark of Bitstream, Inc.
++ DejaVu changes are in public domain.
++License: bitstream-vera
++ Permission is hereby granted, free of charge, to any person obtaining a copy
++ of the fonts accompanying this license ("Fonts") and associated
++ documentation files (the "Font Software"), to reproduce and distribute the
++ Font Software, including without limitation the rights to use, copy, merge,
++ publish, distribute, and/or sell copies of the Font Software, and to permit
++ persons to whom the Font Software is furnished to do so, subject to the
++ following conditions:
++ .
++ The above copyright and trademark notices and this permission notice shall
++ be included in all copies of one or more of the Font Software typefaces.
++ .
++ The Font Software may be modified, altered, or added to, and in particular
++ the designs of glyphs or characters in the Fonts may be modified and
++ additional glyphs or characters may be added to the Fonts, only if the fonts
++ are renamed to names not containing either the words "Bitstream" or the word
++ "Vera".
++ .
++ This License becomes null and void to the extent applicable to Fonts or Font
++ Software that has been modified and is distributed under the "Bitstream
++ Vera" names.
++ .
++ The Font Software may be sold as part of a larger software package but no
++ copy of one or more of the Font Software typefaces may be sold by itself.
++ .
++ THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
++ OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY,
++ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT,
++ TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL BITSTREAM OR THE GNOME
++ FOUNDATION BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING
++ ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES,
++ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
++ THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM OTHER DEALINGS IN THE
++ FONT SOFTWARE.
++ .
++ Except as contained in this notice, the names of Gnome, the Gnome
++ Foundation, and Bitstream Inc., shall not be used in advertising or
++ otherwise to promote the sale, use or other dealings in this Font Software
++ without prior written authorization from the Gnome Foundation or Bitstream
++ Inc., respectively. For further information, contact: fonts at gnome dot
++ org.
++
++Files: debian/*
++Copyright: (C) 2005-2006 Peter Cernak <pce@users.sourceforge.net> 
++           (C) 2006-2011 Davide Viti <zinosat@tiscali.it>
++           (C) 2011-2013 Christian Perrier <bubulle@debian.org>
++           (C) 2013 Fabian Greffrath <fabian+debian@greffrath.com>
++License: GPL-2+
++ This program is free software; you can redistribute it
++ and/or modify it under the terms of the GNU General Public
++ License as published by the Free Software Foundation; either
++ version 2 of the License, or (at your option) any later
++ version.
++ .
++ This program is distributed in the hope that it will be
++ useful, but WITHOUT ANY WARRANTY; without even the implied
++ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
++ PURPOSE.  See the GNU General Public License for more
++ details.
++ .
++ You should have received a copy of the GNU General Public
++ License along with this package; if not, write to the Free
++ Software Foundation, Inc., 51 Franklin St, Fifth Floor,
++ Boston, MA  02110-1301 USA
++ .
++ On Debian systems, the full text of the GNU General Public
++ License version 2 can be found in the file
++ /usr/share/common-licenses/GPL-2'.
+diff --git a/.foundation/fonts/DejaVuSans-Bold.ttf b/.foundation/fonts/DejaVuSans-Bold.ttf
+new file mode 100644
+index 000000000..426812b9b
+Binary files /dev/null and b/.foundation/fonts/DejaVuSans-Bold.ttf differ
+diff --git a/.foundation/fonts/DejaVuSans.ttf b/.foundation/fonts/DejaVuSans.ttf
+new file mode 100644
+index 000000000..fb0bd945a
+Binary files /dev/null and b/.foundation/fonts/DejaVuSans.ttf differ
+diff --git a/.foundation/fonts/DejaVuSansMono-Bold.ttf b/.foundation/fonts/DejaVuSansMono-Bold.ttf
+new file mode 100644
+index 000000000..eeff2f2d5
+Binary files /dev/null and b/.foundation/fonts/DejaVuSansMono-Bold.ttf differ
+diff --git a/.foundation/fonts/DejaVuSansMono.ttf b/.foundation/fonts/DejaVuSansMono.ttf
+new file mode 100644
+index 000000000..538ee2723
+Binary files /dev/null and b/.foundation/fonts/DejaVuSansMono.ttf differ
+diff --git a/.foundation/fonts/LIBERATION-LICENSE b/.foundation/fonts/LIBERATION-LICENSE
+new file mode 100644
+index 000000000..18ec71bce
+--- /dev/null
++++ b/.foundation/fonts/LIBERATION-LICENSE
+@@ -0,0 +1,130 @@
++Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
++Upstream-Name: Liberation Fonts
++Source: https://github.com/liberationfonts
++
++Files: *
++Copyright:
++ Digitized data copyright (c) 2010 Google Corporation with Reserved Font Arimo, Tinos and Cousine.
++ Copyright (c) 2012 Red Hat, Inc. with Reserved Font Name Liberation.
++License: SIL-OFL-1.1
++ This Font Software is licensed under the SIL Open Font License,
++ Version 1.1.
++ .
++ This license is copied below, and is also available with a FAQ at:
++ http://scripts.sil.org/OFL
++ .
++ SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
++ .
++ PREAMBLE The goals of the Open Font License (OFL) are to stimulate
++ worldwide development of collaborative font projects, to support the font
++ creation efforts of academic and linguistic communities, and to provide
++ a free and open framework in which fonts may be shared and improved in
++ partnership with others.
++ .
++ The OFL allows the licensed fonts to be used, studied, modified and
++ redistributed freely as long as they are not sold by themselves.
++ The fonts, including any derivative works, can be bundled, embedded,
++ redistributed and/or sold with any software provided that any reserved
++ names are not used by derivative works.  The fonts and derivatives,
++ however, cannot be released under any other type of license.  The
++ requirement for fonts to remain under this license does not apply to
++ any document created using the fonts or their derivatives.
++ .
++ .
++ .
++ DEFINITIONS
++ "Font Software" refers to the set of files released by the Copyright
++ Holder(s) under this license and clearly marked as such.
++ This may include source files, build scripts and documentation.
++ .
++ "Reserved Font Name" refers to any names specified as such after the
++ copyright statement(s).
++ .
++ "Original Version" refers to the collection of Font Software components
++ as distributed by the Copyright Holder(s).
++ .
++ "Modified Version" refers to any derivative made by adding to, deleting,
++ or substituting ? in part or in whole ?
++ any of the components of the Original Version, by changing formats or
++ by porting the Font Software to a new environment.
++ .
++ "Author" refers to any designer, engineer, programmer, technical writer
++ or other person who contributed to the Font Software.
++ .
++ .
++ PERMISSION & CONDITIONS
++ .
++ Permission is hereby granted, free of charge, to any person obtaining a
++ copy of the Font Software, to use, study, copy, merge, embed, modify,
++ redistribute, and sell modified and unmodified copies of the Font
++ Software, subject to the following conditions:
++ .
++ 1) Neither the Font Software nor any of its individual components,in
++    Original or Modified Versions, may be sold by itself.
++ .
++ 2) Original or Modified Versions of the Font Software may be bundled,
++    redistributed and/or sold with any software, provided that each copy
++    contains the above copyright notice and this license. These can be
++    included either as stand-alone text files, human-readable headers or
++    in the appropriate machine-readable metadata fields within text or
++    binary files as long as those fields can be easily viewed by the user.
++ .
++ 3) No Modified Version of the Font Software may use the Reserved Font
++    Name(s) unless explicit written permission is granted by the
++    corresponding Copyright Holder. This restriction only applies to the
++    primary font name as presented to the users.
++ .
++ 4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
++    Software shall not be used to promote, endorse or advertise any
++    Modified Version, except to acknowledge the contribution(s) of the
++    Copyright Holder(s) and the Author(s) or with their explicit written
++    permission.
++ .
++ 5) The Font Software, modified or unmodified, in part or in whole, must
++    be distributed entirely under this license, and must not be distributed
++    under any other license. The requirement for fonts to remain under
++    this license does not apply to any document created using the Font
++    Software.
++ .
++ .
++ .
++ TERMINATION
++ This license becomes null and void if any of the above conditions are not met.
++ .
++ .
++ .
++ DISCLAIMER
++ THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
++ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
++ OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT.  IN NO EVENT SHALL THE
++ COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
++ INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
++ DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++ FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM OTHER
++ DEALINGS IN THE FONT SOFTWARE.
++ .
++
++Files: debian/*
++Copyright:
++ 2008 Alan Baghumian <alan@technotux.org>
++ 2008-2018 Holger Levsen <holger@debian.org>
++ 2009-2012 Christian Perrier <bubulle@debian.org>
++ 2011-2023 Fabian Greffrath <fabian@debian.org>
++ 2018 Rene Engelhard <rene@debian.org>
++License: GPL-2+
++ This package is free software; you can redistribute it and/or modify
++ it under the terms of the GNU General Public License as published by
++ the Free Software Foundation; either version 2 of the License, or
++ (at your option) any later version.
++ .
++ This package is distributed in the hope that it will be useful,
++ but WITHOUT ANY WARRANTY; without even the implied warranty of
++ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ GNU General Public License for more details.
++ .
++ You should have received a copy of the GNU General Public License
++ along with this program. If not, see <https://www.gnu.org/licenses/>
++ .
++ On Debian systems, the complete text of the GNU General
++ Public License version 2 can be found in "/usr/share/common-licenses/GPL-2".
+diff --git a/.foundation/fonts/LiberationSans-Bold.ttf b/.foundation/fonts/LiberationSans-Bold.ttf
+new file mode 100644
+index 000000000..ee102d8bf
+Binary files /dev/null and b/.foundation/fonts/LiberationSans-Bold.ttf differ
+diff --git a/.foundation/fonts/LiberationSans-Regular.ttf b/.foundation/fonts/LiberationSans-Regular.ttf
+new file mode 100644
+index 000000000..7769c4119
+Binary files /dev/null and b/.foundation/fonts/LiberationSans-Regular.ttf differ
+diff --git a/.foundation/fonts/LiberationSerif-Bold.ttf b/.foundation/fonts/LiberationSerif-Bold.ttf
+new file mode 100644
+index 000000000..ff9543557
+Binary files /dev/null and b/.foundation/fonts/LiberationSerif-Bold.ttf differ
+diff --git a/.foundation/fonts/LiberationSerif-Regular.ttf b/.foundation/fonts/LiberationSerif-Regular.ttf
+new file mode 100644
+index 000000000..44c465480
+Binary files /dev/null and b/.foundation/fonts/LiberationSerif-Regular.ttf differ
 diff --git a/.foundation/links.json b/.foundation/links.json
 new file mode 100644
-index 000000000..4ebf15928
+index 000000000..4fda85fa7
 --- /dev/null
 +++ b/.foundation/links.json
-@@ -0,0 +1,77 @@
+@@ -0,0 +1,158 @@
 +{
 +  "schema": "fdn-links/0",
 +  "designFile": "packages/proof/fixtures/design/tracks-pane.fdn.html",
@@ -400,25 +652,106 @@ index 000000000..4ebf15928
 +    {
 +      "family": "Hanken Grotesk",
 +      "weight": "400",
-+      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-400-normal.woff2"
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-400-normal.woff2",
++      "sha256": "787b3fdd0b7e6d59ae7ce14ce7a41d1a44616584b4c919b527da951972d5d87d",
++      "postScriptName": "HankenGrotesk-Regular"
 +    },
 +    {
 +      "family": "Hanken Grotesk",
 +      "weight": "500",
-+      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-500-normal.woff2"
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-500-normal.woff2",
++      "sha256": "31f666af7bff625900c46aa34a05d8620482ba2db37db7b63749b693ab0c72ec",
++      "postScriptName": "HankenGrotesk-Medium"
 +    },
 +    {
 +      "family": "Hanken Grotesk",
 +      "weight": "600",
-+      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-600-normal.woff2"
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-600-normal.woff2",
++      "sha256": "58f23b7ae3e13b21a4dca4c05360be87b3531d60fc1cbff89732cac8fb3019ae",
++      "postScriptName": "HankenGrotesk-SemiBold"
 +    },
 +    {
 +      "family": "IBM Plex Mono",
 +      "weight": "400",
-+      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2"
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2",
++      "sha256": "08949f728dc52d528e69b1667d15c89a5686a4ee9a296ff90983985f99c380f7",
++      "postScriptName": "IBMPlexMono-Regular"
++    },
++    {
++      "family": "Foundation Design Sans",
++      "weight": "400",
++      "path": ".foundation/fonts/LiberationSans-Regular.ttf",
++      "format": "truetype",
++      "sha256": "4659bc0c58c5028dd488ec928d41d9265db43d9b669fc14ca8b0832daca7b144",
++      "postScriptName": "LiberationSans"
++    },
++    {
++      "family": "Foundation Design Sans",
++      "weight": "700",
++      "path": ".foundation/fonts/LiberationSans-Bold.ttf",
++      "format": "truetype",
++      "sha256": "3973aa5054fb467dd5627245d3dc82e37bf16fe075756156a570455871351582",
++      "postScriptName": "LiberationSans-Bold"
++    },
++    {
++      "family": "Foundation Design Mono",
++      "weight": "400",
++      "path": ".foundation/fonts/DejaVuSansMono.ttf",
++      "format": "truetype",
++      "sha256": "c805f9436dbc268644c1d9584f01a601a653e028e08fd74b9b949f6cf8304d88",
++      "postScriptName": "DejaVuSansMono"
++    },
++    {
++      "family": "Foundation Design Mono",
++      "weight": "700",
++      "path": ".foundation/fonts/DejaVuSansMono-Bold.ttf",
++      "format": "truetype",
++      "sha256": "3a3c502eeff669a231549e80df9f7c49de109bafe303170409e905d0b31a38fe",
++      "postScriptName": "DejaVuSansMono-Bold"
++    },
++    {
++      "family": "Foundation Design Serif",
++      "weight": "400",
++      "path": ".foundation/fonts/LiberationSerif-Regular.ttf",
++      "format": "truetype",
++      "sha256": "705903ae1382f0150f115d6f10a30f5b2f3d6ade649c474afe6366c39174fb65",
++      "postScriptName": "LiberationSerif"
++    },
++    {
++      "family": "Foundation Design Serif",
++      "weight": "700",
++      "path": ".foundation/fonts/LiberationSerif-Bold.ttf",
++      "format": "truetype",
++      "sha256": "9e66c25e20868756bf12eb24a520a4552727c9cd108f577f7ae33e3c0110e39c",
++      "postScriptName": "LiberationSerif-Bold"
++    },
++    {
++      "family": "Foundation Symbols",
++      "weight": "400",
++      "path": ".foundation/fonts/DejaVuSans.ttf",
++      "format": "truetype",
++      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
++      "postScriptName": "DejaVuSans"
++    },
++    {
++      "family": "Foundation Symbols",
++      "weight": "700",
++      "path": ".foundation/fonts/DejaVuSans-Bold.ttf",
++      "format": "truetype",
++      "sha256": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895",
++      "postScriptName": "DejaVuSans-Bold"
 +    }
 +  ],
-+  "binding": "chain-head"
++  "binding": "chain-head",
++  "fontPolicy": {
++    "sans": "Foundation Design Sans",
++    "mono": "Foundation Design Mono",
++    "serif": "Foundation Design Serif",
++    "fallback": "Foundation Symbols",
++    "requireCustomFonts": true
++  },
++  "browserVersion": "151.0.7922.34",
++  "platform": "linux"
 +}
 diff --git a/.foundation/preview.html b/.foundation/preview.html
 new file mode 100644
@@ -508,20 +841,23 @@ index 965a19b3e..ce41958c3 100644
                {...stylex.props(styles.trackRow, active && styles.trackRowActive)}
 diff --git a/apps/next-desktop-beta/foundation.vite.config.ts b/apps/next-desktop-beta/foundation.vite.config.ts
 new file mode 100644
-index 000000000..6354fbd47
+index 000000000..326303357
 --- /dev/null
 +++ b/apps/next-desktop-beta/foundation.vite.config.ts
-@@ -0,0 +1,19 @@
+@@ -0,0 +1,22 @@
 +import base from './vite.config'
++import { createRequire } from 'node:module'
 +import { resolve, dirname } from 'node:path'
 +import { fileURLToPath } from 'node:url'
++const require = createRequire(import.meta.url)
 +const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 +const sources = ['state', 'sessionsStore', 'tracksMirror', 'tracksProposal', 'keybindings']
 +export default {
 +  ...base,
 +  root,
++  optimizeDeps: { include: ['@stylexjs/stylex', '@stylexjs/stylex/lib/stylex-inject'] },
 +  build: { rollupOptions: { input: resolve(root, '.foundation/preview.html') } },
-+  resolve: { ...base.resolve, dedupe: ['react', 'react-dom'], alias: [{ find: 'react', replacement: resolve(root, 'apps/next-desktop-beta/node_modules/react') }, { find: 'react-dom', replacement: resolve(root, 'apps/next-desktop-beta/node_modules/react-dom') }, ...sources.map(name => ({ find: resolve(root, `apps/desktop/src/renderer/src/${name}`), replacement: resolve(root, '.foundation/environment.ts') }))] },
++  resolve: { ...base.resolve, dedupe: ['react', 'react-dom'], alias: [{ find: /^@stylexjs\/stylex$/, replacement: require.resolve('@stylexjs/stylex') }, { find: /^@stylexjs\/stylex\/lib\/stylex-inject$/, replacement: require.resolve('@stylexjs/stylex/lib/stylex-inject') }, { find: 'react', replacement: resolve(root, 'apps/next-desktop-beta/node_modules/react') }, { find: 'react-dom', replacement: resolve(root, 'apps/next-desktop-beta/node_modules/react-dom') }, ...sources.map(name => ({ find: resolve(root, `apps/desktop/src/renderer/src/${name}`), replacement: resolve(root, '.foundation/environment.ts') }))] },
 +  plugins: [...base.plugins ?? [], {
 +    name: 'foundation-boundaries', enforce: 'pre',
 +    resolveId(source: string, importer?: string) {

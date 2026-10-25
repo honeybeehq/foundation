@@ -44,7 +44,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -116,6 +116,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -161,7 +169,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -233,6 +241,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -278,7 +294,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "9px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -350,6 +366,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -395,7 +419,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+        "font-family": "\"Foundation Design Sans\", \"Foundation Symbols\"",
         "font-size": "15px",
         "font-weight": "600",
         "line-height": "normal",
@@ -467,6 +491,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -512,7 +544,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -584,6 +616,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -629,7 +669,7 @@
         "margin-left": "407.828px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -701,6 +741,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -746,7 +794,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -818,6 +866,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -863,7 +919,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -935,6 +991,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "data-fdn-id": "n97::n76::n1",
+          "fill": "none",
+          "height": "16",
+          "viewBox": "0 0 16 16",
+          "width": "16"
+        }
       }
     },
     {
@@ -980,7 +1051,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -1052,6 +1123,17 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "data-fdn-id": "n97::n76::n18"
+        }
       }
     },
     {
@@ -1097,7 +1179,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -1169,6 +1251,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(138, 135, 127)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "cx": "3.6",
+          "cy": "8",
+          "data-fdn-id": "n97::n76::n19",
+          "fill": "currentColor",
+          "r": "1.15"
+        }
       }
     },
     {
@@ -1214,7 +1311,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -1286,6 +1383,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(138, 135, 127)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "cx": "8",
+          "cy": "8",
+          "data-fdn-id": "n97::n76::n20",
+          "fill": "currentColor",
+          "r": "1.15"
+        }
       }
     },
     {
@@ -1331,7 +1443,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -1403,6 +1515,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(138, 135, 127)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "cx": "12.4",
+          "cy": "8",
+          "data-fdn-id": "n97::n76::n21",
+          "fill": "currentColor",
+          "r": "1.15"
+        }
       }
     },
     {
@@ -1448,7 +1575,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "2px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -1520,6 +1647,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -1565,7 +1700,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -1637,6 +1772,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -1682,7 +1825,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "6px",
-        "font-family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+        "font-family": "\"Foundation Design Sans\", \"Foundation Symbols\"",
         "font-size": "12px",
         "font-weight": "500",
         "line-height": "normal",
@@ -1754,6 +1897,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -1799,7 +1950,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+        "font-family": "\"Foundation Design Sans\", \"Foundation Symbols\"",
         "font-size": "12px",
         "font-weight": "500",
         "line-height": "normal",
@@ -1871,6 +2022,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -1916,7 +2075,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "11px",
         "font-weight": "500",
         "line-height": "normal",
@@ -1988,6 +2147,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -2033,7 +2200,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -2105,6 +2272,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -2150,7 +2325,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "6px",
-        "font-family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+        "font-family": "\"Foundation Design Sans\", \"Foundation Symbols\"",
         "font-size": "12px",
         "font-weight": "500",
         "line-height": "normal",
@@ -2222,6 +2397,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -2267,7 +2450,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+        "font-family": "\"Foundation Design Sans\", \"Foundation Symbols\"",
         "font-size": "12px",
         "font-weight": "500",
         "line-height": "normal",
@@ -2339,6 +2522,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -2384,7 +2575,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "11px",
         "font-weight": "500",
         "line-height": "normal",
@@ -2456,6 +2647,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -2501,7 +2700,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -2573,6 +2772,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -2618,7 +2825,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "6px",
-        "font-family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+        "font-family": "\"Foundation Design Sans\", \"Foundation Symbols\"",
         "font-size": "12px",
         "font-weight": "500",
         "line-height": "normal",
@@ -2690,6 +2897,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -2735,7 +2950,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+        "font-family": "\"Foundation Design Sans\", \"Foundation Symbols\"",
         "font-size": "12px",
         "font-weight": "500",
         "line-height": "normal",
@@ -2807,6 +3022,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -2852,7 +3075,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "11px",
         "font-weight": "500",
         "line-height": "normal",
@@ -2924,6 +3147,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -2969,7 +3200,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -3041,6 +3272,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -3086,7 +3325,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -3158,6 +3397,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -3203,7 +3450,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "6px",
-        "font-family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+        "font-family": "\"Foundation Design Sans\", \"Foundation Symbols\"",
         "font-size": "12px",
         "font-weight": "500",
         "line-height": "normal",
@@ -3275,6 +3522,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -3320,7 +3575,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+        "font-family": "\"Foundation Design Sans\", \"Foundation Symbols\"",
         "font-size": "12px",
         "font-weight": "500",
         "line-height": "normal",
@@ -3392,6 +3647,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -3437,7 +3700,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "9.5px",
         "font-weight": "500",
         "line-height": "normal",
@@ -3509,6 +3772,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -3554,7 +3825,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -3626,6 +3897,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -3671,7 +3950,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -3743,6 +4022,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -3788,7 +4075,7 @@
         "margin-left": "0px",
         "row-gap": "3px",
         "column-gap": "3px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -3860,6 +4147,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -3905,7 +4200,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "7px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -3977,6 +4272,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -4022,7 +4325,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -4094,6 +4397,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -4139,7 +4450,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -4211,6 +4522,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "data-fdn-id": "n97::n84#0::n84::n48::n1",
+          "fill": "none",
+          "height": "14",
+          "viewBox": "0 0 16 16",
+          "width": "14"
+        }
       }
     },
     {
@@ -4256,7 +4582,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -4328,6 +4654,17 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "data-fdn-id": "n97::n84#0::n84::n48::n2"
+        }
       }
     },
     {
@@ -4373,7 +4710,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -4445,6 +4782,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "rgb(138, 135, 127)",
+        "strokeWidth": "1.2px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "d": "M3.6 3.2v9.6",
+          "data-fdn-id": "n97::n84#0::n84::n48::n3",
+          "stroke": "currentColor",
+          "stroke-linecap": "round",
+          "stroke-width": "1.2"
+        }
       }
     },
     {
@@ -4490,7 +4842,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -4562,6 +4914,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "rgb(138, 135, 127)",
+        "strokeWidth": "1.2px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "d": "M3.6 4.4h8.6M3.6 8h6.2M3.6 11.6h8.6",
+          "data-fdn-id": "n97::n84#0::n84::n48::n4",
+          "stroke": "currentColor",
+          "stroke-linecap": "round",
+          "stroke-width": "1.2"
+        }
       }
     },
     {
@@ -4607,7 +4974,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+        "font-family": "\"Foundation Design Sans\", \"Foundation Symbols\"",
         "font-size": "13px",
         "font-weight": "500",
         "line-height": "normal",
@@ -4679,6 +5046,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -4724,7 +5099,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -4796,6 +5171,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -4841,7 +5224,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -4913,6 +5296,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -4958,7 +5349,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -5030,6 +5421,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -5075,7 +5474,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "8px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -5147,6 +5546,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -5192,7 +5599,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -5264,6 +5671,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -5309,7 +5724,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "5px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -5381,6 +5796,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -5426,7 +5849,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -5498,6 +5921,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -5543,7 +5974,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -5615,6 +6046,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -5660,7 +6099,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "500",
         "line-height": "normal",
@@ -5732,6 +6171,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -5777,7 +6224,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "500",
         "line-height": "normal",
@@ -5849,6 +6296,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -5894,7 +6349,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -5966,6 +6421,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -6011,7 +6474,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "5px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -6083,6 +6546,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -6128,7 +6599,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -6200,6 +6671,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -6245,7 +6724,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -6317,6 +6796,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -6362,7 +6849,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "500",
         "line-height": "normal",
@@ -6434,6 +6921,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -6479,7 +6974,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "500",
         "line-height": "normal",
@@ -6551,6 +7046,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -6596,7 +7099,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -6668,6 +7171,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -6713,7 +7224,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -6785,6 +7296,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -6830,7 +7349,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "5px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -6902,6 +7421,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -6947,7 +7474,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -7019,6 +7546,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -7064,7 +7599,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -7136,6 +7671,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -7181,7 +7724,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -7253,6 +7796,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -7298,7 +7849,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -7370,6 +7921,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -7415,7 +7974,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "5px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -7487,6 +8046,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -7532,7 +8099,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -7604,6 +8171,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -7649,7 +8224,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "500",
         "line-height": "normal",
@@ -7721,6 +8296,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -7766,7 +8349,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "500",
         "line-height": "normal",
@@ -7838,6 +8421,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -7883,7 +8474,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -7955,6 +8546,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -8000,7 +8599,7 @@
         "margin-left": "0px",
         "row-gap": "3px",
         "column-gap": "3px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -8072,6 +8671,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -8117,7 +8724,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "7px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -8189,6 +8796,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -8234,7 +8849,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -8306,6 +8921,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -8351,7 +8974,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -8423,6 +9046,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "data-fdn-id": "n97::n84#1::n84::n48::n1",
+          "fill": "none",
+          "height": "14",
+          "viewBox": "0 0 16 16",
+          "width": "14"
+        }
       }
     },
     {
@@ -8468,7 +9106,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -8540,6 +9178,17 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "data-fdn-id": "n97::n84#1::n84::n48::n2"
+        }
       }
     },
     {
@@ -8585,7 +9234,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -8657,6 +9306,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "rgb(138, 135, 127)",
+        "strokeWidth": "1.2px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "d": "M3.6 3.2v9.6",
+          "data-fdn-id": "n97::n84#1::n84::n48::n3",
+          "stroke": "currentColor",
+          "stroke-linecap": "round",
+          "stroke-width": "1.2"
+        }
       }
     },
     {
@@ -8702,7 +9366,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -8774,6 +9438,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "rgb(138, 135, 127)",
+        "strokeWidth": "1.2px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "d": "M3.6 4.4h8.6M3.6 8h6.2M3.6 11.6h8.6",
+          "data-fdn-id": "n97::n84#1::n84::n48::n4",
+          "stroke": "currentColor",
+          "stroke-linecap": "round",
+          "stroke-width": "1.2"
+        }
       }
     },
     {
@@ -8819,7 +9498,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+        "font-family": "\"Foundation Design Sans\", \"Foundation Symbols\"",
         "font-size": "13px",
         "font-weight": "500",
         "line-height": "normal",
@@ -8891,6 +9570,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -8936,7 +9623,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -9008,6 +9695,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -9053,7 +9748,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -9125,6 +9820,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -9170,7 +9873,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -9242,6 +9945,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -9287,7 +9998,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "8px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -9359,6 +10070,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -9404,7 +10123,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -9476,6 +10195,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -9521,7 +10248,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "5px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -9593,6 +10320,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -9638,7 +10373,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -9710,6 +10445,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -9755,7 +10498,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -9827,6 +10570,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -9872,7 +10623,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "500",
         "line-height": "normal",
@@ -9944,6 +10695,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -9989,7 +10748,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "500",
         "line-height": "normal",
@@ -10061,6 +10820,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -10106,7 +10873,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -10178,6 +10945,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -10223,7 +10998,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -10295,6 +11070,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -10340,7 +11123,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -10412,6 +11195,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -10457,7 +11248,7 @@
         "margin-left": "0px",
         "row-gap": "3px",
         "column-gap": "3px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -10529,6 +11320,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -10574,7 +11373,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "7px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -10646,6 +11445,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -10691,7 +11498,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -10763,6 +11570,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -10808,7 +11623,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -10880,6 +11695,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "data-fdn-id": "n97::n84#2::n84::n48::n1",
+          "fill": "none",
+          "height": "14",
+          "viewBox": "0 0 16 16",
+          "width": "14"
+        }
       }
     },
     {
@@ -10925,7 +11755,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -10997,6 +11827,17 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "data-fdn-id": "n97::n84#2::n84::n48::n2"
+        }
       }
     },
     {
@@ -11042,7 +11883,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -11114,6 +11955,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "rgb(138, 135, 127)",
+        "strokeWidth": "1.2px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "d": "M3.6 3.2v9.6",
+          "data-fdn-id": "n97::n84#2::n84::n48::n3",
+          "stroke": "currentColor",
+          "stroke-linecap": "round",
+          "stroke-width": "1.2"
+        }
       }
     },
     {
@@ -11159,7 +12015,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -11231,6 +12087,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "rgb(138, 135, 127)",
+        "strokeWidth": "1.2px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "d": "M3.6 4.4h8.6M3.6 8h6.2M3.6 11.6h8.6",
+          "data-fdn-id": "n97::n84#2::n84::n48::n4",
+          "stroke": "currentColor",
+          "stroke-linecap": "round",
+          "stroke-width": "1.2"
+        }
       }
     },
     {
@@ -11276,7 +12147,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+        "font-family": "\"Foundation Design Sans\", \"Foundation Symbols\"",
         "font-size": "13px",
         "font-weight": "500",
         "line-height": "normal",
@@ -11348,6 +12219,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -11393,7 +12272,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -11465,6 +12344,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -11510,7 +12397,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -11582,6 +12469,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -11627,7 +12522,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -11699,6 +12594,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -11744,7 +12647,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "8px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -11816,6 +12719,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -11861,7 +12772,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -11933,6 +12844,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -11978,7 +12897,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "5px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -12050,6 +12969,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -12095,7 +13022,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -12167,6 +13094,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -12212,7 +13147,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -12284,6 +13219,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -12329,7 +13272,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "500",
         "line-height": "normal",
@@ -12401,6 +13344,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -12446,7 +13397,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "500",
         "line-height": "normal",
@@ -12518,6 +13469,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -12563,7 +13522,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -12635,6 +13594,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -12680,7 +13647,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -12752,6 +13719,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -12797,7 +13772,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "5px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -12869,6 +13844,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -12914,7 +13897,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -12986,6 +13969,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -13031,7 +14022,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -13103,6 +14094,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -13148,7 +14147,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -13220,6 +14219,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -13265,7 +14272,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -13337,6 +14344,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -13382,7 +14397,7 @@
         "margin-left": "0px",
         "row-gap": "3px",
         "column-gap": "3px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -13454,6 +14469,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -13499,7 +14522,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "7px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -13571,6 +14594,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -13616,7 +14647,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -13688,6 +14719,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -13733,7 +14772,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -13805,6 +14844,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "data-fdn-id": "n97::n84#3::n84::n48::n1",
+          "fill": "none",
+          "height": "14",
+          "viewBox": "0 0 16 16",
+          "width": "14"
+        }
       }
     },
     {
@@ -13850,7 +14904,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -13922,6 +14976,17 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "data-fdn-id": "n97::n84#3::n84::n48::n2"
+        }
       }
     },
     {
@@ -13967,7 +15032,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -14039,6 +15104,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "rgb(138, 135, 127)",
+        "strokeWidth": "1.2px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "d": "M3.6 3.2v9.6",
+          "data-fdn-id": "n97::n84#3::n84::n48::n3",
+          "stroke": "currentColor",
+          "stroke-linecap": "round",
+          "stroke-width": "1.2"
+        }
       }
     },
     {
@@ -14084,7 +15164,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -14156,6 +15236,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "rgb(138, 135, 127)",
+        "strokeWidth": "1.2px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "d": "M3.6 4.4h8.6M3.6 8h6.2M3.6 11.6h8.6",
+          "data-fdn-id": "n97::n84#3::n84::n48::n4",
+          "stroke": "currentColor",
+          "stroke-linecap": "round",
+          "stroke-width": "1.2"
+        }
       }
     },
     {
@@ -14201,7 +15296,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+        "font-family": "\"Foundation Design Sans\", \"Foundation Symbols\"",
         "font-size": "13px",
         "font-weight": "500",
         "line-height": "normal",
@@ -14273,6 +15368,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -14318,7 +15421,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -14390,6 +15493,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -14435,7 +15546,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -14507,6 +15618,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -14552,7 +15671,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -14624,6 +15743,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -14669,7 +15796,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "8px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -14741,6 +15868,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -14786,7 +15921,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -14858,6 +15993,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -14903,7 +16046,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "5px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -14975,6 +16118,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -15020,7 +16171,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -15092,6 +16243,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -15137,7 +16296,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -15209,6 +16368,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -15254,7 +16421,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "500",
         "line-height": "normal",
@@ -15326,6 +16493,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -15371,7 +16546,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "500",
         "line-height": "normal",
@@ -15443,6 +16618,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -15488,7 +16671,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -15560,6 +16743,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -15605,7 +16796,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -15677,6 +16868,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -15722,7 +16921,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -15794,6 +16993,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -15839,7 +17046,7 @@
         "margin-left": "0px",
         "row-gap": "3px",
         "column-gap": "3px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -15911,6 +17118,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -15956,7 +17171,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "7px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -16028,6 +17243,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -16073,7 +17296,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -16145,6 +17368,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -16190,7 +17421,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -16262,6 +17493,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "data-fdn-id": "n97::n84#4::n84::n48::n1",
+          "fill": "none",
+          "height": "14",
+          "viewBox": "0 0 16 16",
+          "width": "14"
+        }
       }
     },
     {
@@ -16307,7 +17553,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -16379,6 +17625,17 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "data-fdn-id": "n97::n84#4::n84::n48::n2"
+        }
       }
     },
     {
@@ -16424,7 +17681,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -16496,6 +17753,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "rgb(138, 135, 127)",
+        "strokeWidth": "1.2px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "d": "M3.6 3.2v9.6",
+          "data-fdn-id": "n97::n84#4::n84::n48::n3",
+          "stroke": "currentColor",
+          "stroke-linecap": "round",
+          "stroke-width": "1.2"
+        }
       }
     },
     {
@@ -16541,7 +17813,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -16613,6 +17885,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "rgb(138, 135, 127)",
+        "strokeWidth": "1.2px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "d": "M3.6 4.4h8.6M3.6 8h6.2M3.6 11.6h8.6",
+          "data-fdn-id": "n97::n84#4::n84::n48::n4",
+          "stroke": "currentColor",
+          "stroke-linecap": "round",
+          "stroke-width": "1.2"
+        }
       }
     },
     {
@@ -16658,7 +17945,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+        "font-family": "\"Foundation Design Sans\", \"Foundation Symbols\"",
         "font-size": "13px",
         "font-weight": "500",
         "line-height": "normal",
@@ -16730,6 +18017,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -16775,7 +18070,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -16847,6 +18142,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -16892,7 +18195,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -16964,6 +18267,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -17009,7 +18320,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -17081,6 +18392,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -17126,7 +18445,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "8px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -17198,6 +18517,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -17243,7 +18570,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -17315,6 +18642,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -17360,7 +18695,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "5px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -17432,6 +18767,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -17477,7 +18820,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -17549,6 +18892,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -17594,7 +18945,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -17666,6 +19017,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -17711,7 +19070,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "500",
         "line-height": "normal",
@@ -17783,6 +19142,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -17828,7 +19195,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "500",
         "line-height": "normal",
@@ -17900,6 +19267,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -17945,7 +19320,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -18017,6 +19392,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -18062,7 +19445,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -18134,6 +19517,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -18179,7 +19570,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -18251,6 +19642,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -18296,7 +19695,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "5px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -18368,6 +19767,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -18413,7 +19820,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -18485,6 +19892,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -18530,7 +19945,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "500",
         "line-height": "normal",
@@ -18602,6 +20017,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -18647,7 +20070,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "500",
         "line-height": "normal",
@@ -18719,6 +20142,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -18764,7 +20195,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -18836,6 +20267,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -18881,7 +20320,7 @@
         "margin-left": "0px",
         "row-gap": "3px",
         "column-gap": "3px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -18953,6 +20392,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -18998,7 +20445,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "7px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -19070,6 +20517,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -19115,7 +20570,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -19187,6 +20642,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -19232,7 +20695,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -19304,6 +20767,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "data-fdn-id": "n97::n84#5::n84::n48::n1",
+          "fill": "none",
+          "height": "14",
+          "viewBox": "0 0 16 16",
+          "width": "14"
+        }
       }
     },
     {
@@ -19349,7 +20827,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -19421,6 +20899,17 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "data-fdn-id": "n97::n84#5::n84::n48::n2"
+        }
       }
     },
     {
@@ -19466,7 +20955,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -19538,6 +21027,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "rgb(196, 191, 182)",
+        "strokeWidth": "1.2px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "d": "M3.6 3.2v9.6",
+          "data-fdn-id": "n97::n84#5::n84::n48::n3",
+          "stroke": "currentColor",
+          "stroke-linecap": "round",
+          "stroke-width": "1.2"
+        }
       }
     },
     {
@@ -19583,7 +21087,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -19655,6 +21159,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "rgb(196, 191, 182)",
+        "strokeWidth": "1.2px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "d": "M3.6 4.4h8.6M3.6 8h6.2M3.6 11.6h8.6",
+          "data-fdn-id": "n97::n84#5::n84::n48::n4",
+          "stroke": "currentColor",
+          "stroke-linecap": "round",
+          "stroke-width": "1.2"
+        }
       }
     },
     {
@@ -19700,7 +21219,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+        "font-family": "\"Foundation Design Sans\", \"Foundation Symbols\"",
         "font-size": "13px",
         "font-weight": "500",
         "line-height": "normal",
@@ -19772,6 +21291,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -19817,7 +21344,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -19889,6 +21416,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -19934,7 +21469,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -20006,6 +21541,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -20051,7 +21594,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -20123,6 +21666,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -20168,7 +21719,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "8px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -20240,6 +21791,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -20285,7 +21844,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -20357,6 +21916,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -20402,7 +21969,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -20474,6 +22041,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -20519,7 +22094,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -20591,6 +22166,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -20636,7 +22219,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -20708,6 +22291,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -20753,7 +22344,7 @@
         "margin-left": "0px",
         "row-gap": "3px",
         "column-gap": "3px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -20825,6 +22416,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -20870,7 +22469,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "7px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -20942,6 +22541,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -20987,7 +22594,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -21059,6 +22666,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -21104,7 +22719,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -21176,6 +22791,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "data-fdn-id": "n97::n84#6::n84::n48::n1",
+          "fill": "none",
+          "height": "14",
+          "viewBox": "0 0 16 16",
+          "width": "14"
+        }
       }
     },
     {
@@ -21221,7 +22851,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -21293,6 +22923,17 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "data-fdn-id": "n97::n84#6::n84::n48::n2"
+        }
       }
     },
     {
@@ -21338,7 +22979,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -21410,6 +23051,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "rgb(196, 191, 182)",
+        "strokeWidth": "1.2px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "d": "M3.6 3.2v9.6",
+          "data-fdn-id": "n97::n84#6::n84::n48::n3",
+          "stroke": "currentColor",
+          "stroke-linecap": "round",
+          "stroke-width": "1.2"
+        }
       }
     },
     {
@@ -21455,7 +23111,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -21527,6 +23183,21 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "none",
+        "stroke": "rgb(196, 191, 182)",
+        "strokeWidth": "1.2px",
+        "filter": "none",
+        "clipPath": "none",
+        "attributes": {
+          "d": "M3.6 4.4h8.6M3.6 8h6.2M3.6 11.6h8.6",
+          "data-fdn-id": "n97::n84#6::n84::n48::n4",
+          "stroke": "currentColor",
+          "stroke-linecap": "round",
+          "stroke-width": "1.2"
+        }
       }
     },
     {
@@ -21572,7 +23243,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+        "font-family": "\"Foundation Design Sans\", \"Foundation Symbols\"",
         "font-size": "13px",
         "font-weight": "500",
         "line-height": "normal",
@@ -21644,6 +23315,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -21689,7 +23368,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -21761,6 +23440,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -21806,7 +23493,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -21878,6 +23565,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -21923,7 +23618,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -21995,6 +23690,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -22040,7 +23743,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "8px",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -22112,6 +23815,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -22157,7 +23868,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -22229,6 +23940,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -22274,7 +23993,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "\"Times New Roman\"",
+        "font-family": "\"Foundation Design Serif\", \"Foundation Symbols\"",
         "font-size": "16px",
         "font-weight": "400",
         "line-height": "normal",
@@ -22346,6 +24065,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -22391,7 +24118,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10.5px",
         "font-weight": "400",
         "line-height": "normal",
@@ -22463,6 +24190,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -22508,7 +24243,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "10px",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10px",
         "font-weight": "400",
         "line-height": "normal",
@@ -22580,6 +24315,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -22625,7 +24368,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10px",
         "font-weight": "400",
         "line-height": "normal",
@@ -22697,6 +24440,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -22742,7 +24493,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10px",
         "font-weight": "400",
         "line-height": "normal",
@@ -22814,6 +24565,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -22859,7 +24618,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10px",
         "font-weight": "400",
         "line-height": "normal",
@@ -22931,6 +24690,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -22976,7 +24743,7 @@
         "margin-left": "0px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10px",
         "font-weight": "400",
         "line-height": "normal",
@@ -23048,6 +24815,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     },
     {
@@ -23093,7 +24868,7 @@
         "margin-left": "302.781px",
         "row-gap": "normal",
         "column-gap": "normal",
-        "font-family": "ui-monospace, \"SF Mono\", Menlo, monospace",
+        "font-family": "\"Foundation Design Mono\", \"Foundation Symbols\"",
         "font-size": "10px",
         "font-weight": "400",
         "line-height": "normal",
@@ -23165,6 +24940,14 @@
         "--radius-sm": "4px",
         "--radius-xl": "12px",
         "--shadow-pane": "0 2px 8px rgba(0,0,0,.06)"
+      },
+      "paint": {
+        "transform": "none",
+        "fill": "rgb(0, 0, 0)",
+        "stroke": "none",
+        "strokeWidth": "1px",
+        "filter": "none",
+        "clipPath": "none"
       }
     }
   ]
