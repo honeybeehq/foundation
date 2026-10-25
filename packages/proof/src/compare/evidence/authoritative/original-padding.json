@@ -1,0 +1,132 @@
+{
+  "schema": "fdn-drift/0",
+  "artboard": "tracks-pane/default",
+  "state": "default",
+  "viewport": {
+    "width": 1280,
+    "height": 800,
+    "dpr": 1
+  },
+  "design": {
+    "file": "packages/proof/src/compare/evidence/authoritative.fdn.html",
+    "head": "synthetic-measurement",
+    "htmlSha256": null,
+    "binding": "chain-head"
+  },
+  "code": {
+    "repo": null,
+    "commit": null,
+    "root": null
+  },
+  "provable": true,
+  "styles": {
+    "properties": [
+      "color",
+      "background-color",
+      "background-image",
+      "border-top-color",
+      "border-right-color",
+      "border-bottom-color",
+      "border-left-color",
+      "border-top-width",
+      "border-right-width",
+      "border-bottom-width",
+      "border-left-width",
+      "border-top-style",
+      "border-right-style",
+      "border-bottom-style",
+      "border-left-style",
+      "border-top-left-radius",
+      "border-top-right-radius",
+      "border-bottom-left-radius",
+      "border-bottom-right-radius",
+      "padding-top",
+      "padding-right",
+      "padding-bottom",
+      "padding-left",
+      "margin-top",
+      "margin-right",
+      "margin-bottom",
+      "margin-left",
+      "row-gap",
+      "column-gap",
+      "font-family",
+      "font-size",
+      "font-weight",
+      "line-height",
+      "letter-spacing",
+      "text-align",
+      "text-transform",
+      "opacity",
+      "box-shadow",
+      "text-shadow",
+      "display",
+      "align-items",
+      "justify-content",
+      "flex-direction",
+      "visibility",
+      "position",
+      "box-sizing",
+      "overflow-x",
+      "overflow-y",
+      "font-style",
+      "text-decoration-line",
+      "white-space",
+      "gap",
+      "flex-grow",
+      "flex-shrink"
+    ],
+    "unavailable": []
+  },
+  "tolerances": {
+    "pixelRatio": 0.001,
+    "boxPx": 1,
+    "colorDeltaE": 1,
+    "stylePx": 1,
+    "pixelThreshold": 0.1
+  },
+  "pixels": {
+    "diffRatio": 0.00087109375,
+    "diffPixels": 892,
+    "diffImage": "diff.png",
+    "designImage": "design.png",
+    "codeImage": "code.png"
+  },
+  "drifts": [
+    {
+      "id": "d1",
+      "designNode": "n92",
+      "codeNode": "n92",
+      "match": "id",
+      "confidence": 1,
+      "designBox": [
+        32,
+        40,
+        1216,
+        22
+      ],
+      "codeBox": [
+        32,
+        40,
+        1216,
+        22
+      ],
+      "kind": "style",
+      "property": "padding-left",
+      "design": "0px",
+      "code": "4px",
+      "token": {
+        "design": null,
+        "code": null
+      }
+    }
+  ],
+  "verdict": "drift",
+  "timingsMs": {
+    "compare": 83.37434200000098
+  },
+  "matchCounts": {
+    "id": 523,
+    "heuristic": 0
+  }
+}

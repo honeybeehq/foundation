@@ -9,7 +9,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0,
-    "ms": 108.89113100000031
+    "ms": 112.45108899999968
   },
   {
     "scenario": "padding",
@@ -21,7 +21,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0,
-    "ms": 65.83644899999945
+    "ms": 82.45717000000059
   },
   {
     "scenario": "colour",
@@ -33,7 +33,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0.00234375,
-    "ms": 80.41507100000035
+    "ms": 99.79368999999951
   },
   {
     "scenario": "remove",
@@ -45,7 +45,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0.00234375,
-    "ms": 101.81810000000041
+    "ms": 108.34793899999931
   },
   {
     "scenario": "strip-ids",
@@ -57,7 +57,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0,
-    "ms": 153.30051500000081
+    "ms": 146.92460200000005
   },
   {
     "scenario": "no-id-padding",
@@ -69,7 +69,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0,
-    "ms": 109.1987280000003
+    "ms": 114.36125999999967
   },
   {
     "scenario": "no-id-colour",
@@ -81,7 +81,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0.00234375,
-    "ms": 123.88637200000085
+    "ms": 230.33932099999947
   },
   {
     "scenario": "no-id-remove",
@@ -93,7 +93,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0.00234375,
-    "ms": 114.43009200000051
+    "ms": 108.0620119999985
   },
   {
     "scenario": "wrapper",
@@ -105,6 +105,66 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0,
-    "ms": 57.76169300000038
+    "ms": 78.87701500000003
+  },
+  {
+    "scenario": "geometry",
+    "expected": 1,
+    "found": 1,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "pixelRatio": 0,
+    "ms": 84.47508000000016
+  },
+  {
+    "scenario": "text",
+    "expected": 1,
+    "found": 1,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "pixelRatio": 0.0001015625,
+    "ms": 84.64764600000126
+  },
+  {
+    "scenario": "original-padding",
+    "expected": 1,
+    "found": 1,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "pixelRatio": 0.00087109375,
+    "ms": 83.37434200000098
+  },
+  {
+    "scenario": "original-colour",
+    "expected": 1,
+    "found": 1,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "pixelRatio": 0.0005859375,
+    "ms": 81.09762899999987
+  },
+  {
+    "scenario": "original-text",
+    "expected": 1,
+    "found": 1,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "pixelRatio": 0.0008017578125,
+    "ms": 91.86875400000099
   }
 ]

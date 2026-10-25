@@ -1,3 +1,6 @@
 ts	phase	decision	why	evidence	result
 2026-10-25T04:47:42Z	matching	Use unique ids then global assignment	Code wrappers and absent ids need a fallback with inspectable confidence	packages/proof/src/compare/match.ts	implemented; typecheck passes
 2026-10-25T04:47:42Z	measurement	Measure isolated mutations over baked Tracks design	Isolated absolute probes let us count injected drifts without layout cascades	packages/proof/src/compare/evidence/measurements.json	Nine scenarios; zero false positives or missed injections
+2026-10-25T04:58:37Z	audit	Tighten empty-node matching and require external verification policy	Independent audit found unrelated empty boxes could match and reports could omit states or widen tolerance	packages/proof/src/report/evidence/verify-runs.json	Policy, coverage and dirty source failures exercised
+2026-10-25T04:58:37Z	original-node-check	Ignore unpainted zero-width border colors and styles	Original heading color mutation produced four inert currentColor drifts	packages/proof/src/compare/evidence/authoritative/original-colour.json	One injected color drift after fix
+2026-10-25T04:58:37Z	verification	Replay comparison from bundled hashed captures	Hashes alone only verify report integrity; replay checks claimed measurements	packages/proof/src/report/index.ts	Passing control and failing replay checks run
