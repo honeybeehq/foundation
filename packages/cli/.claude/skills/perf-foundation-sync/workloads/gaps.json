@@ -309,16 +309,32 @@
       "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
     },
     {
-      "key": "entry:packages/cli/src/share/github-app.ts:requireMetadataOnly",
-      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
-    },
-    {
       "key": "entry:packages/cli/src/share/keychain.ts:readKeychain",
       "reason": "macOS native Keychain process/cache/migration cost is not exercised by the Linux held-store recipe; native functional canaries are not a latency baseline, and cold compilation remains unmeasured"
     },
     {
       "key": "entry:packages/cli/src/share/keychain.ts:writeKeychain",
       "reason": "macOS native Keychain process/cache/migration cost is not exercised by the Linux held-store recipe; native functional canaries are not a latency baseline, and cold compilation remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:checkSingleFileRead",
+      "reason": "App permission/path verification and preflight are cold work; current single-file real-App authorization latency is not measured by the pre-gate stub series"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:requireDescriptorPath",
+      "reason": "App permission/path verification and preflight are cold work; current single-file real-App authorization latency is not measured by the pre-gate stub series"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:requireSharePermissions",
+      "reason": "App permission/path verification and preflight are cold work; current single-file real-App authorization latency is not measured by the pre-gate stub series"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:recoveryPublicKey",
+      "reason": "Two-step initialization derives the public recovery pin before live sharing; cold bootstrap cost is unmeasured"
+    },
+    {
+      "key": "poll:packages/cli/src/share/service.ts#2",
+      "reason": "Bearer-expiry relay lifecycle timer is outside the bounded warm edit series; descriptor recheck moved the existing timer ordinal"
     }
   ]
 }

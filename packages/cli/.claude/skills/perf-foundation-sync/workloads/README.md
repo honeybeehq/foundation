@@ -7,10 +7,10 @@ Each workload is a `<id>.json` record (machine-readable, schema in `record.schem
 | Workload | Lane | Processes | gap | recipe-only | measured | stale | gated | Unmeasured states | Readiness |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- | --- |
 | [Read-only node and checkout capabilities](./doctor-capabilities.md) | startup | helper | 0 | 0 | 0 | 1 | 0 | repeated | Earlier startup receipts are historical; lazy share dispatch changed main. Startup has not been remeasured for H2. |
-| [Encrypted relay while durable append is held](./share-held-store.md) | streaming | main, helper | 0 | 1 | 0 | 0 | 0 | repeated, release, recovery | Integrated native-vault source rerun on netcup-1; five held saves and durable cursor invariant pass. Linux recipe does not exercise Mac native Keychain cost or establish cross-host tails. |
+| [Encrypted relay while durable append is held](./share-held-store.md) | streaming | main, helper | 0 | 0 | 0 | 1 | 0 | repeated, release, recovery | Retained H3 pre-gate local receipts are historical after the committed-descriptor gate changed service authorization. New gate functional drill passes; no current real-App latency claim. |
 | [Shared-store save to remote session event](./sync-save-to-session.md) | streaming | main, helper, node-remote | 0 | 0 | 0 | 4 | 0 | idle, repeated, scale, release, recovery | Earlier receipts remain historical; current H2/main owners changed. H3 must rerun the two-host series; local held-store recipe is separate. |
 
-## Accounted gaps (80)
+## Accounted gaps (84)
 
 Census keys no workload measures, each with a reason. Removing a reason moves the key to drift.
 
@@ -91,6 +91,10 @@ Census keys no workload measures, each with a reason. Removing a reason moves th
 - `entry:packages/cli/src/share/github-app.ts:mintMetadataToken` — GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured
 - `entry:packages/cli/src/share/github-app.ts:parseGithubAppConfig` — GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured
 - `entry:packages/cli/src/share/github-app.ts:readGithubAppConfig` — GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured
-- `entry:packages/cli/src/share/github-app.ts:requireMetadataOnly` — GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured
 - `entry:packages/cli/src/share/keychain.ts:readKeychain` — macOS native Keychain process/cache/migration cost is not exercised by the Linux held-store recipe; native functional canaries are not a latency baseline, and cold compilation remains unmeasured
 - `entry:packages/cli/src/share/keychain.ts:writeKeychain` — macOS native Keychain process/cache/migration cost is not exercised by the Linux held-store recipe; native functional canaries are not a latency baseline, and cold compilation remains unmeasured
+- `entry:packages/cli/src/share/github-app.ts:checkSingleFileRead` — App permission/path verification and preflight are cold work; current single-file real-App authorization latency is not measured by the pre-gate stub series
+- `entry:packages/cli/src/share/github-app.ts:requireDescriptorPath` — App permission/path verification and preflight are cold work; current single-file real-App authorization latency is not measured by the pre-gate stub series
+- `entry:packages/cli/src/share/github-app.ts:requireSharePermissions` — App permission/path verification and preflight are cold work; current single-file real-App authorization latency is not measured by the pre-gate stub series
+- `entry:packages/cli/src/share/crypto.ts:recoveryPublicKey` — Two-step initialization derives the public recovery pin before live sharing; cold bootstrap cost is unmeasured
+- `poll:packages/cli/src/share/service.ts#2` — Bearer-expiry relay lifecycle timer is outside the bounded warm edit series; descriptor recheck moved the existing timer ordinal

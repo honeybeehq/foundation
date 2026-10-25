@@ -226,7 +226,7 @@
       "collector": "Existing real CLI proof driver polling validated chain; no profiling",
       "aggregation": "max",
       "kind": "upper-bound",
-      "status": "recipe-only",
+      "status": "stale",
       "states": [
         "repeated"
       ],
@@ -255,5 +255,5 @@
   ],
   "updatedAt": "2026-10-25",
   "updatedBy": "H3 deployment",
-  "readiness": "Integrated native-vault source rerun on netcup-1; five held saves and durable cursor invariant pass. Linux recipe does not exercise Mac native Keychain cost or establish cross-host tails."
+  "readiness": "Retained H3 pre-gate local receipts are historical after the committed-descriptor gate changed service authorization. New gate functional drill passes; no current real-App latency claim."
 }
