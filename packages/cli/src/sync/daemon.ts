@@ -187,7 +187,6 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
                 const freshHashes:string[]=[]
                 try { importedChain=updateDocument(design.file, chain => {
                   if (chain.docId() !== design.docId) throw new Error('live path now holds another design')
-              assets?.retry(chain)
                   const previousHashes=new Set(chain.log().map(c=>c.hash))
                   imported = importChangeBlobs(chain, incoming.blobs, syncTraceEnabled ? (stage, durationMs) => syncTrace(`receive.${stage}`, () => ({ docId: design.docId, durationMs })) : undefined)
                   for(const blob of incoming.blobs){const hash=decodeBlob(blob).envelope.hash;if(!previousHashes.has(hash)){importedHashes.add(hash);freshHashes.push(hash)}}

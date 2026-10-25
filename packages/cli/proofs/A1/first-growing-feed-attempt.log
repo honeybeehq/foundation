@@ -1,0 +1,31 @@
+2026-10-25T19:40:45.543Z LABELLED STUB: GitHub identities, repo membership and SSH public keys served by loopback fixture; actual CLI/crypto/HTTP/Comb/disk are real
+2026-10-25T19:40:45.862Z PREPARE: no server space or token before descriptor commit
+2026-10-25T19:40:46.344Z UNCOMMITTED DESCRIPTOR REFUSED: init cannot enable sharing
+2026-10-25T19:40:46.879Z COMMITTED DESCRIPTOR ACCEPTED: default branch stub reads actual git HEAD, not working tree
+2026-10-25T19:40:46.880Z init created secret-free share.json; recovery code withheld from transcript
+2026-10-25T19:40:47.317Z second member login: Live sharing: waiting for key — Waiting for a teammate's machine to share the key
+2026-10-25T19:40:49.711Z automatic signed-device key handover with no designs open: 2390ms
+2026-10-25T19:40:51.508Z genesis durably acknowledged: 365ms
+2026-10-25T19:40:51.818Z activity baseline caught-up marker: 303ms
+2026-10-25T19:40:52.300Z alice edit visible on other member: 109ms
+2026-10-25T19:40:52.301Z save-to-remote visibility alice: 133.134521484375ms
+2026-10-25T19:40:52.748Z bob edit visible on other member: 74ms
+2026-10-25T19:40:52.748Z save-to-remote visibility bob: 96.107421875ms
+2026-10-25T19:42:22.265Z 5MB image reference imports only with installed bytes: 89040ms
+2026-10-25T19:42:22.628Z IMAGE RENDER: second HOME actual browser img naturalWidth1280/naturalHeight1024; screenshot /home/trmd/.hive/v2/cells/fdnx-h2-share-service-490244f656d9/github-com-honeybeehq-foundation-ddad6d63099e-space-490244f656d9/.audit/share-run-Gyrfsq/received-image.png
+2026-10-25T19:42:22.696Z ASSET: 5244767byte PNG transferred byte-exact before reference import
+2026-10-25T19:42:23.460Z ASSET TAMPER REFUSED: real Comb read ciphertext bit-flip rejected; no installed file or partial temp
+2026-10-25T19:42:23.460Z signed ephemeral hint yields live imported activity: 0ms
+2026-10-25T19:42:23.463Z ACTIVITY: signed writer-stated trmd-metal-3 origin retained on bob-owned replica; touched n1; no owner substitution
+2026-10-25T19:42:23.805Z activity cursor resume caught-up marker: 327ms
+2026-10-25T19:42:24.137Z persistent activity observer ready for outage: 316ms
+/home/trmd/.hive/v2/cells/fdnx-h2-share-service-490244f656d9/github-com-honeybeehq-foundation-ddad6d63099e-space-490244f656d9/packages/cli/scripts/share-proof.ts:202
+    if (Date.now() - start > timeout) throw new Error(`timeout ${label}`)
+                                            ^
+
+Error: timeout remote-only catalogue persisted on second HOME
+    at until (/home/trmd/.hive/v2/cells/fdnx-h2-share-service-490244f656d9/github-com-honeybeehq-foundation-ddad6d63099e-space-490244f656d9/packages/cli/scripts/share-proof.ts:202:45)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (/home/trmd/.hive/v2/cells/fdnx-h2-share-service-490244f656d9/github-com-honeybeehq-foundation-ddad6d63099e-space-490244f656d9/packages/cli/scripts/share-proof.ts:339:5)
+
+Node.js v24.18.0
