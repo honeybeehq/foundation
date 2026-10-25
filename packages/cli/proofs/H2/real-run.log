@@ -1,0 +1,36 @@
+2026-10-25T05:12:58.933Z LABELLED STUB: GitHub identities, repo membership and SSH public keys served by loopback fixture; actual CLI/crypto/HTTP/Comb/disk are real
+2026-10-25T05:12:59.338Z init created secret-free share.json; recovery code withheld from transcript
+2026-10-25T05:12:59.681Z second member login: Live sharing: waiting for key — Waiting for a teammate's machine to share the key
+2026-10-25T05:13:00.072Z automatic signed-device key handover with no designs open: 385ms
+2026-10-25T05:13:01.919Z genesis durably acknowledged: 358ms
+2026-10-25T05:13:02.593Z alice edit visible on other member: 160ms
+2026-10-25T05:13:02.593Z save-to-remote visibility alice: 185.769287109375ms
+2026-10-25T05:13:03.190Z bob edit visible on other member: 80ms
+2026-10-25T05:13:03.191Z save-to-remote visibility bob: 111.7314453125ms
+2026-10-25T05:13:03.526Z NO ACCESS REFUSED: Live sharing: no access
+2026-10-25T05:13:03.796Z daemon bob: foundation/machine-B/local-B/f1c618c7-027e-4522-8d90-3f31ada29dcb: receive cursor 4: Live sharing: no access
+2026-10-25T05:13:03.830Z removal causes epoch rotation: 0ms
+2026-10-25T05:13:03.830Z removed device token revoked and relay disconnected
+2026-10-25T05:13:03.962Z daemon bob: foundation/machine-B/local-B/f1c618c7-027e-4522-8d90-3f31ada29dcb: receive cursor 4: Live sharing: no access
+2026-10-25T05:13:04.440Z daemon bob: foundation/machine-B/local-B/f1c618c7-027e-4522-8d90-3f31ada29dcb: receive cursor 4: Live sharing: no access; connection: Live sharing: no access
+2026-10-25T05:13:04.636Z daemon bob: foundation/machine-B/local-B/f1c618c7-027e-4522-8d90-3f31ada29dcb: receive cursor 4: Live sharing: no access; connection: Live sharing: no access
+2026-10-25T05:13:04.716Z new epoch change durably acknowledged: 354ms
+2026-10-25T05:13:04.786Z RAW STORE CIPHERTEXT: removed member old keys and nonmember empty keys cannot decrypt latest event
+2026-10-25T05:13:04.788Z REMOVED TOKEN REFUSED: HTTP 403
+2026-10-25T05:13:04.805Z RAW-STORE GREP: exit 1, no plaintext matches in Comb objects or service metadata
+2026-10-25T05:13:04.807Z TAMPER REFUSED: changed encrypted record fails authentication
+2026-10-25T05:13:05.048Z ROLLBACK REFUSED: {"state":"unavailable","reason":"service rolled back epoch 2 to 1"}
+2026-10-25T05:13:05.079Z daemon bob: foundation/machine-B/local-B/f1c618c7-027e-4522-8d90-3f31ada29dcb: receive cursor 4: Live sharing: no access; connection: Live sharing: no access
+2026-10-25T05:13:05.287Z RECOVERY SUBSTITUTION REFUSED: {"state":"unavailable","reason":"recovery key differs from committed share.json"}
+2026-10-25T05:13:05.630Z REFUSED ROTATION: requirement persisted across retries; old-key sending stays paused
+2026-10-25T05:13:05.681Z OUTAGE: service stopped
+2026-10-25T05:13:05.690Z daemon bob: foundation/machine-B/local-B/f1c618c7-027e-4522-8d90-3f31ada29dcb: receive cursor 4: Live sharing: no access; connection: Live sharing: no access
+2026-10-25T05:13:06.028Z daemon alice: foundation/machine-A/local-A/f1c618c7-027e-4522-8d90-3f31ada29dcb: connection: fetch failed
+2026-10-25T05:13:06.173Z daemon alice: foundation/machine-A/local-A/f1c618c7-027e-4522-8d90-3f31ada29dcb: connection: fetch failed
+2026-10-25T05:13:06.242Z local edit saved during outage
+2026-10-25T05:13:06.599Z daemon alice: foundation/machine-A/local-A/f1c618c7-027e-4522-8d90-3f31ada29dcb: connection: fetch failed
+2026-10-25T05:13:07.236Z daemon bob: foundation/machine-B/local-B/f1c618c7-027e-4522-8d90-3f31ada29dcb: receive cursor 4: Live sharing: no access; connection: Live sharing: no access
+2026-10-25T05:13:07.475Z daemon alice: foundation/machine-A/local-A/f1c618c7-027e-4522-8d90-3f31ada29dcb: connection: fetch failed
+2026-10-25T05:13:09.263Z outbox recovered after service restart: 3018ms
+2026-10-25T05:13:10.457Z complete stopped local-store backup includes metadata and Comb objects
+2026-10-25T05:13:10.458Z PASS real two-HOME CLI/daemon/Comb encrypted sharing, handover, subsecond bidirectional visibility, refusal, removal/rotation, raw-store grep, outage and backup

@@ -1,0 +1,8 @@
+ts	phase	decision	why	evidence	result
+2026-10-25T04:47:46Z	protocol	Write protocol before implementing encryption	Pin trust boundaries and prevent transport changes from altering identities	Project research/H2-protocol.md v1	written and sent to orchestrator
+2026-10-25T04:47:46Z	client	Use libsodium encryption and signed sealed boxes	Use reviewed primitives and bind payloads to repo/feed/epoch	packages/cli/test/share-crypto.test.ts	24 tests across 9 files green
+2026-10-25T05:14:22Z	security	Replace forwarded GitHub tokens with device proof	A repo-scoped token would let a malicious service read git content	packages/cli/src/share/auth.ts	Client credentials stay local
+2026-10-25T05:14:23Z	security	Pin recovery key and certify writer epochs	Independent paper review found service substitution attacks	Project research/H2-review.md; packages/cli/src/share/client.ts	Pin, issuer, recipient, rollback and fork checks implemented
+2026-10-25T05:14:23Z	lifetime	Persist rotation requirement until confirmed replacement	A refused rotation must never let a cached check resume old-key sends	packages/cli/proofs/H2/real-run.log	Two refused rotations stayed paused, then recovered
+2026-10-25T05:14:23Z	verify	Run actual two-HOME CLI daemon service and Comb drill	Tests alone do not establish encryption or usable sharing	packages/cli/proofs/H2/real-run.log	Handover, bidirectional subsecond edits, refusal, rotation, raw grep, outage and backup pass; GitHub identities stubbed
+2026-10-25T05:14:23Z	verify	Verify real GitHub identity SSH binding and permission separately	Only one real account is available; do not present a stub as real GitHub	packages/cli/proofs/H2/real-github-device.json	trmdy write and direct SSH binding verified; multi-account App setup remains
