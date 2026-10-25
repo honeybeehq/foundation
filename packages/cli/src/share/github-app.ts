@@ -97,7 +97,11 @@ export async function metadataToken(repo: string, configPath: string): Promise<s
 export async function checkContentsRefusal(repo: string, config: GithubAppConfig, token: string, fetcher: typeof fetch = fetch): Promise<string> {
   const normalized = githubRepo(repo)
   const response = await githubRequest(`/repos/${normalized}/contents/`, token, 'GET', undefined, fetcher)
-  if (response.status === 403) return 'Contents request refused: HTTP 403'
+  if (response.status === 403) {
+    const denied = await response.json().catch(() => null)
+    if (response.headers.get('x-ratelimit-remaining') === '0' || response.headers.has('retry-after') || denied?.message !== 'Resource not accessible by integration') throw new Error('Contents refusal not proven; GitHub returned an unrelated restriction')
+    return 'Contents request refused: HTTP 403 (Resource not accessible by integration)'
+  }
   if (response.status !== 200) throw new Error(`Contents refusal not proven (HTTP ${response.status}); retry after checking repository access`)
   const jwt = appJwt(config)
   const installation = await githubJson(await githubRequest(`/repos/${normalized}/installation`, jwt, 'GET', undefined, fetcher))
@@ -110,5 +114,7 @@ export async function checkContentsRefusal(repo: string, config: GithubAppConfig
     }
     throw new Error(`Contents permission refusal not proven (HTTP ${attempt.status}); expected 422`)
   }
-  return 'Public contents readable without Contents permission. Contents permission request refused: HTTP 422'
+  const denied = await attempt.json().catch(() => null)
+  if (attempt.headers.has('retry-after') || typeof denied?.message !== 'string' || !/permissions requested are not granted to this installation/i.test(denied.message)) throw new Error('Contents permission refusal not proven; GitHub returned an unrelated validation error')
+  return 'Public contents readable without Contents permission. Contents permission request refused: HTTP 422 (permissions not granted)'
 }

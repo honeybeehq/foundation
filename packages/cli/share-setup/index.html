@@ -22,9 +22,9 @@
 <section id="done" class="hidden">
 <h1>Your App is created.<br>Finish the connection.</h1><p>The code expires in one hour. Finish on the Studio, then install the App on the repository.</p>
 <div class="card"><div class="eyebrow">One-time setup code</div><pre id="code"></pre><button class="copy secondary" id="copy-code">Copy code</button></div>
-<div class="step"><strong>1. Save the private credentials on the Studio</strong><pre id="command"></pre><button class="copy secondary" id="copy-command">Copy command</button><p class="small">The command saves a private 0600 file at ~/.foundation/share-service/github-app.json, outside your repositories. It never prints the key. If an agent is helping, send it only the one-time code.</p></div>
+<div class="step"><strong>1. Save the private credentials on the Studio</strong><pre id="command"></pre><button class="copy secondary" id="copy-command">Copy command</button><p class="small">The command saves a private 0600 file at ~/.foundation/share-service/github-app.json, outside your repositories. It never prints the key. Treat the code as a private credential until finish runs. Share it only with your trusted setup agent.</p></div>
 <div class="step"><strong>2. Install on your repository</strong><p>Choose <strong>Only select repositories → honeybeehq/foundation</strong>.</p><a id="install" class="button" href="#">Install GitHub App →</a><p class="small" id="install-note">The finish command prints the exact install link. If you renamed the App on GitHub, use that link.</p><label for="slug">App slug (from the finish command, if renamed)</label><input id="slug" autocomplete="off" spellcheck="false"></div>
-<div class="step"><strong>3. Check the connection</strong><pre>foundation share github-app check --user trmdy</pre><p class="small">Checks repository permission metadata and confirms contents access is refused.</p></div>
+<div class="step"><strong>3. Check the connection</strong><pre>foundation share github-app check --user trmdy</pre><p class="small">Checks repository permission metadata and confirms the App cannot receive Contents permission. Public repository contents remain public.</p></div>
 </section>
 <p id="status" role="status" aria-live="polite"></p><p class="foot">Private setup for Foundation. <a href="https://github.com/honeybeehq/foundation" rel="noreferrer">View the repository</a></p>
 </main>
@@ -35,7 +35,7 @@ const base=location.origin+location.pathname;
 const name=document.getElementById('name');
 const defaultName='Foundation Share (honeybeehq)';
 const slugFor=name=>name.toLowerCase().replace(/[^a-z0-9 -]/g,'').replace(/ +/g,'-');
-function manifest(){return {name:name.value.trim()||defaultName,url:'https://github.com/honeybeehq/foundation',hook_attributes:{url:'https://github.com/honeybeehq/foundation',active:false},public:false,default_permissions:{metadata:'read'},redirect_url:base+'?done=1'};}
+function manifest(){return {name:name.value.trim()||defaultName,url:'https://github.com/honeybeehq/foundation',hook_attributes:{url:'https://github.com/honeybeehq/foundation',active:false},public:false,default_permissions:{metadata:'read'},redirect_url:base};}
 for(const form of document.querySelectorAll('form'))form.addEventListener('submit',event=>{
  try{const state=crypto.randomUUID();sessionStorage.setItem('foundation-app-state',state);sessionStorage.setItem('foundation-app-slug',slugFor(manifest().name));form.elements.manifest.value=JSON.stringify(manifest());form.elements.state.value=state;}catch{event.preventDefault();document.getElementById('status').textContent='Allow browser storage to start the secure setup flow.';}
 });
