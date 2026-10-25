@@ -1,6 +1,6 @@
 import { createServer, type ServerResponse } from 'node:http'
 import { createHash, randomBytes } from 'node:crypto'
-import { mkdir } from 'node:fs/promises'
+import { mkdir, cp, writeFile, rm } from 'node:fs/promises'
 import { resolve, join } from 'node:path'
 import { acquireDocumentLock } from '../document-lock.js'
 import { CombBridge, validateAppendReceipt, type Frame } from '../sync/bridge.js'
@@ -12,6 +12,8 @@ export interface ShareServiceConfig {
   stateDir: string
   comb: { binary: string; args: string[] }
   oauthClientId?: string
+  /** Complete stopped local backend snapshot for nightly backup. */
+  backupLocalStore?: string
   /** DEVELOPMENT ONLY: GitHub stub on a literal loopback address. Never a remote API override. */
   githubApiUrl?: string
 }
@@ -290,5 +292,9 @@ export async function startShareService(config: ShareServiceConfig) {
 export async function backupShareService(config: ShareServiceConfig, destination: string): Promise<void> {
   requireThat(!active.has(resolve(config.stateDir)), 'stop service before metadata backup', 409)
   const release = acquireDocumentLock(join(resolve(config.stateDir), 'service'), 100)
-  try { await backupShareMetadata(config.stateDir, destination) } finally { release() }
+  try {
+    requireThat(config.backupLocalStore, 'backupLocalStore required: metadata alone is not a store backup')
+    await backupShareMetadata(config.stateDir, destination)
+    try { await cp(config.backupLocalStore, join(destination,'comb-store'), {recursive:true,errorOnExist:true,force:false});await writeFile(join(destination,'BACKUP.json'),JSON.stringify({version:1,scope:'complete-local-store',backendIncluded:true,requiresStoppedService:true,restore:'Restore metadata.json to stateDir and comb-store to the configured local backend root. Restore matching tenant/digest/storage config from your separate secret backup before starting.'}),{mode:0o600}) }catch(error){await rm(destination,{recursive:true,force:true});throw error}
+  } finally { release() }
 }
