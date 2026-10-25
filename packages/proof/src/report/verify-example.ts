@@ -33,7 +33,7 @@ execFileSync("git", [
 await mkdir(path.join(root, "boards"));
 for (const suffix of ["", ".chain"])
   await copyFile(
-    "packages/proof/src/compare/evidence/authoritative.fdn.html" + suffix,
+    "packages/proof/fixtures/design/tracks-pane.fdn.html" + suffix,
     path.join(root, "boards/tracks-pane.fdn.html" + suffix),
   );
 execFileSync("git", ["-C", root, "add", "."]);
@@ -152,6 +152,30 @@ async function run(
     throw Error(`${name}: expected exit ${expected}, got ${result.status}`);
 }
 await run("match", match, 0);
+for (const file of ["dom.json", "screenshot.png"])
+  await copyFile(
+    path.join(
+      "packages/proof/src/compare/evidence/authoritative/code-color-capture",
+      file,
+    ),
+    path.join(scratch, "code", file),
+  );
+const actualColorDrift = await compareDirectories(
+  path.join(scratch, "design"),
+  path.join(scratch, "code"),
+  path.join(scratch, "replay"),
+);
+await run("measured-color-drift", actualColorDrift, 1);
+for (const file of ["dom.json", "screenshot.png"])
+  await copyFile(
+    path.join(measuredSource, file),
+    path.join(scratch, "code", file),
+  );
+await compareDirectories(
+  path.join(scratch, "design"),
+  path.join(scratch, "code"),
+  path.join(scratch, "replay"),
+);
 await run(
   "pixel-drift",
   { ...match, pixels: { diffRatio: 0.02 }, verdict: "drift" },
@@ -202,11 +226,28 @@ await run("dirty-source", match, 1);
 await (
   await import("node:fs/promises")
 ).unlink(path.join(root, "extra-code.ts"));
-const unavailableMeta=path.join(scratch,'code/meta.json'),availableMeta=JSON.parse(await readFile(unavailableMeta,'utf8'));
-await writeFile(unavailableMeta,JSON.stringify({...availableMeta,provable:false,reason:'Classic has no dedicated at-rest state'}));
-const unavailableReport=await compareDirectories(path.join(scratch,'design'),path.join(scratch,'code'),path.join(scratch,'replay'));
-if(unavailableReport.verdict!=='not-provable'||unavailableReport.provable!==false)throw Error('Capture failure was lost');
-await run('capture-not-provable',unavailableReport,1);await writeFile(unavailableMeta,JSON.stringify(availableMeta));
+const unavailableMeta = path.join(scratch, "code/meta.json"),
+  availableMeta = JSON.parse(await readFile(unavailableMeta, "utf8"));
+await writeFile(
+  unavailableMeta,
+  JSON.stringify({
+    ...availableMeta,
+    provable: false,
+    reason: "Classic has no dedicated at-rest state",
+  }),
+);
+const unavailableReport = await compareDirectories(
+  path.join(scratch, "design"),
+  path.join(scratch, "code"),
+  path.join(scratch, "replay"),
+);
+if (
+  unavailableReport.verdict !== "not-provable" ||
+  unavailableReport.provable !== false
+)
+  throw Error("Capture failure was lost");
+await run("capture-not-provable", unavailableReport, 1);
+await writeFile(unavailableMeta, JSON.stringify(availableMeta));
 const shaHead = createHash("sha256")
   .update(await readFile(path.join(root, "boards/tracks-pane.fdn.html.chain")))
   .digest("hex");

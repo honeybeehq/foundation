@@ -15,12 +15,12 @@
   "code": {
     "repo": "fixture",
     "root": "TracksPane",
-    "commit": "637dfca5c06c84269506f695ad712d4f5f356796"
+    "commit": "087cb2cce395c8ed1c6326c3ea5dcef14163ead4"
   },
   "schema": "fdn-drift/0",
   "provable": false,
   "verdict": "not-provable",
   "reason": "Component requires an unstubbed server connection",
   "drifts": [],
-  "reportHash": "d80c448d7de58b4e66b8f0b68b4167795bd8c31aa303acabf227d7ebfc97b226"
+  "reportHash": "79a7b5e93aa88974c381deae125d3228f7eb2d5425d57c23f66bf8e5ee1cb2b6"
 }

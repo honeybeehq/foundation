@@ -8,9 +8,9 @@
     "dpr": 1
   },
   "design": {
-    "file": "packages/proof/src/compare/evidence/authoritative.fdn.html",
-    "head": "synthetic-measurement",
-    "htmlSha256": null,
+    "file": "packages/proof/fixtures/design/tracks-pane.fdn.html",
+    "head": "da6f965fcc33d4ac33d47ffd1cc04da2d288cd113b5ed263501dc50b2bac189d",
+    "htmlSha256": "5fd37f92bb3d214b73a36786dce7ae89d9552db29efd262cc88699de01694431",
     "binding": "chain-head"
   },
   "code": {
@@ -78,6 +78,19 @@
     ],
     "unavailable": []
   },
+  "matching": {
+    "algorithm": "hungarian",
+    "maxCost": 0.48,
+    "weights": {
+      "text": 0.4,
+      "tag": 0.15,
+      "roleName": 0.15,
+      "iou": 0.25,
+      "path": 0.05
+    },
+    "containerText": "descendant-Dice",
+    "confidence": "1-cost; uncalibrated"
+  },
   "tolerances": {
     "pixelRatio": 0.001,
     "boxPx": 1,
@@ -97,7 +110,7 @@
       "id": "d1",
       "kind": "missing",
       "designNode": "probe-remove",
-      "confidence": 1,
+      "confidence": 0,
       "property": "node",
       "designBox": [
         1000,
@@ -109,10 +122,10 @@
   ],
   "verdict": "drift",
   "timingsMs": {
-    "compare": 108.0620119999985
+    "compare": 81.78056700000161
   },
   "matchCounts": {
     "id": 0,
-    "heuristic": 522
+    "heuristic": 159
   }
 }

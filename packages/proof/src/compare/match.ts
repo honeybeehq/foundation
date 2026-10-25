@@ -29,20 +29,50 @@ function iou(a: CaptureNode, b: CaptureNode) {
     Math.max(0, Math.min(y + h, v + q) - Math.max(y, v));
   return n / (w * h + p * q - n || 1);
 }
-function cost(a: CaptureNode, b: CaptureNode) {
-  const text = (a.text || "").trim(),
-    other = (b.text || "").trim();
-  if (!text && !other && !(a.name && a.name === b.name) && iou(a, b) === 0)
-    return 1;
+function contexts(nodes: CaptureNode[]) {
+  const result = new Map<string, Set<string>>();
+  for (const n of nodes) {
+    const text = n.text?.trim();
+    if (!text) continue;
+    const parts = n.path.split("/");
+    for (let i = 1; i <= parts.length; i++) {
+      const key = parts.slice(0, i).join("/");
+      if (!result.has(key)) result.set(key, new Set());
+      result.get(key)!.add(text);
+    }
+  }
+  return result;
+}
+function cost(
+  a: CaptureNode,
+  b: CaptureNode,
+  dc: Map<string, Set<string>>,
+  cc: Map<string, Set<string>>,
+) {
+  const text = (a.text || a.name || "").trim(),
+    other = (b.text || b.name || "").trim();
+  let textDistance = text && text === other ? 0 : text && other ? 1 : 0.7;
+  if (!text && !other) {
+    const left = dc.get(a.path) ?? new Set<string>(),
+      right = cc.get(b.path) ?? new Set<string>();
+    const common = [...left].filter((t) => right.has(t)).length;
+    if (left.size || right.size) {
+      if (!common) {
+        if (
+          a.path === b.path &&
+          a.path.split("/").length <= 2 &&
+          iou(a, b) > 0.1
+        )
+          textDistance = 0.5;
+        else return 1;
+      } else textDistance = 1 - (2 * common) / (left.size + right.size);
+    } else {
+      if (iou(a, b) === 0) return 1;
+      textDistance = 0.5;
+    }
+  }
   return (
-    0.4 *
-      (text && text === other
-        ? 0
-        : !text && !other
-          ? 0.5
-          : text && other
-            ? 1
-            : 0.7) +
+    0.4 * textDistance +
     0.15 * (a.tag === b.tag ? 0 : 1) +
     0.15 *
       ((a.role || "") === (b.role || "") && (a.name || "") === (b.name || "")
@@ -99,7 +129,48 @@ function assign(a: number[][]): number[] {
   for (let j = 1; j <= m; j++) if (p[j]) out[p[j] - 1] = j - 1;
   return out;
 }
-export function matchNodes(design: CaptureNode[], code: CaptureNode[]) {
+function visibleInCapture(
+  nodes: CaptureNode[],
+  viewport?: { width: number; height: number },
+) {
+  if (!viewport) return nodes;
+  const paths = new Map(nodes.map((n) => [n.path, n]));
+  return nodes.filter((n) => {
+    let [x, y, w, h] = n.box,
+      left = Math.max(0, x),
+      top = Math.max(0, y),
+      right = Math.min(viewport.width, x + w),
+      bottom = Math.min(viewport.height, y + h);
+    const parts = n.path.split("/");
+    for (let i = 1; i < parts.length; i++) {
+      const p = paths.get(parts.slice(0, i).join("/"));
+      if (!p) continue;
+      if (
+        p.style.opacity === "0" ||
+        p.style.display === "none" ||
+        p.style.visibility === "hidden"
+      )
+        return false;
+      const [px, py, pw, ph] = p.box;
+      if (/hidden|clip|auto|scroll/.test(p.style["overflow-x"] || "")) {
+        left = Math.max(left, px);
+        right = Math.min(right, px + pw);
+      }
+      if (/hidden|clip|auto|scroll/.test(p.style["overflow-y"] || "")) {
+        top = Math.max(top, py);
+        bottom = Math.min(bottom, py + ph);
+      }
+    }
+    return right > left && bottom > top;
+  });
+}
+export function matchNodes(
+  design: CaptureNode[],
+  code: CaptureNode[],
+  viewport?: { width: number; height: number },
+) {
+  design = visibleInCapture(design, viewport);
+  code = visibleInCapture(code, viewport);
   const d = design.filter(visual),
     c = code.filter(visual),
     matches: Match[] = [],
@@ -116,11 +187,13 @@ export function matchNodes(design: CaptureNode[], code: CaptureNode[]) {
         usedC.add(b);
       }
     }
+  const dc = contexts(design),
+    cc = contexts(code);
   const left = d.filter((n) => !usedD.has(n)),
     right = c.filter((n) => !usedC.has(n));
   if (left.length) {
     const matrix = left.map((a) => [
-      ...right.map((b) => cost(a, b)),
+      ...right.map((b) => cost(a, b, dc, cc)),
       ...left.map(() => 0.48),
     ]);
     const assignment = assign(matrix);

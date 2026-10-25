@@ -6,6 +6,12 @@
     "stderr": ""
   },
   {
+    "name": "measured-color-drift",
+    "exitCode": 1,
+    "stdout": "{\n  \"passed\": false,\n  \"errors\": [\n    \"replay/drift-report.json: replay found drift or incomplete captures\",\n    \"replay/drift-report.json: drift exceeds tolerance\"\n  ],\n  \"reports\": 1\n}",
+    "stderr": ""
+  },
+  {
     "name": "pixel-drift",
     "exitCode": 1,
     "stdout": "{\n  \"passed\": false,\n  \"errors\": [\n    \"replay/drift-report.json: measurement replay mismatch\",\n    \"replay/drift-report.json: drift exceeds tolerance\"\n  ],\n  \"reports\": 1\n}",

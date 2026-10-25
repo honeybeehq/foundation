@@ -15,3 +15,5 @@ Hashes provide integrity and bindings, not author identity or trusted measuremen
 The trusted runner must generate captures from the declared sources. Replay verifies captured measurements; it cannot attest that captured bytes were produced by a particular build. No signature or trusted build attestation is claimed.
 
 `policy.example.json` is illustrative. Replace its matrix with the complete reviewed links matrix. Real enforcement also requires a protected required CI check (or repository review rules covering workflows and policy); a pull-request-controlled workflow can otherwise remove the verification step itself. The inactive example does not configure repository protection.
+
+Generate the matrix directly from reviewed/base-revision links: `pnpm exec tsx packages/proof/src/report/cli.ts policy TRUSTED_LINKS.json proof-policy.json`. `policyFromLinks` uses every linked artboard/state/viewport and the common default tolerances. Review and protect the generated policy and source links; never derive required coverage from the candidate manifest.

@@ -9,7 +9,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0,
-    "ms": 112.45108899999968
+    "ms": 123.06955100000005
   },
   {
     "scenario": "padding",
@@ -21,7 +21,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0,
-    "ms": 82.45717000000059
+    "ms": 77.51104200000009
   },
   {
     "scenario": "colour",
@@ -33,7 +33,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0.00234375,
-    "ms": 99.79368999999951
+    "ms": 113.9694099999997
   },
   {
     "scenario": "remove",
@@ -45,7 +45,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0.00234375,
-    "ms": 108.34793899999931
+    "ms": 122.7627050000001
   },
   {
     "scenario": "strip-ids",
@@ -57,7 +57,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0,
-    "ms": 146.92460200000005
+    "ms": 88.87280800000008
   },
   {
     "scenario": "no-id-padding",
@@ -69,7 +69,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0,
-    "ms": 114.36125999999967
+    "ms": 77.66468999999961
   },
   {
     "scenario": "no-id-colour",
@@ -81,7 +81,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0.00234375,
-    "ms": 230.33932099999947
+    "ms": 120.60678499999995
   },
   {
     "scenario": "no-id-remove",
@@ -93,7 +93,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0.00234375,
-    "ms": 108.0620119999985
+    "ms": 81.78056700000161
   },
   {
     "scenario": "wrapper",
@@ -105,7 +105,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0,
-    "ms": 78.87701500000003
+    "ms": 78.72061100000064
   },
   {
     "scenario": "geometry",
@@ -117,7 +117,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0,
-    "ms": 84.47508000000016
+    "ms": 86.72137699999985
   },
   {
     "scenario": "text",
@@ -129,7 +129,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0.0001015625,
-    "ms": 84.64764600000126
+    "ms": 104.91129000000001
   },
   {
     "scenario": "original-padding",
@@ -141,7 +141,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0.00087109375,
-    "ms": 83.37434200000098
+    "ms": 92.2941350000001
   },
   {
     "scenario": "original-colour",
@@ -153,7 +153,7 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0.0005859375,
-    "ms": 81.09762899999987
+    "ms": 83.85640000000058
   },
   {
     "scenario": "original-text",
@@ -165,6 +165,6 @@
     "precision": 1,
     "recall": 1,
     "pixelRatio": 0.0008017578125,
-    "ms": 91.86875400000099
+    "ms": 102.61811399999897
   }
 ]

@@ -1,4 +1,5 @@
 /** Real Chromium mutation experiment. Run from the repository root. */
+import { createHash } from "node:crypto";
 import { chromium } from "playwright";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import {
@@ -25,7 +26,10 @@ await page.addInitScript("globalThis.__name = (f) => f");
 await page.evaluate("globalThis.__name = (f) => f");
 await page.setContent(html);
 await page.evaluate(() => document.fonts.ready);
-const head = { hash: "synthetic-measurement" };
+const head = loadChain(await readFile(input + ".chain")).head();
+const htmlSha256 = createHash("sha256")
+  .update(await readFile(input))
+  .digest("hex");
 async function capture(): Promise<Capture> {
   const nodes = await page.evaluate((props) => {
     const walk = (e: Element, path: string): any[] => {
@@ -61,6 +65,8 @@ async function capture(): Promise<Capture> {
       viewport: { width: 1280, height: 800, dpr: 1 },
       file: input,
       designHead: head.hash,
+      htmlSha256,
+      binding: "chain-head",
       tokens: { "brand/500": "#0a64c8", "space/4": "16px" },
     },
     screenshot: await page.screenshot(),
@@ -152,6 +158,13 @@ for (const scenario of [
     );
   const code = await capture(),
     r = compare(design, code);
+  if (scenario === "original-colour") {
+    const dir = `${out}/code-color-capture`;
+    await mkdir(dir, { recursive: true });
+    await writeFile(`${dir}/dom.json`, JSON.stringify({ nodes: code.nodes }));
+    await writeFile(`${dir}/meta.json`, JSON.stringify(code.meta));
+    await writeFile(`${dir}/screenshot.png`, code.screenshot);
+  }
   const expected = scenario.endsWith("padding")
     ? "padding-left"
     : scenario.endsWith("colour")

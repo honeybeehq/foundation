@@ -70,7 +70,10 @@ export function compare(
     threshold: t.pixelThreshold,
     includeAA: false,
   });
-  const { matches, missing, extra } = matchNodes(design.nodes, code.nodes),
+  const { matches, missing, extra } = matchNodes(design.nodes, code.nodes, {
+      width: a.width / (design.meta.viewport?.dpr ?? 1),
+      height: a.height / (design.meta.viewport?.dpr ?? 1),
+    }),
     drifts: Drift[] = [];
   const add = (d: Omit<Drift, "id">) =>
     drifts.push({ id: `d${drifts.length + 1}`, ...d });
@@ -154,7 +157,7 @@ export function compare(
     add({
       kind: "missing",
       designNode: n.fdnId || n.path,
-      confidence: 1,
+      confidence: 0,
       property: "node",
       designBox: n.box,
     });
@@ -162,7 +165,7 @@ export function compare(
     add({
       kind: "extra",
       codeNode: n.fdnId || n.path,
-      confidence: 1,
+      confidence: 0,
       property: "node",
       codeBox: n.box,
     });
@@ -198,6 +201,13 @@ export function compare(
     provable: !reason,
     ...(reason ? { reason } : {}),
     styles: { properties, unavailable },
+    matching: {
+      algorithm: "hungarian",
+      maxCost: 0.48,
+      weights: { text: 0.4, tag: 0.15, roleName: 0.15, iou: 0.25, path: 0.05 },
+      containerText: "descendant-Dice",
+      confidence: "1-cost; uncalibrated",
+    },
     tolerances: t,
     pixels: {
       diffRatio: count / (a.width * a.height),
