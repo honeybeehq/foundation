@@ -1,3 +1,4 @@
+import { readAccepted, evaluateAccepted, hasUnacceptedDrift, scopeOf, defectsOf } from '../accept/index.ts';
 import {
   environmentMatches,
   type CaptureEnvironmentPolicy,
@@ -6,7 +7,7 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
-import { loadChain } from "../../../engine/src/index.ts";
+
 import { canonical, hash, seal, checkHash } from "../compare/canonical.ts";
 export { canonical, hash, seal, checkHash } from "../compare/canonical.ts";
 export async function writeReport(
@@ -63,6 +64,7 @@ export interface VerifyPolicy {
   designBinding: "chain-head" | "chain-sha256";
   requireHtmlSha256: true;
   captureEnvironment?: CaptureEnvironmentPolicy;
+  baseline?: { htmlSha256:string; head:string; captures: Record<string,string> };
 }
 export async function verify(
   manifestFile: string,
@@ -75,6 +77,9 @@ export async function verify(
     errors.push("Manifest hash/schema mismatch");
   if (!Array.isArray(manifest.reports) || !manifest.reports.length)
     errors.push("Manifest has no reports");
+  const acceptedList = await readAccepted(path.join(options.codeRepo, '.foundation/accepted.json'));
+  const accepted: {state:string; id:string; reason:string}[] = [];
+  const seenScopes = new Set<string>();
   const policy = options.policy;
   if (
     !policy ||
@@ -115,6 +120,14 @@ export async function verify(
     try {
       const file = path.resolve(path.dirname(manifestFile), entry.path),
         r = JSON.parse(await readFile(file, "utf8"));
+      seenScopes.add(canonical(scopeOf(r)));
+      const acceptance = evaluateAccepted(r, acceptedList);
+      errors.push(...acceptance.errors.map(e => `${entry.path}: ${e}`));
+      for (const id of acceptance.accepted) accepted.push({state:r.state,id,reason:acceptedList.entries.find(e => e.id === id && canonical(e.scope) === canonical(scopeOf(r)))!.reason});
+      if (r.acceptedListHash !== undefined || acceptedList.entries.length) {
+        if (r.acceptedListHash !== hash(acceptedList) || canonical(r.acceptedList) !== canonical(acceptedList)) errors.push(`${entry.path}: accepted list hash/content mismatch; regenerate the proof`);
+        if (canonical(r.defects) !== canonical(acceptance.defects)) errors.push(`${entry.path}: accepted defect annotations mismatch`);
+      }
       if (!checkHash(r) || r.reportHash !== entry.reportHash)
         errors.push(`${entry.path}: report hash mismatch`);
       if (r.schema !== "fdn-drift/0")
@@ -145,7 +158,7 @@ export async function verify(
         errors.push(`${entry.path}: missing design HTML binding`);
       if (!r.code?.commit || r.code.commit !== head)
         errors.push(`${entry.path}: stale code binding`);
-      if (
+      if (!policy.baseline &&
         r.design?.htmlSha256 &&
         createHash("sha256")
           .update(
@@ -156,7 +169,11 @@ export async function verify(
         errors.push(`${entry.path}: stale design HTML binding`);
       if (!r.design?.file || !r.design?.head)
         errors.push(`${entry.path}: missing design binding`);
-      else {
+      else if (policy.baseline) {
+        if (r.design.htmlSha256 !== policy.baseline.htmlSha256 || r.design.head !== policy.baseline.head) errors.push(`${entry.path}: baseline design binding differs from trusted policy`);
+      } else {
+        const enginePath = '../../../engine/src/index.ts';
+        const {loadChain} = await import(enginePath);
         const bytes = await readFile(
           path.resolve(options.designRepo, r.design.file + ".chain"),
         );
@@ -181,6 +198,7 @@ export async function verify(
             readCapture(path.resolve(path.dirname(file), r.inputs.design)),
             readCapture(path.resolve(path.dirname(file), r.inputs.code)),
           ]);
+          if (policy.baseline && policy.baseline.captures[identity(r)] !== captureHash(d)) errors.push(`${entry.path}: baseline capture differs from trusted policy`);
           if (
             captureHash(d) !== r.inputs.designHash ||
             captureHash(c) !== r.inputs.codeHash
@@ -208,7 +226,8 @@ export async function verify(
             actual.pixels.diffRatio !== r.pixels?.diffRatio
           )
             errors.push(`${entry.path}: measurement replay mismatch`);
-          if (actual.verdict !== "match")
+          if (r.defects && canonical(defectsOf(actual).map(({accepted: _a, ...d}: any) => d)) !== canonical(r.defects.map(({accepted: _a, ...d}: any) => d))) errors.push(`${entry.path}: defect replay mismatch`);
+          if (actual.verdict !== "match" && hasUnacceptedDrift(actual, acceptedList))
             errors.push(
               `${entry.path}: replay found drift or incomplete captures`,
             );
@@ -223,12 +242,12 @@ export async function verify(
         Object.values(r.tolerances).some(
           (v) => typeof v !== "number" || !Number.isFinite(v) || v < 0,
         ) ||
-        r.verdict !== "match" ||
+        !["match", "drift"].includes(r.verdict) ||
         !Array.isArray(r.drifts) ||
-        r.drifts.length ||
+        hasUnacceptedDrift(r, acceptedList) ||
         !Number.isFinite(r.pixels?.diffRatio) ||
         !Number.isFinite(r.tolerances?.pixelRatio) ||
-        r.pixels.diffRatio > r.tolerances.pixelRatio
+        (r.pixels.diffRatio > r.tolerances.pixelRatio && !acceptance.accepted.length)
       )
         errors.push(`${entry.path}: drift exceeds tolerance`);
     } catch (e) {
@@ -237,7 +256,9 @@ export async function verify(
       );
     }
   }
+  for (const e of acceptedList.entries) if (!seenScopes.has(canonical(e.scope))) errors.push(`${e.id}: unknown accepted scope; no report for ${e.scope.artboard}/${e.scope.state}`);
   return {
+    accepted,
     passed: errors.length === 0,
     errors,
     reports: manifest.reports?.length ?? 0,
