@@ -1,0 +1,26 @@
+{
+  "recordedAt": "2026-10-25T05:03:40.573Z",
+  "chromiumVersion": "151.0.7922.34",
+  "sourceCommitReportedByT2": "395cdc1c413eb640e3d25db303803bdd342d728d",
+  "limitation": "Asset fingerprints fetched after the final doctor run; source-to-bundle commit attribution is T2 build provenance, not an independent attestation.",
+  "assets": [
+    {
+      "url": "https://trmd-metal-1.tailff9529.ts.net:8466/?state=track-selected",
+      "status": 200,
+      "bytes": 293,
+      "sha256": "e6097c26e73700d047bf63c4782d50ea1c69b8b6eb383113b002b83f5ed148a8"
+    },
+    {
+      "url": "https://trmd-metal-1.tailff9529.ts.net:8466/assets/TracksPane-Bf58Pph4.js",
+      "status": 200,
+      "bytes": 785437,
+      "sha256": "1b3b7cb054aa3644fa2afa18e4f209bb4e33c23fcb296c7f9679516f23439558"
+    },
+    {
+      "url": "https://trmd-metal-1.tailff9529.ts.net:8466/assets/foundation.harness-DU9EYc4O.js",
+      "status": 200,
+      "bytes": 180711,
+      "sha256": "07ec4e8a5acde1ba9fbc5abbbedee22e8c757f2a6049dee969a0d584fbd258c5"
+    }
+  ]
+}
