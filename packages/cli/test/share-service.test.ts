@@ -18,6 +18,7 @@ async function fixture(options: {isPublic?: boolean; publicAccess?: 'repo-read'|
     execFileSync('ssh-keygen',['-q','-t','ed25519','-N','','-f',ssh])
     identities.set(login,{id:index+1,ssh,publicSSH:await readFile(ssh+'.pub','utf8'),ed:generateKeyPairSync('ed25519')})
   }
+  let committed: any
   const requests: {url: string; authorization?: string}[] = []
   const github = createServer((req, res) => {
     const path = req.url!; requests.push({url:path,authorization:req.headers.authorization})
@@ -31,6 +32,7 @@ async function fixture(options: {isPublic?: boolean; publicAccess?: 'repo-read'|
       if (ambiguous.has(login)) {res.writeHead(404).end('{}');return}
       res.end(JSON.stringify({permission:denied.has(login) ? 'none' : login==='writer' ? 'write' : login==='reader' ? 'read' : 'none'}));return
     }
+    if(path.endsWith('/contents/.foundation/share.json')) {if(!committed){res.writeHead(404).end('{}');return}res.end(JSON.stringify({type:'file',path:'.foundation/share.json',encoding:'base64',content:Buffer.from(JSON.stringify(committed)).toString('base64')}));return}
     if (path.startsWith('/repos/')) { res.end(JSON.stringify({private:!options.isPublic}));return }
     res.writeHead(404).end('{}')
   })
@@ -39,7 +41,7 @@ async function fixture(options: {isPublic?: boolean; publicAccess?: 'repo-read'|
   const bridge = join(dir,'bridge.mjs')
   await writeFile(bridge, `import {createInterface} from 'node:readline';import {readFileSync,writeFileSync} from 'node:fs';const file=${JSON.stringify(join(dir,'backend.json'))};createInterface({input:process.stdin}).on('line',line=>{const r=JSON.parse(line);let state={};try{state=JSON.parse(readFileSync(file,'utf8'))}catch{};let x={v:1,id:r.id,op:r.op,ok:true,log:r.log};if(r.op==='hello')Object.assign(x,{protocol:1,capabilities:{durable_idempotency:true,bounded_memory_read:true}});else {const events=state[r.log]??=[];if(r.op==='append'){let index=events.findIndex(e=>e.idempotency_key===r.idempotency_key);if(index>=0&&events[index].payload_hex!==r.payload_hex){process.stdout.write(JSON.stringify({v:1,id:r.id,ok:false,error:{code:'idempotency_conflict'}})+'\\n');return}if(index<0){index=events.length;events.push({seq:String(index+1),payload_hex:r.payload_hex,idempotency_key:r.idempotency_key});writeFileSync(file,JSON.stringify(state))}Object.assign(x,{first:String(index+1),last:String(index+1),cursor:String(index+2)})}else if(r.op==='head')x.cursor=String(events.length+1);else Object.assign(x,{events:events.slice(Number(r.cursor)-1),next_cursor:String(events.length+1)})}process.stdout.write(JSON.stringify(x)+'\\n')});`)
   const config: ShareServiceConfig = {stateDir:join(dir,'state'),comb:{binary:process.execPath,args:[bridge]},githubPermissionToken:'operator-metadata-only',githubApiUrl:`http://127.0.0.1:${(github.address() as any).port}`}
-  let service=await startShareService(config);cleanup.push(() => service.close())
+  let service=await startShareService(config);config.publicUrl=service.url;cleanup.push(() => service.close())
   async function api(path: string, body?: any, token?: string) {
     const result=await fetch(service.url+'/v1/'+path,{method:body===undefined?'GET':'POST',headers:token?{Authorization:`Bearer ${token}`}:{},body:body===undefined?undefined:JSON.stringify(body)})
     return {status:result.status,body:await result.json() as any}
@@ -56,6 +58,7 @@ async function fixture(options: {isPublic?: boolean; publicAccess?: 'repo-read'|
   const creation=(await api('challenge?repo=github.com/team/repo')).body
   space=creation
   const writer=device()
+  committed={version:1,mode:"self-hosted",encryption:"e2e-v1",service:service.url,space:space.space,repo:space.repo}
   expect((await api('spaces',{repo:space.repo,device:writer,challenge:creation.challenge,proof:proof(writer,creation.challenge),publicAccess:options.publicAccess})).status).toBe(200)
   async function tokenBody(d=writer) {
     const challenge=(await api('challenge?space='+space.space)).body.challenge
@@ -66,7 +69,7 @@ async function fixture(options: {isPublic?: boolean; publicAccess?: 'repo-read'|
   const keys=() => api('keys',{expectedEpoch:0,epoch:1,wraps:[wrap()]},token)
   const payload=(epoch=1) => Buffer.from(JSON.stringify({v:1,epoch,dedup:'b'.repeat(64),nonce:Buffer.alloc(24).toString('base64'),ciphertext:Buffer.alloc(32).toString('base64'),keyId:'c'.repeat(32),senderId:writer.id,signature:Buffer.alloc(64).toString('base64')})).toString('hex')
   const append=(epoch=1) => ({op:'append',log:'a'.repeat(64),idempotency_key:'b'.repeat(64),payload_hex:payload(epoch),epoch})
-  return {dir,config,api,space,identities,device,writer,token,tokenBody,proof,wrap,keys,payload,append,denied,ambiguous,requests,get service(){return service},restart:async()=>{await service.close();service=await startShareService(config)}}
+  return {setCommitted:(value:any)=>{committed=value},get committed(){return committed},dir,config,api,space,identities,device,writer,token,tokenBody,proof,wrap,keys,payload,append,denied,ambiguous,requests,get service(){return service},restart:async()=>{await service.close();service=await startShareService(config)}}
 }
 it('authenticates SSH-bound devices with single-use Ed25519 proof without user credentials', async () => {
   const f=await fixture()
@@ -203,4 +206,38 @@ it('authenticates encrypted hints without durable append or a cursor receipt',as
  const result=await f.api('rpc',hint,f.token);expect(result.status).toBe(200);expect(result.body.accepted).toBe(true);expect(result.body.cursor).toBeUndefined()
  const page=await f.api('rpc',{op:'read',log:'a'.repeat(64),cursor:'1'},f.token)
  expect(page.body.events).toHaveLength(0);expect(page.body.next_cursor).toBe('1')
+})
+
+it('requires the committed default-branch descriptor on creation, renewal and existing-token reads', async () => {
+  const f=await fixture()
+  const valid={...f.committed}
+  for (const value of [null,{...valid,space:'sp_wrong'},{...valid,service:'https://other.example'},{...valid,mode:'git-only'}]) {
+    f.setCommitted(value)
+    const now=Date.now();const clock=vi.spyOn(Date,'now').mockReturnValue(now+31000)
+    try {
+      expect((await f.api('state',undefined,f.token)).status).toBe(412)
+      expect((await f.api('token',await f.tokenBody())).status).toBe(412)
+      const challenge=(await f.api('challenge?repo='+f.space.repo)).body.challenge
+      expect((await f.api('spaces',{repo:f.space.repo,device:f.writer,challenge,proof:f.proof(f.writer,challenge)})).status).toBe(412)
+    } finally {clock.mockRestore()}
+  }
+  f.setCommitted(valid)
+  expect((await f.api('state',undefined,f.token)).status).toBe(200)
+  expect(f.requests.filter(r=>r.url.includes('/contents/')).every(r=>r.url.endsWith('/contents/.foundation/share.json')&&r.authorization==='Bearer operator-metadata-only')).toBe(true)
+})
+it('pins the operator service origin and optionally restricts repository owners', async () => {
+  const f=await fixture()
+  await f.service.close()
+  const restricted=await startShareService({...f.config,allowedRepoOwners:['OTHER'],publicUrl:'https://canonical.example'})
+  cleanup.push(()=>restricted.close())
+  const challenge=await fetch(restricted.url+'/v1/challenge?repo=github.com/team/repo')
+  expect(challenge.status).toBe(403)
+  await restricted.close()
+  const pinned=await startShareService({...f.config,publicUrl:'https://canonical.example'})
+  cleanup.push(()=>pinned.close())
+  const result=await fetch(pinned.url+'/v1/challenge?space='+f.space.space)
+  const nonce=await result.json() as any
+  const response=await fetch(pinned.url+'/v1/token',{method:'POST',body:JSON.stringify({space:f.space.space,device:f.writer,challenge:nonce.challenge,proof:f.proof(f.writer,nonce.challenge)})})
+  expect(response.status).toBe(403)
+  expect(await response.text()).toContain('configured publicUrl')
 })

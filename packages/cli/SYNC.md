@@ -152,12 +152,14 @@ through ssh-agent (`--ssh-key ~/.ssh/key.pub` works with an agent), and GitHub l
 The client uses its own `gh auth token` or OAuth device-flow token for **direct**
 GitHub identity/member checks. It never sends that token to the share service.
 The service needs a GitHub App installation credential with repository **Metadata:
-read** and no Contents permission. Do not give the service a repo-scoped PAT.
+read** plus **Single file: read**, limited to `.foundation/share.json`, and no
+Contents permission. Do not give the service a repo-scoped PAT.
 
 ```sh
 foundation share init --service https://share.example.ts.net --ssh-key ~/.ssh/id_ed25519
-# Commit .foundation/share.json, including its public recovery-key pin.
-foundation share login --ssh-key ~/.ssh/id_ed25519
+# Commit .foundation/share.json, including its public recovery-key pin, to the default branch.
+foundation share init --ssh-key ~/.ssh/id_ed25519 # finish registration after the commit
+foundation share login --ssh-key ~/.ssh/id_ed25519 # other members
 foundation sync serve
 foundation share status --json
 ```
@@ -253,3 +255,9 @@ older durable append is still waiting. Only newly imported hints get fallback
 publication grace; an author's own echoed hint cannot defer its outbox. A later
 Comb receipt remains the only sharing acknowledgement. See the held-store recipe
 in `packages/cli/performance/README.md` for before/after and all-relay-loss checks.
+
+The service checks the committed default-branch descriptor against its configured
+public URL and space at creation, renewal and every access (30-second positive
+cache). First init only prepares local configuration; no service data exists until
+the committed descriptor authorizes it. Removing or changing it stops serving,
+including existing tokens and quiet relay connections within the cache/poll bound.

@@ -183,7 +183,7 @@ export async function stateFor(config: ShareConfig, session: Session, readOnly =
   }
   const highest = Math.max(0, ...session.keys.map((k) => k.epoch))
   if (!readOnly && state.epoch < highest) throw new Error(`service rolled back epoch ${highest} to ${state.epoch}`)
-  if (!readOnly && config.recoveryPublicKey && state.recoveryPublicKey !== config.recoveryPublicKey)
+  if (!readOnly && state.epoch !== 0 && config.recoveryPublicKey && state.recoveryPublicKey !== config.recoveryPublicKey)
     throw new Error('recovery key differs from committed share.json')
   if (state.space !== config.space || state.repo.toLowerCase() !== config.repo.toLowerCase())
     throw new Error('share space/repo mismatch')
@@ -211,13 +211,14 @@ function packageWraps(
   if (recovery) wraps.push(wrapKey(config.space, key, { id: 'recovery', boxPublicKey: recovery }, session.device))
   return wraps
 }
-export async function initializeKeys(config: ShareConfig): Promise<string> {
+export async function initializeKeys(config: ShareConfig, recoveryCode?: string): Promise<string> {
   await ready
   const session = await authorizedSession(config),
     state = await stateFor(config, session)
   if (state.epoch !== 0) throw new Error('space already initialized')
   const key = newEpoch(),
-    recovery = recoveryKeypair()
+    recovery = recoveryCode ? {code:recoveryCode,publicKey:(await import('./crypto.js')).recoveryPublicKey(recoveryCode)} : recoveryKeypair()
+  if (config.recoveryPublicKey && config.recoveryPublicKey !== recovery.publicKey) throw new Error('recovery code differs from committed share.json')
   config.recoveryPublicKey = recovery.publicKey
   Object.assign(key, {
     space: config.space,

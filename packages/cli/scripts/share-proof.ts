@@ -80,6 +80,11 @@ const stub = createServer((req, res) => {
     return
   }
   const access = who === 'operator' || who === 'alice' || (who === 'bob' && !removed)
+  if (req.url === '/repos/team/designs/contents/.foundation/share.json') {
+    const committed=spawnSync('git',['show','HEAD:.foundation/share.json'],{cwd:repos[0]!,encoding:'utf8'})
+    if(committed.status!==0){res.writeHead(404).end('{}');return}
+    res.end(JSON.stringify({type:'file',path:'.foundation/share.json',encoding:'base64',content:Buffer.from(committed.stdout).toString('base64')}));return
+  }
   if (req.url?.includes('/collaborators?')) {
     res.end(
       JSON.stringify(
@@ -201,7 +206,7 @@ try {
   log(
     'LABELLED STUB: GitHub identities, repo membership and SSH public keys served by loopback fixture; actual CLI/crypto/HTTP/Comb/disk are real'
   )
-  const init = await ok(
+  const prepared = await ok(
     0,
     'share',
     'init',
@@ -215,7 +220,17 @@ try {
     keys[0]!,
     '--token-stdin'
   )
+  assert.match(prepared, /Commit it to the repository default branch/)
+  assert.equal(existsSync(join(stateDir,'metadata.json')),false)
+  log('PREPARE: no server space or token before descriptor commit')
+  const uncommitted = await cli(0,'share','init','--repo-root',repos[0]!,'--ssh-key',keys[0]!,'--token-stdin')
+  assert.equal(uncommitted.code,1);assert.match(uncommitted.err,/Commit .foundation\/share.json/)
+  log('UNCOMMITTED DESCRIPTOR REFUSED: init cannot enable sharing')
+  assert.equal(spawnSync('git',['add','.foundation/share.json'],{cwd:repos[0]!}).status,0)
+  assert.equal(spawnSync('git',['-c','user.name=Share Proof','-c','user.email=proof@example.invalid','commit','-qm','Enable encrypted sharing'],{cwd:repos[0]!}).status,0)
+  const init=await ok(0,'share','init','--repo-root',repos[0]!,'--ssh-key',keys[0]!,'--token-stdin')
   assert.match(init, /Recovery code saved privately/)
+  log('COMMITTED DESCRIPTOR ACCEPTED: default branch stub reads actual git HEAD, not working tree')
   log('init created secret-free share.json; recovery code withheld from transcript')
   for (let i = 1; i < 3; i++) {
     mkdirSync(join(repos[i]!, '.foundation'))
@@ -517,6 +532,21 @@ try {
     're-attested replacement device receives current key'
   )
   log('RE-ATTEST: renewed SSH binding and replaced revoked device keys; current access checked again')
+  const validToken=vault(0)[space].token
+  const relayCheck=await fetch(`${service.url}/v1/relay?space=${space}`,{headers:{Authorization:`Bearer ${validToken}`}})
+  assert.equal(relayCheck.status,200)
+  const relayReader=relayCheck.body!.getReader();await relayReader.read()
+  let relayClosed=false
+  const observeClose=(async()=>{while(!(await relayReader.read()).done){};relayClosed=true})()
+  assert.equal(spawnSync('git',['rm','--cached','-q','.foundation/share.json'],{cwd:repos[0]!}).status,0)
+  assert.equal(spawnSync('git',['-c','user.name=Share Proof','-c','user.email=proof@example.invalid','commit','-qm','Disable live sharing'],{cwd:repos[0]!}).status,0)
+  log('DESCRIPTOR REMOVED from default-branch git HEAD; waiting for bounded cache expiry')
+  await wait(31000)
+  const disabled=await fetch(`${service.url}/v1/state?space=${space}`,{headers:{Authorization:`Bearer ${validToken}`}})
+  assert.ok([401,412].includes(disabled.status));log(`REMOVED DESCRIPTOR REFUSED existing token: HTTP ${disabled.status}`)
+  await until(()=>relayClosed,'quiet relay closes after descriptor removal',65000)
+  await observeClose
+  log('DESCRIPTOR REMOVAL: existing token refused and quiet SSE disconnected')
   for (const child of [a, b]) child.kill('SIGTERM')
   await wait(1000)
   await service.close()

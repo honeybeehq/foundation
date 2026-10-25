@@ -1,0 +1,63 @@
+2026-10-25T07:13:50.761Z LABELLED STUB: GitHub identities, repo membership and SSH public keys served by loopback fixture; actual CLI/crypto/HTTP/Comb/disk are real
+2026-10-25T07:13:50.962Z PREPARE: no server space or token before descriptor commit
+2026-10-25T07:13:51.304Z UNCOMMITTED DESCRIPTOR REFUSED: init cannot enable sharing
+2026-10-25T07:13:51.705Z COMMITTED DESCRIPTOR ACCEPTED: default branch stub reads actual git HEAD, not working tree
+2026-10-25T07:13:51.706Z init created secret-free share.json; recovery code withheld from transcript
+2026-10-25T07:13:52.056Z second member login: Live sharing: waiting for key — Waiting for a teammate's machine to share the key
+2026-10-25T07:13:52.426Z automatic signed-device key handover with no designs open: 364ms
+2026-10-25T07:13:54.223Z genesis durably acknowledged: 361ms
+2026-10-25T07:13:54.728Z alice edit visible on other member: 136ms
+2026-10-25T07:13:54.729Z save-to-remote visibility alice: 158.410888671875ms
+2026-10-25T07:13:55.165Z bob edit visible on other member: 72ms
+2026-10-25T07:13:55.165Z save-to-remote visibility bob: 102.38330078125ms
+2026-10-25T07:13:55.485Z NO ACCESS REFUSED: Live sharing: no access
+2026-10-25T07:13:55.799Z removal causes epoch rotation: 0ms
+2026-10-25T07:13:55.800Z removed device token revoked and relay disconnected
+2026-10-25T07:13:55.973Z daemon bob: foundation/machine-B/local-B/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 4: Live sharing: no access
+2026-10-25T07:13:56.217Z daemon bob: foundation/machine-B/local-B/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 4: Live sharing: no access
+2026-10-25T07:13:56.520Z new epoch change durably acknowledged: 333ms
+2026-10-25T07:13:56.604Z RAW STORE CIPHERTEXT: removed member old keys and nonmember empty keys cannot decrypt latest event
+2026-10-25T07:13:56.606Z REMOVED TOKEN REFUSED: HTTP 403
+2026-10-25T07:13:56.624Z RAW-STORE GREP: exit 1, no plaintext matches in Comb objects or service metadata
+2026-10-25T07:13:56.626Z TAMPER REFUSED: changed encrypted record fails authentication
+2026-10-25T07:13:56.645Z daemon bob: foundation/machine-B/local-B/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 4: Live sharing: no access
+2026-10-25T07:13:56.873Z ROLLBACK REFUSED: {"state":"unavailable","reason":"service rolled back epoch 2 to 1"}
+2026-10-25T07:13:57.114Z RECOVERY SUBSTITUTION REFUSED: {"state":"unavailable","reason":"recovery key differs from committed share.json"}
+2026-10-25T07:13:57.316Z REFUSED ROTATION: requirement persisted across retries; old-key sending stays paused
+2026-10-25T07:13:57.344Z OUTAGE: service stopped
+2026-10-25T07:13:57.353Z daemon bob: foundation/machine-B/local-B/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 4: fetch failed
+2026-10-25T07:13:57.724Z local edit saved during outage
+2026-10-25T07:13:58.076Z outbox recovered after service restart: 347ms
+2026-10-25T07:13:59.152Z daemon bob: foundation/machine-B/local-B/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 4: waiting for key epoch 2
+2026-10-25T07:14:02.209Z re-attested replacement device receives current key: 3752ms
+2026-10-25T07:14:02.209Z RE-ATTEST: renewed SSH binding and replaced revoked device keys; current access checked again
+2026-10-25T07:14:02.238Z DESCRIPTOR REMOVED from default-branch git HEAD; waiting for bounded cache expiry
+2026-10-25T07:14:27.866Z daemon alice: foundation/machine-A/local-A/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:27.868Z daemon bob: foundation/machine-B/local-B/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:28.027Z daemon bob: foundation/machine-B/local-B/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:28.079Z daemon alice: foundation/machine-A/local-A/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:28.482Z daemon alice: foundation/machine-A/local-A/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:28.542Z daemon bob: foundation/machine-B/local-B/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:29.441Z daemon alice: foundation/machine-A/local-A/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:29.542Z daemon bob: foundation/machine-B/local-B/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:30.517Z daemon alice: foundation/machine-A/local-A/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:30.778Z daemon bob: foundation/machine-B/local-B/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:32.626Z daemon alice: foundation/machine-A/local-A/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:33.252Z REMOVED DESCRIPTOR REFUSED existing token: HTTP 412
+2026-10-25T07:14:34.641Z daemon bob: foundation/machine-B/local-B/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:37.226Z daemon alice: foundation/machine-A/local-A/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:39.419Z daemon bob: foundation/machine-B/local-B/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:41.436Z daemon alice: foundation/machine-A/local-A/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:43.440Z daemon bob: foundation/machine-B/local-B/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:45.006Z daemon alice: foundation/machine-A/local-A/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:47.339Z daemon bob: foundation/machine-B/local-B/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:48.098Z daemon alice: foundation/machine-A/local-A/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:50.938Z daemon bob: foundation/machine-B/local-B/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:51.326Z daemon alice: foundation/machine-A/local-A/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:54.605Z daemon alice: foundation/machine-A/local-A/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:55.296Z daemon bob: foundation/machine-B/local-B/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:57.364Z daemon alice: foundation/machine-A/local-A/d887a9b7-beef-4b74-b5e3-904a226f697d: receive cursor 6: share service 412: {"error":"Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)"}
+2026-10-25T07:14:57.773Z quiet relay closes after descriptor removal: 24521ms
+2026-10-25T07:14:57.774Z DESCRIPTOR REMOVAL: existing token refused and quiet SSE disconnected
+2026-10-25T07:14:58.951Z complete stopped local-store backup includes metadata and Comb objects
+2026-10-25T07:14:58.951Z PASS real two-HOME CLI/daemon/Comb encrypted sharing, handover, subsecond bidirectional visibility, refusal, removal/rotation, raw-store grep, outage and backup
