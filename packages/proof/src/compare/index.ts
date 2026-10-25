@@ -260,6 +260,9 @@ export function compare(
       containerText: "descendant-Dice",
       confidence: "1-cost; uncalibrated",
     },
+    offscreen: [design,code].every(c=>c.nodes.every(n=>n.visibility))
+      ? {status:'measured'}
+      : {status:'unavailable',reason:'offscreen-unavailable: capture lacks per-node visibility facts; recapture both sides to check clipping and off-screen content'},
     tolerances: t,
     pixels: {
       diffRatio: count / (a.width * a.height),

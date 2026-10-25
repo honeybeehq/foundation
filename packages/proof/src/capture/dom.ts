@@ -42,6 +42,6 @@ export async function collectDom(page: Page, root: string) {
       Array.from(el.children).forEach((child, i) => visit(child, `${path}/${i}`))
     }
     visit(element, '0')
-    return { root, nodes, extent: {frame: [0, 0, origin.width, origin.height], scroll: [element.scrollWidth, element.scrollHeight]} }
+    return { root, nodes, extent: {frame: [0, 0, origin.width, origin.height], scroll: [element.scrollWidth, element.scrollHeight], viewport: [-origin.x, -origin.y, innerWidth, innerHeight]} }
   }, { root, properties: [...STYLE_PROPERTIES] })
 }

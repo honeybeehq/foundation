@@ -166,12 +166,13 @@ for (const scenario of [
           ? "n92"
           : `probe-${scenario.endsWith("colour") ? "color" : scenario.endsWith("remove") ? "remove" : "padding"}`),
   ).length;
-  const fp = scenario === "offscreen" ? 0 : r.report.drifts.length - tp,
+  const fp = scenario === "offscreen" ? r.report.defects.filter(d=>d.cause === "offscreen").length - tp : r.report.drifts.length - tp,
     fn = expected ? 1 - tp : 0;
   const offscreen = r.report.defects.filter(d => d.cause === "offscreen");
   if (offscreen.length !== (scenario === "offscreen" ? 1 : 0)) throw Error(`${scenario}: unexpected offscreen count ${offscreen.length}`);
   results.push({
     offscreen: offscreen.length,
+    ...(scenario === "offscreen" ? {otherDrifts:r.report.drifts.filter(d=>d.property!=="offscreen")} : {}),
     scenario,
     expected: expected ? 1 : 0,
     found: scenario === "offscreen" ? offscreen.length : r.report.drifts.length,

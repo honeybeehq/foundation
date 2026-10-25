@@ -57,7 +57,7 @@ export interface Defect {
   cause: string;
   findings: string[];
   summary: string;
-  offscreen?: {box: Box; frame: number[]; elements: string[]; clips: NonNullable<CaptureNode["visibility"]>["clips"]};
+  offscreen?: {box: Box; frame: number[]; viewport?: number[]; elements: string[]; clips: NonNullable<CaptureNode["visibility"]>["clips"]};
   accepted?: { entryId: string; reason: string };
 }
 export interface Match {

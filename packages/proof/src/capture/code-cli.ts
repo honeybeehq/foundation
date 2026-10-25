@@ -269,7 +269,7 @@ try {
           path: join(destination, "screenshot.png"),
           animations: "disabled",
         });
-        await captureFullExtent(page, "#foundation-root", join(destination, "full-extent.png"));
+        const fullExtent = await captureFullExtent(page, "#foundation-root", join(destination, "full-extent.png"));
         await writeFile(
           join(destination, "dom.json"),
           JSON.stringify(dom, null, 2) + "\n",
@@ -285,7 +285,7 @@ try {
           artboard: board.id,
           state: state.name,
           viewport: board.viewport,
-          extent: dom.extent,
+          extent: dom.extent, fullExtent,
           frame,
           url,
           fonts,

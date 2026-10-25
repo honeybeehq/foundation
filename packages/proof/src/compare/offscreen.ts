@@ -1,6 +1,5 @@
 import { hash } from './canonical.ts';
 import type { Capture, CaptureNode, Defect, Match } from './types.ts';
-const id = (n: CaptureNode) => n.fdnId || n.path;
 const within = (n: CaptureNode, p: CaptureNode) => n.path === p.path || n.path.startsWith(p.path + '/');
 const exceeds = (b: number[], clip: number[], x = true, y = true) =>
   (x && (b[0]! < clip[0]! - 1 || b[0]! + b[2]! > clip[0]! + clip[2]! + 1)) ||
@@ -9,7 +8,8 @@ const exceeds = (b: number[], clip: number[], x = true, y = true) =>
 /** Independent of the frozen visible-node matcher; uses identity/text only for exemptions. */
 export function offscreenDefects(design: Capture, code: Capture, matches: Match[]): Defect[] {
   const frame = (c: Capture): number[] => [0, 0, c.meta.frame?.width ?? c.nodes[0]?.box[2] ?? 0, c.meta.frame?.height ?? c.nodes[0]?.box[3] ?? 0];
-  const outside = (n: CaptureNode, c: Capture) => exceeds(n.box, frame(c)) || n.visibility?.clips.some(a => exceeds(n.box, a.box, a.x, a.y));
+  const viewport = (c: Capture): number[] | undefined => c.meta.extent?.viewport ?? (c.meta.viewport ? [0,0,c.meta.viewport.width,c.meta.viewport.height] : undefined);
+  const outside = (n: CaptureNode, c: Capture) => exceeds(n.box, frame(c)) || (viewport(c) && exceeds(n.box,viewport(c)!)) || n.visibility?.clips.some(a => exceeds(n.box, a.box, a.x, a.y));
   const counterpart = (n: CaptureNode) => {
     const ids = n.fdnId ? design.nodes.filter(d => d.fdnId === n.fdnId) : [];
     const same = ids.length === 1 ? ids : design.nodes.filter(d => n.text?.trim() && d.text?.trim() === n.text.trim() && d.tag === n.tag);
@@ -36,10 +36,11 @@ export function offscreenDefects(design: Capture, code: Capture, matches: Match[
   const roots = bad.map(n => code.nodes.filter(p => p.path !== '0' && within(n, p) && outside(p, code) &&
     code.nodes.filter(c => c.visibility?.eligible && within(c, p)).every(c => bad.includes(c)))
     .sort((a,b) => a.path.length - b.path.length)[0] ?? n);
+  const id = (n: CaptureNode) => n.fdnId && code.nodes.filter(c=>c.fdnId===n.fdnId).length===1 ? n.fdnId : n.path;
   return [...new Map(roots.map(n => [n.path, n])).values()].filter(n => !roots.some(p => p !== n && within(n,p))).map(n => ({
-    id: 'def-' + hash({layer:{code:id(n)},kind:'layout',cause:'offscreen'}).slice(0,20),
+    id: 'def-' + hash({layer:{code:id(n)},path:n.path,kind:'layout',cause:'offscreen'}).slice(0,20),
     layer: {code:id(n)}, kind:'layout', cause:'offscreen', classification:'product', findings:[],
     summary: `rendered outside the visible pane: ${label(n) || n.fdnId || n.tag}`,
-    offscreen: {box:n.box,frame:frame(code),elements:bad.filter(c => within(c,n)).map(c => c.path),clips:bad.find(c => within(c,n))!.visibility!.clips},
+    offscreen: {box:n.box,frame:frame(code),viewport:viewport(code),elements:bad.filter(c => within(c,n)).map(c => c.path),clips:bad.find(c => within(c,n))!.visibility!.clips},
   }));
 }
