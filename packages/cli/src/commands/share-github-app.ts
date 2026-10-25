@@ -69,7 +69,7 @@ export async function runShareGithubApp(args: string[], io: CliIO): Promise<numb
       if (typeof metadata.permission !== 'string') throw new Error('GitHub returned no user permission')
       io.stdout(`Metadata allowed: ${user} on ${repo}: ${metadata.permission}`)
       io.stdout(await checkContentsRefusal(repo, config, token))
-      io.stdout('App permissions verified: Metadata read only; no Contents. Installation token minted successfully; the service renews tokens before expiry.')
+      io.stdout('App permissions verified: Metadata read only; no Contents. Installation token minted successfully.')
       return 0
     }
     throw new Error(usage)
