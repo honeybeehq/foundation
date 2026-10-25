@@ -2,6 +2,7 @@ export type Box = [number, number, number, number];
 export interface CaptureNode {
   visibility?: {
     eligible: boolean;
+    interactive?: boolean;
     clips: {path: string; box: number[]; x: boolean; y: boolean; scrollX: boolean; scrollY: boolean; pan?: boolean}[];
   };
   path: string;

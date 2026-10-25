@@ -121,3 +121,17 @@ it('restores intentional scroll positions after diagnostic paint',async () => {
     expect((await collectDom(page,'#root')).nodes).toEqual(before.nodes);
   } finally {await rm(dir,{recursive:true,force:true});}
 });
+
+it('recognizes unique exact clipped text across text-only and mixed-content wrappers',async () => {
+  const a=await capture('<div style="position:absolute;top:350px"><span>Proposal explanation</span></div>');
+  const b=await capture('<div style="position:absolute;top:350px">Proposal explanation<span aria-hidden="true"></span></div>');
+  expect(offscreenDefects(a,b,[])).toHaveLength(0);
+  const visible=await capture('<span>Proposal explanation</span>');
+  expect(offscreenDefects(visible,b,[])).toHaveLength(1);
+});
+
+it('does not excuse a clipped action using non-interactive design text',async () => {
+  const a=await capture('<span style="position:absolute;top:350px">Accept</span>');
+  const b=await capture('<button style="position:absolute;top:350px">Accept</button>');
+  expect(offscreenDefects(a,b,[])).toHaveLength(1);
+});

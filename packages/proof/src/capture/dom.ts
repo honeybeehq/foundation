@@ -25,8 +25,8 @@ export async function collectDom(page: Page, root: string) {
           scrollY: /^(auto|scroll)$/.test(s.overflowY) && parent.scrollHeight > parent.clientHeight + 1})
       }
       const text = Array.from(el.childNodes).some(n => n.nodeType === Node.TEXT_NODE && n.textContent?.trim())
-      const interactive = el.matches('button,input,select,textarea,a[href],[tabindex],[contenteditable="true"],[role="button"],[role="link"],[role="textbox"]')
-      return {eligible: (text || interactive) && !transparent && css.visibility === 'visible' && Number(css.opacity) > 0 && rect.width > 0 && rect.height > 0, clips}
+      const interactive = el.matches('button,input,select,textarea,a[href],[tabindex],[contenteditable]:not([contenteditable="false"]),summary,[role="button"],[role="link"],[role="textbox"],[role="checkbox"],[role="radio"],[role="switch"],[role="combobox"],[role="slider"],[role="spinbutton"],[role="menuitem"],[role="option"],[role="tab"]')
+      return {interactive, eligible: (text || interactive) && !transparent && css.visibility === 'visible' && Number(css.opacity) > 0 && rect.width > 0 && rect.height > 0, clips}
     }
     const visit = (el: Element, path: string) => {
       paths.set(el, path)

@@ -1,5 +1,6 @@
 import { hash } from './canonical.ts';
 import type { Capture, CaptureNode, Defect, Match } from './types.ts';
+const interactive = (n: CaptureNode) => n.visibility?.interactive ?? (/^(button|input|select|textarea|a|summary)$/.test(n.tag) || /^(button|link|textbox|checkbox|radio|switch|combobox|slider|spinbutton|menuitem|option|tab)$/.test(n.role ?? ''));
 const within = (n: CaptureNode, p: CaptureNode) => n.path === p.path || n.path.startsWith(p.path + '/');
 const exceeds = (b: number[], clip: number[], x = true, y = true) =>
   (x && (b[0]! < clip[0]! - 1 || b[0]! + b[2]! > clip[0]! + clip[2]! + 1)) ||
@@ -12,7 +13,7 @@ export function offscreenDefects(design: Capture, code: Capture, matches: Match[
   const outside = (n: CaptureNode, c: Capture) => exceeds(n.box, frame(c)) || (viewport(c) && exceeds(n.box,viewport(c)!)) || n.visibility?.clips.some(a => exceeds(n.box, a.box, a.x, a.y));
   const counterpart = (n: CaptureNode) => {
     const ids = n.fdnId ? design.nodes.filter(d => d.fdnId === n.fdnId) : [];
-    const same = ids.length === 1 ? ids : design.nodes.filter(d => n.text?.trim() && d.text?.trim() === n.text.trim() && d.tag === n.tag);
+    const same = ids.length === 1 ? ids : design.nodes.filter(d => n.text?.trim() && d.text?.trim() === n.text.trim() && interactive(d) === interactive(n));
     const unchanged = design.nodes.find(d => d.path === n.path && d.tag === n.tag && d.text === n.text && d.box.every((v,i) => Math.abs(v-n.box[i]!) <= 1));
     if (unchanged) return unchanged;
     return same.length === 1 ? same[0] : matches.find(m => !m.uncertain && m.code.path === n.path)?.design;
