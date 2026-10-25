@@ -327,6 +327,7 @@ class DesignSession implements Session {
     this.emit({
       t: 'welcome',
       protocol: SESSION_PROTOCOL,
+      features: ['images'],
       path: this.displayPath,
       docId: this.docId,
       chain: this.chain !== null,
