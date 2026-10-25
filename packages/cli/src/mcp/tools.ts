@@ -26,7 +26,9 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { PNG } from 'pngjs'
 import {
+  listDocumentImages,
   bakeDocument,
+  embedDocumentImages,
   createChain,
   loadChain,
   mintAnnotationId,
@@ -403,7 +405,7 @@ async function toolBake(args: Record<string, unknown>): Promise<ToolResult> {
   const read = readSource(path)
   if (!read.ok) return read.result
   const { doc } = parseDocument(read.source)
-  const baked = bakeDocument(doc, { ...(state !== undefined ? { state } : {}), ...(artboardId !== undefined ? { artboardId } : {}), ...(viewport !== undefined ? { viewport } : {}) })
+  const baked = bakeDocument(embedDocumentImages(doc, path), { ...(state !== undefined ? { state } : {}), ...(artboardId !== undefined ? { artboardId } : {}), ...(viewport !== undefined ? { viewport } : {}) })
   return ok({
     path,
     state: baked.state,
@@ -434,7 +436,7 @@ async function toolRender(args: Record<string, unknown>): Promise<ToolResult> {
 
   let cells: RenderCell[]
   try {
-    cells = await renderModule.renderDocument(doc, {
+    cells = await renderModule.renderDocument(embedDocumentImages(doc, path), {
       ...(state !== undefined ? { state } : {}),
       ...(viewport !== undefined ? { viewport } : {}),
       ...(artboardId !== undefined ? { artboardId } : {}),
@@ -526,8 +528,8 @@ async function toolDiff(args: Record<string, unknown>): Promise<ToolResult> {
   }
 
   try {
-    const cellsA = await renderModule.renderDocument(docA)
-    const cellsB = await renderModule.renderDocument(docB)
+    const cellsA = await renderModule.renderDocument(embedDocumentImages(docA, pathA))
+    const cellsB = await renderModule.renderDocument(embedDocumentImages(docB, pathB))
     const byKeyB = new Map(cellsB.map((c) => [`${c.state ?? 'default'}::${c.viewport.name}`, c]))
     const seen = new Set<string>()
     const cells: Array<Record<string, unknown>> = []
@@ -957,6 +959,22 @@ async function toolProject(args: Record<string, unknown>): Promise<ToolResult> {
 // ——— tool registry ———
 
 export const TOOLS: ToolDefinition[] = [
+  {
+    name: 'foundation_images',
+    description: 'List document image references, provenance, content hash and storage status.',
+    inputSchema: { type: 'object', properties: { path: { type: 'string' } }, required: ['path'] },
+    handler: async args => { const path = requireString(args, 'path'); return ok({ path, images: listDocumentImages(parseDocument(readFileSync(path, 'utf8')).doc, path) }) },
+  },
+  ...['import-image', 'localize-images'].map<ToolDefinition>(operation => ({
+    name: `foundation_${operation.replaceAll('-', '_')}`,
+    description: operation === 'import-image' ? 'Store an image from URL, local path or data URI and attach it to an existing img node or background fill. Use this by default for agent image additions.' : 'Explicitly store remote images in the document or selected nodes, retaining source URL metadata. One undo step.',
+    inputSchema: { type: 'object', properties: { path: { type: 'string' }, nodeId: { type: 'string' }, source: { type: 'string' }, property: { type: 'string', enum: ['src', 'background-image'] }, nodeIds: { type: 'array', items: { type: 'string' } }, author: { type: 'string' }, label: { type: 'string' }, id: { type: 'string' }, expectedHead: { type: ['string', 'null'] }, expectedDocId: { type: 'string' }, durable: { type: 'boolean' } }, required: operation === 'import-image' ? ['path', 'nodeId', 'source'] : ['path'] },
+    handler: async (args: Record<string, unknown>) => {
+      const op = operation === 'import-image' ? { op: operation, id: requireString(args, 'nodeId'), source: requireString(args, 'source'), property: optionalString(args, 'property') ?? 'src' } : { op: operation, nodeIds: args.nodeIds }
+      const result = await editDocument(requireString(args, 'path'), [op], optionalString(args, 'label') ?? 'Store images', optionalString(args, 'author') ?? defaultAuthor(), optionalString(args, 'id'), { durable: args.durable === true, expectedDocId: optionalString(args, 'expectedDocId'), expectedHead: args.expectedHead === null ? null : optionalString(args, 'expectedHead') })
+      return { ...ok({ path: args.path, ...result }), ...(!result.ok ? { isError: true } : {}) }
+    },
+  })),
   {
     name: 'foundation_edit',
     description: 'Apply one atomic semantic session-operation batch to a document, including artboard/page CRUD and upgrade. Uses the same file lock, validation and authored chain transaction as the editor.',

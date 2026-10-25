@@ -6,7 +6,7 @@ import type { FdnDocument, FdnNode } from '../types.js'
 
 export const MAX_IMAGE_BYTES = 20 * 1024 * 1024
 export interface ImageAsset { src: string; mime: string; bytes: number; hash: string }
-export interface DocumentImage { nodeId: string; property: string; src: string; sourceUrl: string | null; stored: boolean; mime: string | null; bytes: number | null }
+export interface DocumentImage { nodeId: string; property: string; src: string; sourceUrl: string | null; stored: boolean; mime: string | null; bytes: number | null; hash: string | null }
 export const ASSET_REFERENCE = /^\.foundation\/assets\/([a-f0-9]{64})\.(png|jpg|gif|webp|avif|svg)$/
 
 export function sniffImage(bytes: Uint8Array): { mime: string; ext: string } {
@@ -118,7 +118,7 @@ export function listDocumentImages(doc: FdnDocument, documentPath: string): Docu
         stored = createHash('sha256').update(content).digest('hex') === ASSET_REFERENCE.exec(image.src)![1]
       } catch {}
     }
-    return { nodeId: node.id, ...image, sourceUrl: node.attrs['data-fdn-source-url'] ?? null, stored, mime, bytes }
+    return { nodeId: node.id, ...image, sourceUrl: node.attrs['data-fdn-source-url'] ?? null, stored, mime, bytes, hash: stored ? ASSET_REFERENCE.exec(image.src)![1]! : null }
   }))
 }
 
@@ -126,8 +126,16 @@ export function embedDocumentImages(doc: FdnDocument, documentPath: string): Fdn
   const result = structuredClone(doc)
   for (const node of imageNodes(result)) for (const image of imageSources(node)) {
     if (/^(?:https?:|data:|blob:|#)/i.test(image.src)) continue
-    const bytes = localBytes(image.src.startsWith('file:') ? fileURLToPath(image.src) : resolve(dirname(documentPath), image.src))
-    const { mime } = sniffImage(bytes)
+    let bytes: Buffer
+    let mime: string
+    try {
+      const source = image.src.split(/[?#]/, 1)[0]!
+      bytes = localBytes(source.startsWith('file:') ? fileURLToPath(source) : resolve(dirname(documentPath), decodeURIComponent(source)))
+      mime = sniffImage(bytes).mime
+    } catch (err) {
+      if (ASSET_REFERENCE.test(image.src)) throw err
+      continue
+    }
     if (ASSET_REFERENCE.test(image.src) && createHash('sha256').update(bytes).digest('hex') !== ASSET_REFERENCE.exec(image.src)![1]) throw new Error('asset hash mismatch')
     const source = `data:${mime};base64,${bytes.toString('base64')}`
     if (image.property === 'src') node.attrs.src = source

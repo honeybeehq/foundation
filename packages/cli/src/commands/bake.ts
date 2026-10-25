@@ -3,7 +3,7 @@
  * stdout (API.md CLI section).
  */
 import { readFileSync, writeFileSync } from 'node:fs'
-import { bakeDocument, parseDocument } from 'foundation-engine'
+import { bakeDocument, embedDocumentImages, parseDocument } from 'foundation-engine'
 import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
 
@@ -29,7 +29,13 @@ export async function runBake(args: string[], io: CliIO): Promise<number> {
   const out = flagString(flags, 'o', 'out', 'output')
 
   const { doc } = parseDocument(source)
-  const baked = bakeDocument(doc, { ...(state !== undefined ? { state } : {}), ...(artboardId !== undefined ? { artboardId } : {}), ...(viewport !== undefined ? { viewport } : {}) })
+  let baked: ReturnType<typeof bakeDocument>
+  try {
+    baked = bakeDocument(embedDocumentImages(doc, file), { ...(state !== undefined ? { state } : {}), ...(artboardId !== undefined ? { artboardId } : {}), ...(viewport !== undefined ? { viewport } : {}) })
+  } catch (err) {
+    io.stderr(err instanceof Error ? err.message : String(err))
+    return 1
+  }
 
   for (const line of baked.report.lines) {
     io.stderr(`${line.severity} ${line.code}: ${line.message}`)

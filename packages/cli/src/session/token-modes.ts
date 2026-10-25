@@ -31,6 +31,7 @@ function frameTarget(doc: FdnDocument, op: SessionOp): FdnNode | undefined {
 }
 
 export function expandSessionOps(doc: FdnDocument, ops: SessionOp[], reports: InstanceSwapReport[] = [], detaches: InstanceDetachReport[] = []): PatchOp[] {
+  if (ops.some(op => op.op === 'import-image' || op.op === 'localize-images')) throw new Error('image operations require asset preparation')
   ops = ops.flatMap<SessionOp>(op => {
     if (op.op !== 'remove-state' && op.op !== 'remove-viewport') return [op]
     const key = op.op === 'remove-state' ? 'data-fdn-view-state' : 'data-fdn-view-viewport'

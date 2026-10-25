@@ -1,4 +1,7 @@
 import { mintNodeId } from 'foundation-engine'
+import { hasImageOperations, prepareImageOperations } from './images.js'
+import { listDocumentImages } from 'foundation-engine'
+import type { ImageImportResult } from 'foundation-protocol'
 import { legacyMessage, legacyBoardRef, legacyArtboardReason, legacyArtboardOpReason } from './legacy.js'
 import { ARTBOARD_FRAME_VERSION, ArtboardError, validateArtboards, explicitArtboards, artboardPages, boardViews, boardView, boardKey } from 'foundation-engine'
 import type { BoardRef } from 'foundation-engine'
@@ -138,6 +141,7 @@ class DesignSession implements Session {
     if (this.phase === 'waiting' && message.t === 'hello') this.readMode ||= message.mode === 'read'
     try {
       if (message.t === 'hello' && this.options.create && !this.readMode) mkdirSync(dirname(this.path), { recursive: true })
+      if (message.t === 'commit' && this.phase === 'open' && hasImageOperations(message.ops)) { void this.prepareImages(message); return }
       this.inTransaction(() => this.dispatch(message), message.t === 'hello' ? 0 : 100)
     } catch (err) {
       if (err instanceof DocumentBusyError && this.phase === 'waiting') {
@@ -264,6 +268,9 @@ class DesignSession implements Session {
           return this.reject(message.id, { code: 'invalid-op', message: err instanceof Error ? err.message : String(err) })
         }
       }
+      case 'images':
+        this.syncAndAnnounce()
+        return this.emit({ t: 'images', id: message.id, images: listDocumentImages(this.doc, this.path) })
       case 'commit':
         return this.commit(message)
       case 'anchor':
@@ -595,14 +602,38 @@ class DesignSession implements Session {
     return true
   }
 
-  private commit(message: Extract<WireClientMessage, { t: 'commit' }>): void {
+  private async prepareImages(message: Extract<WireClientMessage, { t: 'commit' }>): Promise<void> {
+    let snapshot!: FdnDocument
+    let expectedHead!: string | null
+    let expectedDocId!: string | null
+    try {
+      this.inTransaction(() => {
+        this.syncAndAnnounce()
+        if (this.readOnlyReason()) throw new Error(this.readOnlyReason()!)
+        snapshot = this.doc
+        expectedHead = this.head()?.hash ?? null
+        expectedDocId = this.docId
+      })
+      const prepared = await prepareImageOperations(snapshot, message.ops, this.path)
+      if (this.phase !== 'open') return
+      this.inTransaction(() => {
+        this.syncAndAnnounce()
+        if (expectedHead !== (this.head()?.hash ?? null) || expectedDocId !== this.docId || canonicalText(snapshot) !== this.docText) return this.reject(message.id, { code: 'conflict', message: 'document changed while importing images; refresh and retry' })
+        this.commit({ ...message, ops: prepared.ops }, prepared.images, true)
+      })
+    } catch (err) {
+      if (this.phase === 'open') this.reject(message.id, { code: 'invalid-op', message: err instanceof Error ? err.message : String(err) })
+    }
+  }
+
+  private commit(message: Extract<WireClientMessage, { t: 'commit' }>, images: ImageImportResult[] = [], allowEmpty = false): void {
     this.syncAndAnnounce()
     if (this.protocol === LEGACY_SESSION_PROTOCOL && (explicitArtboards(this.doc) || message.ops.some(op => isArtboardOperation(op) || op.op === 'set-spec-version'))) return this.reject(message.id, { code: 'invalid-op', message: explicitArtboards(this.doc) ? legacyArtboardReason : legacyArtboardOpReason })
     if (this.readOnlyReason()) return this.reject(message.id, { code: 'invalid-op', message: this.readOnlyReason()! })
     if (this.invalidExternalTokens) return this.reject(message.id, { code: 'invalid-op', message: this.invalidExternalTokens })
     if (message.expectedDocId !== undefined && message.expectedDocId !== this.docId) return this.reject(message.id, { code: 'conflict', message: 'document identity changed; refresh the edit context' })
     if (message.expectedHead !== undefined && message.expectedHead !== (this.head()?.hash ?? null)) return this.reject(message.id, { code: 'conflict', message: 'document head changed; refresh the edit context' })
-    if (message.ops.length === 0) return this.reject(message.id, { code: 'invalid-op', message: 'commit has no ops' })
+    if (message.ops.length === 0 && !allowEmpty) return this.reject(message.id, { code: 'invalid-op', message: 'commit has no ops' })
     if (message.base > this.rev) return this.reject(message.id, { code: 'invalid-op', message: `base ${message.base} is ahead of rev ${this.rev}` })
     const componentSwaps: InstanceSwapReport[] = []
     const componentDetaches: InstanceDetachReport[] = []
@@ -638,7 +669,7 @@ class DesignSession implements Session {
       if (message.durable && this.chain) {
         try { syncDocument(this.path) } catch (err) { return this.reject(message.id, { code: 'write-failed', message: err instanceof Error ? err.message : String(err) }) }
       }
-      this.emit({ t: 'result', id: message.id, ok: true, rev: this.rev, head: this.head(), nodeIds: [], committedAt: new Date().toISOString(), ...(componentSwaps.length ? { componentSwaps } : {}), ...(componentDetaches.length ? { componentDetaches } : {}) })
+      this.emit({ t: 'result', id: message.id, ok: true, images, rev: this.rev, head: this.head(), nodeIds: [], committedAt: new Date().toISOString(), ...(componentSwaps.length ? { componentSwaps } : {}), ...(componentDetaches.length ? { componentDetaches } : {}) })
       return
     }
     const before = this.doc
@@ -651,7 +682,7 @@ class DesignSession implements Session {
     if (failure) return this.reject(message.id, failure)
     this.undoStack.push(undoStep(label, patch.inverse, before, this.doc, patch.applied, history))
     this.redoStack = []
-    this.accept(message.id, { kind: 'commit', id: message.id, author: this.author }, bakeImpact(this.doc, patch.applied, before), componentSwaps, componentDetaches, patch.applied, before)
+    this.accept(message.id, { kind: 'commit', id: message.id, author: this.author }, bakeImpact(this.doc, patch.applied, before), componentSwaps, componentDetaches, patch.applied, before, images)
   }
 
   private step(id: string, direction: 'undo' | 'redo', durable = false): void {
@@ -743,7 +774,7 @@ class DesignSession implements Session {
     if (this.docText !== before || this.sourcePending !== sourcePending) this.announce({ kind: 'external', author: author ?? null })
   }
 
-  private accept(id: string, cause: Cause, impact: BakeImpact, componentSwaps: InstanceSwapReport[] = [], componentDetaches: InstanceDetachReport[] = [], ops: PatchOp[] = [], before: FdnDocument = this.doc): void {
+  private accept(id: string, cause: Cause, impact: BakeImpact, componentSwaps: InstanceSwapReport[] = [], componentDetaches: InstanceDetachReport[] = [], ops: PatchOp[] = [], before: FdnDocument = this.doc, images: ImageImportResult[] = []): void {
     const nodeIds = new Set<string>()
     for (const op of ops) {
       if ('id' in op && op.op !== 'set-annotation-status' && op.op !== 'remove-annotation') nodeIds.add(op.id)
@@ -762,7 +793,7 @@ class DesignSession implements Session {
     }
     this.rev++
     const head = this.head()
-    this.emit({ t: 'result', id, ok: true, rev: this.rev, head, nodeIds: [...nodeIds].sort(), committedAt: new Date().toISOString(), ...(componentSwaps.length ? { componentSwaps } : {}), ...(componentDetaches.length ? { componentDetaches } : {}) })
+    this.emit({ t: 'result', id, ok: true, images, rev: this.rev, head, nodeIds: [...nodeIds].sort(), committedAt: new Date().toISOString(), ...(componentSwaps.length ? { componentSwaps } : {}), ...(componentDetaches.length ? { componentDetaches } : {}) })
     this.emit({ t: 'doc', cause, ...this.documentView(head) })
     this.sendBakes(impact)
   }

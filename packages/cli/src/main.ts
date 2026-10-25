@@ -1,4 +1,5 @@
 #!/usr/bin/env -S npx tsx
+import { runImages } from './commands/images.js'
 /**
  * foundation-cli — entry point (API.md "CLI (packages/cli)"). Zero-dependency
  * argv parsing; bin name `foundation`; tsx is the runtime (this file is the
@@ -35,6 +36,9 @@ import { runSession } from './commands/session.js'
 import type { CliIO } from './io.js'
 
 const COMMANDS: Record<string, (args: string[], io: CliIO) => Promise<number>> = {
+  images: runImages,
+  'import-image': (args, io) => runImages(args, io, 'import-image'),
+  'localize-images': (args, io) => runImages(args, io, 'localize-images'),
   new: runNew,
   copy: runCopy,
   inspect: runInspect,
@@ -64,6 +68,9 @@ const USAGE = `foundation — a design-document engine CLI
 usage: foundation <command> [args]
 
 commands:
+  images <file>                            list image references and storage status
+  import-image <file> <source> --node ID    store image and attach to node (one undo)
+  localize-images <file> [--node ID]        store remote images explicitly (one undo)
   new <name> [--no-chain]                    write a minimal .fdn.html skeleton (chain-inits it too)
   copy <src> <dest> [--title T] [--json]      create an independent document with a fresh identity and chain
   inspect <file>                             summarize a document

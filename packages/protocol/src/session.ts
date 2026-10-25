@@ -65,7 +65,23 @@ export type ComponentOp =
   | { op: 'reset-instance-override'; id: string; target: string[] }
   | { op: 'reset-instance-overrides'; id: string }
 
-export type SessionOp = PatchOp | PlacementOp | TokenModeOp | ComponentOp | ArtboardOp
+export interface ImageImportResult {
+  nodeId: string
+  property: string
+  source: string
+  status: 'stored' | 'failed'
+  asset?: { src: string; mime: string; bytes: number; hash: string }
+  reason?: string
+}
+export interface DocumentImage {
+  nodeId: string; property: string; src: string; sourceUrl: string | null
+  stored: boolean; mime: string | null; bytes: number | null; hash: string | null
+}
+export type ImageOp =
+  | { op: 'import-image'; id: string; source: string; property?: 'src' | 'background-image' }
+  | { op: 'localize-images'; nodeIds?: string[] }
+
+export type SessionOp = ImageOp | PatchOp | PlacementOp | TokenModeOp | ComponentOp | ArtboardOp
 
 export type ClientMessage =
   | { t: 'hello'; protocol: string; client: string; author: string; earlyResult?: boolean; artboardFrames?: boolean; mode?: 'read' }
@@ -76,6 +92,7 @@ export type ClientMessage =
   | { t: 'undo'; id: string; durable?: boolean }
   | { t: 'redo'; id: string; durable?: boolean }
   | { t: 'log'; id: string; limit: number; before?: string }
+  | { t: 'images'; id: string }
   | { t: 'activity'; id: string; limit: number; since?: string; cursor?: string }
 
 export type LegacyClientMessage = Exclude<ClientMessage, { t: 'view' }> | { t: 'view'; states: Array<string | null>; components: boolean; bakeDiffs?: boolean }
@@ -94,10 +111,11 @@ export type ServiceMessage =
   | ({ t: 'baked-diff'; rev: number; baseRev: number; start: number; deleteCount: number; insert: string; report: ReportLine[] } & BoardView)
   | { t: 'component'; rev: number; name: string; html: string; report: ReportLine[] }
   | { t: 'instance-swap-preview'; id: string; rev: number; report: InstanceSwapReport }
-  | ({ t: 'result'; id: string; ok: true; committedAt: string; componentSwaps?: InstanceSwapReport[]; componentDetaches?: InstanceDetachReport[] } & MutationReceipt)
+  | ({ t: 'result'; id: string; ok: true; committedAt: string; images?: ImageImportResult[]; componentSwaps?: InstanceSwapReport[]; componentDetaches?: InstanceDetachReport[] } & MutationReceipt)
   | ({ t: 'result'; id: string; ok: false; code: ResultCode; message: string } & MutationReceipt)
   | { t: 'log'; id: string; entries: Array<EnvelopeRecord & Partial<Omit<ChainLogEntry, keyof EnvelopeRecord>>>; nextCursor?: string | null; latestCursor?: string | null; hasMore?: boolean }
   | { t: 'activity'; id: string; entries: ChainLogEntry[]; frontier: string; nextCursor: string | null; hasMore: boolean }
+  | { t: 'images'; id: string; images: DocumentImage[] }
   | { t: 'fault'; code: FaultCode; message: string }
 
 export type LegacyDocumentView = Omit<DocumentView, 'pages' | 'boards' | 'unavailableBoards'>
@@ -309,15 +327,20 @@ const ARTBOARD_OPS: Record<ArtboardOp['op'], Check> = {
 }
 const isArtboardOp: Check = (value) => isRecord(value) && typeof value.op === 'string' && Object.hasOwn(ARTBOARD_OPS, value.op) && ARTBOARD_OPS[value.op as ArtboardOp['op']](value)
 
+const isImageOp: Check = value => isRecord(value) && (value.op === 'import-image'
+  ? shape({ id: isString, source: isString, property: optional(oneOf(['src', 'background-image'])) })(value)
+  : value.op === 'localize-images' && shape({ nodeIds: optional(arrayOf(isString)) })(value))
+
 const CLIENT_MESSAGES: Record<ClientMessage['t'], Check> = {
   hello: shape({ protocol: isString, client: isString, author: isString, earlyResult: optional(isBoolean), artboardFrames: optional(isBoolean), mode: optional(oneOf(['read'])) }),
   view: shape({ boards: arrayOf(isBoardRef), components: isBoolean, bakeDiffs: optional(isBoolean) }),
   'preview-instance-swap': shape({ id: isString, op: (value) => isRecord(value) && ['swap-instance', 'set-instance-variant'].includes(String(value.op)) && isComponentOp(value) }),
-  commit: shape({ id: isString, durable: optional(isBoolean), base: isCount, expectedHead: optional(nullable(isString)), expectedDocId: optional(isString), ops: arrayOf((value) => isPatchOp(value) || isPlacementOp(value) || isTokenModeOp(value) || isComponentOp(value) || isArtboardOp(value)), label: isString }),
+  commit: shape({ id: isString, durable: optional(isBoolean), base: isCount, expectedHead: optional(nullable(isString)), expectedDocId: optional(isString), ops: arrayOf((value) => isPatchOp(value) || isPlacementOp(value) || isTokenModeOp(value) || isComponentOp(value) || isArtboardOp(value) || isImageOp(value)), label: isString }),
   anchor: shape({ id: isString, durable: optional(isBoolean), name: isString }),
   undo: shape({ id: isString, durable: optional(isBoolean) }),
   redo: shape({ id: isString, durable: optional(isBoolean) }),
   log: shape({ id: isString, limit: isCount, before: optional(isString) }),
+  images: shape({ id: isString }),
   activity: shape({ id: isString, limit: isCount, since: optional(isString), cursor: optional(isString) }),
 }
 
@@ -358,6 +381,7 @@ const SERVICE_MESSAGES: Record<ServiceMessage['t'], Check> = {
     isRecord(value) && isString(value.id) && isCount(value.rev) && nullable(isEnvelope)(value.head) && arrayOf(isString)(value.nodeIds) && (value.ok === true ? isString(value.committedAt) : value.ok === false && oneOf(RESULT_CODES)(value.code) && isString(value.message)),
   log: shape({ id: isString, entries: arrayOf(isLogEntry), nextCursor: optional(nullable(isString)), latestCursor: optional(nullable(isString)), hasMore: optional(isBoolean) }),
   activity: shape({ id: isString, entries: arrayOf(isActivityEntry), frontier: isString, nextCursor: nullable(isString), hasMore: isBoolean }),
+  images: shape({ id: isString, images: arrayOf(shape({ nodeId: isString, property: isString, src: isString, sourceUrl: nullable(isString), stored: isBoolean, mime: nullable(isString), bytes: nullable(isCount), hash: nullable(isString) })) }),
   fault: shape({ code: oneOf(FAULT_CODES), message: isString }),
 }
 

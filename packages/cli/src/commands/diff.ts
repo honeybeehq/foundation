@@ -9,7 +9,7 @@
  * yet in this checkout.
  */
 import { readFileSync } from 'node:fs'
-import { parseDocument, projectDocument } from 'foundation-engine'
+import { embedDocumentImages, parseDocument, projectDocument } from 'foundation-engine'
 import type { ConformanceReport, FdnDocument, FdnViewport } from 'foundation-engine'
 import type { CliIO } from '../io.js'
 import { parseArgs } from '../argv.js'
@@ -139,8 +139,8 @@ export async function runDiff(args: string[], io: CliIO): Promise<number> {
   let cellsA: RenderCell[]
   let cellsB: RenderCell[]
   try {
-    cellsA = await renderModule.renderDocument(docA)
-    cellsB = await renderModule.renderDocument(docB)
+    cellsA = await renderModule.renderDocument(embedDocumentImages(docA, fileA))
+    cellsB = await renderModule.renderDocument(embedDocumentImages(docB, fileB))
   } catch (err) {
     io.stdout(`visual: render failed (${err instanceof Error ? err.message : String(err)}) — structure-only diff`)
     return 0

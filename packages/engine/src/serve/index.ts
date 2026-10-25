@@ -50,6 +50,7 @@ import { existsSync, readFileSync, watch, writeFileSync, type FSWatcher } from '
 import { basename } from 'node:path'
 import { parseDocument } from '../parse/index.js'
 import { bakeDocument } from '../bake/index.js'
+import { embedDocumentImages } from '../assets/index.js'
 import { loadChain, mintAnnotationId } from '../chain/index.js'
 import type { FdnChain } from '../chain/index.js'
 import { validateDocument } from '../validate/index.js'
@@ -97,7 +98,7 @@ function loadAndBake(filePath: string, state: string | null): {
 } {
   const source = readSource(filePath)
   const { doc } = parseDocument(source)
-  const baked = bakeDocument(doc, state !== null ? { state } : undefined)
+  const baked = bakeDocument(embedDocumentImages(doc, filePath), state !== null ? { state } : undefined)
   // report-never-reject (D1): a document with validation ERRORS still bakes
   // best-effort and gets served — validateDocument() runs alongside bake
   // purely to surface those errors as a banner (see validationBanner below),

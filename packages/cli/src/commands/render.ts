@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { PNG } from 'pngjs'
-import { parseDocument } from 'foundation-engine'
+import { embedDocumentImages, parseDocument } from 'foundation-engine'
 import type { ConformanceReport, FdnDocument, FdnViewport } from 'foundation-engine'
 import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
@@ -93,7 +93,7 @@ export async function runRender(args: string[], io: CliIO): Promise<number> {
   }
 
   try {
-    const cells = await renderModule.renderDocument(doc, {
+    const cells = await renderModule.renderDocument(embedDocumentImages(doc, file), {
       ...(state !== undefined ? { state } : {}),
       ...(viewport !== undefined ? { viewport } : {}),
       ...(artboardId !== undefined ? { artboardId } : {}),
