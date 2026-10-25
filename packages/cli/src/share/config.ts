@@ -28,6 +28,7 @@ export function readShareConfig(root: string): ShareConfig | null {
   const raw = JSON.parse(readFileSync(file, 'utf8'))
   if (raw.version !== 1) throw new Error('unsupported share.json version')
   if (raw.mode === 'git-only') return null
+  if(raw.publicAccess!==undefined&&!['repo-read','collaborators'].includes(raw.publicAccess))throw new Error('invalid share public access policy')
   if (
     !['self-hosted', 'hosted'].includes(raw.mode) ||
     raw.encryption !== 'e2e-v1' ||

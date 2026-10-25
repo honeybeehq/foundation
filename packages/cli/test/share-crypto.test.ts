@@ -140,3 +140,9 @@ describe('epoch trust and fork alarms', () => {
     expect(() => recoverEpoch('sp_one', wrap, writer.device, recoveryKeypair().code)).toThrow()
   })
 })
+
+it('rejects misspelled public access policy instead of falling back to public readers',()=>{
+ const root=mkdtempSync(join(tmpdir(),'share-policy-'));mkdirSync(join(root,'.foundation'))
+ writeFileSync(join(root,'.foundation/share.json'),JSON.stringify({version:1,mode:'self-hosted',service:'https://share.example',repo:'github.com/team/repo',space:'sp_one',encryption:'e2e-v1',publicAccess:'collaborater'}))
+ expect(()=>readShareConfig(root)).toThrow(/public access policy/)
+})
