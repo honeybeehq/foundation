@@ -105,6 +105,8 @@ Final anchored compare-only times: **337 / 295 / 87ms**, excluding capture, file
 
 ## Reproduce and inspect
 
+Live evidence gallery: https://trmd-metal-2.tailff9529.ts.net:8465/matching/index.html (same Nectar environment as the capture gallery). It includes the before/after table, both fixed-pair images, and every candidate with possible supporting labels.
+
 Prerequisites: repository frozen lockfile dependencies and pinned Playwright Chromium. Download the anchor capture archive from the gallery, verify SHA256 `281c7ec09faf1a833f3c6728d0af855769945abd907b2157f203a19f03fd1147`, then extract to `.audit/r2-anchors`.
 
 ```sh
