@@ -171,14 +171,13 @@ export class ShareAuth {
   async permission(repo: string, login: string, publicAccess: PublicAccess): Promise<'read' | 'write' | 'none'> {
     const path = `/repos/${repo.slice('github.com/'.length)}`
     const metadata = await this.json(path)
-    const publicRead = metadata.private === false && publicAccess === 'repo-read'
+    if (metadata.private === false && publicAccess === 'repo-read')
+      throw new ShareAuthError(400, 'Public repositories require collaborators and organization members; repo-read is only allowed for private repositories')
     if (!this.config.githubPermissionToken && !this.config.githubApiUrl) {
-      if (publicRead) return 'read'
       throw new ShareAuthError(503, 'service metadata permission credential required')
     }
     const response = await this.request(`${path}/collaborators/${login}/permission`)
     if (response.status === 404 || (metadata.private === false && publicAccess === 'collaborators')) {
-      if (publicRead) return 'read'
       for (let page = 1; page <= 1000; page++) {
         const list = await this.request(`${path}/collaborators?affiliation=all&per_page=100&page=${page}`)
         if (list.status !== 200) throw new ShareAuthError(502, 'Cannot confirm collaborator removal')
@@ -195,7 +194,6 @@ export class ShareAuth {
       throw new ShareAuthError(502, 'Collaborator listing exceeded bound')
     }
     if (response.status !== 200) {
-      if (publicRead && response.status === 404) return 'read'
       throw new ShareAuthError(502, 'GitHub collaborator permission unavailable')
     }
     let permission: unknown
@@ -205,7 +203,7 @@ export class ShareAuth {
       throw new ShareAuthError(502, 'invalid GitHub permission response')
     }
     if (['admin', 'maintain', 'write', 'push'].includes(String(permission))) return 'write'
-    if (['read', 'pull', 'triage'].includes(String(permission)) || publicRead) return 'read'
+    if (['read', 'pull', 'triage'].includes(String(permission))) return 'read'
     if (permission === 'none') return 'none'
     throw new ShareAuthError(502, 'unknown GitHub permission')
   }

@@ -7,7 +7,7 @@ import { randomUUID } from 'node:crypto'
 import { ready, generateDeviceKeys, deviceStatement, deviceId } from '../src/share/crypto.js'
 import { prepareDevice } from '../src/share/client.js'
 import { saveSession } from '../src/share/vault.js'
-import { verifyDevice, signDevice, DeviceBindingError } from '../src/share/github.js'
+import { verifyDevice, signDevice, DeviceBindingError, memberAccess } from '../src/share/github.js'
 import type { ShareConfig } from '../src/share/config.js'
 beforeAll(async () => {
   await ready
@@ -94,4 +94,15 @@ it('authenticates numeric account lookups and caches a verified binding while ke
   } finally {
     rmSync(root, { recursive: true, force: true })
   }
+})
+
+it('independently refuses public repo-read before consulting permissions or sharing keys', async () => {
+  const requests: string[]=[]
+  vi.stubGlobal('fetch', async (input: unknown) => {
+    requests.push(new URL(String(input)).pathname)
+    return Response.json({private:false})
+  })
+  const config: ShareConfig={version:1,mode:'self-hosted',service:'http://127.0.0.1:1',space:'sp_policy',repo:`github.com/team/policy-${randomUUID()}`,encryption:'e2e-v1',publicAccess:'repo-read'}
+  await expect(memberAccess(config,'alice',42,'LOCAL_TOKEN')).rejects.toThrow('repo-read is only allowed for private repositories')
+  expect(requests).toEqual([`/repos/${config.repo.slice(11)}`])
 })

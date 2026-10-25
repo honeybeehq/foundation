@@ -33,8 +33,9 @@ foundation share serve --config /etc/foundation-share.json
 
 Read access fetches and hands over the current epoch; write access creates spaces,
 appends, rotates keys and manages recovery. New spaces default to explicit collaborators, including public repositories.
-An explicitly selected repo-read policy permits every verified GitHub reader of
-a public repo to receive live keys. Devices bind their public service origin, repo, space,
+Public repositories admit only collaborators and organization members with repo
+access (including team/default organization grants). `repo-read` is refused for
+public repositories; it remains a compatibility alias on private repositories. Devices bind their public service origin, repo, space,
 GitHub numeric id and login to both public keys. The service validates possession
 and direct GitHub identity/key ownership. A successful explicit client
 re-attestation updates the SSH signature without changing immutable device keys;

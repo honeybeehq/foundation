@@ -166,9 +166,10 @@ foundation share status --json
 OAuth App client id. `--token-stdin` accepts a local GitHub token without putting
 it in process arguments. `--repo-root` selects a checkout explicitly. `share init`
 can take `--repo github.com/OWNER/REPO` instead of inferring origin. New spaces default to `collaborators`, including public repos, so live drafts
-reach explicitly listed collaborators. `--public-access repo-read` deliberately
-allows every GitHub reader of a public repo to receive live keys. Every peer enforces that committed
-policy independently. Read members receive keys and fetch; only writers append.
+reach only collaborators and organization members with repo access, including
+team and default organization grants. Public repositories refuse
+`--public-access repo-read`; that option remains a compatibility alias only for
+private repositories. Every peer independently enforces this restriction. Read members receive keys and fetch; only writers append.
 
 The descriptor adds public `recoveryPublicKey` and `publicAccess` fields to the
 version 1 discovery shape. Keys are mandatory end-to-end (`e2e-v1`); encryption

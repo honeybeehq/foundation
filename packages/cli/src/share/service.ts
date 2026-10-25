@@ -188,7 +188,7 @@ export async function startShareService(config: ShareServiceConfig) {
     return b
   }
   async function permission(space: ServiceSpace, device: ShareDevice) {
-    const result = await githubAuth.permission(space.repo, device.login, space.publicAccess ?? 'repo-read')
+    const result = await githubAuth.permission(space.repo, device.login, space.publicAccess ?? 'collaborators')
     if (result === 'none') {
       await store.update((spaces) => {
         const current = spaces.find((s) => s.space === space.space) as ServiceSpace | undefined
@@ -305,8 +305,8 @@ export async function startShareService(config: ShareServiceConfig) {
           const existing = spaces.find((s) => s.repo === repo) as ServiceSpace | undefined
           if (existing) {
             requireThat(existing.space === challenge.space, 'space created concurrently; request new challenge', 409)
-            requireThat((existing.publicAccess ?? 'repo-read') === publicAccess, 'immutable public access policy', 409)
-            return { space: existing.space, repo, publicAccess: existing.publicAccess ?? 'repo-read' }
+            requireThat((existing.publicAccess ?? 'collaborators') === publicAccess, 'immutable public access policy', 409)
+            return { space: existing.space, repo, publicAccess: existing.publicAccess ?? 'collaborators' }
           }
           spaces.push(candidate)
           return { space: candidate.space, repo, publicAccess }
@@ -373,7 +373,7 @@ export async function startShareService(config: ShareServiceConfig) {
       )
       delete body.space
       if (method === 'GET' && path === '/v1/state') {
-        send(200, { ...space, publicAccess: space.publicAccess ?? 'repo-read', accessLost: space.accessLost ?? [] })
+        send(200, { ...space, publicAccess: space.publicAccess ?? 'collaborators', accessLost: space.accessLost ?? [] })
         return
       }
       if (method === 'GET' && path === '/v1/relay') {

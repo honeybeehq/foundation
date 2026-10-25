@@ -72,13 +72,19 @@ async function memberAccessFresh(
   token: string
 ): Promise<'read' | 'write' | 'none'> {
   if (!/^[A-Za-z0-9-]+$/.test(login)) throw new DeviceBindingError('invalid member login')
+  if (config.publicAccess === 'repo-read') {
+    const metadata = await github(`/repos/${config.repo.slice(11)}`, token)
+    if (!metadata.ok) throw new Error('cannot independently verify repository visibility')
+    const info = await metadata.json() as { private?: boolean }
+    if (info.private !== true)
+      throw new Error('Public repositories require collaborators and organization members; repo-read is only allowed for private repositories')
+  }
   const response = await github(`/repos/${config.repo.slice(11)}/collaborators/${login}/permission`, token)
   // A 404 can also hide insufficient observer permissions: do not treat it as proof of removal.
   if (response.status === 404 || (response.ok && config.publicAccess === 'collaborators')) {
     const repo = await github(`/repos/${config.repo.slice(11)}`, token)
     if (!repo.ok) throw new Error('observer cannot independently verify repo access')
     const info = (await repo.json()) as { private: boolean }
-    if (info.private === false && config.publicAccess !== 'collaborators') return 'read'
     if (typeof info.private !== 'boolean') throw new Error('unknown repository visibility')
     // Only a complete successful collaborator listing proves absence; a hidden 404 alone does not.
     for (let page = 1; page <= 1000; page++) {
