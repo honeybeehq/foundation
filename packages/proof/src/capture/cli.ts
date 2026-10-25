@@ -42,6 +42,7 @@ try {
   const pairs: {path: string; state: string}[] = []
   for (const { board, state } of target.entries) {
     const pairStart = performance.now()
+    let frame = {width: board.viewport.width, height: board.viewport.height}
     const folder = join(out, board.id, state.name, `${board.viewport.width}x${board.viewport.height}@${board.viewport.dpr}`)
     for (const side of ['design', 'code'] as const) {
       const captureStart = performance.now()
@@ -102,6 +103,11 @@ try {
         }
         await page.addStyleTag({ content: fontAssets.map(font => font.css).join('\n') + '\n*{animation:none!important;transition:none!important;caret-color:transparent!important} #foundation-root{width:100vw;height:100vh;overflow:hidden}' })
         await page.evaluate(() => document.fonts.ready)
+        if (side === 'design') frame = await page.evaluate(() => {
+          const rect = document.querySelector('#foundation-root')!.firstElementChild!.getBoundingClientRect()
+          return {width: rect.width, height: rect.height}
+        })
+        await page.addStyleTag({content: `#foundation-root{width:${frame.width}px;height:${frame.height}px}`})
         await page.waitForFunction(() => (window as any).__foundationPendingTimers === 0, undefined, {timeout:5000})
         await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
         const dom = await collectDom(page, '#foundation-root')
@@ -112,7 +118,7 @@ try {
         await mkdir(destination, { recursive: true })
         await page.screenshot({ path: join(destination, 'screenshot.png'), animations: 'disabled' })
         await writeFile(join(destination, 'dom.json'), JSON.stringify(dom, null, 2) + '\n')
-        const meta = { schema: 'fdn-capture/0', rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, url, fonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
+        const meta = { schema: 'fdn-capture/0', rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, frame, url, fonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
         await writeFile(join(destination, 'meta.json'), JSON.stringify(meta, null, 2) + '\n')
         console.log(`${board.id}/${state.name} ${side}: ${dom.nodes.length} nodes, ${meta.timingsMs.capture} ms`)
       } finally { await context.close() }
