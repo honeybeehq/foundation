@@ -1,6 +1,6 @@
 {
   "schema": "fdn-capture/0",
-  "rendererSourceHash": "70ab9ab5f56628fc5094ec5abec49e461eaab6881ff79dc29f3203b41903da92",
+  "rendererSourceHash": "d43b6b7b6fe9b71ca710b0f479cd1f3c15a4413098973b7d552d7e06950b78db",
   "rendererSources": [
     {
       "file": "package.json",
@@ -168,7 +168,7 @@
     },
     {
       "file": "packages/proof/src/capture/cli.ts",
-      "sha256": "4108b03ba1c00f929085b027b779750c3bc56d2e3e295944b369e35f07ec6df0"
+      "sha256": "d7314a0761a2b06ba7defb4a213cf52fb9f16d7155ea46dc8f9bcfc64411e62f"
     },
     {
       "file": "packages/proof/src/capture/code-cli.ts",
@@ -219,7 +219,7 @@
       "sha256": "65b137b164da0eabf320bd8ad051d2e75dc1b210019746c3be72a78d3db92f37"
     }
   ],
-  "rendererCommit": "617ef30a2203e299eb026bd32098cac64d7e9617",
+  "rendererCommit": "4b192f7060909a6ca79ee060d907faa5b4990307",
   "rendererDirty": false,
   "provable": true,
   "source": "code",
@@ -250,7 +250,7 @@
   },
   "fullExtent": {
     "file": "full-extent.png",
-    "sha256": "457d92c8a7a90cfd1cd6aee1e566eacb5e2670a928d92ede3507ae842ba8c620",
+    "sha256": "4853aee3ddd746fa49a3f98ab377f2076af873b0ca69d6b8300a74c42678af8a",
     "diagnosticPaint": true
   },
   "frame": {
@@ -260,7 +260,61 @@
   "boundary": {
     "codeSelector": "[data-help-center]",
     "originNormalized": true,
-    "sizePreserved": true
+    "bothRootsNormalized": true,
+    "sizePreserved": true,
+    "audit": {
+      "nodes": 1801,
+      "properties": 54,
+      "differences": [
+        {
+          "node": 0,
+          "property": "margin-top",
+          "before": "57px",
+          "after": "0px"
+        },
+        {
+          "node": 0,
+          "property": "margin-right",
+          "before": "210px",
+          "after": "0px"
+        },
+        {
+          "node": 0,
+          "property": "margin-bottom",
+          "before": "57px",
+          "after": "0px"
+        },
+        {
+          "node": 0,
+          "property": "margin-left",
+          "before": "210px",
+          "after": "0px"
+        },
+        {
+          "node": 0,
+          "property": "position",
+          "before": "fixed",
+          "after": "relative"
+        }
+      ],
+      "unexpected": [],
+      "scrolls": [
+        {
+          "node": 20,
+          "x": 0,
+          "y": 2655
+        }
+      ],
+      "finalScrolls": [
+        {
+          "node": 20,
+          "x": 0,
+          "y": 2655,
+          "finalX": 0,
+          "finalY": 2655
+        }
+      ]
+    }
   },
   "url": "http://127.0.0.1:5173/__foundation/0",
   "fonts": [
@@ -649,6 +703,6 @@
   "blocked": [],
   "errors": [],
   "timingsMs": {
-    "capture": 11851
+    "capture": 12059
   }
 }
