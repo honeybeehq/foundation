@@ -963,7 +963,7 @@ export const TOOLS: ToolDefinition[] = [
     inputSchema: { type: 'object', properties: { path: { type: 'string' }, ops: { type: 'array', items: { type: 'object' } }, label: { type: 'string' }, author: { type: 'string' } }, required: ['path', 'ops'] },
     handler: async args => {
       if (!Array.isArray(args.ops)) return fail('ops must be an array')
-      const result = editDocument(requireString(args, 'path'), args.ops as SessionOp[], optionalString(args, 'label') ?? 'Edit', optionalString(args, 'author') ?? defaultAuthor())
+      const result = await editDocument(requireString(args, 'path'), args.ops as SessionOp[], optionalString(args, 'label') ?? 'Edit', optionalString(args, 'author') ?? defaultAuthor())
       return ok({ path: args.path, rev: result.rev })
     },
   },

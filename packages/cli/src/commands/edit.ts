@@ -13,7 +13,7 @@ export async function runEdit(args: string[], io: CliIO): Promise<number> {
   try {
     const ops = JSON.parse(source ?? readFileSync(file!, 'utf8'))
     if (!Array.isArray(ops)) throw new Error('ops must be an array')
-    const result = editDocument(path, ops, flagString(flags, 'label') ?? 'Edit', flagString(flags, 'author') ?? defaultAuthor())
+    const result = await editDocument(path, ops, flagString(flags, 'label') ?? 'Edit', flagString(flags, 'author') ?? defaultAuthor())
     io.stdout(JSON.stringify({ path, rev: result.rev }))
     return 0
   } catch (err) { io.stderr(String(err)); return 1 }
