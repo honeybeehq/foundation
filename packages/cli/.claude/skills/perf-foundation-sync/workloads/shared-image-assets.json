@@ -7,7 +7,7 @@
     "main"
   ],
   "owners": [
-    "packages/cli/src/share/assets.ts@c7341131fa6b8fe342d684a3c9e66a794ac5b4dc"
+    "packages/cli/src/share/assets.ts@708a8c3944b5bd927516872241418f7db9c82354"
   ],
   "effect": {
     "user": "Large immutable images are shared without growing per-feed dedup scans.",

@@ -211,7 +211,7 @@ async function download(config:CombConfig,target:string,ref:AssetRef):Promise<vo
       try {
         await bridge.hello()
         const head=await bridge.request('head',{log})
-        if(head.log!==log||typeof head.cursor!=='string'||!/^\d+$/.test(head.cursor)||BigInt(head.cursor)<2n||BigInt(head.cursor)>65n)throw new Error('asset chunk missing or history too large')
+        if(head.log!==log||typeof head.cursor!=='string'||!/^([1-9][0-9]{0,19})$/.test(head.cursor)||BigInt(head.cursor)<2n||BigInt(head.cursor)>18446744073709551615n)throw new Error('asset chunk missing or invalid head')
         let item:ReturnType<typeof decode>|undefined,lastError:unknown
         const newest=BigInt(head.cursor)-1n
         // Prefer the newest valid copy so a later repaired upload can recover a
