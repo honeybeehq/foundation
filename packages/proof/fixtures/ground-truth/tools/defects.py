@@ -99,7 +99,7 @@ def track_open(prefix, cv, live):
             ('current-step', '0/0/1/1/1/0/5/0', f'{cv}/6/0/1/0/0', 'style',
              'Current step is highlighted by a grey row background in design; code uses a raised white card with semibold title and green "current" label',
              'low', 'yes', '', 'background-color;font-weight;box-shadow'),
-            ('upcoming-title', '0/0/1/1/1/0/[6-9]/0/3', f'{cv}/8/0/1', 'style',
+            ('upcoming-title', '0/0/1/1/1/0/6/0/3;0/0/1/1/1/0/7/0/3;0/0/1/1/1/0/8/0/3;0/0/1/1/1/0/9/0/3', f'{cv}/8/0/1', 'style',
              'Upcoming step titles are full-ink #2E2B27 in design, muted #8A877F in code', 'low', 'unsure', '', 'color'),
         ]
     else:
@@ -130,6 +130,10 @@ def track_open(prefix, cv, live):
              'Change rows are marked + / ~ / − in green / grey / red in design; code marks additions with dashed violet cards and removals with a "removed" label, and the "~ changed" Verdict gate has no marker',
              'low', 'yes', '', 'text;color'),
         ]
+    # Added after the blind comparison; appended so earlier ids stay stable.
+    rows.append(('spine-header', '0/0/1/1/1/0/0/0', 'none', 'missing',
+                 'SPINE section header with the summary "6 items · 1 branch · 9 nodes" above the steps is missing',
+                 'low', 'yes', 'added after blind comparison: found by the second labeller (their D17), missed in my first pass', 'subtree'))
     return [(f'{prefix}-{i + 1:02d}',) + r[1:] + (r[0],) for i, r in enumerate(rows)]
 
 
