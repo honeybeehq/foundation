@@ -7,7 +7,7 @@
     "main"
   ],
   "owners": [
-    "packages/cli/src/share/assets.ts@5787c510405cd5d8cb6c7dc32b1a40c02bb1f78a"
+    "packages/cli/src/share/assets.ts@7177192a095c6642471a19199399efafbedefab3"
   ],
   "effect": {
     "user": "Large immutable images are shared without growing per-feed dedup scans.",
@@ -49,6 +49,14 @@
     {
       "inventory": "boundaries",
       "key": "rpc:packages/cli/src/share/assets.ts:read"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/assets.ts:readAssetStatus"
+    },
+    {
+      "inventory": "work-triggers",
+      "key": "poll:packages/cli/src/share/assets.ts#1"
     }
   ],
   "states": {

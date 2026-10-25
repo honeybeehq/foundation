@@ -15,9 +15,9 @@ vi.mock('../src/share/transport.js',()=>({createBridge:(config:any)=>({hello:asy
 }})}))
 let root:string
 const config:any={binary:'',args:[],share:{space:'test'}}
-afterEach(async()=>{store.clear();if(root)await rm(root,{recursive:true,force:true})})
+afterEach(async()=>{store.clear();vi.unstubAllEnvs();if(root)await rm(root,{recursive:true,force:true})})
 async function fixture(bytes=Buffer.concat([Buffer.from('89504e470d0a1a0a','hex'),Buffer.alloc(300000,71)])){
- root=await mkdtemp(join(tmpdir(),'share-assets-'));const a=join(root,'a','board.fdn.html'),b=join(root,'b','board.fdn.html');await mkdir(join(root,'a','.foundation','assets'),{recursive:true});await mkdir(join(root,'b'))
+ root=await mkdtemp(join(tmpdir(),'share-assets-'));vi.stubEnv('FOUNDATION_REPLICA_STORE',join(root,'replicas'));const a=join(root,'a','board.fdn.html'),b=join(root,'b','board.fdn.html');await mkdir(join(root,'a','.foundation','assets'),{recursive:true});await mkdir(join(root,'b'))
  const hash=createHash('sha256').update(bytes).digest('hex'),path=`.foundation/assets/${hash}.png`
  await writeFile(join(root,'a',path),bytes)
  const doc=skeletonDocument('Image');doc.body[0]!.attrs.src=path
@@ -69,4 +69,25 @@ it('cleans dead-owner partials but preserves active-owner temporary files',async
  await new AssetSharing(config,f.b,root).receive(f.chain)
  expect(await readdir(dir)).toEqual(expect.arrayContaining([live]))
  expect(await readdir(dir)).not.toContain('.asset-2147483647-aaa.tmp')
+})
+it('ignores prose and malformed names instead of stopping publication',()=>{
+ expect(assetReferences({text:'see .foundation/assets/logo.png',other:'Put images in .foundation/assets/<hash>.png',src:'.foundation/assets/logo.png'})).toEqual([])
+ expect(sniffAsset(Buffer.from('<?xml version="1.0"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg xmlns="http://www.w3.org/2000/svg"></svg>'))).toBe('svg')
+ expect(()=>sniffAsset(Buffer.from('<!DOCTYPE svg [<!ENTITY x "x">]><svg/>'))).toThrow('entity')
+})
+it('isolates missing assets and remote chunks in visible status without blocking foreground changes',async()=>{
+ const f=await fixture();await rm(join(root,'a',f.path))
+ const sharing=new AssetSharing(config,f.a,root)
+ await expect(sharing.publish(f.chain,false)).resolves.toBeUndefined()
+ const {readAssetStatus}=await import('../src/share/assets.js')
+ expect(readAssetStatus(f.a)).toEqual(expect.arrayContaining([expect.objectContaining({path:f.path,state:'error'})]))
+ await expect(new AssetSharing(config,f.b,root).receive(f.chain,false)).resolves.toBeUndefined()
+ expect(readAssetStatus(f.b)).toEqual(expect.arrayContaining([expect.objectContaining({path:f.path,state:'error'})]))
+})
+it('uses a later repaired chunk instead of being pinned to a bad first event',async()=>{
+ const f=await fixture();await new AssetSharing(config,f.a,root).publish(f.chain)
+ const rows=[...store.values()][0]!,good={...rows[0]!}
+ rows[0]!.payload_hex=Buffer.from('bad first event').toString('hex');rows.push({...good,seq:'2'})
+ await new AssetSharing(config,f.b,root).receive(f.chain)
+ expect(await readFile(join(root,'b',f.path))).toEqual(f.bytes)
 })

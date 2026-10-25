@@ -1,3 +1,4 @@
+import { readAssetStatus } from '../share/assets.js'
 import { readDirectStatus } from '../sync/direct.js'
 import { materialize, MaterializeError } from '../sync/materialize.js'
 import { readFileSync } from 'node:fs'
@@ -101,13 +102,13 @@ export async function runSync(args: string[], io: CliIO): Promise<number> {
           if(share){try{sharing=JSON.parse(readFileSync(join(replicaRoot(),'sharing',`${share.space}.json`),'utf8'))}catch{sharing={state:'sign in'}}}
           let state
           try { state = readSyncState(copyKey(design)) } catch (err) {
-            return { ...design, direct, sharing, feed: feedName(design), status: 'saved locally', pending: null, cursor: null, lastError: `replica state: ${String(err)}`, lastErrorAt: null, catalogueError: null, updatedAt: '' }
+            return { ...design, assets: readAssetStatus(design.file), direct, sharing, feed: feedName(design), status: 'saved locally', pending: null, cursor: null, lastError: `replica state: ${String(err)}`, lastErrorAt: null, catalogueError: null, updatedAt: '' }
           }
           let pending: number | null = null, localError: string | null = null
           try { const known = new Set(state.published); pending = loadChain(readFileSync(`${design.file}.chain`)).changes().filter(c => !known.has(c.envelope.hash)).length } catch (err) { localError = String(err) }
-          return { ...design, direct, sharing, feed: feedName(design), status: (localError ?? state.lastError) && pending === 0 ? 'blocked' : pending === 0 ? 'shared' : state.updatedAt ? 'waiting to upload' : 'saved locally', pending, cursor: state.cursor, lastError: localError ?? state.lastError, lastErrorAt: state.lastErrorAt ?? null, catalogueError: state.catalogueError ?? null, updatedAt: state.updatedAt }
+          return { ...design, assets: readAssetStatus(design.file), direct, sharing, feed: feedName(design), status: (localError ?? state.lastError) && pending === 0 ? 'blocked' : pending === 0 ? 'shared' : state.updatedAt ? 'waiting to upload' : 'saved locally', pending, cursor: state.cursor, lastError: localError ?? state.lastError, lastErrorAt: state.lastErrorAt ?? null, catalogueError: state.catalogueError ?? null, updatedAt: state.updatedAt }
         })
-        io.stdout(flags.json ? JSON.stringify(rows) : rows.map(row => `${row.file}: ${row.status} [direct ${row.direct.state}${row.direct.reason ? `: ${row.direct.reason}` : ''}] (${row.pending ?? '?'} waiting)${row.lastError ? ` — ${row.lastError}` : ''}${row.catalogueError ? ` — catalogue: ${row.catalogueError}` : ''}`).join('\n'))
+        io.stdout(flags.json ? JSON.stringify(rows) : rows.map(row => `${row.file}: ${row.status} [direct ${row.direct.state}${row.direct.reason ? `: ${row.direct.reason}` : ''}] (${row.pending ?? '?'} waiting)${row.lastError ? ` — ${row.lastError}` : ''}${row.catalogueError ? ` — catalogue: ${row.catalogueError}` : ''}${row.assets.some(a=>a.state!=='ready') ? ` — images: ${row.assets.filter(a=>a.state!=='ready').map(a=>a.path+': '+a.state+(a.reason?' ('+a.reason+')':'')).join('; ')}` : ''}`).join('\n'))
         return 0
       }
       case 'serve': {

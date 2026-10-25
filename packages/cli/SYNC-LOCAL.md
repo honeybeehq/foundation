@@ -127,16 +127,29 @@ opaque asset feed, epoch, key id and keyed chunk identity; the feed address also
 header binds the total. Dedup is keyed per epoch. No custom
 crypto or separate service storage keys are introduced.
 
-Receivers validate the candidate chain, fetch its missing current images, and
-verify sequence, bounded length, full SHA256 and image signature before atomically
-installing without overwrite. Only then may the referencing change import or
-materialize report ready. Failures leave the previous design intact and appear
-in sync's receive error or materialize refusal; retries use the existing outbox.
-Materialization into another directory brings current images there, including
-from complete local cache while offline. Historical blobs stay available for
-later undo references; local undo fetches a missing historical image before republication; materialization does not eagerly download every historical
-image. A corrupt pre-existing immutable local file is refused and preserved for
-inspection, never silently replaced.
+Receivers validate the candidate chain and attempt missing current images for at
+most200ms before importing the consistent change. The writer likewise isolates
+image upload failures rather than blocking later text edits. Local
+`sync status --json` rows expose `assets: [{path,state,reason}]`, with pending,
+error or ready per document-relative path. The daemon retries failed images every
+five seconds even while no new edits arrive. The Inspector already shows “Not on
+this computer yet” for missing stored images; the canvas retains native image
+alt/broken-image or missing background until reload. A richer transport overlay
+belongs to Apiary. No fake content-hash files or altered document references are
+used as placeholders. CLI bake/render/export cannot claim success for a missing
+image; they must keep their strict checks.
+
+Before any image is installed, clients verify sequence, bounded length, full
+SHA256 and image signature. Installation never overwrites. Materialization waits
+for verified current images (bounded60s); otherwise it refuses visibly rather
+than reporting a falsely complete export. Materialization into another directory
+brings current images there, including from complete local cache while offline.
+Historical blobs remain available for later undo references; materialization does
+not eagerly fetch every historical image. A corrupt pre-existing immutable local
+file is refused and preserved for inspection, never silently replaced. Asset-like
+prose and names outside the exact content-addressed contract are ignored. SVG
+DOCTYPE prologs are accepted, but ENTITY declarations are refused across the
+whole file.
 
 There are at most two active transfers and32 queued per client process. Temp
 files are exclusive, removed on failure, and dead-owner temps are cleaned on the
@@ -151,3 +164,13 @@ an image context (`img src` or CSS image URL), never inline DOM, object or embed
 A future consumer that inlines SVG must sanitize on read first. The Design pane
 owner confirms image-context rendering; writer-side ingestion sanitization is
 additional protection, not the receiver's security boundary.
+
+Asset metadata residuals: a former member retaining the routing key can compute
+feed names for a known image hash; with service cooperation they can confirm its
+presence even after access is removed. The service alone cannot compute those
+names. Chunk framing/timing exposes length at roughly128KiB granularity, and
+retention is forever (no GC or storage reclamation). A repaired upload is read
+newest-first with at most eight authenticated alternatives per chunk; malicious
+member-written content can still deny an asset, but never blocks document sync.
+Each chunk uses a lightweight share bridge object; authorization/key checks still
+run for each request. No asset-throughput or cross-host latency SLO is claimed.
