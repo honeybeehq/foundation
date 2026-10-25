@@ -1,0 +1,24 @@
+[
+  {
+    "ids": true,
+    "uniqueDefects": 16,
+    "accepted": 0,
+    "raw": 42,
+    "uncertainMatches": 0,
+    "environment": 0,
+    "uncertain": 1,
+    "matches": 6,
+    "compareMs": 45.843542000000014
+  },
+  {
+    "ids": false,
+    "uniqueDefects": 16,
+    "accepted": 0,
+    "raw": 51,
+    "uncertainMatches": 0,
+    "environment": 0,
+    "uncertain": 2,
+    "matches": 6,
+    "compareMs": 19.282455999999996
+  }
+]
