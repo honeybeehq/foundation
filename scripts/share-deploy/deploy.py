@@ -38,7 +38,7 @@ if not service_config.exists():
 common = 'Environment="PATH=' + str(a.node_bin.resolve()) + ':/usr/local/bin:/usr/bin:/bin"\nUMask=0077\nNoNewPrivileges=yes\n'
 foundation = str(a.foundation.resolve())
 def unit(name, text): (units/name).write_text(text)
-unit('foundation-share.service', '[Unit]\nDescription=Foundation encrypted team sharing (tailnet only)\nAfter=network-online.target\nWants=network-online.target\nStartLimitIntervalSec=0\n\n[Service]\nType=simple\n' + common + 'ExecStart=' + shlex.quote(foundation) + ' share serve --config ' + shlex.quote(str(service_config)) + '\nRestart=on-failure\nRestartSec=3\nTimeoutStopSec=45\n\n[Install]\nWantedBy=default.target\n')
+unit('foundation-share.service', '[Unit]\nDescription=Foundation encrypted team sharing (tailnet only)\nAfter=network-online.target\nWants=network-online.target\nStartLimitIntervalSec=0\n\n[Service]\nType=simple\n' + common + 'ExecStart=' + shlex.quote(foundation) + ' share serve --config ' + shlex.quote(str(service_config)) + '\nRestart=always\nRestartSec=3\nTimeoutStopSec=45\n\n[Install]\nWantedBy=default.target\n')
 env = dict(SHARE_FOUNDATION=foundation, SHARE_CONFIG=str(service_config), SHARE_BACKUPS=str(base/'backups'), SHARE_COMB_CONFIG=str(comb_config))
 unit('foundation-share-backup.service', '[Unit]\nDescription=Stopped Foundation share snapshot with seven-day retention\n\n[Service]\nType=oneshot\n' + common + ''.join('Environment="'+k+'='+v+'"\n' for k,v in env.items()) + 'ExecStart='+str(base/'bin/backup.sh')+'\nTimeoutStartSec=15min\n')
 unit('foundation-share-backup.timer', '[Unit]\nDescription=Nightly Foundation share backup\n\n[Timer]\nOnCalendar=*-*-* 03:15:00\nRandomizedDelaySec=10min\nPersistent=true\n\n[Install]\nWantedBy=timers.target\n')

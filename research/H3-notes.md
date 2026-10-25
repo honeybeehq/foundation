@@ -75,7 +75,7 @@ journalctl --user -u foundation-share.service --since '10 minutes ago'
 curl --fail https://netcup-1.tailff9529.ts.net:19487/v1/oauth
 ```
 
-The service restarts on failure after three seconds. The minute health check
+The service restarts after an unexpected exit after three seconds; an explicit systemctl stop remains stopped. The minute health check
 probes HTTP `/v1/oauth` while the service is running and restarts on HTTP failure.
 An intentionally stopped service stays stopped. This is process/HTTP liveness, not
 a GitHub or durable backend write probe. Health and backup share a filesystem lock; health skips the entire stopped backup window, including oneshot activating state. A real stopped-service lock probe verifies health does not restart it.
@@ -102,10 +102,10 @@ scripts/share-deploy/restore-scratch.sh /ABS/BACKUP /ABS/NEW_SCRATCH
 
 It refuses an existing target, copies registry and objects, rewrites only the
 scratch Comb root and keeps private config mode 0600. Test the scratch backend
-and service before a production restore. To restore production, stop `foundation-share-health.timer` and the service,
+and service before a production restore. To restore production, stop both `foundation-share-health.timer` and `foundation-share-backup.timer`, wait for any active backup job to finish, then stop the service,
 preserve the current registry/objects/config in another private directory, copy
 one matching snapshot into the configured paths, restore matching tenant/digest
-config, then start the service and health timer. Never mix snapshot times. Clients with newer epoch pins
+config, then start the service and both timers. Hold the shared `.backup.lock` throughout any scripted production restore. Never mix snapshot times. Clients with newer epoch pins
 refuse an old restored registry; retain local chains and follow H2's fresh-space
 reseed procedure if a matching current registry cannot be recovered.
 
