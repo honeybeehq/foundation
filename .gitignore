@@ -8,3 +8,7 @@ spikes/render/out/
 *.fdn.html.lock.reap
 *.fdn.html.chain.pending
 *.fdn.html.chain.projection
+
+.artifacts/
+.audit/
+!packages/proof/fixtures/sample-captures/**/*.png
