@@ -11,6 +11,7 @@ import type { Links } from './types.js'
 import { writePair, writeGallery } from './gallery.js'
 import { pinFontStacks, usedFonts } from './fonts.js'
 import {rendererSources} from './provenance.js'
+import {settleRoot} from './settle.js'
 
 const args = process.argv.slice(2)
 const option = (key: string, fallback?: string) => args.includes(key) ? args[args.indexOf(key) + 1] : fallback
@@ -118,8 +119,9 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
         await page.addStyleTag({content: `#foundation-root{width:${frame.width}px;height:${frame.height}px}`})
         await page.waitForFunction(() => (window as any).__foundationPendingTimers === 0, undefined, {timeout:5000})
         await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
-        const dom = await collectDom(page, '#foundation-root')
         const platformFonts = await usedFonts(page, links.fontPolicy?.requireCustomFonts ?? false, fontAssets.map(font => font.postScriptName).filter((name): name is string => Boolean(name)))
+        await settleRoot(page)
+        const dom = await collectDom(page, '#foundation-root')
         if (errors.length || blocked.length) throw new Error(JSON.stringify({ errors, blocked }))
         const fonts = await page.evaluate(() => [...new Set(Array.from(document.querySelectorAll('#foundation-root *')).map(el => getComputedStyle(el).fontFamily))].sort())
         const tokens = await page.evaluate(() => { const css = getComputedStyle(document.documentElement); return Object.fromEntries(Array.from(css).filter(k => k.startsWith('--')).sort().map(k => [k, css.getPropertyValue(k).trim()])) })
