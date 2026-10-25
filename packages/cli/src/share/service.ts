@@ -286,7 +286,7 @@ export async function startShareService(config: ShareServiceConfig) {
         const repo = repoName(body.repo)
         const challenge = githubAuth.consume(body.challenge, 'create')
         requireThat(challenge.repo === repo, 'challenge repo mismatch', 401)
-        const publicAccess = body.publicAccess ?? 'repo-read'
+        const publicAccess = body.publicAccess ?? 'collaborators'
         requireThat(['repo-read', 'collaborators'].includes(publicAccess), 'invalid public access policy')
         const candidate: ServiceSpace = {
           space: challenge.space,
@@ -336,6 +336,7 @@ export async function startShareService(config: ShareServiceConfig) {
             'immutable device binding',
             409
           )
+          if (old) old.signature = device.signature
           if (!old) {
             requireThat(current.devices.length < 1000, 'device registry full', 409)
             current.devices.push(device)

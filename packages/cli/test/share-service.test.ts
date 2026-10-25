@@ -66,7 +66,7 @@ async function fixture(options: {isPublic?: boolean; publicAccess?: 'repo-read'|
   const keys=() => api('keys',{expectedEpoch:0,epoch:1,wraps:[wrap()]},token)
   const payload=(epoch=1) => Buffer.from(JSON.stringify({v:1,epoch,dedup:'b'.repeat(64),nonce:Buffer.alloc(24).toString('base64'),ciphertext:Buffer.alloc(32).toString('base64'),keyId:'c'.repeat(32),senderId:writer.id,signature:Buffer.alloc(64).toString('base64')})).toString('hex')
   const append=(epoch=1) => ({op:'append',log:'a'.repeat(64),idempotency_key:'b'.repeat(64),payload_hex:payload(epoch),epoch})
-  return {dir,config,api,space,device,writer,token,tokenBody,proof,wrap,keys,payload,append,denied,ambiguous,requests,get service(){return service},restart:async()=>{await service.close();service=await startShareService(config)}}
+  return {dir,config,api,space,identities,device,writer,token,tokenBody,proof,wrap,keys,payload,append,denied,ambiguous,requests,get service(){return service},restart:async()=>{await service.close();service=await startShareService(config)}}
 }
 it('authenticates SSH-bound devices with single-use Ed25519 proof without user credentials', async () => {
   const f=await fixture()
@@ -121,10 +121,10 @@ it('persists confirmed access loss, closes old tokens and blocks appends until r
   expect((await f.api('state',undefined,token)).body.accessLost).toEqual([])
   expect((await f.api('rpc',f.append(2),token)).status).toBe(200)
 })
-it('allows public repo read by default and persists a strict collaborators policy', async () => {
-  const f=await fixture({isPublic:true});const stranger=f.device('stranger')
+it('allows explicit public repo read and defaults new spaces to collaborators', async () => {
+  const f=await fixture({isPublic:true,publicAccess:'repo-read'});const stranger=f.device('stranger')
   expect((await f.api('token',await f.tokenBody(stranger))).body.permission).toBe('read')
-  const strict=await fixture({isPublic:true,publicAccess:'collaborators'})
+  const strict=await fixture({isPublic:true})
   expect((await strict.api('token',await strict.tokenBody(strict.device('stranger')))).status).toBe(403)
   await strict.restart();const token=(await strict.api('token',await strict.tokenBody())).body.token
   expect((await strict.api('state',undefined,token)).body.publicAccess).toBe('collaborators')
@@ -170,4 +170,15 @@ it('exports complete stopped local backups and refuses remote GitHub overrides',
   await f.service.close();await backupShareService(f.config,join(f.dir,'backup'))
   const manifest=JSON.parse(await readFile(join(f.dir,'backup','BACKUP.json'),'utf8'));expect(manifest.backendIncluded).toBe(true);expect(await readFile(join(f.dir,'backup/comb-store/encrypted-object'),'utf8')).toBe('ciphertext')
   const metadata=await readFile(join(f.dir,'backup','metadata.json'),'utf8');expect(metadata).toContain(f.writer.id);expect(metadata).not.toContain(f.token);expect(metadata).not.toContain('operator-metadata-only')
+})
+
+it('accepts a fresh SSH attestation for immutable device keys and publishes it to peers',async()=>{
+ const f=await fixture(),reader=f.device('reader')
+ expect((await f.api('token',await f.tokenBody(reader))).status).toBe(200)
+ const identity=f.identities.get('reader')!,ssh=join(f.dir,'reader-new-ssh')
+ execFileSync('ssh-keygen',['-q','-t','ed25519','-N','','-f',ssh]);identity.ssh=ssh;identity.publicSSH=await readFile(ssh+'.pub','utf8')
+ expect((await f.api('token',await f.tokenBody(reader))).status).toBe(403)
+ const renewed=f.device('reader');expect(renewed.id).toBe(reader.id)
+ expect((await f.api('token',await f.tokenBody(renewed))).status).toBe(200)
+ const state=await f.api('state',undefined,f.token);expect(state.body.devices.find((d:any)=>d.id===reader.id).signature).toBe(renewed.signature)
 })

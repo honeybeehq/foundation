@@ -43,7 +43,7 @@ export function readShareConfig(root: string): ShareConfig | null {
     repo: raw.repo,
     encryption: 'e2e-v1',
     recoveryPublicKey: raw.recoveryPublicKey,
-    publicAccess: raw.publicAccess
+    publicAccess: raw.publicAccess ?? 'collaborators'
   }
 }
 export function findShareRoot(path: string): string | null {

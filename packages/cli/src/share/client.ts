@@ -17,7 +17,7 @@ import {
   type WrappedKey
 } from './crypto.js'
 import { sessionFor, saveSession, type Session } from './vault.js'
-import { githubIdentity, memberAccess, signDevice, verifyDevice } from './github.js'
+import { DeviceBindingError, githubIdentity, memberAccess, signDevice, verifyDevice } from './github.js'
 import type { ShareConfig } from './config.js'
 export interface ShareState {
   space: string
@@ -69,7 +69,7 @@ export function ghToken(): string {
     throw new Error('Sign in with GitHub using share login or gh auth login')
   }
 }
-export async function renew(config: ShareConfig, session: Session): Promise<Session> {
+export async function renew(config: ShareConfig, session: Session, replaceDevice = false): Promise<Session> {
   const { challenge } = await api<{ challenge: string }>(config, `challenge?space=${encodeURIComponent(config.space)}`)
   const result = await api<{ token: string; expiresAt: number; permission: string }>(config, 'token', undefined, {
     space: config.space,
@@ -78,10 +78,16 @@ export async function renew(config: ShareConfig, session: Session): Promise<Sess
     proof: authProof(config.service, config.space, challenge, session.device)
   })
   session = { ...session, ...result }
-  saveSession(config.space, session)
+  saveSession(config.space, session, replaceDevice)
   return session
 }
-export async function prepareDevice(config: ShareConfig, token: string, sshKey: string): Promise<Session> {
+export async function prepareDevice(
+  config: ShareConfig,
+  token: string,
+  sshKey: string,
+  reattest = false,
+  newDevice = false
+): Promise<Session> {
   await ready
   let prior: Session | undefined
   try {
@@ -91,7 +97,22 @@ export async function prepareDevice(config: ShareConfig, token: string, sshKey: 
   if (prior) {
     if (prior.device.device.githubId !== user.id)
       throw new Error('this space is already signed in as another GitHub user')
-    return { ...prior, githubToken: token }
+    if (prior.device.device.login === user.login && !newDevice) {
+      if (!reattest) return { ...prior, githubToken: token }
+      const device = {
+        ...prior.device.device,
+        signature: signDevice(deviceStatement(config.service, config.space, config.repo, prior.device.device), sshKey)
+      }
+      await verifyDevice(config, device, token, true)
+      return {
+        ...prior,
+        githubToken: token,
+        device: { ...prior.device, device },
+        rotationRequired: prior.permission === 'write',
+        rotationRequiredAtEpoch: Math.max(0, ...prior.keys.map((k) => k.epoch))
+      }
+    }
+    if (!reattest) throw new Error('GitHub account renamed; use share login --reattest')
   }
   const pair = generateDeviceKeys(),
     publicDevice = {
@@ -107,18 +128,33 @@ export async function prepareDevice(config: ShareConfig, token: string, sshKey: 
     id: deviceId(statement),
     signature: signDevice(statement, sshKey)
   }
-  await verifyDevice(config, device)
+  await verifyDevice(config, device, token)
   return {
     device: { device, boxSecretKey: pair.boxSecretKey, signSecretKey: pair.signSecretKey },
     githubToken: token,
     token: '',
     expiresAt: 0,
     permission: '',
-    keys: []
+    keys: prior?.keys ?? [],
+    repoRoot: prior?.repoRoot,
+    rotationRequired: !!prior,
+    rotationRequiredAtEpoch: Math.max(0, ...(prior?.keys ?? []).map((k) => k.epoch))
   }
 }
-export async function login(config: ShareConfig, token: string, sshKey: string): Promise<Session> {
-  return renew(config, await prepareDevice(config, token, sshKey))
+export async function login(
+  config: ShareConfig,
+  token: string,
+  sshKey: string,
+  reattest = false,
+  newDevice = false
+): Promise<Session> {
+  const prepared = await prepareDevice(config, token, sshKey, reattest)
+  try {
+    return await renew(config, prepared, reattest)
+  } catch (error) {
+    if (!reattest || !(error instanceof ShareError) || error.status !== 403) throw error
+    return renew(config, await prepareDevice(config, token, sshKey, true, true), true)
+  }
 }
 export async function createSpace(config: ShareConfig, challenge: string, session: Session): Promise<void> {
   await api(config, 'spaces', undefined, {
@@ -126,7 +162,7 @@ export async function createSpace(config: ShareConfig, challenge: string, sessio
     device: session.device.device,
     challenge,
     proof: authProof(config.service, config.space, challenge, session.device),
-    publicAccess: config.publicAccess ?? 'repo-read'
+    publicAccess: config.publicAccess ?? 'collaborators'
   })
   await renew(config, session)
 }
@@ -135,7 +171,7 @@ export async function authorizedSession(config: ShareConfig): Promise<Session> {
   if (session.expiresAt < Date.now() + 60000) session = await renew(config, session)
   return session
 }
-export async function stateFor(config: ShareConfig, session: Session): Promise<ShareState> {
+export async function stateFor(config: ShareConfig, session: Session, readOnly = false): Promise<ShareState> {
   let state: ShareState
   try {
     state = await api<ShareState>(config, `state?space=${encodeURIComponent(config.space)}`, session.token)
@@ -145,8 +181,8 @@ export async function stateFor(config: ShareConfig, session: Session): Promise<S
     state = await api<ShareState>(config, `state?space=${encodeURIComponent(config.space)}`, session.token)
   }
   const highest = Math.max(0, ...session.keys.map((k) => k.epoch))
-  if (state.epoch < highest) throw new Error(`service rolled back epoch ${highest} to ${state.epoch}`)
-  if (config.recoveryPublicKey && state.recoveryPublicKey !== config.recoveryPublicKey)
+  if (!readOnly && state.epoch < highest) throw new Error(`service rolled back epoch ${highest} to ${state.epoch}`)
+  if (!readOnly && config.recoveryPublicKey && state.recoveryPublicKey !== config.recoveryPublicKey)
     throw new Error('recovery key differs from committed share.json')
   if (state.space !== config.space || state.repo.toLowerCase() !== config.repo.toLowerCase())
     throw new Error('share space/repo mismatch')
@@ -155,7 +191,12 @@ export async function stateFor(config: ShareConfig, session: Session): Promise<S
 async function trusted(config: ShareConfig, device: Device, session: Session): Promise<boolean> {
   const access = await memberAccess(config, device.login, device.githubId, session.githubToken)
   if (access === 'none') return false
-  await verifyDevice(config, device)
+  await verifyDevice(config, device, session.githubToken)
+  if (access === 'write')
+    session.writerDevices = [...new Set([...(session.writerDevices ?? []), device.id])].slice(-1000)
+  session.trustedDevices = [
+    ...new Map([...(session.trustedDevices ?? []), device].map((d) => [d.id, d])).values()
+  ].slice(-1000)
   return true
 }
 function packageWraps(
@@ -215,33 +256,38 @@ export async function maintainKeys(
   if (!config.recoveryPublicKey || state.recoveryPublicKey !== config.recoveryPublicKey)
     throw new Error('recovery key differs from committed share.json')
   if (state.revoked.includes(session.device.device.id)) throw new Error('Live sharing: no access (device revoked)')
+  const warnings: string[] = []
   for (const wrap of state.wraps.filter(
     (w) => w.deviceId === session.device.device.id && !session.keys.some((key) => key.epoch === w.epoch)
   )) {
-    const sender = state.devices.find((d) => d.id === wrap.senderId)
-    if (!sender) throw new Error('unknown wrapped-key sender')
-    // Accept key material only from a device independently verified as a current member.
-    if (!(await trusted(config, sender, session)))
-      throw new Error('wrapped-key sender no longer has repo access; wait for another member')
-    const key = unwrapKey(config.space, wrap, sender, session.device)
-    verifyEpochCertificate(key)
-    const issuer = key.issuer!
-    await verifyDevice(config, issuer)
-    if ((await memberAccess(config, issuer.login, issuer.githubId, session.githubToken)) !== 'write')
-      throw new Error('epoch issuer no longer has write access')
-    if (key.space !== config.space || key.repo !== config.repo || !Array.isArray(key.recipients))
-      throw new Error('epoch package context mismatch')
-    const prior = session.keys.find((k) => k.epoch === key.epoch)
-    if (prior && keyId(prior) !== keyId(key)) throw new Error(`key fork at epoch ${key.epoch}`)
-    if (session.keys.length && session.keys.some((k) => k.feedKey !== key.feedKey))
-      throw new Error('routing keys changed unexpectedly')
-    for (const item of [...(key.history ?? []), key])
-      if (!session.keys.some((k) => k.epoch === item.epoch)) session.keys.push(item)
+    try {
+      const sender = state.devices.find((d) => d.id === wrap.senderId)
+      if (!sender) throw new Error('unknown wrapped-key sender')
+      // Accept key material only from a device independently verified as a current member.
+      if (!(await trusted(config, sender, session)))
+        throw new Error('wrapped-key sender no longer has repo access; wait for another member')
+      const key = unwrapKey(config.space, wrap, sender, session.device)
+      verifyEpochCertificate(key)
+      const issuer = key.issuer!
+      await verifyDevice(config, issuer, session.githubToken)
+      if ((await memberAccess(config, issuer.login, issuer.githubId, session.githubToken)) !== 'write')
+        throw new Error('epoch issuer no longer has write access')
+      if (key.space !== config.space || key.repo !== config.repo || !Array.isArray(key.recipients))
+        throw new Error('epoch package context mismatch')
+      const prior = session.keys.find((k) => k.epoch === key.epoch)
+      if (prior && keyId(prior) !== keyId(key)) throw new Error(`key fork at epoch ${key.epoch}`)
+      if (session.keys.length && session.keys.some((k) => k.feedKey !== key.feedKey))
+        throw new Error('routing keys changed unexpectedly')
+      for (const item of [...(key.history ?? []), key])
+        if (!session.keys.some((k) => k.epoch === item.epoch)) session.keys.push(item)
+    } catch (error) {
+      warnings.push(`Skipped key epoch ${wrap.epoch}: ${error instanceof Error ? error.message : String(error)}`)
+    }
   }
   session.recoveryPublicKey = config.recoveryPublicKey
   saveSession(config.space, session)
   const current = session.keys.find((k) => k.epoch === state.epoch)
-  if (!current) return { session, state }
+  if (!current) return { session, state, warning: warnings.join('; ') || undefined }
   const pending = state.devices.some(
     (d) => !state.revoked.includes(d.id) && !state.wraps.some((w) => w.deviceId === d.id && w.epoch === state.epoch)
   )
@@ -254,18 +300,30 @@ export async function maintainKeys(
     !(state.accessLost ?? []).length &&
     Date.now() - (lastMembershipPoll.get(config.space) ?? 0) < 120000
   )
-    return { session, state }
+    return { session, state, warning: session.deviceWarnings?.join('; ') || undefined }
   const lost = new Set([...revoke, ...(session.pendingRevocations ?? [])]),
     verified: Device[] = []
   try {
     for (const recipient of current.recipients ?? []) {
-      if ((await memberAccess(config, recipient.login, recipient.githubId, session.githubToken)) === 'none')
+      try {
+        if ((await memberAccess(config, recipient.login, recipient.githubId, session.githubToken)) === 'none')
+          lost.add(recipient.deviceId)
+      } catch (error) {
+        if (!(error instanceof DeviceBindingError)) throw error
         lost.add(recipient.deviceId)
+        warnings.push(`Device ${recipient.login}/${recipient.deviceId.slice(0, 8)} must re-attest: ${error.message}`)
+      }
     }
     for (const device of state.devices.filter((d) => !state.revoked.includes(d.id))) {
       if (lost.has(device.id)) continue
-      if (await trusted(config, device, session)) verified.push(device)
-      else lost.add(device.id)
+      try {
+        if (await trusted(config, device, session)) verified.push(device)
+        else lost.add(device.id)
+      } catch (error) {
+        if (!(error instanceof DeviceBindingError)) throw error
+        warnings.push(`Device ${device.login}/${device.id.slice(0, 8)} must re-attest: ${error.message}`)
+        if (current.recipients?.some((r) => r.deviceId === device.id)) lost.add(device.id)
+      }
     }
   } catch (error) {
     if (
@@ -284,6 +342,7 @@ export async function maintainKeys(
       `Live sharing paused: cannot confirm members with GitHub since ${session.membershipCheckedAt ? new Date(session.membershipCheckedAt).toISOString() : 'startup'}: ${String(error)}`
     )
   }
+  session.deviceWarnings = warnings.filter((w) => w.startsWith('Device '))
   session.membershipCheckedAt = Date.now()
   saveSession(config.space, session)
   if (lost.has(session.device.device.id)) throw new Error('Live sharing: no access')
@@ -332,20 +391,24 @@ export async function maintainKeys(
       })
   }
   lastMembershipPoll.set(config.space, Date.now())
-  return { session, state }
+  return { session, state, warning: warnings.join('; ') || undefined }
 }
 export async function sharingStatus(config: ShareConfig): Promise<{ state: string; epoch?: number; reason?: string }> {
   try {
-    const { session, state } = await maintainKeys(config)
+    const { session, state, warning } = await maintainKeys(config)
     return {
       state: session.keys.some((k) => k.epoch === state.epoch) ? 'shared' : 'waiting for key',
       epoch: state.epoch,
-      ...(!session.keys.length ? { reason: "Waiting for a teammate's machine to share the key" } : {})
+      ...(!session.keys.some((k) => k.epoch === state.epoch)
+        ? { reason: warning ?? "Waiting for a teammate's machine to share the key" }
+        : warning
+          ? { reason: warning }
+          : {})
     }
   } catch (error) {
     return {
       state:
-        error instanceof ShareError && error.status === 403
+        (error instanceof ShareError && error.status === 403) || String(error).includes('no access')
           ? 'no access'
           : String(error).includes('Sign in')
             ? 'sign in'

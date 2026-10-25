@@ -1,9 +1,17 @@
+import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { deviceId, deviceStatement, unb64, type Device } from './crypto.js'
 import type { ShareConfig } from './config.js'
+export class DeviceBindingError extends Error {}
+const verifiedBindings = new Map<string, number>()
+const BINDING_TTL = 10 * 60 * 1000
+const invalidBindings = new Map<string, { at: number; error: DeviceBindingError }>()
+const checkingBindings = new Map<string, Promise<void>>()
+const checkingMemberships = new Map<string, Promise<'read' | 'write' | 'none'>>()
+const memberships = new Map<string, { at: number; permission: 'read' | 'write' | 'none' }>()
 export function githubBase(): string {
   const stub = process.env.FOUNDATION_SHARE_TEST_GITHUB
   if (!stub) return 'https://api.github.com'
@@ -32,7 +40,38 @@ export async function memberAccess(
   githubId: number,
   token: string
 ): Promise<'read' | 'write' | 'none'> {
-  if (!/^[A-Za-z0-9-]+$/.test(login)) throw new Error('invalid member login')
+  const cacheKey = JSON.stringify([
+    githubBase(),
+    config.repo,
+    config.publicAccess,
+    login,
+    githubId,
+    createHash('sha256').update(token).digest('hex')
+  ])
+  const prior = memberships.get(cacheKey)
+  if (prior && Date.now() - prior.at < 120000) return prior.permission
+  const checking = checkingMemberships.get(cacheKey)
+  if (checking) return checking
+  const task = memberAccessFresh(config, login, githubId, token).then((permission) => {
+    if (memberships.size >= 4096) memberships.delete(memberships.keys().next().value!)
+    if (permission === 'none') memberships.delete(cacheKey)
+    else memberships.set(cacheKey, { at: Date.now(), permission })
+    return permission
+  })
+  checkingMemberships.set(cacheKey, task)
+  try {
+    return await task
+  } finally {
+    if (checkingMemberships.get(cacheKey) === task) checkingMemberships.delete(cacheKey)
+  }
+}
+async function memberAccessFresh(
+  config: ShareConfig,
+  login: string,
+  githubId: number,
+  token: string
+): Promise<'read' | 'write' | 'none'> {
+  if (!/^[A-Za-z0-9-]+$/.test(login)) throw new DeviceBindingError('invalid member login')
   const response = await github(`/repos/${config.repo.slice(11)}/collaborators/${login}/permission`, token)
   // A 404 can also hide insufficient observer permissions: do not treat it as proof of removal.
   if (response.status === 404 || (response.ok && config.publicAccess === 'collaborators')) {
@@ -59,7 +98,7 @@ export async function memberAccess(
   if (!response.ok) throw new Error(`cannot independently check ${login}'s repo access (GitHub ${response.status})`)
   const value = (await response.json()) as { permission: string; user?: { id: number; login: string } }
   if (!value.user || value.user.id !== githubId || value.user.login.toLowerCase() !== login.toLowerCase())
-    throw new Error('GitHub member identity mismatch')
+    throw new DeviceBindingError('GitHub member identity mismatch')
   if (value.permission === 'none') return 'none'
   if (['write', 'admin', 'maintain'].includes(value.permission)) return 'write'
   if (['read', 'triage'].includes(value.permission)) return 'read'
@@ -78,19 +117,54 @@ export function signDevice(statement: string, key: string): string {
     rmSync(dir, { recursive: true, force: true })
   }
 }
-export async function verifyDevice(config: ShareConfig, device: Device): Promise<void> {
-  if (device.service !== config.service) throw new Error('device service mismatch')
+export async function verifyDevice(config: ShareConfig, device: Device, token: string, force = false): Promise<void> {
+  const cacheKey = JSON.stringify([githubBase(), config.service, config.space, config.repo, device])
+  const previous = verifiedBindings.get(cacheKey),
+    invalid = invalidBindings.get(cacheKey)
+  if (!force && previous !== undefined && Date.now() - previous < BINDING_TTL) return
+  if (!force && invalid && Date.now() - invalid.at < BINDING_TTL) throw invalid.error
+  const checking = checkingBindings.get(cacheKey)
+  if (checking && !force) return checking
+  const task = (async () => {
+    try {
+      await verifyDeviceFresh(config, device, token)
+    } catch (error) {
+      if (error instanceof DeviceBindingError) {
+        verifiedBindings.delete(cacheKey)
+        if (invalidBindings.size >= 4096) invalidBindings.delete(invalidBindings.keys().next().value!)
+        invalidBindings.set(cacheKey, { at: Date.now(), error })
+      }
+      throw error
+    }
+    invalidBindings.delete(cacheKey)
+    if (verifiedBindings.size >= 4096) verifiedBindings.delete(verifiedBindings.keys().next().value!)
+    verifiedBindings.set(cacheKey, Date.now())
+  })()
+  checkingBindings.set(cacheKey, task)
+  try {
+    await task
+  } finally {
+    if (checkingBindings.get(cacheKey) === task) checkingBindings.delete(cacheKey)
+  }
+}
+async function verifyDeviceFresh(config: ShareConfig, device: Device, token: string): Promise<void> {
+  if (device.service !== config.service) throw new DeviceBindingError('device service mismatch')
   if (!/^[A-Za-z0-9-]+$/.test(device.login) || !Number.isSafeInteger(device.githubId))
-    throw new Error('invalid device identity')
-  unb64(device.boxPublicKey, 32)
-  unb64(device.signPublicKey, 32)
-  const resolved = await github(`/user/${device.githubId}`, '')
-  if (!resolved.ok) throw new Error('cannot resolve GitHub account id')
+    throw new DeviceBindingError('invalid device identity')
+  try {
+    unb64(device.boxPublicKey, 32)
+    unb64(device.signPublicKey, 32)
+  } catch {
+    throw new DeviceBindingError('invalid device public key')
+  }
+  const resolved = await github(`/user/${device.githubId}`, token)
+  if (resolved.status === 404) throw new DeviceBindingError('GitHub account no longer exists; re-attest device')
+  if (!resolved.ok) throw new Error(`cannot resolve GitHub account id (HTTP ${resolved.status})`)
   const identity = (await resolved.json()) as { id: number; login: string }
   if (identity.id !== device.githubId || identity.login.toLowerCase() !== device.login.toLowerCase())
-    throw new Error('GitHub account renamed; device must be re-attested')
+    throw new DeviceBindingError('GitHub account renamed; device must be re-attested')
   const statement = deviceStatement(config.service, config.space, config.repo, device)
-  if (deviceId(statement) !== device.id) throw new Error('device statement mismatch')
+  if (deviceId(statement) !== device.id) throw new DeviceBindingError('device statement mismatch')
   const url = process.env.FOUNDATION_SHARE_TEST_GITHUB
     ? `${githubBase()}/${device.login}.keys`
     : `https://github.com/${device.login}.keys`
@@ -103,7 +177,7 @@ export async function verifyDevice(config: ShareConfig, device: Device): Promise
     .split('\n')
     .map((line) => line.trim().split(/\s+/).slice(0, 2).join(' '))
     .filter((line) => /^(ssh-|ecdsa-|sk-)[A-Za-z0-9@._+-]+ [A-Za-z0-9+/=]+$/.test(line))
-  if (!keys.length) throw new Error('no GitHub SSH keys available')
+  if (!keys.length) throw new DeviceBindingError('no GitHub SSH keys available')
   const dir = mkdtempSync(join(tmpdir(), 'foundation-verify-'))
   try {
     writeFileSync(
@@ -128,8 +202,9 @@ export async function verifyDevice(config: ShareConfig, device: Device): Promise
       ],
       { input: statement, stdio: ['pipe', 'pipe', 'pipe'] }
     )
-  } catch {
-    throw new Error('device signature does not match GitHub SSH keys')
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') throw new Error('SSH verifier unavailable')
+    throw new DeviceBindingError('device signature does not match GitHub SSH keys')
   } finally {
     rmSync(dir, { recursive: true, force: true })
   }
