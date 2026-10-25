@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
 """Render user units for an already pinned Foundation and Comb install (no secrets)."""
-import argparse, json, os, pathlib, shlex, shutil
+import argparse, json, os, pathlib, shlex, shutil, tempfile
+from urllib.parse import urlsplit
 p = argparse.ArgumentParser()
 p.add_argument('--foundation', required=True, type=pathlib.Path)
 p.add_argument('--comb-bridge', required=True, type=pathlib.Path)
 p.add_argument('--node-bin', required=True, type=pathlib.Path)
+p.add_argument('--public-url', required=True)
+p.add_argument('--owner', action='append', required=True)
 a = p.parse_args()
+origin = urlsplit(a.public_url)
+if origin.scheme != 'https' or not origin.hostname or origin.username or origin.password or origin.path not in ('', '/') or origin.query or origin.fragment:
+    raise SystemExit('--public-url must be an HTTPS origin')
+public_url = a.public_url.rstrip('/')
 home = pathlib.Path.home()
 base = home / '.config/foundation-share/data'
 config_dir = home / '.config/foundation-share'
@@ -31,8 +38,20 @@ if not comb_config.exists():
     comb_config.chmod(0o600)
 service_config = config_dir/'service.json'
 if not service_config.exists():
-    service_config.write_text(json.dumps(dict(host='127.0.0.1', port=19487, stateDir=str(base/'metadata'), comb=dict(binary=str(a.comb_bridge.resolve()), args=['--dir', str(base/'comb')]), backupLocalStore=str(base/'objects')), indent=2)+'\n')
+    service_config.write_text(json.dumps(dict(host='127.0.0.1', port=19487, publicUrl=public_url, allowedRepoOwners=a.owner, stateDir=str(base/'metadata'), comb=dict(binary=str(a.comb_bridge.resolve()), args=['--dir', str(base/'comb')]), backupLocalStore=str(base/'objects')), indent=2)+'\n')
     service_config.chmod(0o600)
+# Add required deployment pins without discarding App configuration or secrets.
+value = json.loads(service_config.read_text())
+if value.get('publicUrl', public_url) != public_url or sorted(value.get('allowedRepoOwners', a.owner)) != sorted(a.owner):
+    raise SystemExit('Existing public URL/owner pins differ; edit the private configuration deliberately')
+value['publicUrl'], value['allowedRepoOwners'] = public_url, a.owner
+fd, temporary = tempfile.mkstemp(prefix='service-render-', suffix='.json', dir=config_dir)
+with os.fdopen(fd, 'w') as file:
+    json.dump(value, file, indent=2)
+    file.write('\n')
+    file.flush()
+    os.fsync(file.fileno())
+os.replace(temporary, service_config)
 # App path is added only once a real private config exists; absent credential fails closed.
 # No fake account or credential is presented as production auth.
 common = 'Environment="PATH=' + str(a.node_bin.resolve()) + ':/usr/local/bin:/usr/bin:/bin"\nUMask=0077\nNoNewPrivileges=yes\n'
