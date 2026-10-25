@@ -3,22 +3,22 @@
     "ids": true,
     "uniqueDefects": 16,
     "accepted": 0,
-    "raw": 42,
+    "raw": 43,
     "uncertainMatches": 0,
     "environment": 0,
     "uncertain": 1,
     "matches": 6,
-    "compareMs": 45.843542000000014
+    "compareMs": 32.21026600000002
   },
   {
     "ids": false,
     "uniqueDefects": 16,
     "accepted": 0,
-    "raw": 51,
+    "raw": 52,
     "uncertainMatches": 0,
     "environment": 0,
     "uncertain": 2,
     "matches": 6,
-    "compareMs": 19.282455999999996
+    "compareMs": 15.959833000000003
   }
 ]

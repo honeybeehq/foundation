@@ -1,0 +1,328 @@
+{
+  "component": "inbox-row",
+  "state": "failed",
+  "mode": "no-ids",
+  "correspondence": {
+    "tp": 7,
+    "fp": 1,
+    "fn": 2,
+    "precision": 0.875,
+    "recall": 0.7777777777777778,
+    "abstained": 0,
+    "excludedUnsure": 0,
+    "errors": [
+      {
+        "design": "n249#0::n249::n17",
+        "expected": "0/0",
+        "actual": "0"
+      }
+    ]
+  },
+  "defects": {
+    "tp": 4,
+    "fp": 14,
+    "fn": 2,
+    "precision": 0.2222222222222222,
+    "recall": 0.6666666666666666,
+    "predicted": 18,
+    "labelled": 6,
+    "agreement": [
+      {
+        "defect": "def-dfee3242fbdef2698bac",
+        "label": "IF-05",
+        "description": "Rows are taller in code: line 1 is 19px and line 2 19px/17px (line-height 1.45) vs 16px and 15px in design, so the row is 54px instead of 49px, the dot, \"failed\" and note sit 3-4px lower and the row overruns the 49px design frame by 5px"
+      },
+      {
+        "defect": "def-7a481c01d6089093e530",
+        "label": "IF-03",
+        "description": "Leading glyph is the agent hexagon in muted #8A877F in design; code shows the agent's model logo (OpenAI mark) in lighter #A29D93"
+      },
+      {
+        "defect": "def-6c2394a8a581112bc258",
+        "label": "IF-01",
+        "description": "Title and note render in a serif face in the design but in Hanken Grotesk (sans) in code: the inbox board uses var(--font-sans) but never defines it, so the design falls back to the default serif"
+      },
+      {
+        "defect": "def-3cff89f226ce6d81db34",
+        "label": "IF-02",
+        "description": "Title ink is pure black in the design (var(--color-text-primary) is undefined on the board) vs warm near-black #2E2B27 in code"
+      }
+    ],
+    "falsePositives": [
+      {
+        "cause": "style:surface",
+        "classification": "product",
+        "findings": [
+          "d1",
+          "d2",
+          "d3",
+          "d4"
+        ],
+        "id": "def-dc28712de6769430e333",
+        "kind": "style",
+        "layer": {
+          "code": "0",
+          "design": "0/0"
+        },
+        "summary": "style surface differs at 0/0"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d17",
+          "d18",
+          "d19",
+          "d27"
+        ],
+        "id": "def-812e849691fc745e2e3a",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/0",
+          "design": "0/0/0"
+        },
+        "summary": "layout configuration differs at 0/0/0"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d20",
+          "d26"
+        ],
+        "id": "def-a076f5f8a1a02930b79c",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/0/0/0/0",
+          "design": "0/0/0/0/0"
+        },
+        "summary": "layout configuration differs at 0/0/0/0/0"
+      },
+      {
+        "cause": "token:font-size",
+        "classification": "product",
+        "findings": [
+          "d23"
+        ],
+        "id": "def-b64746a09c6101c012eb",
+        "kind": "token",
+        "layer": {
+          "code": "0",
+          "design": "0/0"
+        },
+        "summary": "token font-size differs at 0/0"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d32"
+        ],
+        "id": "def-544f734d41f787c9294d",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/0/1",
+          "design": "0/0/0/1"
+        },
+        "summary": "layout configuration differs at 0/0/0/1"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d33",
+          "d35",
+          "d37"
+        ],
+        "id": "def-0b4305be81671d2b0f66",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/0/2",
+          "design": "0/0/0/2"
+        },
+        "summary": "layout configuration differs at 0/0/0/2"
+      },
+      {
+        "cause": "style:font-family",
+        "classification": "product",
+        "findings": [
+          "d34"
+        ],
+        "id": "def-0206bcb5c2ffeeae9746",
+        "kind": "style",
+        "layer": {
+          "code": "0/0/0/2",
+          "design": "0/0/0/2"
+        },
+        "summary": "style font-family differs at 0/0/0/2"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d38",
+          "d39",
+          "d40",
+          "d41"
+        ],
+        "id": "def-287bdca24795f8c0b47e",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/1",
+          "design": "0/0/1"
+        },
+        "summary": "layout configuration differs at 0/0/1"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d42",
+          "d43"
+        ],
+        "id": "def-43f320e78ae9a113c26d",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/1/0",
+          "design": "0/0/1/0/0"
+        },
+        "summary": "layout configuration differs at 0/0/1/0/0"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d44",
+          "d45",
+          "d47",
+          "d49"
+        ],
+        "id": "def-a60abefd75eeb07f25ef",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/1/1",
+          "design": "0/0/1/1"
+        },
+        "summary": "layout configuration differs at 0/0/1/1"
+      },
+      {
+        "cause": "style:font-family",
+        "classification": "product",
+        "findings": [
+          "d46"
+        ],
+        "id": "def-145bd69f94d97db9d576",
+        "kind": "style",
+        "layer": {
+          "code": "0/0/1/1",
+          "design": "0/0/1/1"
+        },
+        "summary": "style font-family differs at 0/0/1/1"
+      },
+      {
+        "cause": "missing:subtree",
+        "classification": "product",
+        "findings": [
+          "d50"
+        ],
+        "id": "def-b656d3711d75e1d62c19",
+        "kind": "missing",
+        "layer": {
+          "design": "0/0/1/2"
+        },
+        "summary": "missing subtree differs at 0/0/1/2"
+      },
+      {
+        "cause": "extra:subtree",
+        "classification": "product",
+        "findings": [
+          "d51",
+          "d52"
+        ],
+        "id": "def-a4167e02a8097fa11e3b",
+        "kind": "extra",
+        "layer": {
+          "code": "0/0"
+        },
+        "summary": "extra subtree differs at 0/0"
+      },
+      {
+        "cause": "offscreen",
+        "classification": "product",
+        "findings": [
+          "d53"
+        ],
+        "id": "def-8c318c403d72e465682f",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0"
+        },
+        "offscreen": {
+          "box": [
+            0,
+            0,
+            340,
+            54.234375
+          ],
+          "clips": [
+            {
+              "box": [
+                0,
+                0,
+                340,
+                49
+              ],
+              "pan": false,
+              "path": "0",
+              "scrollX": false,
+              "scrollY": false,
+              "x": true,
+              "y": true
+            }
+          ],
+          "elements": [
+            "0/0"
+          ],
+          "frame": [
+            0,
+            0,
+            340,
+            49
+          ],
+          "viewport": [
+            0,
+            0,
+            340,
+            100
+          ]
+        },
+        "summary": "rendered outside the visible pane: button · pay-webhooks · 1h44 · failed · runtime died un-commanded — revive"
+      }
+    ],
+    "falseNegatives": [
+      {
+        "id": "IF-04",
+        "design_layer": "0/0/1/2",
+        "code_layer": "0/0/1/2",
+        "kind": "text",
+        "description": "Note copy differs: \"tmux host died mid-write — revive\" in design vs \"runtime died un-commanded — revive\" in code",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "[failed-note-copy] probably fixture data or reworded failure reason",
+        "properties": "text"
+      },
+      {
+        "id": "IF-06",
+        "design_layer": "0/0/0/0/0",
+        "code_layer": "0/0/0/0/0/0",
+        "kind": "layout",
+        "description": "Leading glyph sits 3px lower relative to the title (y 11 vs 8): code nudges marks down 2px to the title baseline on top of the taller line",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[glyph-offset] rowGlyphDown translateY(2px) is a deliberate optical-baseline tweak",
+        "properties": "transform"
+      }
+    ]
+  },
+  "compareMs": 14.055397999999997
+}

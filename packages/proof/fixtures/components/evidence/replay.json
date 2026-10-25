@@ -1,0 +1,26 @@
+[
+  {
+    "file": "packages/proof/fixtures/components/keycap/captures/keycap/default/160x60@1/design/screenshot.png",
+    "same": true
+  },
+  {
+    "file": "packages/proof/fixtures/components/keycap/captures/keycap/default/160x60@1/code/screenshot.png",
+    "same": true
+  },
+  {
+    "file": "packages/proof/fixtures/components/inbox-row/captures/inbox-row/failed/340x100@1/design/screenshot.png",
+    "same": true
+  },
+  {
+    "file": "packages/proof/fixtures/components/inbox-row/captures/inbox-row/failed/340x100@1/code/screenshot.png",
+    "same": true
+  },
+  {
+    "file": "packages/proof/fixtures/components/inbox-row/captures/inbox-row/selected/340x100@1/design/screenshot.png",
+    "same": true
+  },
+  {
+    "file": "packages/proof/fixtures/components/inbox-row/captures/inbox-row/selected/340x100@1/code/screenshot.png",
+    "same": true
+  }
+]

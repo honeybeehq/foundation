@@ -1,6 +1,6 @@
 {
   "schema": "fdn-capture/0",
-  "rendererSourceHash": "df73cd8adde556f2b3eaed4bf7761a0f01a13cc360852a8d21246cd3b80d33ff",
+  "rendererSourceHash": "93c6f566b93af848e58782f40603f61eb7819279ac481904364fcd8f5e515b1c",
   "rendererSources": [
     {
       "file": "package.json",
@@ -168,19 +168,19 @@
     },
     {
       "file": "packages/proof/src/capture/cli.ts",
-      "sha256": "5121bac2760767c7267ddd7041a300c4b49d95d5f2568351777708aa22557ec3"
+      "sha256": "a0b4c94670be83a74ac03cefcb781b776d88dec36e292ed28b8976784c55a255"
     },
     {
       "file": "packages/proof/src/capture/code-cli.ts",
-      "sha256": "36906167c23ca281454701c0109cc8ef3efc8b0ac7d660e2bd37099d95693df1"
+      "sha256": "66dbdd0ef5ff55bbed5da8baa8b6d8715de897a0eb3098e4c1d2f1f195424370"
     },
     {
       "file": "packages/proof/src/capture/dom.ts",
-      "sha256": "c7282cebcf5a21e7f897931bb06302c1df333d8184ba09d2324b39fc4fc90f66"
+      "sha256": "c150903e25374a32893c0936ef5a4f1735be8652086372a81153752bb2361a87"
     },
     {
       "file": "packages/proof/src/capture/extent.ts",
-      "sha256": "4f68f5a84e8e7db7dd7f147a3cd419c7558927a7b0a8874449fb7764bbdd1f06"
+      "sha256": "07c5d903afd383fd68a9bc29bc97488556cf290d540700098f81cc2ff08a4acf"
     },
     {
       "file": "packages/proof/src/capture/fonts.ts",
@@ -219,7 +219,7 @@
       "sha256": "65b137b164da0eabf320bd8ad051d2e75dc1b210019746c3be72a78d3db92f37"
     }
   ],
-  "rendererCommit": "48009b4a2709b60e8d3d3aee2bd417682c40734a",
+  "rendererCommit": "44174b74590d48bbf7300aec76ca869b5aa63540",
   "rendererDirty": false,
   "provable": true,
   "source": "design",
@@ -240,7 +240,18 @@
     "scroll": [
       340,
       49
+    ],
+    "viewport": [
+      0,
+      0,
+      340,
+      100
     ]
+  },
+  "fullExtent": {
+    "file": "full-extent.png",
+    "sha256": "e27aa8b61c7ab6f1e4f3faf3e708d9513903a08e804e6776dfe3aee713fa1580",
+    "diagnosticPaint": true
   },
   "frame": {
     "width": 340,
@@ -532,6 +543,6 @@
   "blocked": [],
   "errors": [],
   "timingsMs": {
-    "capture": 839
+    "capture": 745
   }
 }

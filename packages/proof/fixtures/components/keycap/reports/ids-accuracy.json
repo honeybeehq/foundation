@@ -1,0 +1,83 @@
+{
+  "component": "keycap",
+  "state": "default",
+  "mode": "ids",
+  "correspondence": {
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "abstained": 0,
+    "excludedUnsure": 0,
+    "errors": []
+  },
+  "defects": {
+    "tp": 2,
+    "fp": 2,
+    "fn": 1,
+    "precision": 0.5,
+    "recall": 0.6666666666666666,
+    "predicted": 4,
+    "labelled": 3,
+    "agreement": [
+      {
+        "defect": "def-db1dff5c581fd8abccd0",
+        "label": "K-01",
+        "description": "Key cap is 18px tall in code but 21px in design (both author height 18px; design adds the 1px top and 2px bottom border outside it, code's border-box puts them inside), so the cap looks squatter and the \"⌘T\" sits about 1.5px higher"
+      },
+      {
+        "defect": "def-a90f8172b6dec2f6c6d6",
+        "label": "K-02",
+        "description": "Key label ink is lighter in code: #6B6862 (inkSoft token) vs the design's #5A564E"
+      }
+    ],
+    "falsePositives": [
+      {
+        "cause": "style:surface",
+        "classification": "product",
+        "findings": [
+          "d3",
+          "d4",
+          "d5",
+          "d6"
+        ],
+        "id": "def-38c91ede9c3543fac351",
+        "kind": "style",
+        "layer": {
+          "code": "n203::n1",
+          "design": "n203::n1"
+        },
+        "summary": "style surface differs at n203::n1"
+      },
+      {
+        "cause": "style:font-family",
+        "classification": "product",
+        "findings": [
+          "d7"
+        ],
+        "id": "def-f9d3f7a1a2de447ef05b",
+        "kind": "style",
+        "layer": {
+          "code": "n203::n1",
+          "design": "n203::n1"
+        },
+        "summary": "style font-family differs at n203::n1"
+      }
+    ],
+    "falseNegatives": [
+      {
+        "id": "K-03",
+        "design_layer": "0/0",
+        "code_layer": "0/0",
+        "kind": "token",
+        "description": "Key border is #E2E0DB (ghostBorder) in code vs --color-border #E7E5E0 in design, a barely visible shade darker",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "[cap-border] different border token",
+        "properties": "border-color"
+      }
+    ]
+  },
+  "compareMs": 17.268839000000014
+}
