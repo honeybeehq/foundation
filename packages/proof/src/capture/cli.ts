@@ -116,8 +116,10 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
           const selected = side === 'code' ? root.querySelector(selector) : root.firstElementChild
           if (!(selected instanceof HTMLElement)) throw new Error(`Missing capture boundary: ${selector}`)
           const {width, height} = selected.getBoundingClientRect()
+          const scrolls = [selected, ...selected.querySelectorAll('*')].map(el => ({el, x:el.scrollLeft, y:el.scrollTop}))
           root.replaceChildren(selected)
           Object.assign(selected.style, {position:'relative', inset:'auto', left:'0px', top:'0px', margin:'0px', width:`${width}px`, height:`${height}px`})
+          for (const {el,x,y} of scrolls) { el.scrollLeft=x; el.scrollTop=y }
         }, {side, selector:codeBoundary})
         await page.addStyleTag({ content: fontAssets.map(font => font.css).join('\n') + '\n*{animation:none!important;transition:none!important;caret-color:transparent!important} #foundation-root{width:100vw;height:100vh;overflow:hidden}' })
         await page.evaluate(() => document.fonts.ready)
