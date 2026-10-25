@@ -1,3 +1,7 @@
+import {
+  environmentMatches,
+  type CaptureEnvironmentPolicy,
+} from "../compare/environment.ts";
 import { createHash } from "node:crypto";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
@@ -58,6 +62,7 @@ export interface VerifyPolicy {
   }[];
   designBinding: "chain-head" | "chain-sha256";
   requireHtmlSha256: true;
+  captureEnvironment?: CaptureEnvironmentPolicy;
 }
 export async function verify(
   manifestFile: string,
@@ -181,6 +186,14 @@ export async function verify(
             captureHash(c) !== r.inputs.codeHash
           )
             errors.push(`${entry.path}: capture hash mismatch`);
+          if (
+            policy.captureEnvironment &&
+            (!environmentMatches(d.meta, policy.captureEnvironment) ||
+              !environmentMatches(c.meta, policy.captureEnvironment))
+          )
+            errors.push(
+              `${entry.path}: capture environment differs from reviewed policy`,
+            );
           const actual = compare(d, c, r.tolerances).report;
           if (
             actual.code.commit !== r.code.commit ||

@@ -1,3 +1,4 @@
+import { environmentFromLinks } from "../compare/environment.ts";
 import type { Links } from "../capture/types.ts";
 import { defaults, type Tolerances } from "../compare/types.ts";
 import type { VerifyPolicy } from "./index.ts";
@@ -17,10 +18,14 @@ export function policyFromLinks(
   );
   if (!required.length)
     throw Error("Policy needs at least one required capture");
+  const captureEnvironment = environmentFromLinks(
+    links as unknown as Record<string, any>,
+  );
   return {
     tolerances: { ...tolerances },
     required,
     designBinding: links.binding ?? "chain-head",
     requireHtmlSha256: true,
+    ...(captureEnvironment ? { captureEnvironment } : {}),
   };
 }

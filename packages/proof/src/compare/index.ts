@@ -1,3 +1,4 @@
+import { pairEnvironmentIssues, captureEnvironment } from "./environment.ts";
 import { seal, canonical, hash } from "./canonical.ts";
 import { readFile, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -180,6 +181,7 @@ export function compare(
       c.meta.errors?.length ||
       c.meta.blocked?.length,
   );
+  const fontIssues = pairEnvironmentIssues(design, code);
   const reason = failure
     ? String(
         failure.meta.reason ||
@@ -189,9 +191,11 @@ export function compare(
               ? "Capture had runtime errors or blocked network requests"
               : "Capture producer marked this state not-provable"),
       )
-    : unavailable.length
-      ? "Capture lacks visual properties: " + unavailable.join(", ")
-      : null;
+    : fontIssues.length
+      ? fontIssues.join("; ")
+      : unavailable.length
+        ? "Capture lacks visual properties: " + unavailable.join(", ")
+        : null;
   const meta = design.meta;
   const report = {
     schema: "fdn-drift/0",
@@ -220,9 +224,15 @@ export function compare(
               failure?.meta.notProvable?.fix ??
               (failure
                 ? "Provide a renderable fixture for the requested state without changing its meaning."
-                : "Recapture both sides with the shared visual property list."),
+                : fontIssues.length
+                  ? "Bundle and pin all rendered font faces and use matching browser/platform/source fingerprints."
+                  : "Recapture both sides with the shared visual property list."),
           },
         }
+      : {}),
+    ...(!fontIssues.length &&
+    design.meta.fontPolicy?.requireCustomFonts === true
+      ? { captureEnvironment: captureEnvironment(design.meta) }
       : {}),
     styles: { properties, unavailable },
     matching: {

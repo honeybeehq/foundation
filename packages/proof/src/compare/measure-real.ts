@@ -1,9 +1,9 @@
 /** Reproduce every real Tracks report; run after collecting T2's final samples. */
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile, readFile } from "node:fs/promises";
 import path from "node:path";
 import { compareDirectories } from "./index.ts";
 import { canonical } from "./canonical.ts";
-import { defaults } from "./types.ts";
+import { policyFromLinks } from "../report/policy.ts";
 import { writeManifest } from "../report/index.ts";
 const viewport = process.argv[2] || "1416x720@1";
 const out = "packages/proof/fixtures/sample-reports";
@@ -51,16 +51,17 @@ for (const state of states) {
 await writeManifest(path.join(out, "proof-manifest.json"), reports);
 await writeFile(
   path.join(out, "proof-policy.json"),
-  canonical({
-    tolerances: defaults,
-    required: rows.map((r) => ({
-      artboard: "tracks-pane",
-      state: r.state,
-      viewport: r.viewport,
-    })),
-    designBinding: "chain-head",
-    requireHtmlSha256: true,
-  }) + "\n",
+  canonical(
+    policyFromLinks(
+      JSON.parse(
+        await readFile(
+          process.argv[3] ||
+            "packages/proof/src/report/evidence/reviewed-links.json",
+          "utf8",
+        ),
+      ),
+    ),
+  ) + "\n",
 );
 await writeFile(
   path.join(out, "summary.json"),
