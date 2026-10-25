@@ -1,0 +1,459 @@
+{
+  "correspondence": {
+    "tp": 15,
+    "fp": 0,
+    "fn": 41,
+    "precision": 1,
+    "recall": 0.26785714285714285,
+    "abstained": 17,
+    "excludedUnsure": 41,
+    "errors": []
+  },
+  "defects": {
+    "tp": 6,
+    "fp": 5,
+    "fn": 29,
+    "precision": 0.5454545454545454,
+    "recall": 0.17142857142857143,
+    "predicted": 11,
+    "labelled": 35,
+    "agreement": [
+      {
+        "defect": "def-d527fb3d3fef2877c598",
+        "label": "P-18",
+        "description": "Pane is a white card with 8px corner radius and drop shadow in design; code pane has square corners and no shadow"
+      },
+      {
+        "defect": "def-c1103dc24e98c0161c13",
+        "label": "P-06",
+        "description": "Filter tabs above the track list (All 7 / Attached 5 / Idle 2) are missing"
+      },
+      {
+        "defect": "def-3d269beaeb58d18d9016",
+        "label": "P-08",
+        "description": "Track rows show version, last-activity time and live status counts (2 running · 1 review · 1 exception / no attachments) in design; code shows a static step summary (\"7 steps · action ×3 · orch…\") and no version or time"
+      },
+      {
+        "defect": "def-df819624850fdeefaca7",
+        "label": "P-19",
+        "description": "Code adds a 36px AI sidecar rail on the right edge (hex icon + ⌘⌃B) with a violet proposal dot"
+      },
+      {
+        "defect": "def-56c5ad2ad716c375906b",
+        "label": "P-02",
+        "description": "Attached panel (bees on this track with harness/model, status, age, current step, skipped-step note) is missing"
+      },
+      {
+        "defect": "def-903ade8281ab3522e335",
+        "label": "P-27",
+        "description": "Proposed edit is a card in the right column listing three change rows (+ Publish preview, ~ Verdict gate, − Manual smoke test) in design; code renders the proposal inline on the flow as violet dashed ghost cards and a removed card"
+      }
+    ],
+    "falsePositives": [
+      {
+        "id": "def-9068b5b1cfaf9e4528ee",
+        "layer": {
+          "design": "0/0",
+          "code": "0/0"
+        },
+        "kind": "layout",
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d7",
+          "d8",
+          "d9",
+          "d10",
+          "d11"
+        ],
+        "summary": "layout configuration differs at 0/0"
+      },
+      {
+        "id": "def-1f14bcf4968ed891b7d3",
+        "layer": {
+          "design": "0/0/0"
+        },
+        "kind": "missing",
+        "cause": "missing:subtree",
+        "classification": "product",
+        "findings": [
+          "d479",
+          "d480",
+          "d481",
+          "d482"
+        ],
+        "summary": "missing subtree differs at 0/0/0"
+      },
+      {
+        "id": "def-0a1bd717e956c7f9f40a",
+        "layer": {
+          "design": "0/0/1/1/2"
+        },
+        "kind": "missing",
+        "cause": "missing:subtree",
+        "classification": "product",
+        "findings": [
+          "d723",
+          "d724",
+          "d725",
+          "d726",
+          "d727",
+          "d728"
+        ],
+        "summary": "missing subtree differs at 0/0/1/1/2"
+      },
+      {
+        "id": "def-4aaa87ac3013a95ad50d",
+        "layer": {
+          "code": "0/0/0/0/0"
+        },
+        "kind": "extra",
+        "cause": "extra:subtree",
+        "classification": "product",
+        "findings": [
+          "d729",
+          "d730",
+          "d731",
+          "d732",
+          "d733"
+        ],
+        "summary": "extra subtree differs at 0/0/0/0/0"
+      },
+      {
+        "id": "def-476294cf78aac0664130",
+        "layer": {
+          "code": "0/0/0/1/2"
+        },
+        "kind": "extra",
+        "cause": "extra:subtree",
+        "classification": "product",
+        "findings": [
+          "d782",
+          "d783"
+        ],
+        "summary": "extra subtree differs at 0/0/0/1/2"
+      }
+    ],
+    "falseNegatives": [
+      {
+        "id": "P-01",
+        "design_layer": "0/0/1/1/1/0",
+        "code_layer": "0/0/0/1/1/0",
+        "kind": "layout",
+        "description": "Spine is a compact list of rows (status, kind, title, description) in design; code draws it as a flow graph of node cards on a dotted canvas, so later steps fall below the visible area (Fix findings, Publish preview, Ship it? need scrolling)",
+        "severity": "high",
+        "likely_intentional": "yes",
+        "note": "[detail] Classic TracksPane says it implements a newer \"Tracks · Flow View\" design; the .fdn board predates it",
+        "properties": "layout"
+      },
+      {
+        "id": "P-03",
+        "design_layer": "0/0/1/1/1/0/10",
+        "code_layer": "none",
+        "kind": "missing",
+        "description": "Exceptions section under the spine is missing in the proposal view",
+        "severity": "medium",
+        "likely_intentional": "unsure",
+        "note": "[exceptions]",
+        "properties": "subtree"
+      },
+      {
+        "id": "P-04",
+        "design_layer": "0/0/1/1/1/0/11",
+        "code_layer": "none",
+        "kind": "text",
+        "description": "Help note \"Steps are the agent's own to mark...\" under the spine is missing",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[help-note]",
+        "properties": "text"
+      },
+      {
+        "id": "P-05",
+        "design_layer": "0/0/0",
+        "code_layer": "0/0/0/0/0",
+        "kind": "layout",
+        "description": "Pane title bar (\"Tracks\" 15px semibold + \"7 defined · 5 attached · 3 queued\" + more menu, full width) is replaced by a rail-only header: \"TRACKS\" 10px spaced caps label, bare count \"7\" and a + button",
+        "severity": "medium",
+        "likely_intentional": "yes",
+        "note": "[pane-header]",
+        "properties": "text;font-size;letter-spacing;color;layout"
+      },
+      {
+        "id": "P-07",
+        "design_layer": "0/0/1/0",
+        "code_layer": "0/0/0/0",
+        "kind": "layout",
+        "description": "Track list column is 317px wide in design, 232px in code",
+        "severity": "medium",
+        "likely_intentional": "unsure",
+        "note": "[rail-width]",
+        "properties": "width"
+      },
+      {
+        "id": "P-09",
+        "design_layer": "0/0/1/0/1/*/0/0/1",
+        "code_layer": "0/0/0/0/1/*/1/0",
+        "kind": "style",
+        "description": "Track row title is 13px (semibold when selected, medium otherwise) in design, 12.5px medium for every row in code; rows are 45px tall in design, 48px in code",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "[row-title]",
+        "properties": "font-size;font-weight;height"
+      },
+      {
+        "id": "P-10",
+        "design_layer": "0/0/1/0/1/0/0",
+        "code_layer": "0/0/0/0/1/0",
+        "kind": "token",
+        "description": "Selected track row background is warm grey #EEEDE9 in design, light blue #DCE8F8 in code",
+        "severity": "medium",
+        "likely_intentional": "unsure",
+        "note": "[row-selected-bg] code uses the app-wide railSelection token",
+        "properties": "background-color"
+      },
+      {
+        "id": "P-11",
+        "design_layer": "0/0/1/0/1/5/0;0/0/1/0/1/6/0",
+        "code_layer": "0/0/0/0/1/5;0/0/0/0/1/6",
+        "kind": "style",
+        "description": "Idle tracks (dep-bump, nectar-preview) are dimmed in design (muted name #8A877F, faint glyph); code shows them like every other row",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "[row-idle-dim]",
+        "properties": "color"
+      },
+      {
+        "id": "P-12",
+        "design_layer": "0/0/1/0/1/*/0/0/0",
+        "code_layer": "0/0/0/0/1/*/0/0",
+        "kind": "style",
+        "description": "Track glyph is a small list/spine icon in design, a vertical chain of rings in code",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[row-glyph]",
+        "properties": "icon"
+      },
+      {
+        "id": "P-13",
+        "design_layer": "0/0/1/1/0/0;0/0/1/1/0/2;0/0/1/1/0/3",
+        "code_layer": "0/0/0/1/0/1",
+        "kind": "text",
+        "description": "Detail header shows track glyph, version badge \"v3\" and the description in design; code shows only the name plus a status line (\"● proposal · 3 changes\" in violet)",
+        "severity": "medium",
+        "likely_intentional": "yes",
+        "note": "[header-meta]",
+        "properties": "text;subtree"
+      },
+      {
+        "id": "P-14",
+        "design_layer": "0/0/1/1/0/4",
+        "code_layer": "0/0/0/1/0/4",
+        "kind": "missing",
+        "description": "Header actions \"Attach a bee (a)\", \"Edit spine (e)\" and the more menu are missing; code offers a greyed \"Attach to agent\" instead",
+        "severity": "medium",
+        "likely_intentional": "unsure",
+        "note": "[header-actions-missing]",
+        "properties": "subtree"
+      },
+      {
+        "id": "P-15",
+        "design_layer": "none",
+        "code_layer": "0/0/0/1/0/3",
+        "kind": "extra",
+        "description": "Code adds a Flow / Code view toggle to the header",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[header-actions-extra]",
+        "properties": "subtree"
+      },
+      {
+        "id": "P-16",
+        "design_layer": "0/0/1/1/0;0/0/1/1/0/1",
+        "code_layer": "0/0/0/1/0;0/0/0/1/0/0",
+        "kind": "style",
+        "description": "Detail header is 45px tall with a 14.5px title in design, 40px with a 14px title in code",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "[header-size]",
+        "properties": "height;font-size"
+      },
+      {
+        "id": "P-17",
+        "design_layer": "0/0/1/1",
+        "code_layer": "0/0/0/1",
+        "kind": "style",
+        "description": "Detail area is white in design; in code it has no surface of its own and shows the warm app background #F5F4F1 with a dot grid",
+        "severity": "medium",
+        "likely_intentional": "yes",
+        "note": "[main-bg] dot grid is part of the flow canvas design",
+        "properties": "background-color;background-image"
+      },
+      {
+        "id": "P-20",
+        "design_layer": "0/0/1/1/2",
+        "code_layer": "0/0/0/1/2",
+        "kind": "text",
+        "description": "Footer shows key hints \"a attach · q queue behind · e edit spine · x exceptions\" and \"defined 4d ago · 3 versions · promoted on edit\" in design; code shows \"a proposed diff from the sidecar — nothing is real until you accept\"",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[footer-text]",
+        "properties": "text"
+      },
+      {
+        "id": "P-21",
+        "design_layer": "0/0/1/1/1/0/7/0/4",
+        "code_layer": "0/0/0/1/1/0/0/0/0/1/0",
+        "kind": "style",
+        "description": "DENIED marker is an outlined pill on the Fix findings row in brick red #B0512E; code puts \"DENIED ↺\" on the flow connector in orange #BD6B3C",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "[denied]",
+        "properties": "color;border;position"
+      },
+      {
+        "id": "P-22",
+        "design_layer": "0/0/1/1/1/0/*/0/2;0/0/1/1/1/0/*/0/1",
+        "code_layer": "none",
+        "kind": "missing",
+        "description": "Step rows show a kind icon and kind label (ACTION / ORCHESTRATE / BRANCH / REVIEW / DEPLOY / ASK) in design; code cards show a generic icon and only some kinds as right-hand meta (\"orchestrate\", \"gate\", \"blocking\")",
+        "severity": "medium",
+        "likely_intentional": "yes",
+        "note": "[step-kind]",
+        "properties": "subtree;text"
+      },
+      {
+        "id": "P-23",
+        "design_layer": "0/0/1/1/1/0/*/0/4;0/0/1/1/1/0/*/0/5",
+        "code_layer": "none",
+        "kind": "missing",
+        "description": "Step descriptions and LANE A / LANE B tags are missing on the cards",
+        "severity": "medium",
+        "likely_intentional": "yes",
+        "note": "[step-desc]",
+        "properties": "subtree;text"
+      },
+      {
+        "id": "P-24",
+        "design_layer": "0/0/1/1/1/0/3/0",
+        "code_layer": "0/0/0/1/1/0/0/0/5",
+        "kind": "missing",
+        "description": "Branch step \"Parallel — both lanes must land before the gate\" is a titled row in design; code shows only an untitled frame around the two lanes",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[branch-row]",
+        "properties": "text"
+      },
+      {
+        "id": "P-25",
+        "design_layer": "*",
+        "code_layer": "*",
+        "kind": "token",
+        "description": "UI text is authored in the system font stack (-apple-system / Helvetica Neue, SF Mono) in design and in Hanken Grotesk / IBM Plex Mono in code",
+        "severity": "medium",
+        "likely_intentional": "yes",
+        "note": "[font-family] authored stacks differ, independent of the Linux substitution",
+        "properties": "font-family"
+      },
+      {
+        "id": "P-28",
+        "design_layer": "0/0/1/1/1/1/2/5",
+        "code_layer": "0/0/0/1/1/0/0/0/15",
+        "kind": "layout",
+        "description": "Accept / discard controls are visible in the proposal card in design; in code the action bar sits at the end of the flow (y≈1030) far below the visible area, so the user must scroll to accept",
+        "severity": "high",
+        "likely_intentional": "no",
+        "note": "[proposal-actions-hidden]",
+        "properties": "position"
+      },
+      {
+        "id": "P-29",
+        "design_layer": "0/0/1/1/1/1/2/5/1/0;0/0/1/1/1/1/2/5/2/0",
+        "code_layer": "0/0/0/1/1/0/0/0/15/2;0/0/0/1/1/0/0/0/15/4",
+        "kind": "style",
+        "description": "Proposal buttons: design is bordered \"discard\" then filled \"accept ⌘↵\" (accept on the right); code is filled \"Accept ⌘↵\", bordered \"Refine\", text-only \"Discard ⌘⌫\" (accept on the left), labels capitalised",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "[proposal-buttons]",
+        "properties": "order;border;text-transform;font-weight"
+      },
+      {
+        "id": "P-30",
+        "design_layer": "none",
+        "code_layer": "0/0/0/1/1/0/0/0/15/3",
+        "kind": "extra",
+        "description": "Code adds a \"Refine\" action for the proposal",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[proposal-refine]",
+        "properties": "subtree"
+      },
+      {
+        "id": "P-31",
+        "design_layer": "0/0/1/1/1/1/2/0/0;0/0/1/1/1/1/2/5/0",
+        "code_layer": "0/0/0/1/0/1",
+        "kind": "missing",
+        "description": "Proposal author/age (\"sidecar-1 · 2m\"), \"PROPOSED EDIT\" label and the \"v3 → v4 · one pending at a time\" note are missing",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "[proposal-meta]",
+        "properties": "text;subtree"
+      },
+      {
+        "id": "P-32",
+        "design_layer": "0/0/1/1/1/1/2/1",
+        "code_layer": "0/0/0/1/1/0/0/0/16",
+        "kind": "text",
+        "description": "Proposal rationale reads \"The suite passes but nothing publishes a preview for the human — add the deploy the review desk expects.\" in design; code shows a different summary (\"Publish preview after the gate; add Fix findings on denial; replace Ma…\") with a violet dot, below the visible area",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "[proposal-rationale] may be fixture wording rather than product copy",
+        "properties": "text"
+      },
+      {
+        "id": "P-33",
+        "design_layer": "none",
+        "code_layer": "0/0/0/1/1/0/0/0/8/1/1/0/0/2;0/0/0/1/1/0/0/0/10/2;0/0/0/1/1/0/0/0/12/0/2;0/0/0/1/1/0/0/0/15/1",
+        "kind": "extra",
+        "description": "Code exposes internal node ids to the user (\"n4d · proposed\", \"n5old · removed\", \"+n4d · +n5 · −n5old\"); design never shows ids",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "[proposal-ids]",
+        "properties": "text"
+      },
+      {
+        "id": "P-34",
+        "design_layer": "0/0/1/1/1/0/*/0/0",
+        "code_layer": "none",
+        "kind": "missing",
+        "description": "While a proposal is pending, design keeps the live spine (done/current/upcoming markers), attached bees and queue; code switches to the editing view with no step status, attachments or queue",
+        "severity": "medium",
+        "likely_intentional": "yes",
+        "note": "[proposal-no-status] code renders proposals in the editing register",
+        "properties": "subtree"
+      },
+      {
+        "id": "P-35",
+        "design_layer": "0/0/1/1/1/1/2/*/0/0",
+        "code_layer": "none",
+        "kind": "missing",
+        "description": "Change rows are marked + / ~ / − in green / grey / red in design; code marks additions with dashed violet cards and removals with a \"removed\" label, and the \"~ changed\" Verdict gate has no marker",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[proposal-change-sign]",
+        "properties": "text;color"
+      },
+      {
+        "id": "P-36",
+        "design_layer": "0/0/1/1/1/0/0/0",
+        "code_layer": "none",
+        "kind": "missing",
+        "description": "SPINE section header with the summary \"6 items · 1 branch · 9 nodes\" above the steps is missing",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[spine-header] added after blind comparison: found by the second labeller (their D17), missed in my first pass",
+        "properties": "subtree"
+      }
+    ]
+  }
+}

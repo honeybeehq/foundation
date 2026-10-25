@@ -1,0 +1,162 @@
+[
+  {
+    "state": "track-selected",
+    "mode": "ids",
+    "product": 24,
+    "uncertain": 18,
+    "oneToOneSupport": 10,
+    "productPrecision": 0.4166666666666667,
+    "productRecall": 0.3225806451612903,
+    "inclusivePrecision": 0.23809523809523808,
+    "productLabelCoverage": 19,
+    "allLabelCoverage": 24,
+    "onlyUncertainLabels": [
+      "S-08",
+      "S-09",
+      "S-10",
+      "S-25",
+      "S-11"
+    ],
+    "compositeProductCandidates": 2,
+    "broadLabelsExcluded": [
+      "S-18",
+      "S-25"
+    ],
+    "narrowScopeSupport": 9,
+    "narrowScopePrecision": 0.375,
+    "narrowScopeRecall": 0.3103448275862069
+  },
+  {
+    "state": "track-selected",
+    "mode": "no-ids",
+    "product": 11,
+    "uncertain": 42,
+    "oneToOneSupport": 6,
+    "productPrecision": 0.5454545454545454,
+    "productRecall": 0.1935483870967742,
+    "inclusivePrecision": 0.11320754716981132,
+    "productLabelCoverage": 15,
+    "allLabelCoverage": 24,
+    "onlyUncertainLabels": [
+      "S-07",
+      "S-09",
+      "S-10",
+      "S-25",
+      "S-11",
+      "S-13",
+      "S-14",
+      "S-15",
+      "S-16"
+    ],
+    "compositeProductCandidates": 2,
+    "broadLabelsExcluded": [
+      "S-18",
+      "S-25"
+    ],
+    "narrowScopeSupport": 5,
+    "narrowScopePrecision": 0.45454545454545453,
+    "narrowScopeRecall": 0.1724137931034483
+  },
+  {
+    "state": "proposal-pending",
+    "mode": "ids",
+    "product": 24,
+    "uncertain": 18,
+    "oneToOneSupport": 11,
+    "productPrecision": 0.4583333333333333,
+    "productRecall": 0.3142857142857143,
+    "inclusivePrecision": 0.2619047619047619,
+    "productLabelCoverage": 18,
+    "allLabelCoverage": 23,
+    "onlyUncertainLabels": [
+      "P-08",
+      "P-09",
+      "P-10",
+      "P-25",
+      "P-11"
+    ],
+    "compositeProductCandidates": 3,
+    "broadLabelsExcluded": [
+      "P-18",
+      "P-25"
+    ],
+    "narrowScopeSupport": 10,
+    "narrowScopePrecision": 0.4166666666666667,
+    "narrowScopeRecall": 0.30303030303030304
+  },
+  {
+    "state": "proposal-pending",
+    "mode": "no-ids",
+    "product": 11,
+    "uncertain": 42,
+    "oneToOneSupport": 6,
+    "productPrecision": 0.5454545454545454,
+    "productRecall": 0.17142857142857143,
+    "inclusivePrecision": 0.11320754716981132,
+    "productLabelCoverage": 14,
+    "allLabelCoverage": 23,
+    "onlyUncertainLabels": [
+      "P-07",
+      "P-09",
+      "P-10",
+      "P-25",
+      "P-11",
+      "P-13",
+      "P-14",
+      "P-15",
+      "P-16"
+    ],
+    "compositeProductCandidates": 2,
+    "broadLabelsExcluded": [
+      "P-18",
+      "P-25"
+    ],
+    "narrowScopeSupport": 5,
+    "narrowScopePrecision": 0.45454545454545453,
+    "narrowScopeRecall": 0.15151515151515152
+  },
+  {
+    "state": "empty",
+    "mode": "ids",
+    "product": 20,
+    "uncertain": 0,
+    "oneToOneSupport": 10,
+    "productPrecision": 0.5,
+    "productRecall": 0.7142857142857143,
+    "inclusivePrecision": 0.5,
+    "productLabelCoverage": 10,
+    "allLabelCoverage": 10,
+    "onlyUncertainLabels": [],
+    "compositeProductCandidates": 4,
+    "broadLabelsExcluded": [
+      "E-01",
+      "E-11",
+      "E-14"
+    ],
+    "narrowScopeSupport": 8,
+    "narrowScopePrecision": 0.4,
+    "narrowScopeRecall": 0.7272727272727273
+  },
+  {
+    "state": "empty",
+    "mode": "no-ids",
+    "product": 6,
+    "uncertain": 0,
+    "oneToOneSupport": 5,
+    "productPrecision": 0.8333333333333334,
+    "productRecall": 0.35714285714285715,
+    "inclusivePrecision": 0.8333333333333334,
+    "productLabelCoverage": 5,
+    "allLabelCoverage": 5,
+    "onlyUncertainLabels": [],
+    "compositeProductCandidates": 3,
+    "broadLabelsExcluded": [
+      "E-01",
+      "E-11",
+      "E-14"
+    ],
+    "narrowScopeSupport": 3,
+    "narrowScopePrecision": 0.5,
+    "narrowScopeRecall": 0.2727272727272727
+  }
+]

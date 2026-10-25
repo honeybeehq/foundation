@@ -1,0 +1,171 @@
+{
+  "source": "47ea4b5dc07d589f62069365fb51893feecf1851",
+  "dirty": false,
+  "renderer": "3e3b0a3b0ff405c61b8b215dfcdacadddac34917",
+  "rendererSourceHash": "df66be2348c724908b98a4076213748b99413e582548b8deca7c214991c4a69f",
+  "browser": "151.0.7922.34",
+  "platform": "linux",
+  "fontAssets": [
+    {
+      "family": "Hanken Grotesk",
+      "weight": "400",
+      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-400-normal.woff2",
+      "sha256": "787b3fdd0b7e6d59ae7ce14ce7a41d1a44616584b4c919b527da951972d5d87d",
+      "postScriptName": "HankenGrotesk-Regular"
+    },
+    {
+      "family": "Hanken Grotesk",
+      "weight": "500",
+      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-500-normal.woff2",
+      "sha256": "31f666af7bff625900c46aa34a05d8620482ba2db37db7b63749b693ab0c72ec",
+      "postScriptName": "HankenGrotesk-Medium"
+    },
+    {
+      "family": "Hanken Grotesk",
+      "weight": "600",
+      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-600-normal.woff2",
+      "sha256": "58f23b7ae3e13b21a4dca4c05360be87b3531d60fc1cbff89732cac8fb3019ae",
+      "postScriptName": "HankenGrotesk-SemiBold"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "weight": "400",
+      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2",
+      "sha256": "08949f728dc52d528e69b1667d15c89a5686a4ee9a296ff90983985f99c380f7",
+      "postScriptName": "IBMPlexMono-Regular"
+    },
+    {
+      "family": "Foundation Design Sans",
+      "weight": "400",
+      "path": ".foundation/fonts/LiberationSans-Regular.ttf",
+      "format": "truetype",
+      "sha256": "4659bc0c58c5028dd488ec928d41d9265db43d9b669fc14ca8b0832daca7b144",
+      "postScriptName": "LiberationSans"
+    },
+    {
+      "family": "Foundation Design Sans",
+      "weight": "700",
+      "path": ".foundation/fonts/LiberationSans-Bold.ttf",
+      "format": "truetype",
+      "sha256": "3973aa5054fb467dd5627245d3dc82e37bf16fe075756156a570455871351582",
+      "postScriptName": "LiberationSans-Bold"
+    },
+    {
+      "family": "Foundation Design Mono",
+      "weight": "400",
+      "path": ".foundation/fonts/DejaVuSansMono.ttf",
+      "format": "truetype",
+      "sha256": "c805f9436dbc268644c1d9584f01a601a653e028e08fd74b9b949f6cf8304d88",
+      "postScriptName": "DejaVuSansMono"
+    },
+    {
+      "family": "Foundation Design Mono",
+      "weight": "700",
+      "path": ".foundation/fonts/DejaVuSansMono-Bold.ttf",
+      "format": "truetype",
+      "sha256": "3a3c502eeff669a231549e80df9f7c49de109bafe303170409e905d0b31a38fe",
+      "postScriptName": "DejaVuSansMono-Bold"
+    },
+    {
+      "family": "Foundation Design Serif",
+      "weight": "400",
+      "path": ".foundation/fonts/LiberationSerif-Regular.ttf",
+      "format": "truetype",
+      "sha256": "705903ae1382f0150f115d6f10a30f5b2f3d6ade649c474afe6366c39174fb65",
+      "postScriptName": "LiberationSerif"
+    },
+    {
+      "family": "Foundation Design Serif",
+      "weight": "700",
+      "path": ".foundation/fonts/LiberationSerif-Bold.ttf",
+      "format": "truetype",
+      "sha256": "9e66c25e20868756bf12eb24a520a4552727c9cd108f577f7ae33e3c0110e39c",
+      "postScriptName": "LiberationSerif-Bold"
+    },
+    {
+      "family": "Foundation Symbols",
+      "weight": "400",
+      "path": ".foundation/fonts/DejaVuSans.ttf",
+      "format": "truetype",
+      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
+      "postScriptName": "DejaVuSans"
+    },
+    {
+      "family": "Foundation Symbols",
+      "weight": "700",
+      "path": ".foundation/fonts/DejaVuSans-Bold.ttf",
+      "format": "truetype",
+      "sha256": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895",
+      "postScriptName": "DejaVuSans-Bold"
+    },
+    {
+      "family": "Hanken Grotesk",
+      "weight": "700",
+      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-700-normal.woff2",
+      "format": "woff2",
+      "sha256": "d85de6e272296d06f8205ad11e27140274e0ef97050232777d146eabb71c312d",
+      "postScriptName": "HankenGrotesk-Bold"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "weight": "500",
+      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2",
+      "format": "woff2",
+      "sha256": "01d285447409c8a588692162439a038b8cbd7871309ee20267b0d2d91c6e8e22",
+      "postScriptName": "IBMPlexMono-Medium"
+    }
+  ],
+  "screenshots": [
+    {
+      "state": "at-rest",
+      "side": "design",
+      "pngSha256": "41139f0cc982aaed0e8c1ebd4382c29dcc09551f1f8985a376bf039a62bd3ad4",
+      "canonicalPngExact": true
+    },
+    {
+      "state": "at-rest",
+      "side": "code",
+      "pngSha256": "2dd03890158134048e7a63b4064d5561b038e012aeb2202eac7704dc441aecb6",
+      "canonicalPngExact": true
+    },
+    {
+      "state": "track-selected",
+      "side": "design",
+      "pngSha256": "b5b7591868d52677d5e7474e58fe3c8c736cc2821f4f67de465fb17de68bb9a5",
+      "canonicalPngExact": true
+    },
+    {
+      "state": "track-selected",
+      "side": "code",
+      "pngSha256": "9c61b5e18c30596c2d748f3e3f6e18ab623f14c681c82f00b12dffa1df8113c5",
+      "canonicalPngExact": true
+    },
+    {
+      "state": "proposal-pending",
+      "side": "design",
+      "pngSha256": "26426ad7c48957584632255dccc8fcfb620714d3475ed9a1d70475d4c752b2cd",
+      "canonicalPngExact": true
+    },
+    {
+      "state": "proposal-pending",
+      "side": "code",
+      "pngSha256": "1686ff2e867cfb7f9c4346aac392ab31c7021ef2e3f0fcab643d74d6f6463932",
+      "canonicalPngExact": true
+    },
+    {
+      "state": "empty",
+      "side": "design",
+      "pngSha256": "e797a8b41c380eb1085013070b29b678178244e66af0f60bc9c40830cfdda249",
+      "canonicalPngExact": true
+    },
+    {
+      "state": "empty",
+      "side": "code",
+      "pngSha256": "79e57ce6d9711f22370c6cbb3538257d0e2dad604d9c0fb1720621729c7edf08",
+      "canonicalPngExact": true
+    }
+  ],
+  "checks": "TS7 desktop typecheck and eslint passed",
+  "captureMs": 29936,
+  "captureLog": "capture.log"
+}
