@@ -208,7 +208,13 @@ export function compare(
         ? "Capture lacks visual properties: " + unavailable.join(", ")
         : null;
   const meta = design.meta;
-  const defects = [...groupDefects(drifts, matches, design, code), ...offscreenDefects(design, code, matches)];
+  const defects = groupDefects(drifts, matches, design, code);
+  for (const defect of offscreenDefects(design, code, matches)) {
+    add({kind:'layout', property:'offscreen', codeNode:defect.layer.code, confidence:1,
+      codeBox:defect.offscreen!.box, code:{...defect.offscreen, summary:defect.summary}});
+    defect.findings = [drifts.at(-1)!.id];
+    defects.push(defect);
+  }
   const report = {
     schema: "fdn-drift/0",
     artboard: meta.artboard ?? "unknown",

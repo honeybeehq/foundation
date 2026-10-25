@@ -11,7 +11,7 @@ for(const state of ['track-selected','proposal-pending','empty']) {
   const design=await readCapture(join(pair,'design')), code=await readCapture(join(pair,'code'));
   const before=compare(design,{...code,nodes:code.nodes.map(({visibility,...n})=>n)}).report;
   const after=compare(design,code).report;
-  if(JSON.stringify(before.drifts)!==JSON.stringify(after.drifts) || JSON.stringify(before.matches)!==JSON.stringify(after.matches)) throw Error('Frozen matching changed');
+  if(JSON.stringify(before.drifts)!==JSON.stringify(after.drifts.filter(d=>d.property!=='offscreen')) || JSON.stringify(before.matches)!==JSON.stringify(after.matches)) throw Error('Frozen matching changed');
   const added=after.defects.filter(d=>d.cause==='offscreen');
   await writeFile(join(out,`${state}-before.json`),JSON.stringify(before.defects,null,2)+'\n');
   await writeFile(join(out,`${state}-after.json`),JSON.stringify(after.defects,null,2)+'\n');

@@ -62,12 +62,13 @@ it('ignores display:none, visibility:hidden and transparent ancestor subtrees',a
 });
 
 it('captures beyond the viewport without changing measured layout or leaving clips disabled',async () => {
-  const a=await capture('<div style="position:absolute;top:350px"><button>Accept</button></div>');
+  const a=await capture('<div style="position:absolute;top:350px;left:-80px"><button>Accept</button></div>');
   const dir=await mkdtemp(join(tmpdir(),'fdn-extent-'));
   try {
     await captureFullExtent(page,'#root',join(dir,'extent.png'));
     const png=PNG.sync.read(await readFile(join(dir,'extent.png')));
     expect(png.height).toBeGreaterThan(350);
+    expect(png.width).toBeGreaterThan(300);
     expect((await collectDom(page,'#root')).nodes).toEqual(a.nodes);
   } finally {await rm(dir,{recursive:true,force:true});}
 });
