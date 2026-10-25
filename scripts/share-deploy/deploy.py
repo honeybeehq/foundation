@@ -9,6 +9,11 @@ p.add_argument('--node-bin', required=True, type=pathlib.Path)
 p.add_argument('--public-url', required=True)
 p.add_argument('--owner', action='append', required=True)
 a = p.parse_args()
+for executable in (a.foundation, a.comb_bridge):
+    if not executable.is_absolute() or not executable.is_file() or not os.access(executable, os.X_OK):
+        raise SystemExit('Expected an existing absolute executable path')
+if not a.node_bin.is_absolute() or not a.node_bin.is_dir():
+    raise SystemExit('--node-bin must be an existing absolute directory')
 origin = urlsplit(a.public_url)
 if origin.scheme != 'https' or not origin.hostname or origin.username or origin.password or origin.path not in ('', '/') or origin.query or origin.fragment:
     raise SystemExit('--public-url must be an HTTPS origin')
