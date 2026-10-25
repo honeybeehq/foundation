@@ -1,0 +1,15 @@
+# Encrypted shared image evidence
+
+Runtime source d85af5c (based on17da342); final cleanup removes one redundant pre-import retry only. No engine identity, file format or Comb semantic changes.
+
+Run `pnpm exec tsx packages/cli/scripts/share-proof.ts /absolute/comb-bridge --assets` using actual Comb b73e9bb. This local real-run uses two isolated child HOMEs with real CLI/daemon/HTTP/libsodium/SSH signing/Comb and a labelled loopback GitHub identity/permission/committed-descriptor stub. No real two-account or GitHub App acceptance claim.
+
+A5,244,767byte PNG is saved on one HOME, fetched byte-exact on the other and decoded by actual Chromium at1280x1024. The screenshot is that second HOME's generated design HTML, not a mockup or Apiary UI. Image references may import with pending images, while only verified bytes are installed. Ordinary text changes continue while the image transfers. Missing, oversized, wrong-hash and unsupported-type images each retain visible pending/error status while edits sync in both directions. Asset-like prose does not stop sync.
+
+A fault injector flips real encrypted Comb read ciphertext; the receiver rejects it with no installed or partial file. A separate unit test alters decrypted chunk bytes to verify full-file SHA refusal. Raw-store bytegrep checks128 exact original PNG bytes and plaintext SHA across every Comb/service file; neither appears. Existing design-text grep also passes. Remote-only materialize fetches the missing image into a new directory before ready. Offline complete-cache materialize, access refusal, rotation, outage/re-attestation, restart cursor/dedup, descriptor removal and backup also pass.
+
+Clean upload has41 opaque keyed chunk feeds with exactly one durable event each. The record/checker gate is a deterministic work count; no image throughput or cross-host latency SLO is claimed. The earlier growing-feed prototype rendered correctly but took89s and later timed out on a duplicate upload before catalogue publication; its failed transcript is retained. A later liveness attempt passed all asset/outage checks but its quiet-SSE EOF observer rejected; the harness now handles disconnection and the final full run passes.
+
+Receiver SVG invariant: image-context only, never inline DOM/object/embed; sync preserves member bytes and does not rely on writer sanitization. ENTITY declarations are refused, DOCTYPE supported. Corrupt existing files remain unchanged and refused. Two active transfers/32queued; perasset errors retry while the daemon is idle. Strict materialize waits up to60s then refuses rather than advertising complete export.
+
+Apiary's existing Inspector says Not on this computer yet; its canvas has native broken-image/alt or no background until reload. Foundation adds local sync status.assets; a richer automatic pending/error overlay belongs to the Design pane owner and is not implemented here. No fake content-hash placeholders are written. Former-member known-image confirmation with service collusion, chunk-length metadata and permanent retention are explicit residuals in SYNC-LOCAL.md.

@@ -1,0 +1,26 @@
+{
+  "workload": "shared-image-assets",
+  "seriesId": "metal3-image-5mb-v1",
+  "verdict": "pass",
+  "results": [
+    {
+      "workload": "shared-image-assets",
+      "metric": "maxChunkFeedEvents",
+      "unit": "count",
+      "kind": "actual",
+      "aggregation": "max",
+      "samples": 41,
+      "discardedSamples": 0,
+      "aggregate": 1,
+      "findings": [],
+      "budget": {
+        "value": 1,
+        "unit": "count",
+        "comparator": "<=",
+        "status": "proposed",
+        "ok": true
+      },
+      "verdict": "pass"
+    }
+  ]
+}
