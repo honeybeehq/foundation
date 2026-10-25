@@ -64,3 +64,5 @@ To check stale behavior locally, download the run artifact, then run `pnpm exec 
 Proof images render the actual downloaded final cold summary.md with an explicit source/run banner. The native GitHub sidecar returned browser-unavailable (no mounted sidecar), so the screenshot is not claimed to show GitHub browser chrome. A Nectar preview provides the same full summary and captured image links.
 
 Live final summary preview: https://trmd-metal-2.tailff9529.ts.net:8467, Nectar reference `nectar://trmd-metal-2/fdn-r3-ci-summary--proto-fdn-proof-ci-ready--web`. Earlier summary preview was stopped to free its own quota slot.
+
+Apiary's proof liveness checker requests URLs without GitHub authentication, so the private Actions URLs return404 there despite successful authenticated `gh` reads. The proof therefore also links reachable authenticated API receipts at the Nectar preview's `/runs.html`, retaining each original GitHub URL, commit and conclusion. This is a disclosed mirror of real run evidence, not an access-control change. Both repository diffs are attached directly.
