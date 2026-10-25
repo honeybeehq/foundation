@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { resolve, join, relative } from 'node:path'
 import { performance } from 'node:perf_hooks'
-import { parseDocument, bakeDocument } from '../../../engine/src/index.js'
+import { parseDocument, bakeDocument, loadChain } from '../../../engine/src/index.js'
 import { getBrowser, closeBrowser, DETERMINISM_FLAGS } from '../../../engine/src/render/browser.js'
 import { collectDom, STYLE_PROPERTIES } from './dom.js'
 import { startCodeServer } from './vite.js'
@@ -22,12 +22,16 @@ if (links.schema !== 'fdn-links/0' || !links.artboards?.length) throw new Error(
 const source = await readFile(designPath, 'utf8')
 const htmlSha256 = createHash('sha256').update(source).digest('hex')
 const { doc } = parseDocument(source)
+const chainBytes = await readFile(`${designPath}.chain`)
+const designHead = links.binding === 'chain-sha256' ? createHash('sha256').update(chainBytes).digest('hex') : loadChain(chainBytes).head().hash
+if (links.designHead && links.designHead !== designHead) throw new Error('Linked design head differs from design sidecar')
 const fontAssets = await Promise.all((links.fonts ?? []).map(async font => {
   const bytes = await readFile(resolve(repo, font.path))
   return { ...font, sha256: createHash('sha256').update(bytes).digest('hex'), css: `@font-face{font-family:${JSON.stringify(font.family)};font-weight:${font.weight};font-style:normal;src:url(data:font/woff2;base64,${bytes.toString('base64')}) format('woff2')}` }
 }))
 const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim()
 const dirty = execFileSync('git', ['status', '--porcelain'], { cwd: repo, encoding: 'utf8' }).trim()
+if (dirty && !args.includes('--allow-dirty')) throw new Error('Code checkout is dirty; commit it or use --allow-dirty for exploratory captures')
 const target = await startCodeServer(repo, links)
 const browser = await getBrowser()
 try {
@@ -93,7 +97,7 @@ try {
         await mkdir(destination, { recursive: true })
         await page.screenshot({ path: join(destination, 'screenshot.png'), animations: 'disabled' })
         await writeFile(join(destination, 'dom.json'), JSON.stringify(dom, null, 2) + '\n')
-        const meta = { schema: 'fdn-capture/0', source: side, artboard: board.id, state: state.name, viewport: board.viewport, url, fonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead: (links as any).designHead ?? htmlSha256 }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
+        const meta = { schema: 'fdn-capture/0', source: side, artboard: board.id, state: state.name, viewport: board.viewport, url, fonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
         await writeFile(join(destination, 'meta.json'), JSON.stringify(meta, null, 2) + '\n')
         console.log(`${board.id}/${state.name} ${side}: ${dom.nodes.length} nodes, ${meta.timingsMs.capture} ms`)
       } finally { await context.close() }

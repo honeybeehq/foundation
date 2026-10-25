@@ -17,6 +17,8 @@ export interface ArtboardLink {
 export interface Links {
   schema: 'fdn-links/0'
   designFile: string
+  designHead?: string
+  binding?: 'chain-head' | 'chain-sha256'
   viteConfig: string
   harness: string
   fonts?: { family: string; weight: string; path: string }[]
