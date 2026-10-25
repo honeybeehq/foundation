@@ -76,7 +76,7 @@
 </style>
 </head>
 <body>
-  <fdn-doc data-fdn-version="W3sicGVlciI6Ijk3NTgyMzM0NTUyOTQ3IiwiY291bnRlciI6NTd9XQ" data-fdn-doc-id="6c291ec0-31b8-4f78-8eb2-78fdd8fbc4bb" hidden data-fdn-spec-version="0.0.1-draft" data-fdn-title="Apiary — Tracks pane · Flow View">
+  <fdn-doc data-fdn-version="W3sicGVlciI6IjE4NTI0NTAyNDgxNTQ4NCIsImNvdW50ZXIiOjh9XQ" data-fdn-doc-id="6c291ec0-31b8-4f78-8eb2-78fdd8fbc4bb" hidden data-fdn-spec-version="0.0.1-draft" data-fdn-title="Apiary — Tracks pane · Flow View">
     <fdn-params>
       <fdn-param name="selectedtrack" type="enum" values="review-and-ship,pr-triage,spec-round,board-draw,flaky-hunt,dep-bump,nectar-preview" default="review-and-ship" description="which track definition the rail has selected; the canvas renders that definition. Opening the pane always selects one — there is no unselected view"></fdn-param>
       <fdn-param name="proposalstate" type="enum" values="pending,none" default="pending" description="whether a sidecar agent has a track_propose edit awaiting the human's accept/refine/discard — at most one pending per track. Pending swaps the live register for the proposal register"></fdn-param>
@@ -160,6 +160,13 @@
         <fdn-entry key="removed" value="var(--color-text-muted)"></fdn-entry>
         <fdn-entry key="upcoming" value="var(--color-text-muted)"></fdn-entry>
       </fdn-lookup>
+      <fdn-lookup name="titlewrap">
+        <fdn-entry key="current" value="normal"></fdn-entry>
+        <fdn-entry key="definition" value="nowrap"></fdn-entry>
+        <fdn-entry key="done" value="normal"></fdn-entry>
+        <fdn-entry key="removed" value="nowrap"></fdn-entry>
+        <fdn-entry key="upcoming" value="normal"></fdn-entry>
+      </fdn-lookup>
       <fdn-lookup name="titleweight">
         <fdn-entry key="current" value="var(--font-weight-semibold)"></fdn-entry>
         <fdn-entry key="definition" value="var(--font-weight-medium)"></fdn-entry>
@@ -188,35 +195,35 @@
     <fdn-style name="section-label" color="var(--color-text-faint)" font-family="var(--font-sans)" font-size="10px" font-weight="var(--font-weight-semibold)" letter-spacing=".12em"></fdn-style>
     <fdn-style name="meta-mono" color="var(--color-text-faint)" font-family="var(--font-mono)" font-size="var(--font-size-xs)" font-weight="var(--font-weight-regular)"></fdn-style>
     <fdn-style name="meta-10" color="var(--color-text-faint)" font-family="var(--font-mono)" font-size="var(--font-size-meta)" font-weight="var(--font-weight-regular)"></fdn-style>
-    <fdn-style name="pill-btn" align-items="center" border="1px solid var(--color-border-input)" border-bottom-left-radius="var(--radius-md)" border-bottom-right-radius="var(--radius-md)" border-top-left-radius="var(--radius-md)" border-top-right-radius="var(--radius-md)" box-sizing="border-box" color="var(--color-text-primary)" column-gap="6px" cursor="pointer" display="flex" flex="none" font-family="var(--font-sans)" font-size="var(--font-size-row)" font-weight="var(--font-weight-medium)" height="28px" padding-bottom="0" padding-left="14px" padding-right="14px" padding-top="0" white-space="nowrap" style-hover="background:var(--color-hover)"></fdn-style>
-    <fdn-style name="pill-btn-accent" align-items="center" background="var(--color-accent)" border-bottom-left-radius="var(--radius-md)" border-bottom-right-radius="var(--radius-md)" border-top-left-radius="var(--radius-md)" border-top-right-radius="var(--radius-md)" color="var(--color-on-honey)" column-gap="7px" cursor="pointer" display="flex" flex="none" font-family="var(--font-sans)" font-size="var(--font-size-row)" font-weight="var(--font-weight-semibold)" height="28px" padding-bottom="0" padding-left="14px" padding-right="14px" padding-top="0" white-space="nowrap" style-hover="background:#A87826"></fdn-style>
-    <fdn-style name="flow-pane" box-sizing="border-box" display="flex" flex-direction="column" font-family="var(--font-sans)" line-height="var(--line-height-ui)" position="relative"></fdn-style>
+    <fdn-style name="pill-btn" align-items="center" border="1px solid var(--color-border-input)" border-bottom-left-radius="var(--radius-md)" border-bottom-right-radius="var(--radius-md)" border-top-left-radius="var(--radius-md)" border-top-right-radius="var(--radius-md)" box-sizing="border-box" color="var(--color-text-primary)" column-gap="6px" cursor="pointer" display="flex" font-family="var(--font-sans)" font-size="var(--font-size-row)" font-weight="var(--font-weight-medium)" height="28px" padding-bottom="0" padding-left="14px" padding-right="14px" padding-top="0" row-gap="6px" white-space="nowrap" style-hover="background:var(--color-hover)"></fdn-style>
+    <fdn-style name="pill-btn-accent" align-items="center" background="var(--color-accent)" border-bottom-left-radius="var(--radius-md)" border-bottom-right-radius="var(--radius-md)" border-top-left-radius="var(--radius-md)" border-top-right-radius="var(--radius-md)" color="var(--color-on-honey)" column-gap="7px" cursor="pointer" display="flex" font-family="var(--font-sans)" font-size="var(--font-size-row)" font-weight="var(--font-weight-semibold)" height="28px" padding-bottom="0" padding-left="14px" padding-right="14px" padding-top="0" row-gap="7px" style-hover="background:#A87826"></fdn-style>
+    <fdn-style name="flow-pane" box-sizing="border-box" color="var(--color-text-primary)" display="flex" flex-direction="column" flex-grow="1" font-family="var(--font-sans)" font-size="var(--font-size-md)" line-height="var(--line-height-ui)" position="relative" text-align="start"></fdn-style>
     <fdn-style name="fill-row" box-sizing="border-box" display="flex" flex="1" min-height="0"></fdn-style>
     <fdn-style name="fill-column" box-sizing="border-box" display="flex" flex="1" flex-direction="column" min-width="0"></fdn-style>
     <fdn-style name="rail" background="var(--color-surface)" border-right="1px solid var(--color-divider)" box-sizing="border-box" display="flex" flex="none" flex-direction="column" width="232px"></fdn-style>
-    <fdn-style name="rail-header" align-items="center" border-bottom="1px solid var(--color-divider)" box-sizing="border-box" column-gap="8px" display="flex" flex="none" height="40px" padding-bottom="0" padding-left="14px" padding-right="10px" padding-top="0"></fdn-style>
+    <fdn-style name="rail-header" align-items="center" border-bottom="1px solid var(--color-divider)" box-sizing="border-box" column-gap="8px" display="flex" flex="none" height="40px" padding-bottom="0" padding-left="14px" padding-right="10px" padding-top="0" row-gap="8px"></fdn-style>
     <fdn-style name="rail-label" color="var(--color-label-track)" font-family="var(--font-sans)" font-size="var(--font-size-meta)" font-weight="var(--font-weight-semibold)" letter-spacing=".14em"></fdn-style>
     <fdn-style name="rail-list" box-sizing="border-box" flex="1" min-height="0" overflow="hidden" padding-bottom="8px" padding-left="6px" padding-right="6px" padding-top="8px"></fdn-style>
-    <fdn-style name="rail-row" align-items="center" border-bottom-left-radius="var(--radius-md)" border-bottom-right-radius="var(--radius-md)" border-top-left-radius="var(--radius-md)" border-top-right-radius="var(--radius-md)" box-sizing="border-box" column-gap="9px" cursor="pointer" display="flex" padding-bottom="7px" padding-left="8px" padding-right="8px" padding-top="7px" style-hover="background:var(--color-hover)"></fdn-style>
-    <fdn-style name="icon-btn" align-items="center" border-bottom-left-radius="5px" border-bottom-right-radius="5px" border-top-left-radius="5px" border-top-right-radius="5px" display="flex" flex="none" height="24px" justify-content="center" margin-left="auto" width="24px" style-hover="background:var(--color-hover)"></fdn-style>
-    <fdn-style name="flow-header" align-items="center" border-bottom="1px solid var(--color-divider)" box-sizing="border-box" column-gap="10px" display="flex" flex="none" height="40px" padding-bottom="0" padding-left="16px" padding-right="12px" padding-top="0"></fdn-style>
+    <fdn-style name="rail-row" align-items="center" border-bottom-left-radius="var(--radius-md)" border-bottom-right-radius="var(--radius-md)" border-top-left-radius="var(--radius-md)" border-top-right-radius="var(--radius-md)" box-sizing="border-box" column-gap="9px" cursor="pointer" display="flex" padding-bottom="7px" padding-left="8px" padding-right="8px" padding-top="7px" row-gap="9px" text-align="left" width="100%" style-hover="background:var(--color-hover)"></fdn-style>
+    <fdn-style name="icon-btn" align-items="center" border-bottom-left-radius="5px" border-bottom-right-radius="5px" border-top-left-radius="5px" border-top-right-radius="5px" display="flex" height="24px" justify-content="center" margin-left="auto" width="24px" style-hover="background:var(--color-hover)"></fdn-style>
+    <fdn-style name="flow-header" align-items="center" border-bottom="1px solid var(--color-divider)" box-sizing="border-box" column-gap="10px" display="flex" flex="none" height="40px" padding-bottom="0" padding-left="16px" padding-right="12px" padding-top="0" row-gap="10px"></fdn-style>
     <fdn-style name="flow-header-name" color="var(--color-text-primary)" flex="none" font-family="var(--font-sans)" font-size="var(--font-size-title)" font-weight="var(--font-weight-semibold)" max-width="32%" min-width="72px" overflow="hidden" text-overflow="ellipsis" white-space="nowrap"></fdn-style>
-    <fdn-style name="flow-header-status" align-items="center" column-gap="6px" display="flex" font-family="var(--font-mono)" font-size="var(--font-size-sm)" white-space="nowrap"></fdn-style>
-    <fdn-style name="segment" align-items="center" border-bottom-left-radius="5px" border-bottom-right-radius="5px" border-top-left-radius="5px" border-top-right-radius="5px" display="flex" font-family="var(--font-sans)" font-size="var(--font-size-base)" font-weight="var(--font-weight-medium)" padding-bottom="3px" padding-left="10px" padding-right="10px" padding-top="3px"></fdn-style>
+    <fdn-style name="flow-header-status" align-items="center" column-gap="6px" display="flex" font-family="var(--font-mono)" font-size="var(--font-size-sm)" row-gap="6px" white-space="nowrap"></fdn-style>
+    <fdn-style name="segment" border-bottom-left-radius="5px" border-bottom-right-radius="5px" border-top-left-radius="5px" border-top-right-radius="5px" display="block" font-family="var(--font-sans)" font-size="var(--font-size-base)" font-weight="var(--font-weight-medium)" padding-bottom="3px" padding-left="10px" padding-right="10px" padding-top="3px" white-space="nowrap"></fdn-style>
     <fdn-style name="flow-canvas" background-image="radial-gradient(circle at 1px 1px, var(--color-canvas-dot) 1px, transparent 0)" background-size="20px 20px" box-sizing="border-box" display="flex" flex="1" flex-direction="column" min-height="0"></fdn-style>
     <fdn-style name="flow-viewport" align-items="center" box-sizing="border-box" display="flex" flex="1" flex-direction="column" min-height="0" overflow="hidden"></fdn-style>
-    <fdn-style name="flow-graph" align-items="center" box-sizing="border-box" display="flex" flex="none" flex-direction="column" padding-bottom="28px" padding-left="24px" padding-right="24px" padding-top="24px" width="728px"></fdn-style>
-    <fdn-style name="flow-card" align-items="center" background="var(--color-surface)" border="1px solid var(--color-border)" border-bottom-left-radius="var(--radius-lg)" border-bottom-right-radius="var(--radius-lg)" border-top-left-radius="var(--radius-lg)" border-top-right-radius="var(--radius-lg)" box-sizing="border-box" display="flex" flex="none"></fdn-style>
-    <fdn-style name="card-title" flex-grow="1" font-family="var(--font-sans)" font-size="var(--font-size-md)" min-width="0" overflow="hidden" text-overflow="ellipsis" white-space="nowrap"></fdn-style>
+    <fdn-style name="flow-graph" align-items="center" box-sizing="border-box" display="flex" flex-direction="column" padding-bottom="28px" padding-left="24px" padding-right="24px" padding-top="24px" position="relative" width="728px"></fdn-style>
+    <fdn-style name="flow-card" align-items="center" background="var(--color-surface)" border="1px solid var(--color-border)" border-bottom-left-radius="var(--radius-lg)" border-bottom-right-radius="var(--radius-lg)" border-top-left-radius="var(--radius-lg)" border-top-right-radius="var(--radius-lg)" box-sizing="border-box" display="flex" position="relative"></fdn-style>
+    <fdn-style name="card-title" flex-grow="1" font-family="var(--font-sans)" font-size="var(--font-size-md)" min-width="0" overflow="hidden" text-overflow="ellipsis"></fdn-style>
     <fdn-style name="card-meta" flex-shrink="1" font-family="var(--font-mono)" min-width="0" overflow="hidden" text-overflow="ellipsis" white-space="nowrap"></fdn-style>
     <fdn-style name="spine-link" background="var(--color-border-input)" display="block" flex="none" height="42px" width="1px"></fdn-style>
     <fdn-style name="branch" box-sizing="border-box" display="flex" flex="none" flex-direction="column" width="680px"></fdn-style>
     <fdn-style name="branch-frame" align-items="center" border="1px solid var(--color-border-input)" border-bottom-left-radius="var(--radius-lg)" border-bottom-right-radius="var(--radius-lg)" border-top-left-radius="var(--radius-lg)" border-top-right-radius="var(--radius-lg)" box-sizing="border-box" display="flex" flex="none" flex-direction="column" justify-content="flex-end" margin-left="164px" width="353px"></fdn-style>
-    <fdn-style name="lanes" column-gap="24px" display="flex"></fdn-style>
+    <fdn-style name="lanes" column-gap="24px" display="flex" row-gap="24px"></fdn-style>
     <fdn-style name="lane" display="flex" flex="1 1 0" flex-direction="column" min-width="0"></fdn-style>
     <fdn-style name="arm-join" align-items="flex-end" border-bottom="1px solid var(--color-border-input)" border-bottom-right-radius="var(--radius-lg)" border-right="1px solid var(--color-border-input)" box-sizing="border-box" display="flex" flex="none" height="42px" margin-left="240px" width="125px"></fdn-style>
     <fdn-style name="junction" background="var(--color-border-input)" border="1px solid var(--color-surface)" border-bottom-left-radius="50%" border-bottom-right-radius="50%" border-top-left-radius="50%" border-top-right-radius="50%" box-sizing="border-box" display="block" flex="none" height="6px" margin-bottom="-3.5px" width="6px"></fdn-style>
-    <fdn-style name="flow-footer" align-items="center" border-top="1px solid var(--color-divider)" box-sizing="border-box" color="var(--color-meta-faint)" column-gap="14px" display="flex" flex="none" font-family="var(--font-mono)" font-size="var(--font-size-xs)" height="32px" padding-bottom="0" padding-left="16px" padding-right="16px" padding-top="0"></fdn-style>
+    <fdn-style name="flow-footer" align-items="center" border-top="1px solid var(--color-divider)" box-sizing="border-box" color="var(--color-meta-faint)" column-gap="14px" display="flex" flex="none" font-family="var(--font-mono)" font-size="var(--font-size-xs)" height="32px" padding-bottom="0" padding-left="16px" padding-right="16px" padding-top="0" row-gap="14px"></fdn-style>
   </fdn-styles>
   <fdn-component name="ActionButton" hidden>
     <fdn-props>
@@ -225,32 +232,32 @@
       <fdn-prop name="variant" type="enum" values="default,accent" default="default"></fdn-prop>
       <fdn-prop name="disabled" type="enum" values="yes,no" default="no"></fdn-prop>
     </fdn-props>
-    <span data-fdn-id="n37" when="prop.variant == 'default'" data-fdn-style="pill-btn" style="opacity:{{ prop.disabled == 'yes' ? '0.45' : '1' }}">
-      <span data-fdn-id="n38">
+    <button data-fdn-id="n37" when="prop.variant == 'default'" data-fdn-style="pill-btn" style="background-color:transparent;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0;opacity:{{ prop.disabled == 'yes' ? '0.45' : '1' }}">
+      <span data-fdn-id="n38" style="box-sizing:border-box">
         {{ prop.label }}
       </span>
-      <span data-fdn-id="n39" when="prop.hint" style="color:var(--color-text-muted);font-family:var(--font-mono);font-size:var(--font-size-2xs);opacity:0.8">
+      <span data-fdn-id="n39" when="prop.hint" style="box-sizing:border-box;color:var(--color-text-muted);font-family:var(--font-mono);font-size:var(--font-size-2xs);opacity:0.8">
         {{ prop.hint }}
       </span>
-    </span>
-    <span data-fdn-id="n40" when="prop.variant == 'accent'" data-fdn-style="pill-btn-accent">
-      <span data-fdn-id="n41">
+    </button>
+    <button data-fdn-id="n40" when="prop.variant == 'accent'" data-fdn-style="pill-btn-accent" style="border-width:0;box-sizing:border-box;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
+      <span data-fdn-id="n41" style="box-sizing:border-box">
         {{ prop.label }}
       </span>
-      <span data-fdn-id="n42" when="prop.hint" style="font-family:var(--font-mono);font-size:var(--font-size-meta);opacity:0.8">
+      <span data-fdn-id="n42" when="prop.hint" style="box-sizing:border-box;font-family:var(--font-mono);font-size:var(--font-size-meta);opacity:0.8">
         {{ prop.hint }}
       </span>
-    </span>
+    </button>
   </fdn-component>
   <fdn-component name="ArmLabels" hidden>
-    <div data-fdn-id="n401" style="align-items:flex-start;display:flex;flex:none;height:64px;width:480px">
+    <div data-fdn-id="n401" style="align-items:flex-start;box-sizing:border-box;display:flex;flex:none;height:64px;width:480px">
       <span data-fdn-id="n402" style="box-sizing:border-box;color:var(--color-meta-faint);flex:none;font-family:var(--font-mono);font-size:var(--font-size-2xs);letter-spacing:0.08em;padding-left:51px;padding-top:5px;white-space:nowrap;width:302px">
         approved ↓ continues
       </span>
-      <span data-fdn-id="n403" style="color:var(--color-status-review);flex:none;font-family:var(--font-mono);font-size:var(--font-size-2xs);font-weight:var(--font-weight-semibold);letter-spacing:0.13em;padding-top:5px;white-space:nowrap;width:56px">
+      <span data-fdn-id="n403" style="box-sizing:border-box;color:var(--color-status-review);flex:none;font-family:var(--font-mono);font-size:var(--font-size-2xs);font-weight:var(--font-weight-semibold);letter-spacing:0.13em;padding-top:5px;white-space:nowrap;width:56px">
         DENIED ↺
       </span>
-      <span data-fdn-id="n404" style="background-color:var(--color-border-input);flex:none;height:64px;margin-left:6px;width:1px"></span>
+      <span data-fdn-id="n404" style="background-color:var(--color-border-input);box-sizing:border-box;flex:none;height:64px;margin-left:6px;width:1px"></span>
     </div>
   </fdn-component>
   <fdn-component name="BoardCaption" hidden>
@@ -281,15 +288,15 @@
       <fdn-prop name="glyph" type="enum" values="lines,orchestrate,gate,ask,deploy" default="lines"></fdn-prop>
       <fdn-prop name="fit" type="enum" values="spine,lane,wide" default="spine"></fdn-prop>
     </fdn-props>
-    <div data-fdn-id="n405" data-fdn-style="flow-card" style="box-shadow:{{ cardshadow[prop.state] }};column-gap:{{ prop.state == 'current' ? '8px' : cardgap[prop.fit] }};opacity:{{ cardopacity[prop.state] }};padding-bottom:{{ cardpady[prop.state] }};padding-left:{{ prop.state == 'current' ? '14px' : cardpadx[prop.fit] }};padding-right:{{ prop.state == 'current' ? '14px' : cardpadx[prop.fit] }};padding-top:{{ cardpady[prop.state] }};width:{{ cardwidth[prop.fit] }}">
+    <div data-fdn-id="n405" data-fdn-style="flow-card" style="box-shadow:{{ cardshadow[prop.state] }};column-gap:{{ prop.state == 'current' ? '8px' : cardgap[prop.fit] }};opacity:{{ cardopacity[prop.state] }};padding-bottom:{{ cardpady[prop.state] }};padding-left:{{ prop.state == 'current' ? '14px' : cardpadx[prop.fit] }};padding-right:{{ prop.state == 'current' ? '14px' : cardpadx[prop.fit] }};padding-top:{{ cardpady[prop.state] }};row-gap:{{ prop.state == 'current' ? '8px' : cardgap[prop.fit] }};width:{{ cardwidth[prop.fit] }}">
       <fdn-use data-fdn-id="n406" component="FlowGlyph" data-fdn-prop-color="var(--color-status-running)" data-fdn-prop-name="done" when="prop.state == 'done'"></fdn-use>
-      <span data-fdn-id="n407" when="prop.state == 'current'" style="background-color:var(--color-status-running);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;flex:none;height:8px;width:8px"></span>
+      <span data-fdn-id="n407" when="prop.state == 'current'" style="background-color:var(--color-status-running);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:8px;width:8px"></span>
       <span data-fdn-id="n408" when="prop.state == 'upcoming'" style="border:1px solid var(--color-border-input);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:12px;width:12px"></span>
       <fdn-use data-fdn-id="n409" component="FlowGlyph" data-fdn-prop-color="{{ glyphcolor[prop.glyph] }}" data-fdn-prop-name="{{ prop.glyph }}" data-fdn-prop-size="{{ prop.glyph == 'orchestrate' ? '15' : '14' }}" when="prop.state == 'definition' || prop.state == 'removed'"></fdn-use>
-      <span data-fdn-id="n410" data-fdn-style="card-title" style="color:{{ titlecolor[prop.state] }};font-weight:{{ titleweight[prop.state] }};text-decoration-line:{{ prop.state == 'removed' ? 'line-through' : 'none' }}">
+      <span data-fdn-id="n410" data-fdn-style="card-title" style="box-sizing:border-box;color:{{ titlecolor[prop.state] }};font-weight:{{ titleweight[prop.state] }};text-decoration-line:{{ prop.state == 'removed' ? 'line-through' : 'none' }};white-space:{{ titlewrap[prop.state] }}">
         {{ prop.title }}
       </span>
-      <span data-fdn-id="n411" when="prop.meta" data-fdn-style="card-meta" style="color:{{ prop.state == 'current' ? 'var(--color-status-running)' : 'var(--color-text-faint)' }};font-size:{{ metasize[prop.state] }}">
+      <span data-fdn-id="n411" when="prop.meta" data-fdn-style="card-meta" style="box-sizing:border-box;color:{{ prop.state == 'current' ? 'var(--color-status-running)' : 'var(--color-text-faint)' }};font-size:{{ metasize[prop.state] }}">
         {{ prop.meta }}
       </span>
     </div>
@@ -300,7 +307,7 @@
       <fdn-prop name="size" type="number" default="14"></fdn-prop>
       <fdn-prop name="color" type="token" default="var(--color-text-muted)"></fdn-prop>
     </fdn-props>
-    <svg data-fdn-id="n412" fill="none" height="{{ prop.size }}" viewBox="0 0 16 16" width="{{ prop.size }}" style="color:{{ prop.color }};flex:none">
+    <svg data-fdn-id="n412" fill="none" height="{{ prop.size }}" viewBox="0 0 16 16" width="{{ prop.size }}" style="box-sizing:border-box;color:{{ prop.color }}">
       <g data-fdn-id="n413" when="prop.name == 'done'">
         <circle data-fdn-id="n414" cx="8" cy="8" r="6.3" stroke="currentColor" stroke-width="1.3"></circle>
         <path data-fdn-id="n415" d="M5.5 8.2l1.8 1.8 3.2-3.6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
@@ -335,133 +342,141 @@
     <div data-fdn-id="n436" data-fdn-style="flow-canvas">
       <div data-fdn-id="n437" data-fdn-style="flow-viewport">
         <div data-fdn-id="n438" data-fdn-style="flow-graph">
-          <div data-fdn-id="n439" style="align-items:center;color:var(--color-meta-faint);column-gap:6px;display:flex;font-family:var(--font-mono);font-size:var(--font-size-xs);margin-bottom:14px;white-space:nowrap;width:480px">
+          <div data-fdn-id="n439" style="align-items:center;box-sizing:border-box;color:var(--color-meta-faint);column-gap:6px;display:flex;font-family:var(--font-mono);font-size:var(--font-size-xs);margin-bottom:14px;row-gap:6px;width:480px">
             <span data-fdn-id="n440" style="border:1px solid var(--color-meta-faint);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:6px;width:6px"></span>
-            <span data-fdn-id="n441">
+            <span data-fdn-id="n441" style="box-sizing:border-box">
               read-only while attached — edits fork the definition for the next run
             </span>
           </div>
           <fdn-use data-fdn-id="n442" component="FlowCard" data-fdn-prop-meta="done · 11:48" data-fdn-prop-state="done" data-fdn-prop-title="Read the diff"></fdn-use>
-          <span data-fdn-id="n443" data-fdn-style="spine-link"></span>
+          <span data-fdn-id="n443" data-fdn-style="spine-link" style="box-sizing:border-box"></span>
           <fdn-use data-fdn-id="n444" component="FlowCard" data-fdn-prop-meta="done · 11:48" data-fdn-prop-state="done" data-fdn-prop-title="Fan out reviewers"></fdn-use>
-          <span data-fdn-id="n445" data-fdn-style="spine-link"></span>
+          <span data-fdn-id="n445" data-fdn-style="spine-link" style="box-sizing:border-box"></span>
           <div data-fdn-id="n446" data-fdn-style="branch">
             <div data-fdn-id="n447" data-fdn-style="branch-frame" style="height:129.5px">
               <span data-fdn-id="n448" data-fdn-style="junction"></span>
             </div>
-            <div data-fdn-id="n449" data-fdn-style="lanes" style="margin-bottom:42.5px;margin-top:-87.5px">
-              <div data-fdn-id="n450" data-fdn-style="lane">
-                <fdn-use data-fdn-id="n451" component="FlowCard" data-fdn-prop-fit="lane" data-fdn-prop-meta="done · 11:48" data-fdn-prop-state="done" data-fdn-prop-title="Typecheck &amp; lint"></fdn-use>
+            <div data-fdn-id="n449" data-fdn-style="lanes" style="box-sizing:border-box;margin-bottom:42.5px;margin-top:-87.5px">
+              <div data-fdn-id="n450" data-fdn-style="lane" style="box-sizing:border-box">
+                <div data-fdn-id="n451" style="box-sizing:border-box;display:flex;flex-direction:column">
+                  <fdn-use data-fdn-id="n452" component="FlowCard" data-fdn-prop-fit="lane" data-fdn-prop-meta="done · 11:48" data-fdn-prop-state="done" data-fdn-prop-title="Typecheck &amp; lint"></fdn-use>
+                </div>
               </div>
-              <div data-fdn-id="n452" data-fdn-style="lane">
-                <fdn-use data-fdn-id="n453" component="FlowCard" data-fdn-prop-fit="lane" data-fdn-prop-meta="current" data-fdn-prop-state="current" data-fdn-prop-title="Run the suite"></fdn-use>
+              <div data-fdn-id="n453" data-fdn-style="lane" style="box-sizing:border-box">
+                <div data-fdn-id="n454" style="box-sizing:border-box;display:flex;flex-direction:column">
+                  <fdn-use data-fdn-id="n455" component="FlowCard" data-fdn-prop-fit="lane" data-fdn-prop-meta="current" data-fdn-prop-state="current" data-fdn-prop-title="Run the suite"></fdn-use>
+                </div>
               </div>
             </div>
           </div>
-          <span data-fdn-id="n454" data-fdn-style="spine-link"></span>
-          <fdn-use data-fdn-id="n455" component="FlowCard" data-fdn-prop-meta="upcoming · gate" data-fdn-prop-state="upcoming" data-fdn-prop-title="Verdict gate"></fdn-use>
-          <div data-fdn-id="n456" style="display:flex;flex:none;flex-direction:column;width:480px">
-            <fdn-use data-fdn-id="n457" component="ArmLabels"></fdn-use>
-            <div data-fdn-id="n458" style="display:flex;justify-content:flex-end">
-              <div data-fdn-id="n459" style="width:232px">
-                <fdn-use data-fdn-id="n460" component="FlowCard" data-fdn-prop-fit="lane" data-fdn-prop-meta="upcoming" data-fdn-prop-state="upcoming" data-fdn-prop-title="Fix findings"></fdn-use>
+          <span data-fdn-id="n456" data-fdn-style="spine-link" style="box-sizing:border-box"></span>
+          <fdn-use data-fdn-id="n457" component="FlowCard" data-fdn-prop-meta="upcoming · gate" data-fdn-prop-state="upcoming" data-fdn-prop-title="Verdict gate"></fdn-use>
+          <div data-fdn-id="n458" style="box-sizing:border-box;display:flex;flex:none;flex-direction:column;width:480px">
+            <fdn-use data-fdn-id="n459" component="ArmLabels"></fdn-use>
+            <div data-fdn-id="n460" style="box-sizing:border-box;display:flex;justify-content:flex-end">
+              <div data-fdn-id="n461" style="box-sizing:border-box;width:232px">
+                <fdn-use data-fdn-id="n462" component="FlowCard" data-fdn-prop-fit="lane" data-fdn-prop-meta="upcoming" data-fdn-prop-state="upcoming" data-fdn-prop-title="Fix findings"></fdn-use>
               </div>
             </div>
-            <div data-fdn-id="n461" data-fdn-style="arm-join">
-              <span data-fdn-id="n462" data-fdn-style="junction" style="margin-left:-3px"></span>
+            <div data-fdn-id="n463" data-fdn-style="arm-join">
+              <span data-fdn-id="n464" data-fdn-style="junction" style="margin-left:-3px"></span>
             </div>
           </div>
-          <fdn-use data-fdn-id="n463" component="FlowCard" data-fdn-prop-meta="upcoming · nectar" data-fdn-prop-state="upcoming" data-fdn-prop-title="Publish preview"></fdn-use>
-          <span data-fdn-id="n464" data-fdn-style="spine-link"></span>
-          <fdn-use data-fdn-id="n465" component="FlowCard" data-fdn-prop-meta="upcoming · blocking ask" data-fdn-prop-state="upcoming" data-fdn-prop-title="Ship it?"></fdn-use>
-          <div data-fdn-id="n466" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-xs);margin-top:18px;width:480px">
-            up next · pr-triage · queued by bumble-7 · 11:58 — spec-round · queued
+          <fdn-use data-fdn-id="n465" component="FlowCard" data-fdn-prop-meta="upcoming · nectar" data-fdn-prop-state="upcoming" data-fdn-prop-title="Publish preview"></fdn-use>
+          <span data-fdn-id="n466" data-fdn-style="spine-link" style="box-sizing:border-box"></span>
+          <fdn-use data-fdn-id="n467" component="FlowCard" data-fdn-prop-meta="upcoming · blocking ask" data-fdn-prop-state="upcoming" data-fdn-prop-title="Ship it?"></fdn-use>
+          <div data-fdn-id="n468" style="box-sizing:border-box;color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-xs);margin-top:18px;width:480px">
+            up next · pr-triage · queued by bumble-7 · 11:58 — spec-round · queued by mite-3 · 11:58
           </div>
         </div>
       </div>
     </div>
   </fdn-component>
   <fdn-component name="PixelBee" hidden>
-    <div data-fdn-id="n467" style="flex:none;height:56px;width:44px">
-      <span data-fdn-id="n468" style="box-shadow:var(--art-ink-deep) 12px 0 0 0, var(--art-ink-deep) 28px 0 0 0, var(--art-ink-deep) 16px 4px 0 0, var(--art-ink-deep) 24px 4px 0 0, var(--art-ink-deep) 12px 8px 0 0, var(--art-ink-deep) 16px 8px 0 0, var(--art-ink-deep) 20px 8px 0 0, var(--art-ink-deep) 24px 8px 0 0, var(--art-ink-deep) 28px 8px 0 0, var(--art-ink-deep) 8px 12px 0 0, var(--art-ink-deep) 12px 12px 0 0, var(--art-ink-deep) 16px 12px 0 0, var(--art-ink-deep) 20px 12px 0 0, var(--art-ink-deep) 24px 12px 0 0, var(--art-ink-deep) 28px 12px 0 0, var(--art-ink-deep) 32px 12px 0 0, var(--art-ink-deep) 8px 16px 0 0, var(--art-pale) 12px 16px 0 0, var(--art-ink-deep) 16px 16px 0 0, var(--art-ink-deep) 20px 16px 0 0, var(--art-ink-deep) 24px 16px 0 0, var(--art-pale) 28px 16px 0 0, var(--art-ink-deep) 32px 16px 0 0, var(--art-ink-deep) 8px 20px 0 0, var(--art-ink-deep) 12px 20px 0 0, var(--art-ink-deep) 16px 20px 0 0, var(--art-ink-deep) 20px 20px 0 0, var(--art-ink-deep) 24px 20px 0 0, var(--art-ink-deep) 28px 20px 0 0, var(--art-ink-deep) 32px 20px 0 0, var(--art-pale) 0 24px 0 0, var(--art-pale) 4px 24px 0 0, var(--art-honey) 12px 24px 0 0, var(--art-honey) 16px 24px 0 0, var(--art-honey) 20px 24px 0 0, var(--art-honey) 24px 24px 0 0, var(--art-honey) 28px 24px 0 0, var(--art-pale) 36px 24px 0 0, var(--art-pale) 40px 24px 0 0, var(--art-pale) 0 28px 0 0, var(--art-pale) 4px 28px 0 0, var(--art-pale) 8px 28px 0 0, var(--art-ink-deep) 12px 28px 0 0, var(--art-ink-deep) 16px 28px 0 0, var(--art-ink-deep) 20px 28px 0 0, var(--art-ink-deep) 24px 28px 0 0, var(--art-ink-deep) 28px 28px 0 0, var(--art-pale) 32px 28px 0 0, var(--art-pale) 36px 28px 0 0, var(--art-pale) 40px 28px 0 0, var(--art-pale) 0 32px 0 0, var(--art-pale) 4px 32px 0 0, var(--art-honey) 12px 32px 0 0, var(--art-honey) 16px 32px 0 0, var(--art-honey) 20px 32px 0 0, var(--art-honey) 24px 32px 0 0, var(--art-honey) 28px 32px 0 0, var(--art-pale) 36px 32px 0 0, var(--art-pale) 40px 32px 0 0, var(--art-ink-deep) 8px 36px 0 0, var(--art-ink-deep) 12px 36px 0 0, var(--art-ink-deep) 16px 36px 0 0, var(--art-ink-deep) 20px 36px 0 0, var(--art-ink-deep) 24px 36px 0 0, var(--art-ink-deep) 28px 36px 0 0, var(--art-ink-deep) 32px 36px 0 0, var(--art-honey) 12px 40px 0 0, var(--art-honey) 16px 40px 0 0, var(--art-honey) 20px 40px 0 0, var(--art-honey) 24px 40px 0 0, var(--art-honey) 28px 40px 0 0, var(--art-ink-deep) 12px 44px 0 0, var(--art-ink-deep) 16px 44px 0 0, var(--art-ink-deep) 20px 44px 0 0, var(--art-ink-deep) 24px 44px 0 0, var(--art-ink-deep) 28px 44px 0 0, var(--art-honey) 16px 48px 0 0, var(--art-honey) 20px 48px 0 0, var(--art-honey) 24px 48px 0 0, var(--art-ink-deep) 20px 52px 0 0;display:block;height:4px;width:4px"></span>
+    <div data-fdn-id="n469" style="box-sizing:border-box;flex:none;height:56px;width:44px">
+      <span data-fdn-id="n470" style="box-shadow:var(--art-ink-deep) 12px 0 0 0, var(--art-ink-deep) 28px 0 0 0, var(--art-ink-deep) 16px 4px 0 0, var(--art-ink-deep) 24px 4px 0 0, var(--art-ink-deep) 12px 8px 0 0, var(--art-ink-deep) 16px 8px 0 0, var(--art-ink-deep) 20px 8px 0 0, var(--art-ink-deep) 24px 8px 0 0, var(--art-ink-deep) 28px 8px 0 0, var(--art-ink-deep) 8px 12px 0 0, var(--art-ink-deep) 12px 12px 0 0, var(--art-ink-deep) 16px 12px 0 0, var(--art-ink-deep) 20px 12px 0 0, var(--art-ink-deep) 24px 12px 0 0, var(--art-ink-deep) 28px 12px 0 0, var(--art-ink-deep) 32px 12px 0 0, var(--art-ink-deep) 8px 16px 0 0, var(--art-pale) 12px 16px 0 0, var(--art-ink-deep) 16px 16px 0 0, var(--art-ink-deep) 20px 16px 0 0, var(--art-ink-deep) 24px 16px 0 0, var(--art-pale) 28px 16px 0 0, var(--art-ink-deep) 32px 16px 0 0, var(--art-ink-deep) 8px 20px 0 0, var(--art-ink-deep) 12px 20px 0 0, var(--art-ink-deep) 16px 20px 0 0, var(--art-ink-deep) 20px 20px 0 0, var(--art-ink-deep) 24px 20px 0 0, var(--art-ink-deep) 28px 20px 0 0, var(--art-ink-deep) 32px 20px 0 0, var(--art-pale) 0 24px 0 0, var(--art-pale) 4px 24px 0 0, var(--art-honey) 12px 24px 0 0, var(--art-honey) 16px 24px 0 0, var(--art-honey) 20px 24px 0 0, var(--art-honey) 24px 24px 0 0, var(--art-honey) 28px 24px 0 0, var(--art-pale) 36px 24px 0 0, var(--art-pale) 40px 24px 0 0, var(--art-pale) 0 28px 0 0, var(--art-pale) 4px 28px 0 0, var(--art-pale) 8px 28px 0 0, var(--art-ink-deep) 12px 28px 0 0, var(--art-ink-deep) 16px 28px 0 0, var(--art-ink-deep) 20px 28px 0 0, var(--art-ink-deep) 24px 28px 0 0, var(--art-ink-deep) 28px 28px 0 0, var(--art-pale) 32px 28px 0 0, var(--art-pale) 36px 28px 0 0, var(--art-pale) 40px 28px 0 0, var(--art-pale) 0 32px 0 0, var(--art-pale) 4px 32px 0 0, var(--art-honey) 12px 32px 0 0, var(--art-honey) 16px 32px 0 0, var(--art-honey) 20px 32px 0 0, var(--art-honey) 24px 32px 0 0, var(--art-honey) 28px 32px 0 0, var(--art-pale) 36px 32px 0 0, var(--art-pale) 40px 32px 0 0, var(--art-ink-deep) 8px 36px 0 0, var(--art-ink-deep) 12px 36px 0 0, var(--art-ink-deep) 16px 36px 0 0, var(--art-ink-deep) 20px 36px 0 0, var(--art-ink-deep) 24px 36px 0 0, var(--art-ink-deep) 28px 36px 0 0, var(--art-ink-deep) 32px 36px 0 0, var(--art-honey) 12px 40px 0 0, var(--art-honey) 16px 40px 0 0, var(--art-honey) 20px 40px 0 0, var(--art-honey) 24px 40px 0 0, var(--art-honey) 28px 40px 0 0, var(--art-ink-deep) 12px 44px 0 0, var(--art-ink-deep) 16px 44px 0 0, var(--art-ink-deep) 20px 44px 0 0, var(--art-ink-deep) 24px 44px 0 0, var(--art-ink-deep) 28px 44px 0 0, var(--art-honey) 16px 48px 0 0, var(--art-honey) 20px 48px 0 0, var(--art-honey) 24px 48px 0 0, var(--art-ink-deep) 20px 52px 0 0;box-sizing:border-box;display:block;height:4px;width:4px"></span>
     </div>
   </fdn-component>
   <fdn-component name="ProposalBar" hidden>
-    <div data-fdn-id="n469" style="align-items:center;background-color:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-shadow:var(--shadow-dock);box-sizing:border-box;column-gap:8px;display:flex;flex:none;padding-bottom:8px;padding-left:10px;padding-right:10px;padding-top:8px;width:480px">
-      <span data-fdn-id="n470" style="color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-sm);white-space:nowrap">
+    <div data-fdn-id="n471" style="align-items:center;background-color:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-shadow:var(--shadow-dock);box-sizing:border-box;column-gap:8px;display:flex;flex:none;padding-bottom:8px;padding-left:10px;padding-right:10px;padding-top:8px;row-gap:8px;width:480px">
+      <span data-fdn-id="n472" style="box-sizing:border-box;color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-sm);white-space:nowrap">
         3 changes
       </span>
-      <span data-fdn-id="n471" style="color:var(--color-meta-faint);font-family:var(--font-mono);font-size:var(--font-size-sm);overflow:hidden;white-space:nowrap">
+      <span data-fdn-id="n473" style="box-sizing:border-box;color:var(--color-meta-faint);font-family:var(--font-mono);font-size:var(--font-size-sm);overflow:hidden;white-space:nowrap">
         +n4d · +n5 · −n5old
       </span>
-      <span data-fdn-id="n472" data-fdn-style="pill-btn-accent" style="column-gap:5px;font-size:var(--font-size-base);height:26px;margin-left:auto;padding-left:12px;padding-right:12px">
-        <span data-fdn-id="n473">
+      <span data-fdn-id="n474" data-fdn-style="pill-btn-accent" style="box-sizing:border-box;column-gap:5px;font-size:var(--font-size-base);height:26px;margin-left:auto;padding-left:12px;padding-right:12px;row-gap:5px">
+        <span data-fdn-id="n475" style="box-sizing:border-box">
           Accept
         </span>
-        <span data-fdn-id="n474" style="font-family:var(--font-mono);font-size:var(--font-size-2xs);opacity:0.8">
+        <span data-fdn-id="n476" style="box-sizing:border-box;font-family:var(--font-mono);font-size:var(--font-size-2xs);opacity:0.8">
           ⌘↵
         </span>
       </span>
-      <span data-fdn-id="n475" data-fdn-style="pill-btn" style="font-size:var(--font-size-base);height:26px;padding-left:12px;padding-right:12px">
+      <span data-fdn-id="n477" data-fdn-style="pill-btn" style="font-size:var(--font-size-base);height:26px;padding-left:12px;padding-right:12px">
         Refine
       </span>
-      <span data-fdn-id="n476" style="align-items:center;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);color:var(--color-text-muted);column-gap:5px;display:flex;flex:none;font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);height:26px;padding-left:12px;padding-right:12px">
-        <span data-fdn-id="n477">
+      <span data-fdn-id="n478" style="align-items:center;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;color:var(--color-text-muted);column-gap:5px;display:flex;flex:none;font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);height:26px;padding-left:12px;padding-right:12px;row-gap:5px">
+        <span data-fdn-id="n479" style="box-sizing:border-box">
           Discard
         </span>
-        <span data-fdn-id="n478" style="font-family:var(--font-mono);font-size:var(--font-size-2xs);opacity:0.8">
+        <span data-fdn-id="n480" style="box-sizing:border-box;font-family:var(--font-mono);font-size:var(--font-size-2xs);opacity:0.8">
           ⌘⌫
         </span>
       </span>
     </div>
   </fdn-component>
   <fdn-component name="ProposalFlow" hidden>
-    <div data-fdn-id="n479" data-fdn-style="flow-canvas">
-      <div data-fdn-id="n480" data-fdn-style="flow-viewport">
-        <div data-fdn-id="n481" data-fdn-style="flow-graph">
-          <fdn-use data-fdn-id="n482" component="FlowCard" data-fdn-prop-fit="wide" data-fdn-prop-state="definition" data-fdn-prop-title="Read the diff"></fdn-use>
-          <span data-fdn-id="n483" data-fdn-style="spine-link"></span>
-          <fdn-use data-fdn-id="n484" component="FlowCard" data-fdn-prop-fit="wide" data-fdn-prop-glyph="orchestrate" data-fdn-prop-meta="orchestrate" data-fdn-prop-state="definition" data-fdn-prop-title="Fan out reviewers"></fdn-use>
-          <span data-fdn-id="n485" data-fdn-style="spine-link"></span>
-          <div data-fdn-id="n486" data-fdn-style="branch">
-            <div data-fdn-id="n487" data-fdn-style="branch-frame" style="height:125px">
-              <span data-fdn-id="n488" data-fdn-style="junction"></span>
+    <div data-fdn-id="n481" data-fdn-style="flow-canvas">
+      <div data-fdn-id="n482" data-fdn-style="flow-viewport">
+        <div data-fdn-id="n483" data-fdn-style="flow-graph">
+          <fdn-use data-fdn-id="n484" component="FlowCard" data-fdn-prop-fit="wide" data-fdn-prop-state="definition" data-fdn-prop-title="Read the diff"></fdn-use>
+          <span data-fdn-id="n485" data-fdn-style="spine-link" style="box-sizing:border-box"></span>
+          <fdn-use data-fdn-id="n486" component="FlowCard" data-fdn-prop-fit="wide" data-fdn-prop-glyph="orchestrate" data-fdn-prop-meta="orchestrate" data-fdn-prop-state="definition" data-fdn-prop-title="Fan out reviewers"></fdn-use>
+          <span data-fdn-id="n487" data-fdn-style="spine-link" style="box-sizing:border-box"></span>
+          <div data-fdn-id="n488" data-fdn-style="branch">
+            <div data-fdn-id="n489" data-fdn-style="branch-frame" style="height:125px">
+              <span data-fdn-id="n490" data-fdn-style="junction"></span>
             </div>
-            <div data-fdn-id="n489" data-fdn-style="lanes" style="margin-bottom:42px;margin-top:-83px">
-              <div data-fdn-id="n490" data-fdn-style="lane">
-                <fdn-use data-fdn-id="n491" component="FlowCard" data-fdn-prop-fit="lane" data-fdn-prop-state="definition" data-fdn-prop-title="Typecheck &amp; lint"></fdn-use>
+            <div data-fdn-id="n491" data-fdn-style="lanes" style="box-sizing:border-box;margin-bottom:42px;margin-top:-83px">
+              <div data-fdn-id="n492" data-fdn-style="lane" style="box-sizing:border-box">
+                <div data-fdn-id="n493" style="box-sizing:border-box;display:flex;flex-direction:column">
+                  <fdn-use data-fdn-id="n494" component="FlowCard" data-fdn-prop-fit="lane" data-fdn-prop-state="definition" data-fdn-prop-title="Typecheck &amp; lint"></fdn-use>
+                </div>
               </div>
-              <div data-fdn-id="n492" data-fdn-style="lane">
-                <fdn-use data-fdn-id="n493" component="FlowCard" data-fdn-prop-fit="lane" data-fdn-prop-state="definition" data-fdn-prop-title="Run the suite"></fdn-use>
+              <div data-fdn-id="n495" data-fdn-style="lane" style="box-sizing:border-box">
+                <div data-fdn-id="n496" style="box-sizing:border-box;display:flex;flex-direction:column">
+                  <fdn-use data-fdn-id="n497" component="FlowCard" data-fdn-prop-fit="lane" data-fdn-prop-state="definition" data-fdn-prop-title="Run the suite"></fdn-use>
+                </div>
               </div>
             </div>
           </div>
-          <span data-fdn-id="n494" data-fdn-style="spine-link"></span>
-          <fdn-use data-fdn-id="n495" component="FlowCard" data-fdn-prop-fit="wide" data-fdn-prop-glyph="gate" data-fdn-prop-meta="gate" data-fdn-prop-state="definition" data-fdn-prop-title="Verdict gate"></fdn-use>
-          <div data-fdn-id="n496" style="display:flex;flex:none;flex-direction:column;width:480px">
-            <fdn-use data-fdn-id="n497" component="ArmLabels"></fdn-use>
-            <div data-fdn-id="n498" style="display:flex;justify-content:flex-end">
-              <fdn-use data-fdn-id="n499" component="ProposedCard" data-fdn-prop-field="INSTRUCTION" data-fdn-prop-fit="lane" data-fdn-prop-ref="n4d" data-fdn-prop-title="Fix findings" data-fdn-prop-type="ACTION" data-fdn-prop-value="then back to the gate"></fdn-use>
+          <span data-fdn-id="n498" data-fdn-style="spine-link" style="box-sizing:border-box"></span>
+          <fdn-use data-fdn-id="n499" component="FlowCard" data-fdn-prop-fit="wide" data-fdn-prop-glyph="gate" data-fdn-prop-meta="gate" data-fdn-prop-state="definition" data-fdn-prop-title="Verdict gate"></fdn-use>
+          <div data-fdn-id="n500" style="box-sizing:border-box;display:flex;flex:none;flex-direction:column;width:480px">
+            <fdn-use data-fdn-id="n501" component="ArmLabels"></fdn-use>
+            <div data-fdn-id="n502" style="box-sizing:border-box;display:flex;justify-content:flex-end">
+              <fdn-use data-fdn-id="n503" component="ProposedCard" data-fdn-prop-field="INSTRUCTION" data-fdn-prop-fit="lane" data-fdn-prop-ref="n4d" data-fdn-prop-title="Fix findings" data-fdn-prop-type="ACTION" data-fdn-prop-value="then back to the gate"></fdn-use>
             </div>
-            <div data-fdn-id="n500" data-fdn-style="arm-join">
-              <span data-fdn-id="n501" data-fdn-style="junction" style="margin-left:-3px"></span>
+            <div data-fdn-id="n504" data-fdn-style="arm-join">
+              <span data-fdn-id="n505" data-fdn-style="junction" style="margin-left:-3px"></span>
             </div>
           </div>
-          <fdn-use data-fdn-id="n502" component="FlowCard" data-fdn-prop-fit="wide" data-fdn-prop-meta="n5old · removed" data-fdn-prop-state="removed" data-fdn-prop-title="Manual smoke test"></fdn-use>
-          <span data-fdn-id="n503" data-fdn-style="spine-link"></span>
-          <fdn-use data-fdn-id="n504" component="ProposedCard" data-fdn-prop-field="TARGET" data-fdn-prop-glyph="deploy" data-fdn-prop-ref="n5" data-fdn-prop-title="Publish preview" data-fdn-prop-type="DEPLOY" data-fdn-prop-value="nectar &quot;review&quot;"></fdn-use>
-          <span data-fdn-id="n505" data-fdn-style="spine-link"></span>
-          <fdn-use data-fdn-id="n506" component="FlowCard" data-fdn-prop-fit="wide" data-fdn-prop-glyph="ask" data-fdn-prop-meta="blocking" data-fdn-prop-state="definition" data-fdn-prop-title="Ship it?"></fdn-use>
-          <div data-fdn-id="n507" style="align-items:center;color:var(--color-mono-meta);column-gap:8px;display:flex;font-family:var(--font-mono);font-size:var(--font-size-xs);margin-top:19px;width:480px">
-            <span data-fdn-id="n508" style="background-color:var(--color-status-merged);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;flex:none;height:6px;width:6px"></span>
-            <span data-fdn-id="n509">
-              Publish preview after the gate; add Fix findings on denial; replace Manual smoke test.
+          <fdn-use data-fdn-id="n506" component="FlowCard" data-fdn-prop-fit="wide" data-fdn-prop-meta="n5old · removed" data-fdn-prop-state="removed" data-fdn-prop-title="Manual smoke test"></fdn-use>
+          <span data-fdn-id="n507" data-fdn-style="spine-link" style="box-sizing:border-box"></span>
+          <fdn-use data-fdn-id="n508" component="ProposedCard" data-fdn-prop-field="TARGET" data-fdn-prop-glyph="deploy" data-fdn-prop-ref="n5" data-fdn-prop-title="Publish preview" data-fdn-prop-type="DEPLOY" data-fdn-prop-value="nectar &quot;review&quot;"></fdn-use>
+          <span data-fdn-id="n509" data-fdn-style="spine-link" style="box-sizing:border-box"></span>
+          <fdn-use data-fdn-id="n510" component="FlowCard" data-fdn-prop-fit="wide" data-fdn-prop-glyph="ask" data-fdn-prop-meta="blocking" data-fdn-prop-state="definition" data-fdn-prop-title="Ship it?"></fdn-use>
+          <div data-fdn-id="n511" style="align-items:center;box-sizing:border-box;color:var(--color-mono-meta);column-gap:8px;display:flex;font-family:var(--font-mono);font-size:var(--font-size-xs);margin-top:19px;row-gap:8px;width:480px">
+            <span data-fdn-id="n512" style="background-color:var(--color-status-merged);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:6px;width:6px"></span>
+            <span data-fdn-id="n513" style="box-sizing:border-box">
+              Publish preview after the gate; add Fix findings on denial; replace Manual smoke test
             </span>
           </div>
         </div>
       </div>
-      <div data-fdn-id="n510" style="display:flex;flex:none;justify-content:center;padding-bottom:16px;padding-top:12px">
-        <fdn-use data-fdn-id="n511" component="ProposalBar"></fdn-use>
+      <div data-fdn-id="n514" style="box-sizing:border-box;display:flex;flex:none;justify-content:center;padding-bottom:16px;padding-top:12px">
+        <fdn-use data-fdn-id="n515" component="ProposalBar"></fdn-use>
       </div>
     </div>
   </fdn-component>
@@ -475,24 +490,24 @@
       <fdn-prop name="value" type="string" required="true"></fdn-prop>
       <fdn-prop name="fit" type="enum" values="lane,wide" default="wide"></fdn-prop>
     </fdn-props>
-    <div data-fdn-id="n512" style="background-color:var(--color-proposal-wash);border:1px dashed var(--color-status-merged);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;flex-direction:column;padding-bottom:10px;padding-left:{{ prop.fit == 'lane' ? '13px' : '14px' }};padding-right:{{ prop.fit == 'lane' ? '13px' : '14px' }};padding-top:10px;row-gap:8px;width:{{ cardwidth[prop.fit] }}">
-      <div data-fdn-id="n513" style="align-items:center;column-gap:8px;display:flex">
-        <fdn-use data-fdn-id="n514" component="FlowGlyph" data-fdn-prop-color="{{ glyphcolor[prop.glyph] }}" data-fdn-prop-name="{{ prop.glyph }}" data-fdn-prop-size="{{ prop.glyph == 'deploy' ? '13' : '14' }}"></fdn-use>
-        <span data-fdn-id="n515" style="color:{{ glyphcolor[prop.glyph] }};font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium)">
+    <div data-fdn-id="n516" style="background-color:var(--color-proposal-wash);border:1px dashed var(--color-status-merged);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;flex-direction:column;padding-bottom:10px;padding-left:{{ prop.fit == 'lane' ? '13px' : '14px' }};padding-right:{{ prop.fit == 'lane' ? '13px' : '14px' }};padding-top:10px;row-gap:8px;width:{{ cardwidth[prop.fit] }}">
+      <div data-fdn-id="n517" style="align-items:center;box-sizing:border-box;column-gap:8px;display:flex;row-gap:8px">
+        <fdn-use data-fdn-id="n518" component="FlowGlyph" data-fdn-prop-color="{{ glyphcolor[prop.glyph] }}" data-fdn-prop-name="{{ prop.glyph }}" data-fdn-prop-size="{{ prop.glyph == 'deploy' ? '13' : '14' }}"></fdn-use>
+        <span data-fdn-id="n519" style="box-sizing:border-box;color:{{ glyphcolor[prop.glyph] }};font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium)">
           {{ prop.type }}
         </span>
-        <span data-fdn-id="n516" style="color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-meta);margin-left:auto;white-space:nowrap">
+        <span data-fdn-id="n520" style="box-sizing:border-box;color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-meta);margin-left:auto;white-space:nowrap">
           {{ prop.ref }} · proposed
         </span>
       </div>
-      <div data-fdn-id="n517" style="color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-md);font-weight:var(--font-weight-semibold)">
+      <div data-fdn-id="n521" style="box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-md);font-weight:var(--font-weight-semibold)">
         {{ prop.title }}
       </div>
-      <div data-fdn-id="n518" style="display:flex;flex-direction:column">
-        <div data-fdn-id="n519" style="color:var(--color-text-muted);font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);margin-bottom:4px">
+      <div data-fdn-id="n522" style="box-sizing:border-box;display:flex;flex-direction:column">
+        <div data-fdn-id="n523" style="box-sizing:border-box;color:var(--color-text-muted);font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);margin-bottom:4px">
           {{ prop.field }}
         </div>
-        <div data-fdn-id="n520" style="background-color:var(--color-surface-alt);border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-base);padding-bottom:7px;padding-left:11px;padding-right:11px;padding-top:7px">
+        <div data-fdn-id="n524" style="background-color:var(--color-surface-alt);border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-base);padding-bottom:7px;padding-left:11px;padding-right:11px;padding-top:7px">
           {{ prop.value }}
         </div>
       </div>
@@ -505,18 +520,20 @@
       <fdn-prop name="selected" type="enum" values="yes,no" default="no"></fdn-prop>
       <fdn-prop name="attached" type="enum" values="yes,no" default="no"></fdn-prop>
     </fdn-props>
-    <div data-fdn-id="n521" data-fdn-style="rail-row" style="background-color:{{ prop.selected == 'yes' ? 'var(--color-rail-selection)' : 'transparent' }}">
-      <fdn-use data-fdn-id="n522" component="FlowGlyph" data-fdn-prop-color="var(--color-chip-ink)" data-fdn-prop-name="track"></fdn-use>
-      <span data-fdn-id="n523" style="display:flex;flex-direction:column;flex-grow:1;min-width:0">
-        <span data-fdn-id="n524" style="color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+    <button data-fdn-id="n525" data-fdn-style="rail-row" style="background-color:{{ prop.selected == 'yes' ? 'var(--color-rail-selection)' : 'transparent' }};border-width:0;color:inherit;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
+      <span data-fdn-id="n526" style="box-sizing:border-box;display:block;flex-shrink:0;height:14px;width:14px">
+        <fdn-use data-fdn-id="n527" component="FlowGlyph" data-fdn-prop-color="var(--color-chip-ink)" data-fdn-prop-name="track"></fdn-use>
+      </span>
+      <span data-fdn-id="n528" style="box-sizing:border-box;display:block;flex-grow:1;min-width:0">
+        <span data-fdn-id="n529" style="box-sizing:border-box;color:var(--color-text-primary);display:block;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
           {{ prop.name }}
         </span>
-        <span data-fdn-id="n525" data-fdn-style="meta-10" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+        <span data-fdn-id="n530" data-fdn-style="meta-10" style="box-sizing:border-box;display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
           {{ prop.meta }}
         </span>
       </span>
-      <fdn-use data-fdn-id="n526" component="StatusDot" data-fdn-prop-state="running" when="prop.attached == 'yes'"></fdn-use>
-    </div>
+      <fdn-use data-fdn-id="n531" component="StatusDot" data-fdn-prop-state="running" when="prop.attached == 'yes'"></fdn-use>
+    </button>
   </fdn-component>
   <fdn-component name="SectionLabel" hidden>
     <fdn-props>
@@ -536,191 +553,191 @@
     <fdn-props>
       <fdn-prop name="code" type="enum" values="enabled,disabled" default="enabled"></fdn-prop>
     </fdn-props>
-    <span data-fdn-id="n527" style="align-items:center;background-color:var(--color-chip-bg);border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);column-gap:2px;display:flex;flex:none;padding-bottom:2px;padding-left:2px;padding-right:2px;padding-top:2px">
-      <span data-fdn-id="n528" data-fdn-style="segment" style="background-color:var(--color-segment-on);box-shadow:var(--shadow-segment);color:var(--color-text-primary)">
+    <span data-fdn-id="n532" style="align-items:center;background-color:var(--color-chip-bg);border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;column-gap:2px;display:flex;flex:none;padding-bottom:2px;padding-left:2px;padding-right:2px;padding-top:2px;row-gap:2px">
+      <button data-fdn-id="n533" data-fdn-style="segment" style="background-color:var(--color-segment-on);border-width:0;box-shadow:var(--shadow-segment);box-sizing:border-box;color:var(--color-text-primary);cursor:pointer;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
         Flow
-      </span>
-      <span data-fdn-id="n529" data-fdn-style="segment" style="color:var(--color-text-muted);opacity:{{ prop.code == 'disabled' ? '0.45' : '1' }}">
+      </button>
+      <button data-fdn-id="n534" data-fdn-style="segment" style="background-color:transparent;border-width:0;box-sizing:border-box;color:var(--color-text-muted);cursor:pointer;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0;opacity:{{ prop.code == 'disabled' ? '0.45' : '1' }}">
         Code
-      </span>
+      </button>
     </span>
   </fdn-component>
   <fdn-component name="SidecarRail" hidden>
     <fdn-props>
       <fdn-prop name="pending" type="enum" values="pending,none" default="none"></fdn-prop>
     </fdn-props>
-    <div data-fdn-id="n530" style="align-items:center;border-left:1px solid var(--color-divider);box-sizing:border-box;display:flex;flex:none;flex-direction:column;padding-bottom:12px;padding-top:12px;width:36px">
-      <span data-fdn-id="n531" style="align-items:flex-end;display:flex;flex-direction:column;height:15px;width:15px">
-        <fdn-use data-fdn-id="n532" component="FlowGlyph" data-fdn-prop-name="sidecar" data-fdn-prop-size="15"></fdn-use>
-        <span data-fdn-id="n533" when="prop.pending == 'pending'" style="background-color:var(--color-status-merged);border:1.5px solid var(--color-surface);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:7px;margin-right:-4px;margin-top:-18px;width:7px"></span>
+    <button data-fdn-id="n535" style="align-items:center;background-color:transparent;border-bottom-width:0;border-left:1px solid var(--color-divider);border-right-width:0;border-top-width:0;box-sizing:border-box;color:var(--color-text-muted);cursor:pointer;display:flex;flex:none;flex-direction:column;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0;padding-bottom:12px;padding-left:0;padding-right:0;padding-top:12px;width:36px">
+      <span data-fdn-id="n536" style="align-items:flex-end;box-sizing:border-box;display:flex;flex-direction:column;height:15px;width:15px">
+        <fdn-use data-fdn-id="n537" component="FlowGlyph" data-fdn-prop-color="currentColor" data-fdn-prop-name="sidecar" data-fdn-prop-size="15"></fdn-use>
+        <span data-fdn-id="n538" when="prop.pending == 'pending'" style="background-color:var(--color-status-merged);border:1.5px solid var(--color-surface);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:7px;margin-right:-4px;margin-top:-18px;width:7px"></span>
       </span>
-      <span data-fdn-id="n534" style="color:var(--color-meta-faint);font-family:var(--font-mono);font-size:var(--font-size-2xs);margin-top:10px;writing-mode:vertical-rl">
+      <span data-fdn-id="n539" style="box-sizing:border-box;color:var(--color-meta-faint);font-family:var(--font-mono);font-size:var(--font-size-2xs);margin-top:10px;writing-mode:vertical-rl">
         ⌘⌃B
       </span>
-    </div>
+    </button>
   </fdn-component>
   <fdn-component name="StatusDot" hidden>
     <fdn-props>
       <fdn-prop name="state" type="enum" values="blocked,done,merged,review,running,waiting" required="true"></fdn-prop>
       <fdn-prop name="size" type="string" default="7px"></fdn-prop>
     </fdn-props>
-    <span data-fdn-id="n25" style="background:{{ statuscolor[prop.state] }};border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;flex:none;height:{{ prop.size }};width:{{ prop.size }}"></span>
+    <span data-fdn-id="n25" style="background:{{ statuscolor[prop.state] }};border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex-shrink:0;height:{{ prop.size }};width:{{ prop.size }}"></span>
   </fdn-component>
   <fdn-component name="TracksPane" hidden>
     <fdn-props>
       <fdn-prop name="mode" type="enum" values="rest,selected,empty" required="true"></fdn-prop>
     </fdn-props>
     <div data-fdn-id="n71" when="prop.mode == 'rest'" data-fdn-style="flow-pane" style="height:525.5px;width:1416px">
-      <div data-fdn-id="n535" data-fdn-style="fill-row">
-        <aside data-fdn-id="n536" data-fdn-style="rail">
-          <div data-fdn-id="n537" data-fdn-style="rail-header">
-            <span data-fdn-id="n538" data-fdn-style="rail-label">
+      <div data-fdn-id="n540" data-fdn-style="fill-row">
+        <aside data-fdn-id="n541" data-fdn-style="rail">
+          <div data-fdn-id="n542" data-fdn-style="rail-header">
+            <span data-fdn-id="n543" data-fdn-style="rail-label" style="box-sizing:border-box">
               TRACKS
             </span>
-            <span data-fdn-id="n539" data-fdn-style="meta-10">
+            <span data-fdn-id="n544" data-fdn-style="meta-10" style="box-sizing:border-box">
               7
             </span>
-            <span data-fdn-id="n540" data-fdn-style="icon-btn">
-              <fdn-use data-fdn-id="n541" component="FlowGlyph" data-fdn-prop-color="var(--color-icon-muted)" data-fdn-prop-name="plus" data-fdn-prop-size="12"></fdn-use>
-            </span>
+            <button data-fdn-id="n545" data-fdn-style="icon-btn" style="background-color:transparent;border-width:0;box-sizing:border-box;color:var(--color-icon-muted);cursor:pointer;font-family:inherit;font-size:inherit;line-height:inherit;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0">
+              <fdn-use data-fdn-id="n546" component="FlowGlyph" data-fdn-prop-color="var(--color-icon-muted)" data-fdn-prop-name="plus" data-fdn-prop-size="12"></fdn-use>
+            </button>
           </div>
-          <div data-fdn-id="n542" data-fdn-style="rail-list">
-            <fdn-use data-fdn-id="n543" component="RailRow" data-fdn-prop-attached="{{ track.attached }}" data-fdn-prop-meta="{{ param.proposalstate == 'pending' ? track.proposalmeta : track.meta }}" data-fdn-prop-name="{{ track.name }}" data-fdn-prop-selected="{{ track.id == param.selectedtrack ? 'yes' : 'no' }}" each="track in data.tracks"></fdn-use>
+          <div data-fdn-id="n547" data-fdn-style="rail-list">
+            <fdn-use data-fdn-id="n548" component="RailRow" data-fdn-prop-attached="{{ track.attached }}" data-fdn-prop-meta="{{ param.proposalstate == 'pending' ? track.proposalmeta : track.meta }}" data-fdn-prop-name="{{ track.name }}" data-fdn-prop-selected="{{ track.id == param.selectedtrack ? 'yes' : 'no' }}" each="track in data.tracks"></fdn-use>
           </div>
         </aside>
-        <main data-fdn-id="n544" data-fdn-style="fill-column">
-          <div data-fdn-id="n545" data-fdn-style="flow-header">
-            <span data-fdn-id="n546" data-fdn-style="flow-header-name">
+        <main data-fdn-id="n549" data-fdn-style="fill-column">
+          <div data-fdn-id="n550" data-fdn-style="flow-header">
+            <span data-fdn-id="n551" data-fdn-style="flow-header-name" style="box-sizing:border-box">
               review-and-ship
             </span>
-            <span data-fdn-id="n547" when="param.proposalstate == 'none'" data-fdn-style="flow-header-status" style="color:var(--color-mono-meta)">
-              <fdn-use data-fdn-id="n548" component="StatusDot" data-fdn-prop-state="running"></fdn-use>
-              <span data-fdn-id="n549">
+            <span data-fdn-id="n552" when="param.proposalstate == 'none'" data-fdn-style="flow-header-status" style="box-sizing:border-box;color:var(--color-mono-meta)">
+              <fdn-use data-fdn-id="n553" component="StatusDot" data-fdn-prop-state="running"></fdn-use>
+              <span data-fdn-id="n554" style="box-sizing:border-box">
                 attached · drone-12 · step 4 of 7
               </span>
             </span>
-            <span data-fdn-id="n550" when="param.proposalstate == 'pending'" data-fdn-style="flow-header-status" style="color:var(--color-status-merged)">
-              <fdn-use data-fdn-id="n551" component="StatusDot" data-fdn-prop-size="6px" data-fdn-prop-state="merged"></fdn-use>
-              <span data-fdn-id="n552">
+            <span data-fdn-id="n555" when="param.proposalstate == 'pending'" data-fdn-style="flow-header-status" style="box-sizing:border-box;color:var(--color-status-merged)">
+              <fdn-use data-fdn-id="n556" component="StatusDot" data-fdn-prop-size="6px" data-fdn-prop-state="merged"></fdn-use>
+              <span data-fdn-id="n557" style="box-sizing:border-box">
                 proposal · 3 changes
               </span>
             </span>
-            <span data-fdn-id="n553" style="flex-grow:1;min-width:0"></span>
-            <fdn-use data-fdn-id="n554" component="SegmentedView" data-fdn-prop-code="{{ param.proposalstate == 'pending' ? 'disabled' : 'enabled' }}"></fdn-use>
-            <fdn-use data-fdn-id="n555" component="ActionButton" data-fdn-prop-label="Open agent" when="param.proposalstate == 'none'"></fdn-use>
-            <fdn-use data-fdn-id="n556" component="ActionButton" data-fdn-prop-disabled="yes" data-fdn-prop-label="Attach to agent" when="param.proposalstate == 'pending'"></fdn-use>
+            <span data-fdn-id="n558" style="box-sizing:border-box;flex-grow:1;min-width:0"></span>
+            <fdn-use data-fdn-id="n559" component="SegmentedView" data-fdn-prop-code="{{ param.proposalstate == 'pending' ? 'disabled' : 'enabled' }}"></fdn-use>
+            <fdn-use data-fdn-id="n560" component="ActionButton" data-fdn-prop-label="Open agent" when="param.proposalstate == 'none'"></fdn-use>
+            <fdn-use data-fdn-id="n561" component="ActionButton" data-fdn-prop-disabled="yes" data-fdn-prop-label="Attach to agent" when="param.proposalstate == 'pending'"></fdn-use>
           </div>
-          <fdn-use data-fdn-id="n557" component="LiveFlow" when="param.proposalstate == 'none'"></fdn-use>
-          <fdn-use data-fdn-id="n558" component="ProposalFlow" when="param.proposalstate == 'pending'"></fdn-use>
-          <div data-fdn-id="n559" data-fdn-style="flow-footer">
-            <span data-fdn-id="n560" when="param.proposalstate == 'none'">
+          <fdn-use data-fdn-id="n562" component="LiveFlow" when="param.proposalstate == 'none'"></fdn-use>
+          <fdn-use data-fdn-id="n563" component="ProposalFlow" when="param.proposalstate == 'pending'"></fdn-use>
+          <div data-fdn-id="n564" data-fdn-style="flow-footer">
+            <span data-fdn-id="n565" when="param.proposalstate == 'none'" style="box-sizing:border-box">
               hover a step for timestamps · click an exception for the full note
             </span>
-            <span data-fdn-id="n561" when="param.proposalstate == 'none'" style="align-items:center;column-gap:6px;display:flex;margin-left:auto;white-space:nowrap">
-              <fdn-use data-fdn-id="n562" component="StatusDot" data-fdn-prop-size="6px" data-fdn-prop-state="waiting"></fdn-use>
-              <span data-fdn-id="n563">
+            <span data-fdn-id="n566" when="param.proposalstate == 'none'" style="align-items:center;box-sizing:border-box;column-gap:6px;display:flex;margin-left:auto;white-space:nowrap">
+              <fdn-use data-fdn-id="n567" component="StatusDot" data-fdn-prop-size="6px" data-fdn-prop-state="waiting"></fdn-use>
+              <span data-fdn-id="n568" style="box-sizing:border-box">
                 1 exception
               </span>
             </span>
-            <span data-fdn-id="n564" when="param.proposalstate == 'pending'">
+            <span data-fdn-id="n569" when="param.proposalstate == 'pending'" style="box-sizing:border-box">
               a proposed diff from the sidecar — nothing is real until you accept
             </span>
           </div>
         </main>
-        <fdn-use data-fdn-id="n565" component="SidecarRail" data-fdn-prop-pending="{{ param.proposalstate }}"></fdn-use>
+        <fdn-use data-fdn-id="n570" component="SidecarRail" data-fdn-prop-pending="{{ param.proposalstate }}"></fdn-use>
       </div>
     </div>
     <div data-fdn-id="n136" when="prop.mode == 'selected'" data-fdn-style="flow-pane" style="height:{{ paneheight[param.proposalstate] }};width:1416px">
       <div data-fdn-id="n142" data-fdn-style="fill-row">
         <aside data-fdn-id="n143" data-fdn-style="rail">
-          <div data-fdn-id="n566" data-fdn-style="rail-header">
-            <span data-fdn-id="n567" data-fdn-style="rail-label">
+          <div data-fdn-id="n571" data-fdn-style="rail-header">
+            <span data-fdn-id="n572" data-fdn-style="rail-label" style="box-sizing:border-box">
               TRACKS
             </span>
-            <span data-fdn-id="n568" data-fdn-style="meta-10">
+            <span data-fdn-id="n573" data-fdn-style="meta-10" style="box-sizing:border-box">
               7
             </span>
-            <span data-fdn-id="n569" data-fdn-style="icon-btn">
-              <fdn-use data-fdn-id="n570" component="FlowGlyph" data-fdn-prop-color="var(--color-icon-muted)" data-fdn-prop-name="plus" data-fdn-prop-size="12"></fdn-use>
-            </span>
+            <button data-fdn-id="n574" data-fdn-style="icon-btn" style="background-color:transparent;border-width:0;box-sizing:border-box;color:var(--color-icon-muted);cursor:pointer;font-family:inherit;font-size:inherit;line-height:inherit;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0">
+              <fdn-use data-fdn-id="n575" component="FlowGlyph" data-fdn-prop-color="var(--color-icon-muted)" data-fdn-prop-name="plus" data-fdn-prop-size="12"></fdn-use>
+            </button>
           </div>
           <div data-fdn-id="n148" data-fdn-style="rail-list">
-            <fdn-use data-fdn-id="n571" component="RailRow" data-fdn-prop-attached="{{ track.attached }}" data-fdn-prop-meta="{{ param.proposalstate == 'pending' ? track.proposalmeta : track.meta }}" data-fdn-prop-name="{{ track.name }}" data-fdn-prop-selected="{{ track.id == param.selectedtrack ? 'yes' : 'no' }}" each="track in data.tracks"></fdn-use>
+            <fdn-use data-fdn-id="n576" component="RailRow" data-fdn-prop-attached="{{ track.attached }}" data-fdn-prop-meta="{{ param.proposalstate == 'pending' ? track.proposalmeta : track.meta }}" data-fdn-prop-name="{{ track.name }}" data-fdn-prop-selected="{{ track.id == param.selectedtrack ? 'yes' : 'no' }}" each="track in data.tracks"></fdn-use>
           </div>
         </aside>
         <main data-fdn-id="n150" data-fdn-style="fill-column">
           <div data-fdn-id="n151" data-fdn-style="flow-header">
-            <span data-fdn-id="n153" data-fdn-style="flow-header-name">
+            <span data-fdn-id="n153" data-fdn-style="flow-header-name" style="box-sizing:border-box">
               review-and-ship
             </span>
-            <span data-fdn-id="n572" when="param.proposalstate == 'none'" data-fdn-style="flow-header-status" style="color:var(--color-mono-meta)">
-              <fdn-use data-fdn-id="n573" component="StatusDot" data-fdn-prop-state="running"></fdn-use>
-              <span data-fdn-id="n574">
+            <span data-fdn-id="n577" when="param.proposalstate == 'none'" data-fdn-style="flow-header-status" style="box-sizing:border-box;color:var(--color-mono-meta)">
+              <fdn-use data-fdn-id="n578" component="StatusDot" data-fdn-prop-state="running"></fdn-use>
+              <span data-fdn-id="n579" style="box-sizing:border-box">
                 attached · drone-12 · step 4 of 7
               </span>
             </span>
-            <span data-fdn-id="n575" when="param.proposalstate == 'pending'" data-fdn-style="flow-header-status" style="color:var(--color-status-merged)">
-              <fdn-use data-fdn-id="n576" component="StatusDot" data-fdn-prop-size="6px" data-fdn-prop-state="merged"></fdn-use>
-              <span data-fdn-id="n577">
+            <span data-fdn-id="n580" when="param.proposalstate == 'pending'" data-fdn-style="flow-header-status" style="box-sizing:border-box;color:var(--color-status-merged)">
+              <fdn-use data-fdn-id="n581" component="StatusDot" data-fdn-prop-size="6px" data-fdn-prop-state="merged"></fdn-use>
+              <span data-fdn-id="n582" style="box-sizing:border-box">
                 proposal · 3 changes
               </span>
             </span>
-            <span data-fdn-id="n578" style="flex-grow:1;min-width:0"></span>
-            <fdn-use data-fdn-id="n579" component="SegmentedView" data-fdn-prop-code="{{ param.proposalstate == 'pending' ? 'disabled' : 'enabled' }}"></fdn-use>
-            <fdn-use data-fdn-id="n580" component="ActionButton" data-fdn-prop-label="Open agent" when="param.proposalstate == 'none'"></fdn-use>
-            <fdn-use data-fdn-id="n581" component="ActionButton" data-fdn-prop-disabled="yes" data-fdn-prop-label="Attach to agent" when="param.proposalstate == 'pending'"></fdn-use>
+            <span data-fdn-id="n583" style="box-sizing:border-box;flex-grow:1;min-width:0"></span>
+            <fdn-use data-fdn-id="n584" component="SegmentedView" data-fdn-prop-code="{{ param.proposalstate == 'pending' ? 'disabled' : 'enabled' }}"></fdn-use>
+            <fdn-use data-fdn-id="n585" component="ActionButton" data-fdn-prop-label="Open agent" when="param.proposalstate == 'none'"></fdn-use>
+            <fdn-use data-fdn-id="n586" component="ActionButton" data-fdn-prop-disabled="yes" data-fdn-prop-label="Attach to agent" when="param.proposalstate == 'pending'"></fdn-use>
           </div>
-          <fdn-use data-fdn-id="n582" component="LiveFlow" when="param.proposalstate == 'none'"></fdn-use>
-          <fdn-use data-fdn-id="n583" component="ProposalFlow" when="param.proposalstate == 'pending'"></fdn-use>
-          <div data-fdn-id="n584" data-fdn-style="flow-footer">
-            <span data-fdn-id="n585" when="param.proposalstate == 'none'">
+          <fdn-use data-fdn-id="n587" component="LiveFlow" when="param.proposalstate == 'none'"></fdn-use>
+          <fdn-use data-fdn-id="n588" component="ProposalFlow" when="param.proposalstate == 'pending'"></fdn-use>
+          <div data-fdn-id="n589" data-fdn-style="flow-footer">
+            <span data-fdn-id="n590" when="param.proposalstate == 'none'" style="box-sizing:border-box">
               hover a step for timestamps · click an exception for the full note
             </span>
-            <span data-fdn-id="n586" when="param.proposalstate == 'none'" style="align-items:center;column-gap:6px;display:flex;margin-left:auto;white-space:nowrap">
-              <fdn-use data-fdn-id="n587" component="StatusDot" data-fdn-prop-size="6px" data-fdn-prop-state="waiting"></fdn-use>
-              <span data-fdn-id="n588">
+            <span data-fdn-id="n591" when="param.proposalstate == 'none'" style="align-items:center;box-sizing:border-box;column-gap:6px;display:flex;margin-left:auto;white-space:nowrap">
+              <fdn-use data-fdn-id="n592" component="StatusDot" data-fdn-prop-size="6px" data-fdn-prop-state="waiting"></fdn-use>
+              <span data-fdn-id="n593" style="box-sizing:border-box">
                 1 exception
               </span>
             </span>
-            <span data-fdn-id="n589" when="param.proposalstate == 'pending'">
+            <span data-fdn-id="n594" when="param.proposalstate == 'pending'" style="box-sizing:border-box">
               a proposed diff from the sidecar — nothing is real until you accept
             </span>
           </div>
         </main>
-        <fdn-use data-fdn-id="n590" component="SidecarRail" data-fdn-prop-pending="{{ param.proposalstate }}"></fdn-use>
+        <fdn-use data-fdn-id="n595" component="SidecarRail" data-fdn-prop-pending="{{ param.proposalstate }}"></fdn-use>
       </div>
     </div>
     <div data-fdn-id="n265" when="prop.mode == 'empty'" data-fdn-style="flow-pane" style="height:468px;width:724px">
-      <div data-fdn-id="n591" data-fdn-style="fill-row">
-        <aside data-fdn-id="n592" data-fdn-style="rail">
-          <div data-fdn-id="n593" data-fdn-style="rail-header">
-            <span data-fdn-id="n594" data-fdn-style="rail-label">
+      <div data-fdn-id="n596" data-fdn-style="fill-row">
+        <aside data-fdn-id="n597" data-fdn-style="rail">
+          <div data-fdn-id="n598" data-fdn-style="rail-header">
+            <span data-fdn-id="n599" data-fdn-style="rail-label" style="box-sizing:border-box">
               TRACKS
             </span>
-            <span data-fdn-id="n595" data-fdn-style="meta-10">
+            <span data-fdn-id="n600" data-fdn-style="meta-10" style="box-sizing:border-box">
               0
             </span>
-            <span data-fdn-id="n596" data-fdn-style="icon-btn">
-              <fdn-use data-fdn-id="n597" component="FlowGlyph" data-fdn-prop-color="var(--color-icon-muted)" data-fdn-prop-name="plus" data-fdn-prop-size="12"></fdn-use>
-            </span>
+            <button data-fdn-id="n601" data-fdn-style="icon-btn" style="background-color:transparent;border-width:0;box-sizing:border-box;color:var(--color-icon-muted);cursor:pointer;font-family:inherit;font-size:inherit;line-height:inherit;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0">
+              <fdn-use data-fdn-id="n602" component="FlowGlyph" data-fdn-prop-color="var(--color-icon-muted)" data-fdn-prop-name="plus" data-fdn-prop-size="12"></fdn-use>
+            </button>
           </div>
-          <div data-fdn-id="n598" data-fdn-style="rail-list"></div>
+          <div data-fdn-id="n603" data-fdn-style="rail-list"></div>
         </aside>
-        <main data-fdn-id="n599" data-fdn-style="fill-column">
-          <div data-fdn-id="n271" style="align-items:center;display:flex;flex:1;flex-direction:column;justify-content:center;padding-bottom:24px;padding-left:24px;padding-right:24px;padding-top:24px">
+        <main data-fdn-id="n604" data-fdn-style="fill-column">
+          <div data-fdn-id="n271" style="align-items:center;box-sizing:border-box;display:flex;flex:1;flex-direction:column;justify-content:center">
             <fdn-use data-fdn-id="n272" component="PixelBee"></fdn-use>
-            <div data-fdn-id="n273" style="color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-xl);font-weight:var(--font-weight-semibold);margin-top:18px">
+            <div data-fdn-id="n273" style="box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-xl);font-weight:var(--font-weight-semibold);margin-top:18px">
               Write down how you’d want it done.
             </div>
-            <div data-fdn-id="n274" style="color:var(--color-chip-ink);font-family:var(--font-sans);font-size:var(--font-size-md);line-height:1.5;margin-top:6px;max-width:380px;text-align:center">
+            <div data-fdn-id="n274" style="box-sizing:border-box;color:var(--color-chip-ink);font-family:var(--font-sans);font-size:var(--font-size-md);line-height:1.5;margin-top:6px;max-width:380px;text-align:center">
               A track is a short list of steps an agent follows and checks off as it works.
             </div>
-            <div data-fdn-id="n600" style="margin-top:18px">
+            <div data-fdn-id="n605" style="box-sizing:border-box;margin-top:18px">
               <fdn-use data-fdn-id="n276" component="ActionButton" data-fdn-prop-hint="c" data-fdn-prop-label="New track" data-fdn-prop-variant="accent"></fdn-use>
             </div>
           </div>
         </main>
-        <fdn-use data-fdn-id="n601" component="SidecarRail"></fdn-use>
+        <fdn-use data-fdn-id="n606" component="SidecarRail"></fdn-use>
       </div>
     </div>
   </fdn-component>
