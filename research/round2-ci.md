@@ -49,7 +49,7 @@ All final runs below install tool **0.2.0-proto.4** and capture the exact Apiary
 |---|---|---:|---:|---:|---:|---|
 | [40182358445](https://github.com/honeybeehq/apiary/actions/runs/40182358445) | advisory job green; verification false as expected | 112s | 108s | 51s | 15s | cold/miss |
 | [40182524513](https://github.com/honeybeehq/apiary/actions/runs/40182524513) | advisory job green; verification false as expected | 91s | 87s | 24s | 14s | warm/hit |
-| [40182357998](https://github.com/honeybeehq/apiary/actions/runs/40182357998) | required job red; drift + incomplete coverage | 96s | see job log | see job log | see job log | concurrent cold |
+| [40182357998](https://github.com/honeybeehq/apiary/actions/runs/40182357998) | required job red; drift + incomplete coverage | 96s | 92s | 47s | 16s | concurrent cold |
 
 For the exact final tool, caching cut install time from 51s to 24s (27s, about53%); total run elapsed fell from112s to91s. Browser and app node_modules restored successfully; tool installation remained fresh.
 
@@ -62,3 +62,5 @@ The final cold report has selected/proposal/empty residual differences of 2.805%
 To check stale behavior locally, download the run artifact, then run `pnpm exec tsx packages/proof/src/accept/verify-demo.ts MANIFEST APIARY_REPO TRUSTED_POLICY OUTPUT_DIR`. It first records a real accepted difference, temporarily stales the design head, records the clear failure, and restores the list in a finally block. Committed output is under `packages/proof/src/accept/evidence/`.
 
 Proof images render the actual downloaded final cold summary.md with an explicit source/run banner. The native GitHub sidecar returned browser-unavailable (no mounted sidecar), so the screenshot is not claimed to show GitHub browser chrome. A Nectar preview provides the same full summary and captured image links.
+
+Live final summary preview: https://trmd-metal-2.tailff9529.ts.net:8467, Nectar reference `nectar://trmd-metal-2/fdn-r3-ci-summary--proto-fdn-proof-ci-ready--web`. Earlier summary preview was stopped to free its own quota slot.
