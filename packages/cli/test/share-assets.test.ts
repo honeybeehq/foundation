@@ -6,6 +6,7 @@ import { afterEach, expect, it, vi } from 'vitest'
 import { createChain } from 'foundation-engine'
 import { skeletonDocument } from '../src/commands/new.js'
 import { AssetSharing, assetRef, assetReferences, sniffAsset, MAX_ASSET } from '../src/share/assets.js'
+vi.mock('../src/share/vault.js',()=>({sessionFor:()=>({permission:'read'})}))
 const store=new Map<string,{seq:string;payload_hex:string}[]>()
 vi.mock('../src/share/transport.js',()=>({createBridge:(config:any)=>({hello:async()=>{},finish:async()=>{},close:()=>{},request:async(op:string,f:any)=>{
  const key=config.shareLog,rows=store.get(key)??[]
@@ -90,4 +91,13 @@ it('uses a later repaired chunk instead of being pinned to a bad first event',as
  rows[0]!.payload_hex=Buffer.from('bad first event').toString('hex');rows.push({...good,seq:'2'})
  await new AssetSharing(config,f.b,root).receive(f.chain)
  expect(await readFile(join(root,'b',f.path))).toEqual(f.bytes)
+})
+
+it('a read-only member retries availability without attempting uploads',async()=>{
+ const f=await fixture();await mkdir(join(root,'b','.foundation/assets'),{recursive:true});await writeFile(join(root,'b',f.path),f.bytes)
+ const reader=new AssetSharing(config,f.b,root),publish=vi.spyOn(reader,'publish')
+ reader.retry(f.chain)
+ await reader.receive(f.chain)
+ expect(publish).not.toHaveBeenCalled();expect(store.size).toBe(0)
+ const {readAssetStatus}=await import('../src/share/assets.js');expect(readAssetStatus(f.b)).toContainEqual({path:f.path,state:'ready',reason:null})
 })

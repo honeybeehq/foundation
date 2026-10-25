@@ -10,6 +10,7 @@ import { createBridge } from './transport.js'
 import { validateAppendReceipt } from '../sync/bridge.js'
 import { replicaRoot } from '../sync-store.js'
 import { writeAtomic } from '../disk.js'
+import { sessionFor } from './vault.js'
 
 export const MAX_ASSET = 20 * 1024 * 1024
 const CHUNK = 128 * 1024
@@ -164,7 +165,7 @@ export class AssetSharing {
     if(!this.config.share)return
     const jobs=assetReferences(chain.doc()).filter(ref=>!this.available.has(ref.path)).map(ref=>this.job(ref,'fetch',async()=>{
       const target=await confinedPath(this.file,this.root,ref,true)
-      try{await transfer(()=>verifyFile(target,ref))}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;await fetchAsset(this.config,target,ref)}
+      try{await transfer(()=>verifyFile(target,ref))}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;await fetchAsset(this.config,target,ref);this.uploaded.add(ref.path);acknowledged.add(JSON.stringify([this.config.share!.space,this.config.share!.service,this.root,ref.path]))}
       this.available.add(ref.path)
     }))
     await this.wait(jobs,strict)
@@ -173,7 +174,9 @@ export class AssetSharing {
    * new document edit. The foreground document never waits for the retry. */
   retry(chain:FdnChain):void {
     if(Date.now()-this.polledAt<5000)return
-    this.polledAt=Date.now();void this.receive(chain,false).catch(()=>{});void this.publish(chain,false).catch(()=>{})
+    this.polledAt=Date.now();void this.receive(chain,false).catch(()=>{})
+    // A reader can fetch, but must not retry background uploads of its Git files.
+    try{if(this.config.share&&sessionFor(this.config.share.space).permission==='write')void this.publish(chain,false).catch(()=>{})}catch{/* sign-in status is reported by the sharing transport */}
   }
 }
 // A large image never opens unbounded streams or monopolizes every connection.
