@@ -137,7 +137,10 @@ export function pairEnvironmentIssues(
   if (errors.length) return errors;
   const d = captureEnvironment(design.meta),
     c = captureEnvironment(code.meta);
-  if (canonical(d) !== canonical(c))
+  const baselineBound = code.meta.baselineCaptureHash === hash({nodes:design.nodes,meta:design.meta,image:design.screenshot.toString('base64')});
+  const {rendererSourceHash: _d, ...designPortable} = d;
+  const {rendererSourceHash: _c, ...codePortable} = c;
+  if (canonical(baselineBound ? designPortable : d) !== canonical(baselineBound ? codePortable : c))
     return [
       "Capture font assets, font policy, browser/platform or renderer source fingerprints differ",
     ];
