@@ -1,6 +1,6 @@
 {
   "schema": "fdn-capture/0",
-  "rendererSourceHash": "93c6f566b93af848e58782f40603f61eb7819279ac481904364fcd8f5e515b1c",
+  "rendererSourceHash": "70ab9ab5f56628fc5094ec5abec49e461eaab6881ff79dc29f3203b41903da92",
   "rendererSources": [
     {
       "file": "package.json",
@@ -168,7 +168,7 @@
     },
     {
       "file": "packages/proof/src/capture/cli.ts",
-      "sha256": "a0b4c94670be83a74ac03cefcb781b776d88dec36e292ed28b8976784c55a255"
+      "sha256": "4108b03ba1c00f929085b027b779750c3bc56d2e3e295944b369e35f07ec6df0"
     },
     {
       "file": "packages/proof/src/capture/code-cli.ts",
@@ -219,7 +219,7 @@
       "sha256": "65b137b164da0eabf320bd8ad051d2e75dc1b210019746c3be72a78d3db92f37"
     }
   ],
-  "rendererCommit": "44174b74590d48bbf7300aec76ca869b5aa63540",
+  "rendererCommit": "617ef30a2203e299eb026bd32098cac64d7e9617",
   "rendererDirty": false,
   "provable": true,
   "source": "code",
@@ -234,12 +234,12 @@
     "frame": [
       0,
       0,
-      1064,
-      720
+      1062,
+      718
     ],
     "scroll": [
-      1064,
-      720
+      1062,
+      718
     ],
     "viewport": [
       0,
@@ -250,12 +250,12 @@
   },
   "fullExtent": {
     "file": "full-extent.png",
-    "sha256": "7a0555de0345143450adfc553290cb31eff98f5de4207b974aacd57ad595e384",
+    "sha256": "457d92c8a7a90cfd1cd6aee1e566eacb5e2670a928d92ede3507ae842ba8c620",
     "diagnosticPaint": true
   },
   "frame": {
-    "width": 1064,
-    "height": 720
+    "width": 1062,
+    "height": 718
   },
   "boundary": {
     "codeSelector": "[data-help-center]",
@@ -563,7 +563,7 @@
   },
   "renderedAt": "2026-07-31T12:00:00.000Z",
   "repo": "honeybeehq/apiary",
-  "commit": "5850046fe9541d6c044db5674b795a2dfcee3a75",
+  "commit": "4ece46a89966d9b4d3dedc585541ac2ca3d23e1c",
   "dirty": false,
   "root": "apps/desktop/src/renderer/src/chrome/HelpCenter.tsx#HelpCenter",
   "browserVersion": "151.0.7922.34",
@@ -649,6 +649,6 @@
   "blocked": [],
   "errors": [],
   "timingsMs": {
-    "capture": 11526
+    "capture": 11851
   }
 }
