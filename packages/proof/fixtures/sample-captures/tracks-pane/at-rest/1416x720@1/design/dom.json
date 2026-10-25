@@ -3,6 +3,7 @@
   "nodes": [
     {
       "path": "0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": null,
       "role": "",
@@ -128,6 +129,7 @@
     },
     {
       "path": "0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n71",
       "role": "",
@@ -253,6 +255,7 @@
     },
     {
       "path": "0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n72",
       "role": "",
@@ -378,6 +381,7 @@
     },
     {
       "path": "0/0/0/0",
+      "authoredFontFamily": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
       "tag": "span",
       "fdnId": "n97::n73",
       "role": "",
@@ -503,6 +507,7 @@
     },
     {
       "path": "0/0/0/1",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n74",
       "role": "",
@@ -628,6 +633,7 @@
     },
     {
       "path": "0/0/0/2",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n75",
       "role": "",
@@ -753,6 +759,7 @@
     },
     {
       "path": "0/0/0/2/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n76",
       "role": "",
@@ -878,6 +885,7 @@
     },
     {
       "path": "0/0/0/2/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "svg",
       "fdnId": "n97::n76::n1",
       "role": "",
@@ -1010,6 +1018,7 @@
     },
     {
       "path": "0/0/0/2/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "g",
       "fdnId": "n97::n76::n18",
       "role": "",
@@ -1138,6 +1147,7 @@
     },
     {
       "path": "0/0/0/2/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "circle",
       "fdnId": "n97::n76::n19",
       "role": "",
@@ -1270,6 +1280,7 @@
     },
     {
       "path": "0/0/0/2/0/0/0/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "circle",
       "fdnId": "n97::n76::n20",
       "role": "",
@@ -1402,6 +1413,7 @@
     },
     {
       "path": "0/0/0/2/0/0/0/2",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "circle",
       "fdnId": "n97::n76::n21",
       "role": "",
@@ -1534,6 +1546,7 @@
     },
     {
       "path": "0/0/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n77",
       "role": "",
@@ -1659,6 +1672,7 @@
     },
     {
       "path": "0/0/1/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n78",
       "role": "",
@@ -1784,6 +1798,7 @@
     },
     {
       "path": "0/0/1/0/0",
+      "authoredFontFamily": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
       "tag": "span",
       "fdnId": "n97::n78::n43",
       "role": "",
@@ -1909,6 +1924,7 @@
     },
     {
       "path": "0/0/1/0/0/0",
+      "authoredFontFamily": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
       "tag": "span",
       "fdnId": "n97::n78::n44",
       "role": "",
@@ -2034,6 +2050,7 @@
     },
     {
       "path": "0/0/1/0/0/1",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n78::n45",
       "role": "",
@@ -2159,6 +2176,7 @@
     },
     {
       "path": "0/0/1/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n79",
       "role": "",
@@ -2284,6 +2302,7 @@
     },
     {
       "path": "0/0/1/1/0",
+      "authoredFontFamily": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
       "tag": "span",
       "fdnId": "n97::n79::n43",
       "role": "",
@@ -2409,6 +2428,7 @@
     },
     {
       "path": "0/0/1/1/0/0",
+      "authoredFontFamily": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
       "tag": "span",
       "fdnId": "n97::n79::n44",
       "role": "",
@@ -2534,6 +2554,7 @@
     },
     {
       "path": "0/0/1/1/0/1",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n79::n45",
       "role": "",
@@ -2659,6 +2680,7 @@
     },
     {
       "path": "0/0/1/2",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n80",
       "role": "",
@@ -2784,6 +2806,7 @@
     },
     {
       "path": "0/0/1/2/0",
+      "authoredFontFamily": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
       "tag": "span",
       "fdnId": "n97::n80::n43",
       "role": "",
@@ -2909,6 +2932,7 @@
     },
     {
       "path": "0/0/1/2/0/0",
+      "authoredFontFamily": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
       "tag": "span",
       "fdnId": "n97::n80::n44",
       "role": "",
@@ -3034,6 +3058,7 @@
     },
     {
       "path": "0/0/1/2/0/1",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n80::n45",
       "role": "",
@@ -3159,6 +3184,7 @@
     },
     {
       "path": "0/0/1/3",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n81",
       "role": "",
@@ -3284,6 +3310,7 @@
     },
     {
       "path": "0/0/1/4",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n82",
       "role": "",
@@ -3409,6 +3436,7 @@
     },
     {
       "path": "0/0/1/4/0",
+      "authoredFontFamily": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
       "tag": "span",
       "fdnId": "n97::n82::n40",
       "role": "",
@@ -3534,6 +3562,7 @@
     },
     {
       "path": "0/0/1/4/0/0",
+      "authoredFontFamily": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
       "tag": "span",
       "fdnId": "n97::n82::n41",
       "role": "",
@@ -3659,6 +3688,7 @@
     },
     {
       "path": "0/0/1/4/0/1",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n82::n42",
       "role": "",
@@ -3784,6 +3814,7 @@
     },
     {
       "path": "0/0/2",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n83",
       "role": "",
@@ -3909,6 +3940,7 @@
     },
     {
       "path": "0/0/2/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#0::n84",
       "role": "",
@@ -4034,6 +4066,7 @@
     },
     {
       "path": "0/0/2/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#0::n84::n46",
       "role": "",
@@ -4159,6 +4192,7 @@
     },
     {
       "path": "0/0/2/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#0::n84::n47",
       "role": "",
@@ -4284,6 +4318,7 @@
     },
     {
       "path": "0/0/2/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#0::n84::n48",
       "role": "",
@@ -4409,6 +4444,7 @@
     },
     {
       "path": "0/0/2/0/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "svg",
       "fdnId": "n97::n84#0::n84::n48::n1",
       "role": "",
@@ -4541,6 +4577,7 @@
     },
     {
       "path": "0/0/2/0/0/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "g",
       "fdnId": "n97::n84#0::n84::n48::n2",
       "role": "",
@@ -4669,6 +4706,7 @@
     },
     {
       "path": "0/0/2/0/0/0/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "path",
       "fdnId": "n97::n84#0::n84::n48::n3",
       "role": "",
@@ -4801,6 +4839,7 @@
     },
     {
       "path": "0/0/2/0/0/0/0/0/0/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "path",
       "fdnId": "n97::n84#0::n84::n48::n4",
       "role": "",
@@ -4933,6 +4972,7 @@
     },
     {
       "path": "0/0/2/0/0/0/1",
+      "authoredFontFamily": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n49",
       "role": "",
@@ -5058,6 +5098,7 @@
     },
     {
       "path": "0/0/2/0/0/0/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n50",
       "role": "",
@@ -5183,6 +5224,7 @@
     },
     {
       "path": "0/0/2/0/0/0/3",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n51",
       "role": "",
@@ -5308,6 +5350,7 @@
     },
     {
       "path": "0/0/2/0/0/0/4",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n52",
       "role": "",
@@ -5433,6 +5476,7 @@
     },
     {
       "path": "0/0/2/0/0/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#0::n84::n53",
       "role": "",
@@ -5558,6 +5602,7 @@
     },
     {
       "path": "0/0/2/0/0/1/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#0::n84::n54",
       "role": "",
@@ -5683,6 +5728,7 @@
     },
     {
       "path": "0/0/2/0/0/1/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n54::n26",
       "role": "",
@@ -5808,6 +5854,7 @@
     },
     {
       "path": "0/0/2/0/0/1/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#0::n84::n54::n27",
       "role": "",
@@ -5933,6 +5980,7 @@
     },
     {
       "path": "0/0/2/0/0/1/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n54::n27::n25",
       "role": "",
@@ -6058,6 +6106,7 @@
     },
     {
       "path": "0/0/2/0/0/1/0/0/1",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n54::n28",
       "role": "",
@@ -6183,6 +6232,7 @@
     },
     {
       "path": "0/0/2/0/0/1/0/0/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n54::n29",
       "role": "",
@@ -6308,6 +6358,7 @@
     },
     {
       "path": "0/0/2/0/0/1/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#0::n84::n55",
       "role": "",
@@ -6433,6 +6484,7 @@
     },
     {
       "path": "0/0/2/0/0/1/1/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n55::n26",
       "role": "",
@@ -6558,6 +6610,7 @@
     },
     {
       "path": "0/0/2/0/0/1/1/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#0::n84::n55::n27",
       "role": "",
@@ -6683,6 +6736,7 @@
     },
     {
       "path": "0/0/2/0/0/1/1/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n55::n27::n25",
       "role": "",
@@ -6808,6 +6862,7 @@
     },
     {
       "path": "0/0/2/0/0/1/1/0/1",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n55::n28",
       "role": "",
@@ -6933,6 +6988,7 @@
     },
     {
       "path": "0/0/2/0/0/1/1/0/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n55::n29",
       "role": "",
@@ -7058,6 +7114,7 @@
     },
     {
       "path": "0/0/2/0/0/1/2",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n59",
       "role": "",
@@ -7183,6 +7240,7 @@
     },
     {
       "path": "0/0/2/0/0/1/3",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n60",
       "role": "",
@@ -7308,6 +7366,7 @@
     },
     {
       "path": "0/0/2/0/0/1/4",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n61",
       "role": "",
@@ -7433,6 +7492,7 @@
     },
     {
       "path": "0/0/2/0/0/1/4/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n62",
       "role": "",
@@ -7558,6 +7618,7 @@
     },
     {
       "path": "0/0/2/0/0/1/4/1",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n63",
       "role": "",
@@ -7683,6 +7744,7 @@
     },
     {
       "path": "0/0/2/0/0/1/4/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n64",
       "role": "",
@@ -7808,6 +7870,7 @@
     },
     {
       "path": "0/0/2/0/0/1/5",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#0::n84::n65",
       "role": "",
@@ -7933,6 +7996,7 @@
     },
     {
       "path": "0/0/2/0/0/1/5/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n65::n30",
       "role": "",
@@ -8058,6 +8122,7 @@
     },
     {
       "path": "0/0/2/0/0/1/5/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n65::n31",
       "role": "",
@@ -8183,6 +8248,7 @@
     },
     {
       "path": "0/0/2/0/0/1/5/0/1",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n65::n32",
       "role": "",
@@ -8308,6 +8374,7 @@
     },
     {
       "path": "0/0/2/0/0/1/5/0/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#0::n84::n65::n33",
       "role": "",
@@ -8433,6 +8500,7 @@
     },
     {
       "path": "0/0/2/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#1::n84",
       "role": "",
@@ -8558,6 +8626,7 @@
     },
     {
       "path": "0/0/2/1/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#1::n84::n46",
       "role": "",
@@ -8683,6 +8752,7 @@
     },
     {
       "path": "0/0/2/1/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#1::n84::n47",
       "role": "",
@@ -8808,6 +8878,7 @@
     },
     {
       "path": "0/0/2/1/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#1::n84::n48",
       "role": "",
@@ -8933,6 +9004,7 @@
     },
     {
       "path": "0/0/2/1/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "svg",
       "fdnId": "n97::n84#1::n84::n48::n1",
       "role": "",
@@ -9065,6 +9137,7 @@
     },
     {
       "path": "0/0/2/1/0/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "g",
       "fdnId": "n97::n84#1::n84::n48::n2",
       "role": "",
@@ -9193,6 +9266,7 @@
     },
     {
       "path": "0/0/2/1/0/0/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "path",
       "fdnId": "n97::n84#1::n84::n48::n3",
       "role": "",
@@ -9325,6 +9399,7 @@
     },
     {
       "path": "0/0/2/1/0/0/0/0/0/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "path",
       "fdnId": "n97::n84#1::n84::n48::n4",
       "role": "",
@@ -9457,6 +9532,7 @@
     },
     {
       "path": "0/0/2/1/0/0/1",
+      "authoredFontFamily": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
       "tag": "span",
       "fdnId": "n97::n84#1::n84::n49",
       "role": "",
@@ -9582,6 +9658,7 @@
     },
     {
       "path": "0/0/2/1/0/0/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#1::n84::n50",
       "role": "",
@@ -9707,6 +9784,7 @@
     },
     {
       "path": "0/0/2/1/0/0/3",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#1::n84::n51",
       "role": "",
@@ -9832,6 +9910,7 @@
     },
     {
       "path": "0/0/2/1/0/0/4",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#1::n84::n52",
       "role": "",
@@ -9957,6 +10036,7 @@
     },
     {
       "path": "0/0/2/1/0/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#1::n84::n53",
       "role": "",
@@ -10082,6 +10162,7 @@
     },
     {
       "path": "0/0/2/1/0/1/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#1::n84::n54",
       "role": "",
@@ -10207,6 +10288,7 @@
     },
     {
       "path": "0/0/2/1/0/1/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#1::n84::n54::n26",
       "role": "",
@@ -10332,6 +10414,7 @@
     },
     {
       "path": "0/0/2/1/0/1/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#1::n84::n54::n27",
       "role": "",
@@ -10457,6 +10540,7 @@
     },
     {
       "path": "0/0/2/1/0/1/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#1::n84::n54::n27::n25",
       "role": "",
@@ -10582,6 +10666,7 @@
     },
     {
       "path": "0/0/2/1/0/1/0/0/1",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#1::n84::n54::n28",
       "role": "",
@@ -10707,6 +10792,7 @@
     },
     {
       "path": "0/0/2/1/0/1/0/0/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#1::n84::n54::n29",
       "role": "",
@@ -10832,6 +10918,7 @@
     },
     {
       "path": "0/0/2/1/0/1/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#1::n84::n59",
       "role": "",
@@ -10957,6 +11044,7 @@
     },
     {
       "path": "0/0/2/1/0/1/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#1::n84::n60",
       "role": "",
@@ -11082,6 +11170,7 @@
     },
     {
       "path": "0/0/2/2",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#2::n84",
       "role": "",
@@ -11207,6 +11296,7 @@
     },
     {
       "path": "0/0/2/2/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#2::n84::n46",
       "role": "",
@@ -11332,6 +11422,7 @@
     },
     {
       "path": "0/0/2/2/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#2::n84::n47",
       "role": "",
@@ -11457,6 +11548,7 @@
     },
     {
       "path": "0/0/2/2/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#2::n84::n48",
       "role": "",
@@ -11582,6 +11674,7 @@
     },
     {
       "path": "0/0/2/2/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "svg",
       "fdnId": "n97::n84#2::n84::n48::n1",
       "role": "",
@@ -11714,6 +11807,7 @@
     },
     {
       "path": "0/0/2/2/0/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "g",
       "fdnId": "n97::n84#2::n84::n48::n2",
       "role": "",
@@ -11842,6 +11936,7 @@
     },
     {
       "path": "0/0/2/2/0/0/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "path",
       "fdnId": "n97::n84#2::n84::n48::n3",
       "role": "",
@@ -11974,6 +12069,7 @@
     },
     {
       "path": "0/0/2/2/0/0/0/0/0/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "path",
       "fdnId": "n97::n84#2::n84::n48::n4",
       "role": "",
@@ -12106,6 +12202,7 @@
     },
     {
       "path": "0/0/2/2/0/0/1",
+      "authoredFontFamily": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
       "tag": "span",
       "fdnId": "n97::n84#2::n84::n49",
       "role": "",
@@ -12231,6 +12328,7 @@
     },
     {
       "path": "0/0/2/2/0/0/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#2::n84::n50",
       "role": "",
@@ -12356,6 +12454,7 @@
     },
     {
       "path": "0/0/2/2/0/0/3",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#2::n84::n51",
       "role": "",
@@ -12481,6 +12580,7 @@
     },
     {
       "path": "0/0/2/2/0/0/4",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#2::n84::n52",
       "role": "",
@@ -12606,6 +12706,7 @@
     },
     {
       "path": "0/0/2/2/0/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#2::n84::n53",
       "role": "",
@@ -12731,6 +12832,7 @@
     },
     {
       "path": "0/0/2/2/0/1/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#2::n84::n55",
       "role": "",
@@ -12856,6 +12958,7 @@
     },
     {
       "path": "0/0/2/2/0/1/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#2::n84::n55::n26",
       "role": "",
@@ -12981,6 +13084,7 @@
     },
     {
       "path": "0/0/2/2/0/1/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#2::n84::n55::n27",
       "role": "",
@@ -13106,6 +13210,7 @@
     },
     {
       "path": "0/0/2/2/0/1/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#2::n84::n55::n27::n25",
       "role": "",
@@ -13231,6 +13336,7 @@
     },
     {
       "path": "0/0/2/2/0/1/0/0/1",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#2::n84::n55::n28",
       "role": "",
@@ -13356,6 +13462,7 @@
     },
     {
       "path": "0/0/2/2/0/1/0/0/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#2::n84::n55::n29",
       "role": "",
@@ -13481,6 +13588,7 @@
     },
     {
       "path": "0/0/2/2/0/1/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#2::n84::n59",
       "role": "",
@@ -13606,6 +13714,7 @@
     },
     {
       "path": "0/0/2/2/0/1/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#2::n84::n60",
       "role": "",
@@ -13731,6 +13840,7 @@
     },
     {
       "path": "0/0/2/2/0/1/3",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#2::n84::n61",
       "role": "",
@@ -13856,6 +13966,7 @@
     },
     {
       "path": "0/0/2/2/0/1/3/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#2::n84::n62",
       "role": "",
@@ -13981,6 +14092,7 @@
     },
     {
       "path": "0/0/2/2/0/1/3/1",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#2::n84::n63",
       "role": "",
@@ -14106,6 +14218,7 @@
     },
     {
       "path": "0/0/2/2/0/1/3/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#2::n84::n64",
       "role": "",
@@ -14231,6 +14344,7 @@
     },
     {
       "path": "0/0/2/3",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#3::n84",
       "role": "",
@@ -14356,6 +14470,7 @@
     },
     {
       "path": "0/0/2/3/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#3::n84::n46",
       "role": "",
@@ -14481,6 +14596,7 @@
     },
     {
       "path": "0/0/2/3/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#3::n84::n47",
       "role": "",
@@ -14606,6 +14722,7 @@
     },
     {
       "path": "0/0/2/3/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#3::n84::n48",
       "role": "",
@@ -14731,6 +14848,7 @@
     },
     {
       "path": "0/0/2/3/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "svg",
       "fdnId": "n97::n84#3::n84::n48::n1",
       "role": "",
@@ -14863,6 +14981,7 @@
     },
     {
       "path": "0/0/2/3/0/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "g",
       "fdnId": "n97::n84#3::n84::n48::n2",
       "role": "",
@@ -14991,6 +15110,7 @@
     },
     {
       "path": "0/0/2/3/0/0/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "path",
       "fdnId": "n97::n84#3::n84::n48::n3",
       "role": "",
@@ -15123,6 +15243,7 @@
     },
     {
       "path": "0/0/2/3/0/0/0/0/0/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "path",
       "fdnId": "n97::n84#3::n84::n48::n4",
       "role": "",
@@ -15255,6 +15376,7 @@
     },
     {
       "path": "0/0/2/3/0/0/1",
+      "authoredFontFamily": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
       "tag": "span",
       "fdnId": "n97::n84#3::n84::n49",
       "role": "",
@@ -15380,6 +15502,7 @@
     },
     {
       "path": "0/0/2/3/0/0/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#3::n84::n50",
       "role": "",
@@ -15505,6 +15628,7 @@
     },
     {
       "path": "0/0/2/3/0/0/3",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#3::n84::n51",
       "role": "",
@@ -15630,6 +15754,7 @@
     },
     {
       "path": "0/0/2/3/0/0/4",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#3::n84::n52",
       "role": "",
@@ -15755,6 +15880,7 @@
     },
     {
       "path": "0/0/2/3/0/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#3::n84::n53",
       "role": "",
@@ -15880,6 +16006,7 @@
     },
     {
       "path": "0/0/2/3/0/1/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#3::n84::n54",
       "role": "",
@@ -16005,6 +16132,7 @@
     },
     {
       "path": "0/0/2/3/0/1/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#3::n84::n54::n26",
       "role": "",
@@ -16130,6 +16258,7 @@
     },
     {
       "path": "0/0/2/3/0/1/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#3::n84::n54::n27",
       "role": "",
@@ -16255,6 +16384,7 @@
     },
     {
       "path": "0/0/2/3/0/1/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#3::n84::n54::n27::n25",
       "role": "",
@@ -16380,6 +16510,7 @@
     },
     {
       "path": "0/0/2/3/0/1/0/0/1",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#3::n84::n54::n28",
       "role": "",
@@ -16505,6 +16636,7 @@
     },
     {
       "path": "0/0/2/3/0/1/0/0/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#3::n84::n54::n29",
       "role": "",
@@ -16630,6 +16762,7 @@
     },
     {
       "path": "0/0/2/3/0/1/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#3::n84::n59",
       "role": "",
@@ -16755,6 +16888,7 @@
     },
     {
       "path": "0/0/2/3/0/1/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#3::n84::n60",
       "role": "",
@@ -16880,6 +17014,7 @@
     },
     {
       "path": "0/0/2/4",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#4::n84",
       "role": "",
@@ -17005,6 +17140,7 @@
     },
     {
       "path": "0/0/2/4/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#4::n84::n46",
       "role": "",
@@ -17130,6 +17266,7 @@
     },
     {
       "path": "0/0/2/4/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#4::n84::n47",
       "role": "",
@@ -17255,6 +17392,7 @@
     },
     {
       "path": "0/0/2/4/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#4::n84::n48",
       "role": "",
@@ -17380,6 +17518,7 @@
     },
     {
       "path": "0/0/2/4/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "svg",
       "fdnId": "n97::n84#4::n84::n48::n1",
       "role": "",
@@ -17512,6 +17651,7 @@
     },
     {
       "path": "0/0/2/4/0/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "g",
       "fdnId": "n97::n84#4::n84::n48::n2",
       "role": "",
@@ -17640,6 +17780,7 @@
     },
     {
       "path": "0/0/2/4/0/0/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "path",
       "fdnId": "n97::n84#4::n84::n48::n3",
       "role": "",
@@ -17772,6 +17913,7 @@
     },
     {
       "path": "0/0/2/4/0/0/0/0/0/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "path",
       "fdnId": "n97::n84#4::n84::n48::n4",
       "role": "",
@@ -17904,6 +18046,7 @@
     },
     {
       "path": "0/0/2/4/0/0/1",
+      "authoredFontFamily": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
       "tag": "span",
       "fdnId": "n97::n84#4::n84::n49",
       "role": "",
@@ -18029,6 +18172,7 @@
     },
     {
       "path": "0/0/2/4/0/0/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#4::n84::n50",
       "role": "",
@@ -18154,6 +18298,7 @@
     },
     {
       "path": "0/0/2/4/0/0/3",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#4::n84::n51",
       "role": "",
@@ -18279,6 +18424,7 @@
     },
     {
       "path": "0/0/2/4/0/0/4",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#4::n84::n52",
       "role": "",
@@ -18404,6 +18550,7 @@
     },
     {
       "path": "0/0/2/4/0/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#4::n84::n53",
       "role": "",
@@ -18529,6 +18676,7 @@
     },
     {
       "path": "0/0/2/4/0/1/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#4::n84::n57",
       "role": "",
@@ -18654,6 +18802,7 @@
     },
     {
       "path": "0/0/2/4/0/1/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#4::n84::n57::n26",
       "role": "",
@@ -18779,6 +18928,7 @@
     },
     {
       "path": "0/0/2/4/0/1/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#4::n84::n57::n27",
       "role": "",
@@ -18904,6 +19054,7 @@
     },
     {
       "path": "0/0/2/4/0/1/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#4::n84::n57::n27::n25",
       "role": "",
@@ -19029,6 +19180,7 @@
     },
     {
       "path": "0/0/2/4/0/1/0/0/1",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#4::n84::n57::n28",
       "role": "",
@@ -19154,6 +19306,7 @@
     },
     {
       "path": "0/0/2/4/0/1/0/0/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#4::n84::n57::n29",
       "role": "",
@@ -19279,6 +19432,7 @@
     },
     {
       "path": "0/0/2/4/0/1/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#4::n84::n59",
       "role": "",
@@ -19404,6 +19558,7 @@
     },
     {
       "path": "0/0/2/4/0/1/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#4::n84::n60",
       "role": "",
@@ -19529,6 +19684,7 @@
     },
     {
       "path": "0/0/2/4/0/1/3",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#4::n84::n65",
       "role": "",
@@ -19654,6 +19810,7 @@
     },
     {
       "path": "0/0/2/4/0/1/3/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#4::n84::n65::n30",
       "role": "",
@@ -19779,6 +19936,7 @@
     },
     {
       "path": "0/0/2/4/0/1/3/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#4::n84::n65::n31",
       "role": "",
@@ -19904,6 +20062,7 @@
     },
     {
       "path": "0/0/2/4/0/1/3/0/1",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#4::n84::n65::n32",
       "role": "",
@@ -20029,6 +20188,7 @@
     },
     {
       "path": "0/0/2/4/0/1/3/0/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#4::n84::n65::n33",
       "role": "",
@@ -20154,6 +20314,7 @@
     },
     {
       "path": "0/0/2/5",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#5::n84",
       "role": "",
@@ -20279,6 +20440,7 @@
     },
     {
       "path": "0/0/2/5/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#5::n84::n46",
       "role": "",
@@ -20404,6 +20566,7 @@
     },
     {
       "path": "0/0/2/5/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#5::n84::n47",
       "role": "",
@@ -20529,6 +20692,7 @@
     },
     {
       "path": "0/0/2/5/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#5::n84::n48",
       "role": "",
@@ -20654,6 +20818,7 @@
     },
     {
       "path": "0/0/2/5/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "svg",
       "fdnId": "n97::n84#5::n84::n48::n1",
       "role": "",
@@ -20786,6 +20951,7 @@
     },
     {
       "path": "0/0/2/5/0/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "g",
       "fdnId": "n97::n84#5::n84::n48::n2",
       "role": "",
@@ -20914,6 +21080,7 @@
     },
     {
       "path": "0/0/2/5/0/0/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "path",
       "fdnId": "n97::n84#5::n84::n48::n3",
       "role": "",
@@ -21046,6 +21213,7 @@
     },
     {
       "path": "0/0/2/5/0/0/0/0/0/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "path",
       "fdnId": "n97::n84#5::n84::n48::n4",
       "role": "",
@@ -21178,6 +21346,7 @@
     },
     {
       "path": "0/0/2/5/0/0/1",
+      "authoredFontFamily": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
       "tag": "span",
       "fdnId": "n97::n84#5::n84::n49",
       "role": "",
@@ -21303,6 +21472,7 @@
     },
     {
       "path": "0/0/2/5/0/0/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#5::n84::n50",
       "role": "",
@@ -21428,6 +21598,7 @@
     },
     {
       "path": "0/0/2/5/0/0/3",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#5::n84::n51",
       "role": "",
@@ -21553,6 +21724,7 @@
     },
     {
       "path": "0/0/2/5/0/0/4",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#5::n84::n52",
       "role": "",
@@ -21678,6 +21850,7 @@
     },
     {
       "path": "0/0/2/5/0/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#5::n84::n53",
       "role": "",
@@ -21803,6 +21976,7 @@
     },
     {
       "path": "0/0/2/5/0/1/0",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#5::n84::n58",
       "role": "",
@@ -21928,6 +22102,7 @@
     },
     {
       "path": "0/0/2/5/0/1/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#5::n84::n59",
       "role": "",
@@ -22053,6 +22228,7 @@
     },
     {
       "path": "0/0/2/5/0/1/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#5::n84::n60",
       "role": "",
@@ -22178,6 +22354,7 @@
     },
     {
       "path": "0/0/2/6",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#6::n84",
       "role": "",
@@ -22303,6 +22480,7 @@
     },
     {
       "path": "0/0/2/6/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#6::n84::n46",
       "role": "",
@@ -22428,6 +22606,7 @@
     },
     {
       "path": "0/0/2/6/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#6::n84::n47",
       "role": "",
@@ -22553,6 +22732,7 @@
     },
     {
       "path": "0/0/2/6/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "fdn-use",
       "fdnId": "n97::n84#6::n84::n48",
       "role": "",
@@ -22678,6 +22858,7 @@
     },
     {
       "path": "0/0/2/6/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "svg",
       "fdnId": "n97::n84#6::n84::n48::n1",
       "role": "",
@@ -22810,6 +22991,7 @@
     },
     {
       "path": "0/0/2/6/0/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "g",
       "fdnId": "n97::n84#6::n84::n48::n2",
       "role": "",
@@ -22938,6 +23120,7 @@
     },
     {
       "path": "0/0/2/6/0/0/0/0/0/0",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "path",
       "fdnId": "n97::n84#6::n84::n48::n3",
       "role": "",
@@ -23070,6 +23253,7 @@
     },
     {
       "path": "0/0/2/6/0/0/0/0/0/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "path",
       "fdnId": "n97::n84#6::n84::n48::n4",
       "role": "",
@@ -23202,6 +23386,7 @@
     },
     {
       "path": "0/0/2/6/0/0/1",
+      "authoredFontFamily": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
       "tag": "span",
       "fdnId": "n97::n84#6::n84::n49",
       "role": "",
@@ -23327,6 +23512,7 @@
     },
     {
       "path": "0/0/2/6/0/0/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#6::n84::n50",
       "role": "",
@@ -23452,6 +23638,7 @@
     },
     {
       "path": "0/0/2/6/0/0/3",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#6::n84::n51",
       "role": "",
@@ -23577,6 +23764,7 @@
     },
     {
       "path": "0/0/2/6/0/0/4",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#6::n84::n52",
       "role": "",
@@ -23702,6 +23890,7 @@
     },
     {
       "path": "0/0/2/6/0/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "div",
       "fdnId": "n97::n84#6::n84::n53",
       "role": "",
@@ -23827,6 +24016,7 @@
     },
     {
       "path": "0/0/2/6/0/1/0",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#6::n84::n58",
       "role": "",
@@ -23952,6 +24142,7 @@
     },
     {
       "path": "0/0/2/6/0/1/1",
+      "authoredFontFamily": "\"Times New Roman\"",
       "tag": "span",
       "fdnId": "n97::n84#6::n84::n59",
       "role": "",
@@ -24077,6 +24268,7 @@
     },
     {
       "path": "0/0/2/6/0/1/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n84#6::n84::n60",
       "role": "",
@@ -24202,6 +24394,7 @@
     },
     {
       "path": "0/0/3",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "div",
       "fdnId": "n97::n85",
       "role": "",
@@ -24327,6 +24520,7 @@
     },
     {
       "path": "0/0/3/0",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n86",
       "role": "",
@@ -24452,6 +24646,7 @@
     },
     {
       "path": "0/0/3/1",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n87",
       "role": "",
@@ -24577,6 +24772,7 @@
     },
     {
       "path": "0/0/3/2",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n88",
       "role": "",
@@ -24702,6 +24898,7 @@
     },
     {
       "path": "0/0/3/3",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n89",
       "role": "",
@@ -24827,6 +25024,7 @@
     },
     {
       "path": "0/0/3/4",
+      "authoredFontFamily": "ui-monospace, \"SF Mono\", Menlo, monospace",
       "tag": "span",
       "fdnId": "n97::n90",
       "role": "",

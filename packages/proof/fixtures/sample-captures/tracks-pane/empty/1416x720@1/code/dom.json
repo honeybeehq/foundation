@@ -3,6 +3,7 @@
   "nodes": [
     {
       "path": "0",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "div",
       "fdnId": null,
       "role": "",
@@ -204,6 +205,7 @@
     },
     {
       "path": "0/0",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "div",
       "fdnId": null,
       "role": "",
@@ -405,6 +407,7 @@
     },
     {
       "path": "0/0/0",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "div",
       "fdnId": null,
       "role": "",
@@ -606,6 +609,7 @@
     },
     {
       "path": "0/0/0/0",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "aside",
       "fdnId": null,
       "role": "",
@@ -807,6 +811,7 @@
     },
     {
       "path": "0/0/0/0/0",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "div",
       "fdnId": null,
       "role": "",
@@ -1008,6 +1013,7 @@
     },
     {
       "path": "0/0/0/0/0/0",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "span",
       "fdnId": null,
       "role": "",
@@ -1209,6 +1215,7 @@
     },
     {
       "path": "0/0/0/0/0/1",
+      "authoredFontFamily": "\"IBM Plex Mono\", ui-monospace, monospace",
       "tag": "span",
       "fdnId": null,
       "role": "",
@@ -1410,6 +1417,7 @@
     },
     {
       "path": "0/0/0/0/0/2",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "button",
       "fdnId": null,
       "role": "button",
@@ -1611,6 +1619,7 @@
     },
     {
       "path": "0/0/0/0/0/2/0",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "svg",
       "fdnId": null,
       "role": "",
@@ -1818,6 +1827,7 @@
     },
     {
       "path": "0/0/0/0/0/2/0/0",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "path",
       "fdnId": null,
       "role": "",
@@ -2025,6 +2035,7 @@
     },
     {
       "path": "0/0/0/0/1",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "div",
       "fdnId": null,
       "role": "",
@@ -2226,6 +2237,7 @@
     },
     {
       "path": "0/0/0/1",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "main",
       "fdnId": null,
       "role": "",
@@ -2427,6 +2439,7 @@
     },
     {
       "path": "0/0/0/1/0",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "div",
       "fdnId": null,
       "role": "",
@@ -2628,6 +2641,7 @@
     },
     {
       "path": "0/0/0/1/0/0",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "div",
       "fdnId": null,
       "role": "",
@@ -2829,6 +2843,7 @@
     },
     {
       "path": "0/0/0/1/0/0/0",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "span",
       "fdnId": null,
       "role": "",
@@ -3030,6 +3045,7 @@
     },
     {
       "path": "0/0/0/1/0/1",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "div",
       "fdnId": null,
       "role": "",
@@ -3231,6 +3247,7 @@
     },
     {
       "path": "0/0/0/1/0/2",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "div",
       "fdnId": null,
       "role": "",
@@ -3432,6 +3449,7 @@
     },
     {
       "path": "0/0/0/1/0/3",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "button",
       "fdnId": null,
       "role": "button",
@@ -3633,6 +3651,7 @@
     },
     {
       "path": "0/0/0/1/0/3/0",
+      "authoredFontFamily": "\"IBM Plex Mono\", ui-monospace, monospace",
       "tag": "span",
       "fdnId": null,
       "role": "",
@@ -3834,6 +3853,7 @@
     },
     {
       "path": "0/0/0/2",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "button",
       "fdnId": null,
       "role": "button",
@@ -4035,6 +4055,7 @@
     },
     {
       "path": "0/0/0/2/0",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "span",
       "fdnId": null,
       "role": "",
@@ -4236,6 +4257,7 @@
     },
     {
       "path": "0/0/0/2/0/0",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "svg",
       "fdnId": null,
       "role": "",
@@ -4443,6 +4465,7 @@
     },
     {
       "path": "0/0/0/2/0/0/0",
+      "authoredFontFamily": "\"Hanken Grotesk\", system-ui, sans-serif",
       "tag": "path",
       "fdnId": null,
       "role": "",
@@ -4650,6 +4673,7 @@
     },
     {
       "path": "0/0/0/2/1",
+      "authoredFontFamily": "\"IBM Plex Mono\", ui-monospace, monospace",
       "tag": "span",
       "fdnId": null,
       "role": "",

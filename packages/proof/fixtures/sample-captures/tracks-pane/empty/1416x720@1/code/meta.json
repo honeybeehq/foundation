@@ -1,10 +1,14 @@
 {
   "schema": "fdn-capture/0",
-  "rendererSourceHash": "cbbd451f7d105b50824f2ba16230cd9467e26396046bfe778f0a86dccc11d6ed",
+  "rendererSourceHash": "df66be2348c724908b98a4076213748b99413e582548b8deca7c214991c4a69f",
   "rendererSources": [
     {
       "file": "package.json",
       "sha256": "b22faf1759df3cb80d059fe751e8ab6f9c645fd870a6f524a5cd6f1588da1e0a"
+    },
+    {
+      "file": "packages/engine/package.json",
+      "sha256": "554ce65b98f7d7a584d2b9cee61fc8cc824e8a4ac8b9710dee4f007a52ffc3c7"
     },
     {
       "file": "packages/engine/src/artboards/frame.ts",
@@ -159,16 +163,20 @@
       "sha256": "c04cf023f2d05f03a48babda7a36c0383f78f59eafeb4c92996a8dedc5fba1fa"
     },
     {
+      "file": "packages/proof/package.json",
+      "sha256": "b8461be2be2b6aca250f60de65ee1f534927aba94ce5ac49d1423cdc9ef5282d"
+    },
+    {
       "file": "packages/proof/src/capture/cli.ts",
-      "sha256": "972b132d54084e678cecf8210c3eab105ce4c5246ab1ac69d48f9ede0a06ed48"
+      "sha256": "a3080346e74533b103b3b3a9e6e571016fe2e7e2bcdccdbf84a5304c4ad47ed3"
     },
     {
       "file": "packages/proof/src/capture/dom.ts",
-      "sha256": "e332d23feca546d11b0b29abd34d25d5a8cb7bf35d4ad792ccee375e18d5959d"
+      "sha256": "6d85075b46d934d812148cf13358e8d62e9a7e709242c2d39961f7be49f253a6"
     },
     {
       "file": "packages/proof/src/capture/fonts.ts",
-      "sha256": "cb0797d998125659ee78e8d811f342982feb07ecd230c290f63d92ffa39a29ed"
+      "sha256": "b0e1e3c0104194a298c4998f9b0b2506deecfca56a2078945aa7784afcd258ea"
     },
     {
       "file": "packages/proof/src/capture/gallery.ts",
@@ -176,11 +184,11 @@
     },
     {
       "file": "packages/proof/src/capture/provenance.ts",
-      "sha256": "aba386bb0702abd8bcd96a1707d9d21b0ae0f84de9134e4bf41da421d45453bc"
+      "sha256": "1647933a888a910b78c7bc6db8fb3416c8bdf0804f651557e684621f50c22c96"
     },
     {
       "file": "packages/proof/src/capture/settle.ts",
-      "sha256": "1201284d1ec55d275e2a49881b25e8a335ee726cbfcdc92528e1c532c44cc3a7"
+      "sha256": "b7d1c585fcf85de43075d70962aa9736b63f3f901693c902b2eaa7462d853918"
     },
     {
       "file": "packages/proof/src/capture/types.ts",
@@ -197,9 +205,13 @@
     {
       "file": "pnpm-lock.yaml",
       "sha256": "35660c0f2da4d33be4b224fbb80ea76c9b7d4fca4953f48774eae70d242b2722"
+    },
+    {
+      "file": "tsconfig.json",
+      "sha256": "65b137b164da0eabf320bd8ad051d2e75dc1b210019746c3be72a78d3db92f37"
     }
   ],
-  "rendererCommit": "b8a211ad5f25bd8f3b68d32673a896967771d716",
+  "rendererCommit": "73211d09e2d8c8a9474ac49c8aadd8c89eb7e870",
   "rendererDirty": false,
   "provable": true,
   "source": "code",
@@ -256,10 +268,16 @@
       "glyphCount": 89
     },
     {
+      "familyName": "IBM Plex Mono Medium",
+      "postScriptName": "IBMPlexMono-Medium",
+      "isCustomFont": true,
+      "glyphCount": 2
+    },
+    {
       "familyName": "IBM Plex Mono",
       "postScriptName": "IBMPlexMono-Regular",
       "isCustomFont": true,
-      "glyphCount": 6
+      "glyphCount": 4
     }
   ],
   "fontAssets": [
@@ -354,6 +372,22 @@
       "format": "truetype",
       "sha256": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895",
       "postScriptName": "DejaVuSans-Bold"
+    },
+    {
+      "family": "Hanken Grotesk",
+      "weight": "700",
+      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-700-normal.woff2",
+      "format": "woff2",
+      "sha256": "d85de6e272296d06f8205ad11e27140274e0ef97050232777d146eabb71c312d",
+      "postScriptName": "HankenGrotesk-Bold"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "weight": "500",
+      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2",
+      "format": "woff2",
+      "sha256": "01d285447409c8a588692162439a038b8cbd7871309ee20267b0d2d91c6e8e22",
+      "postScriptName": "IBMPlexMono-Medium"
     }
   ],
   "tokens": {
@@ -481,7 +515,7 @@
   },
   "renderedAt": "2026-07-31T12:00:00.000Z",
   "repo": "honeybeehq/apiary",
-  "commit": "57813ee8c067a5a37a94562196ebe7c521022efc",
+  "commit": "ccbf95de70dd3ea8bbf439fcc2ae23aa086860e3",
   "dirty": false,
   "root": "apps/desktop/src/renderer/src/panes/TracksPane.tsx#TracksPane",
   "browserVersion": "151.0.7922.34",
@@ -567,6 +601,6 @@
   "blocked": [],
   "errors": [],
   "timingsMs": {
-    "capture": 1253
+    "capture": 1271
   }
 }
