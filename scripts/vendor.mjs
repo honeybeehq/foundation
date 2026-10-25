@@ -29,7 +29,7 @@ const hash = createHash('sha256')
 for (const [from, to] of files) {
   const text = readFileSync(join(root, from), 'utf8')
   for (const [, specifier] of text.matchAll(specifiers)) {
-    if (!vendored.has(specifier)) {
+    if (!vendored.has(specifier.replace(/\.js$/, '.ts'))) {
       console.error(`${from} imports '${specifier}', which is not part of the vendored set`)
       process.exit(1)
     }
