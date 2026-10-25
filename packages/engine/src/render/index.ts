@@ -282,7 +282,7 @@ function detectSystemFontStackLines(doc: FdnDocument, tree: FdnNode[], html: str
     const resolved = resolveFontFamilyValue(decl.value, doc)
     const primary = splitFontFamilyList(resolved)[0]
     if (primary === undefined || embedded.has(primary)) continue
-    const key = `${decl.nodeId} ${decl.value}`
+    const key = `${decl.nodeId}\u0000${decl.value}`
     if (seen.has(key)) continue
     seen.add(key)
     lines.push({
