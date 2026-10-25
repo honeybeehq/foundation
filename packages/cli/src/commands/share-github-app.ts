@@ -71,7 +71,7 @@ export async function runShareGithubApp(args: string[], io: CliIO): Promise<numb
       io.stdout(`Metadata allowed: ${user} on ${repo}: ${metadata.permission}`)
       if (singleFile) io.stdout(await checkSingleFileRead(repo, token))
       io.stdout(await checkContentsRefusal(repo, config, token))
-      io.stdout(singleFile ? 'App permissions verified: Metadata read and Single file read limited to .foundation/share.json; no Contents.' : 'App permissions verified: Metadata read only; no Contents. Installation token minted successfully.')
+      io.stdout(singleFile ? 'App grants verified: Metadata read and Single file read limited to .foundation/share.json; no Contents.' : 'App permissions verified: Metadata read only; no Contents. Installation token minted successfully.')
       return 0
     }
     throw new Error(usage)

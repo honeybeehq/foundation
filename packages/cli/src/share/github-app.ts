@@ -98,14 +98,21 @@ export async function mintMetadataToken(repo: string, config: GithubAppConfig, f
 }
 
 export async function checkSingleFileRead(repo: string, token: string, fetcher: typeof fetch = fetch): Promise<string> {
-  const result = await githubJson(await githubRequest(`/repos/${githubRepo(repo)}/contents/${shareDescriptorPath}`, token, 'GET', undefined, fetcher))
+  const normalized = githubRepo(repo)
+  const repository = await githubJson(await githubRequest(`/repos/${normalized}`, token, 'GET', undefined, fetcher))
+  if (typeof repository.private !== 'boolean') throw new Error('GitHub returned no repository visibility')
+  const response = await githubRequest(`/repos/${normalized}/contents/${shareDescriptorPath}`, token, 'GET', undefined, fetcher)
+  if (response.status === 404) throw new Error(`No committed ${shareDescriptorPath} on the default branch, or the Single file grant does not cover it`)
+  const result = await githubJson(response)
   if (result.path !== shareDescriptorPath || result.type !== 'file' || result.encoding !== 'base64' || typeof result.content !== 'string' || typeof result.size !== 'number' || result.size > 65_536 || result.size <= 0 || result.content.length > 90_000) throw new Error('GitHub returned an invalid or oversized share descriptor')
   const bytes = Buffer.from(result.content, 'base64')
   if (bytes.length !== result.size) throw new Error('GitHub share descriptor size mismatch')
   let descriptor: unknown
   try { descriptor = JSON.parse(bytes.toString('utf8')) } catch { throw new Error('Committed share descriptor is not JSON') }
   if (!descriptor || typeof descriptor !== 'object' || Array.isArray(descriptor) || (descriptor as Record<string, unknown>).version !== 1) throw new Error('Committed share descriptor must be a version 1 object')
-  return `Single file read allowed: ${shareDescriptorPath} on the default branch (HTTP 200)`
+  return repository.private
+    ? `Private single-file read allowed: ${shareDescriptorPath} on the default branch (HTTP 200)`
+    : `Descriptor readable (public): ${shareDescriptorPath} (HTTP 200); Single file scope verified by installation grant, not this public read`
 }
 
 export async function metadataToken(repo: string, configPath: string): Promise<string> {
