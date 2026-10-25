@@ -101,20 +101,28 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
         } else {
           const baked = bakeDocument(doc, { state: state.designState, includeNodeIds: true })
           await page.setContent(baked.html)
-          await page.evaluate(id => {
+          await page.evaluate(({id,properties,audit}) => {
             const selected = document.querySelector(`[data-fdn-id="${id}"]`)
             if (!selected) throw new Error(`Design node missing: ${id}`)
+            const elements = [selected, ...selected.querySelectorAll('*')]
+            const before = audit ? elements.map(el => properties.map(p => getComputedStyle(el).getPropertyValue(p))) : []
             const root = document.createElement('div')
             root.id = 'foundation-root'
             root.append(selected)
             document.body.replaceChildren(root)
             document.body.style.margin = '0'
-          }, state.designNode ?? board.designNode)
+            if (audit) {
+              const differences = elements.flatMap((el,i) => properties.flatMap((property,j) => { const after=getComputedStyle(el).getPropertyValue(property); return before[i]![j] === after ? [] : [{node:i,property,before:before[i]![j],after}] }))
+              ;(window as any).__foundationDesignExtraction = {nodes:elements.length,properties:properties.length,differences}
+            }
+          }, {id:state.designNode ?? board.designNode,properties:[...STYLE_PROPERTIES],audit:Boolean(codeBoundary)})
         }
-        if (codeBoundary) await page.evaluate(({side, selector}) => {
+        if (codeBoundary) await page.evaluate(({side, selector, properties}) => {
           const root = document.querySelector('#foundation-root')!
           const selected = side === 'code' ? root.querySelector(selector) : root.firstElementChild
           if (!(selected instanceof HTMLElement)) throw new Error(`Missing capture boundary: ${selector}`)
+          const elements = [selected, ...selected.querySelectorAll('*')]
+          const before = elements.map(el => properties.map(p => getComputedStyle(el).getPropertyValue(p)))
           const {width, height} = selected.getBoundingClientRect()
           const css = getComputedStyle(selected)
           const horizontal = css.boxSizing === 'border-box' ? 0 : ['paddingLeft','paddingRight','borderLeftWidth','borderRightWidth'].reduce((sum,key) => sum + parseFloat(css[key as keyof CSSStyleDeclaration] as string || '0'), 0)
@@ -125,7 +133,12 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
           for (const {el,x,y} of scrolls) { el.scrollLeft=x; el.scrollTop=y }
           const after = selected.getBoundingClientRect()
           if (Math.abs(after.width-width)>0.05 || Math.abs(after.height-height)>0.05) throw new Error('Capture boundary size changed during extraction')
-        }, {side, selector:codeBoundary})
+                  const differences = elements.flatMap((el,i) => properties.flatMap((property,j) => { const after=getComputedStyle(el).getPropertyValue(property); return before[i]![j] === after ? [] : [{node:i,property,before:before[i]![j],after}] }))
+          const allowed = new Set(['position','margin-top','margin-right','margin-bottom','margin-left'])
+          const unexpected = differences.filter(d => d.node !== 0 || !allowed.has(d.property))
+          ;(window as any).__foundationBoundaryAudit = {nodes:elements.length,properties:properties.length,differences,unexpected,scrolls:scrolls.flatMap(({el,x,y},i) => x || y ? [{node:i,x,y}] : []),designExtraction:(window as any).__foundationDesignExtraction}
+          if (unexpected.length || (window as any).__foundationDesignExtraction?.differences.length) throw new Error('Computed styles changed during boundary extraction: '+JSON.stringify(unexpected))
+        }, {side, selector:codeBoundary,properties:[...STYLE_PROPERTIES]})
         await page.addStyleTag({ content: fontAssets.map(font => font.css).join('\n') + '\n*{animation:none!important;transition:none!important;caret-color:transparent!important} #foundation-root{width:100vw;height:100vh;overflow:hidden}' })
         await page.evaluate(() => document.fonts.ready)
         const fontSubstitutions = await pinFontStacks(page, links.fontPolicy)
@@ -138,6 +151,11 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
         await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
         await settleRoot(page)
         const platformFonts = await usedFonts(page, links.fontPolicy?.requireCustomFonts ?? false, fontAssets.map(font => font.postScriptName).filter((name): name is string => Boolean(name)))
+        const boundaryAudit = codeBoundary ? await page.evaluate(() => {
+          const audit = (window as any).__foundationBoundaryAudit
+          const elements = [document.querySelector('#foundation-root')!.firstElementChild!, ...document.querySelector('#foundation-root')!.firstElementChild!.querySelectorAll('*')]
+          return {...audit, finalScrolls:audit.scrolls.map((s:any) => ({...s,finalX:elements[s.node]!.scrollLeft,finalY:elements[s.node]!.scrollTop}))}
+        }) : undefined
         const dom = await collectDom(page, '#foundation-root')
         if (errors.length || blocked.length) throw new Error(JSON.stringify({ errors, blocked }))
         const fonts = await page.evaluate(() => [...new Set(Array.from(document.querySelectorAll('#foundation-root *')).map(el => getComputedStyle(el).fontFamily))].sort())
@@ -147,7 +165,7 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
         await page.screenshot({ path: join(destination, 'screenshot.png'), animations: 'disabled' })
         const fullExtent = await captureFullExtent(page, '#foundation-root', join(destination, 'full-extent.png'))
         await writeFile(join(destination, 'dom.json'), JSON.stringify(dom, null, 2) + '\n')
-        const meta = { schema: 'fdn-capture/0', ...provenance, rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, extent: dom.extent, fullExtent, frame, ...(codeBoundary ? {boundary:{codeSelector:codeBoundary, originNormalized:true, sizePreserved:true}} : {}), url, fonts, fontPolicy: links.fontPolicy, fontSubstitutions, platformFonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
+        const meta = { schema: 'fdn-capture/0', ...provenance, rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, extent: dom.extent, fullExtent, frame, ...(codeBoundary ? {boundary:{codeSelector:codeBoundary, originNormalized:true, bothRootsNormalized:true, sizePreserved:true,audit:boundaryAudit}} : {}), url, fonts, fontPolicy: links.fontPolicy, fontSubstitutions, platformFonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
         await writeFile(join(destination, 'meta.json'), JSON.stringify(meta, null, 2) + '\n')
         console.log(`${board.id}/${state.name} ${side}: ${dom.nodes.length} nodes, ${meta.timingsMs.capture} ms`)
       } finally { await context.close() }
