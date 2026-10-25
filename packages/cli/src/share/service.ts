@@ -332,6 +332,7 @@ export async function startShareService(config: ShareServiceConfig) {
         const access = await permission(candidate, device)
         requireThat(access === 'write', 'write permission required', 403)
         const result = await store.update((spaces) => {
+          requireThat(!spaces.some(s => s.space === candidate.space && s.repo !== repo), 'space is already bound to another repository', 409)
           const existing = spaces.find((s) => s.repo === repo) as ServiceSpace | undefined
           if (existing) {
             requireThat(existing.space === challenge.space, 'space created concurrently; request new challenge', 409)
