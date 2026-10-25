@@ -339,7 +339,7 @@ index 000000000..05fb31081
 +export const empty = { ...base, mirror: { definitions: [], attachments: [] }, props: { ...props, pane: { ...props.pane, params: {} } } }
 diff --git a/.foundation/links.json b/.foundation/links.json
 new file mode 100644
-index 000000000..c06e8340a
+index 000000000..4ebf15928
 --- /dev/null
 +++ b/.foundation/links.json
 @@ -0,0 +1,77 @@
@@ -356,7 +356,7 @@ index 000000000..c06e8340a
 +      "designNode": "n97::n71",
 +      "viewport": {
 +        "width": 1416,
-+        "height": 600,
++        "height": 720,
 +        "dpr": 1
 +      },
 +      "states": [
