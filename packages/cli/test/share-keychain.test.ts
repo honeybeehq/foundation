@@ -17,7 +17,7 @@ it('selects a private dedicated macOS keychain for reads and writes without chan
     vi.stubEnv('FOUNDATION_SHARE_KEYCHAIN', file)
     vi.mocked(execFileSync).mockReturnValue('{"sessions":{}}')
     expect(readVault()).toEqual({ sessions: {} })
-    expect(vi.mocked(execFileSync).mock.calls[0][1]).toEqual(['find-generic-password', '-a', root, '-s', 'foundation-share-v1', '-w', file])
+    expect(vi.mocked(execFileSync).mock.calls[0]![1]).toEqual(['find-generic-password', '-a', root, '-s', 'foundation-share-v1', '-w', file])
     const session = { keys: [], device: { device: { id: 'test' } }, githubToken: 'LOCAL_SECRET' } as unknown as Session
     saveSession('space', session)
     const write = vi.mocked(execFileSync).mock.calls.at(-1)!
