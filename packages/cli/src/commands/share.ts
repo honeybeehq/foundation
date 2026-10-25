@@ -69,6 +69,7 @@ function sshKey(flags: Record<string, unknown>): string {
   throw new Error('select a GitHub SSH signing key with --ssh-key PATH (ssh-agent public-key paths also work)')
 }
 export async function runShare(args: string[], io: CliIO): Promise<number> {
+  if (args[0] === 'github-app') return (await import('./share-github-app.js')).runShareGithubApp(args.slice(1), io)
   const { positionals, flags } = parseArgs(args)
   try {
     if (positionals[0] === 'serve' || positionals[0] === 'backup') {

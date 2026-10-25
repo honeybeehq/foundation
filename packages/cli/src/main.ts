@@ -56,6 +56,7 @@ commands:
   doctor --capabilities --json [--product-root ABS] [--design-path ABS] [--foundation-path ABS]
                                               report installed runtime and selected checkout without writes
   share init|login|status|grant|revoke-device|serve|backup     encrypted repo sharing
+  share github-app finish|check             register and verify a Metadata-only GitHub App
   sync open|close|serve|status|materialize                    register live designs, sync through Comb, inspect local/upload state
   new <name> [--no-chain]                    write a minimal .fdn.html skeleton (chain-inits it too)
   copy <src> <dest> [--title T] [--json]      create an independent document with a fresh identity and chain
