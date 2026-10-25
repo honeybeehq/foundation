@@ -1,0 +1,150 @@
+[
+  {
+    "state": "at-rest",
+    "viewport": {
+      "width": 1416,
+      "height": 720,
+      "dpr": 1
+    },
+    "verdict": "not-provable",
+    "reason": "Classic TracksPane always selects a track; dedicated at-rest view is unavailable",
+    "drifts": 250,
+    "kinds": {
+      "layout": 25,
+      "style": 44,
+      "token": 8,
+      "text": 0,
+      "missing": 113,
+      "extra": 60
+    },
+    "matches": 9,
+    "idMatches": 0,
+    "heuristicMatches": 9,
+    "pixelRatio": 0.019232580037664784,
+    "compareMs": 182.57294200000007,
+    "totalMs": 383.197565,
+    "design": {
+      "file": "packages/proof/fixtures/design/tracks-pane.fdn.html",
+      "head": "da6f965fcc33d4ac33d47ffd1cc04da2d288cd113b5ed263501dc50b2bac189d",
+      "htmlSha256": "5fd37f92bb3d214b73a36786dce7ae89d9552db29efd262cc88699de01694431",
+      "binding": "chain-head"
+    },
+    "code": {
+      "repo": "honeybeehq/apiary",
+      "commit": "ccbf95de70dd3ea8bbf439fcc2ae23aa086860e3",
+      "root": "apps/desktop/src/renderer/src/panes/TracksPane.tsx#TracksPane"
+    },
+    "reportHash": "7f81f7f19b5d72e4504670b1b0ab9fbcc8dadf88b4096ea6772fe8d576873082"
+  },
+  {
+    "state": "track-selected",
+    "viewport": {
+      "width": 1416,
+      "height": 720,
+      "dpr": 1
+    },
+    "verdict": "drift",
+    "reason": null,
+    "drifts": 513,
+    "kinds": {
+      "layout": 64,
+      "style": 126,
+      "token": 18,
+      "text": 0,
+      "missing": 239,
+      "extra": 66
+    },
+    "matches": 22,
+    "idMatches": 0,
+    "heuristicMatches": 22,
+    "pixelRatio": 0.02804947426239799,
+    "compareMs": 208.32924000000003,
+    "totalMs": 445.72700299999997,
+    "design": {
+      "file": "packages/proof/fixtures/design/tracks-pane.fdn.html",
+      "head": "da6f965fcc33d4ac33d47ffd1cc04da2d288cd113b5ed263501dc50b2bac189d",
+      "htmlSha256": "5fd37f92bb3d214b73a36786dce7ae89d9552db29efd262cc88699de01694431",
+      "binding": "chain-head"
+    },
+    "code": {
+      "repo": "honeybeehq/apiary",
+      "commit": "ccbf95de70dd3ea8bbf439fcc2ae23aa086860e3",
+      "root": "apps/desktop/src/renderer/src/panes/TracksPane.tsx#TracksPane"
+    },
+    "reportHash": "bb7bc9870e9246968d5a71d37526c69e54ac434e8cc6e0e2d4ca61008c158f13"
+  },
+  {
+    "state": "proposal-pending",
+    "viewport": {
+      "width": 1416,
+      "height": 720,
+      "dpr": 1
+    },
+    "verdict": "drift",
+    "reason": null,
+    "drifts": 581,
+    "kinds": {
+      "layout": 72,
+      "style": 154,
+      "token": 24,
+      "text": 0,
+      "missing": 261,
+      "extra": 70
+    },
+    "matches": 24,
+    "idMatches": 0,
+    "heuristicMatches": 24,
+    "pixelRatio": 0.03232207313245449,
+    "compareMs": 238.14541499999996,
+    "totalMs": 490.13158999999996,
+    "design": {
+      "file": "packages/proof/fixtures/design/tracks-pane.fdn.html",
+      "head": "da6f965fcc33d4ac33d47ffd1cc04da2d288cd113b5ed263501dc50b2bac189d",
+      "htmlSha256": "5fd37f92bb3d214b73a36786dce7ae89d9552db29efd262cc88699de01694431",
+      "binding": "chain-head"
+    },
+    "code": {
+      "repo": "honeybeehq/apiary",
+      "commit": "ccbf95de70dd3ea8bbf439fcc2ae23aa086860e3",
+      "root": "apps/desktop/src/renderer/src/panes/TracksPane.tsx#TracksPane"
+    },
+    "reportHash": "eb31936f853f89c7805e127ec24b30c7d4bb5a72473bb34a0a04fb3368962b7b"
+  },
+  {
+    "state": "empty",
+    "viewport": {
+      "width": 1416,
+      "height": 720,
+      "dpr": 1
+    },
+    "verdict": "drift",
+    "reason": null,
+    "drifts": 83,
+    "kinds": {
+      "layout": 0,
+      "style": 11,
+      "token": 5,
+      "text": 0,
+      "missing": 50,
+      "extra": 17
+    },
+    "matches": 2,
+    "idMatches": 0,
+    "heuristicMatches": 2,
+    "pixelRatio": 0.012347967671060892,
+    "compareMs": 83.41251000000011,
+    "totalMs": 180.47161000000006,
+    "design": {
+      "file": "packages/proof/fixtures/design/tracks-pane.fdn.html",
+      "head": "da6f965fcc33d4ac33d47ffd1cc04da2d288cd113b5ed263501dc50b2bac189d",
+      "htmlSha256": "5fd37f92bb3d214b73a36786dce7ae89d9552db29efd262cc88699de01694431",
+      "binding": "chain-head"
+    },
+    "code": {
+      "repo": "honeybeehq/apiary",
+      "commit": "ccbf95de70dd3ea8bbf439fcc2ae23aa086860e3",
+      "root": "apps/desktop/src/renderer/src/panes/TracksPane.tsx#TracksPane"
+    },
+    "reportHash": "d1425507cb03877bf8b42c10ca7b0d486c7cb1bd3c6e4dafb7bb64d320d80d88"
+  }
+]

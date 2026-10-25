@@ -1,0 +1,67 @@
+{
+  "schema": "fdn-drift/0",
+  "artboard": "tracks-pane/default",
+  "state": "default",
+  "viewport": {
+    "width": 1280,
+    "height": 800,
+    "dpr": 1
+  },
+  "design": {
+    "file": "boards/tracks-pane.fdn.html",
+    "head": "bc4ad7441c5826f24e7a675d518edd01ee4cad2790349c94b00d02d4a632bb00"
+  },
+  "code": {},
+  "provable": true,
+  "tolerances": {
+    "pixelRatio": 0.001,
+    "boxPx": 1,
+    "colorDeltaE": 1,
+    "stylePx": 1,
+    "pixelThreshold": 0.1
+  },
+  "pixels": {
+    "diffRatio": 0.00234375,
+    "diffPixels": 2400,
+    "diffImage": "diff.png",
+    "designImage": "design.png",
+    "codeImage": "code.png"
+  },
+  "drifts": [
+    {
+      "id": "d1",
+      "designNode": "probe-color",
+      "codeNode": "probe-color",
+      "match": "id",
+      "confidence": 1,
+      "designBox": [
+        1000,
+        100,
+        80,
+        30
+      ],
+      "codeBox": [
+        1000,
+        100,
+        80,
+        30
+      ],
+      "kind": "style",
+      "property": "background-color",
+      "design": "rgb(10, 100, 200)",
+      "code": "rgb(200, 10, 100)",
+      "token": {
+        "design": null,
+        "code": null
+      }
+    }
+  ],
+  "verdict": "drift",
+  "timingsMs": {
+    "compare": 98.68459199999961
+  },
+  "matchCounts": {
+    "id": 523,
+    "heuristic": 0
+  }
+}

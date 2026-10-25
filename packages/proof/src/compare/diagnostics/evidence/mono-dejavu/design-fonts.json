@@ -1,0 +1,380 @@
+[
+  {
+    "state": "track-selected",
+    "monoFile": ".audit/font-probe/DejaVuSansMono.ttf",
+    "storedFrame": {
+      "width": 1416,
+      "height": 525.5
+    },
+    "freshFrame": {
+      "width": 1416,
+      "height": 525.5
+    },
+    "matches": true,
+    "textNodes": [
+      {
+        "fdnId": "n212::n138",
+        "text": "Tracks",
+        "style": {
+          "family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+          "size": "15px",
+          "lineHeight": "normal"
+        },
+        "storedBox": [
+          16,
+          11.5,
+          47.546875,
+          17
+        ],
+        "freshBox": [
+          16,
+          11.5,
+          47.546875,
+          17
+        ],
+        "platformFonts": [
+          {
+            "familyName": "Liberation Sans",
+            "postScriptName": "LiberationSans-Bold",
+            "isCustomFont": false,
+            "glyphCount": 6
+          }
+        ]
+      },
+      {
+        "fdnId": "n212::n139",
+        "text": "7 defined · 5 attached · 3 queued",
+        "style": {
+          "family": "DiagnosticMono",
+          "size": "10.5px",
+          "lineHeight": "normal"
+        },
+        "storedBox": [
+          72.546875,
+          14,
+          208.625,
+          12
+        ],
+        "freshBox": [
+          72.546875,
+          14,
+          208.625,
+          12
+        ],
+        "platformFonts": [
+          {
+            "familyName": "DejaVu Sans Mono",
+            "postScriptName": "DejaVuSansMono",
+            "isCustomFont": true,
+            "glyphCount": 33
+          }
+        ]
+      },
+      {
+        "fdnId": "n212::n145::n44",
+        "text": "All",
+        "style": {
+          "family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+          "size": "12px",
+          "lineHeight": "normal"
+        },
+        "storedBox": [
+          20,
+          53,
+          13.34375,
+          14
+        ],
+        "freshBox": [
+          20,
+          53,
+          13.34375,
+          14
+        ],
+        "platformFonts": [
+          {
+            "familyName": "Liberation Sans",
+            "postScriptName": "LiberationSans",
+            "isCustomFont": false,
+            "glyphCount": 3
+          }
+        ]
+      },
+      {
+        "fdnId": "n212::n145::n45",
+        "text": "7",
+        "style": {
+          "family": "DiagnosticMono",
+          "size": "11px",
+          "lineHeight": "normal"
+        },
+        "storedBox": [
+          39.34375,
+          53.5,
+          6.625,
+          13
+        ],
+        "freshBox": [
+          39.34375,
+          53.5,
+          6.625,
+          13
+        ],
+        "platformFonts": [
+          {
+            "familyName": "DejaVu Sans Mono",
+            "postScriptName": "DejaVuSansMono",
+            "isCustomFont": true,
+            "glyphCount": 1
+          }
+        ]
+      },
+      {
+        "fdnId": "n212::n146::n44",
+        "text": "Attached",
+        "style": {
+          "family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+          "size": "12px",
+          "lineHeight": "normal"
+        },
+        "storedBox": [
+          67.96875,
+          53,
+          47.375,
+          14
+        ],
+        "freshBox": [
+          67.96875,
+          53,
+          47.375,
+          14
+        ],
+        "platformFonts": [
+          {
+            "familyName": "Liberation Sans",
+            "postScriptName": "LiberationSans",
+            "isCustomFont": false,
+            "glyphCount": 8
+          }
+        ]
+      },
+      {
+        "fdnId": "n212::n146::n45",
+        "text": "5",
+        "style": {
+          "family": "DiagnosticMono",
+          "size": "11px",
+          "lineHeight": "normal"
+        },
+        "storedBox": [
+          121.34375,
+          53.5,
+          6.625,
+          13
+        ],
+        "freshBox": [
+          121.34375,
+          53.5,
+          6.625,
+          13
+        ],
+        "platformFonts": [
+          {
+            "familyName": "DejaVu Sans Mono",
+            "postScriptName": "DejaVuSansMono",
+            "isCustomFont": true,
+            "glyphCount": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "state": "proposal-pending",
+    "monoFile": ".audit/font-probe/DejaVuSansMono.ttf",
+    "storedFrame": {
+      "width": 1416,
+      "height": 611
+    },
+    "freshFrame": {
+      "width": 1416,
+      "height": 611
+    },
+    "matches": true,
+    "textNodes": [
+      {
+        "fdnId": "n212::n138",
+        "text": "Tracks",
+        "style": {
+          "family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+          "size": "15px",
+          "lineHeight": "normal"
+        },
+        "storedBox": [
+          16,
+          11.5,
+          47.546875,
+          17
+        ],
+        "freshBox": [
+          16,
+          11.5,
+          47.546875,
+          17
+        ],
+        "platformFonts": [
+          {
+            "familyName": "Liberation Sans",
+            "postScriptName": "LiberationSans-Bold",
+            "isCustomFont": false,
+            "glyphCount": 6
+          }
+        ]
+      },
+      {
+        "fdnId": "n212::n139",
+        "text": "7 defined · 5 attached · 3 queued",
+        "style": {
+          "family": "DiagnosticMono",
+          "size": "10.5px",
+          "lineHeight": "normal"
+        },
+        "storedBox": [
+          72.546875,
+          14,
+          208.625,
+          12
+        ],
+        "freshBox": [
+          72.546875,
+          14,
+          208.625,
+          12
+        ],
+        "platformFonts": [
+          {
+            "familyName": "DejaVu Sans Mono",
+            "postScriptName": "DejaVuSansMono",
+            "isCustomFont": true,
+            "glyphCount": 33
+          }
+        ]
+      },
+      {
+        "fdnId": "n212::n145::n44",
+        "text": "All",
+        "style": {
+          "family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+          "size": "12px",
+          "lineHeight": "normal"
+        },
+        "storedBox": [
+          20,
+          53,
+          13.34375,
+          14
+        ],
+        "freshBox": [
+          20,
+          53,
+          13.34375,
+          14
+        ],
+        "platformFonts": [
+          {
+            "familyName": "Liberation Sans",
+            "postScriptName": "LiberationSans",
+            "isCustomFont": false,
+            "glyphCount": 3
+          }
+        ]
+      },
+      {
+        "fdnId": "n212::n145::n45",
+        "text": "7",
+        "style": {
+          "family": "DiagnosticMono",
+          "size": "11px",
+          "lineHeight": "normal"
+        },
+        "storedBox": [
+          39.34375,
+          53.5,
+          6.625,
+          13
+        ],
+        "freshBox": [
+          39.34375,
+          53.5,
+          6.625,
+          13
+        ],
+        "platformFonts": [
+          {
+            "familyName": "DejaVu Sans Mono",
+            "postScriptName": "DejaVuSansMono",
+            "isCustomFont": true,
+            "glyphCount": 1
+          }
+        ]
+      },
+      {
+        "fdnId": "n212::n146::n44",
+        "text": "Attached",
+        "style": {
+          "family": "-apple-system, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+          "size": "12px",
+          "lineHeight": "normal"
+        },
+        "storedBox": [
+          67.96875,
+          53,
+          47.375,
+          14
+        ],
+        "freshBox": [
+          67.96875,
+          53,
+          47.375,
+          14
+        ],
+        "platformFonts": [
+          {
+            "familyName": "Liberation Sans",
+            "postScriptName": "LiberationSans",
+            "isCustomFont": false,
+            "glyphCount": 8
+          }
+        ]
+      },
+      {
+        "fdnId": "n212::n146::n45",
+        "text": "5",
+        "style": {
+          "family": "DiagnosticMono",
+          "size": "11px",
+          "lineHeight": "normal"
+        },
+        "storedBox": [
+          121.34375,
+          53.5,
+          6.625,
+          13
+        ],
+        "freshBox": [
+          121.34375,
+          53.5,
+          6.625,
+          13
+        ],
+        "platformFonts": [
+          {
+            "familyName": "DejaVu Sans Mono",
+            "postScriptName": "DejaVuSansMono",
+            "isCustomFont": true,
+            "glyphCount": 1
+          }
+        ]
+      }
+    ]
+  }
+]

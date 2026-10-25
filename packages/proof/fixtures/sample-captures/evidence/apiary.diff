@@ -1,0 +1,911 @@
+diff --git a/.foundation/design-data.json b/.foundation/design-data.json
+new file mode 100644
+index 000000000..6765a0c2d
+--- /dev/null
++++ b/.foundation/design-data.json
+@@ -0,0 +1,278 @@
++{
++  "tracks": [
++    {
++      "id": "review-and-ship",
++      "blocked": "0",
++      "exceptions": "1",
++      "idle": "false",
++      "lastactivity": "12m",
++      "name": "review-and-ship",
++      "queued": "2",
++      "review": "1",
++      "running": "2",
++      "shape": "6 items \u00b7 1 branch \u00b7 9 nodes",
++      "version": "v3",
++      "waiting": "0"
++    },
++    {
++      "id": "pr-triage",
++      "blocked": "0",
++      "exceptions": "0",
++      "idle": "false",
++      "lastactivity": "3m",
++      "name": "pr-triage",
++      "queued": "0",
++      "review": "0",
++      "running": "1",
++      "shape": "4 items \u00b7 6 nodes",
++      "version": "v7",
++      "waiting": "0"
++    },
++    {
++      "id": "spec-round",
++      "blocked": "0",
++      "exceptions": "0",
++      "idle": "false",
++      "lastactivity": "41m",
++      "name": "spec-round",
++      "queued": "1",
++      "review": "1",
++      "running": "0",
++      "shape": "5 items \u00b7 1 review gate",
++      "version": "v2",
++      "waiting": "0"
++    },
++    {
++      "id": "board-draw",
++      "blocked": "0",
++      "exceptions": "0",
++      "idle": "false",
++      "lastactivity": "6m",
++      "name": "board-draw",
++      "queued": "0",
++      "review": "0",
++      "running": "1",
++      "shape": "7 items \u00b7 1 branch \u00b7 10 nodes",
++      "version": "v1",
++      "waiting": "0"
++    },
++    {
++      "id": "flaky-hunt",
++      "blocked": "1",
++      "exceptions": "2",
++      "idle": "false",
++      "lastactivity": "1h04",
++      "name": "flaky-hunt",
++      "queued": "0",
++      "review": "0",
++      "running": "0",
++      "shape": "5 items \u00b7 8 nodes",
++      "version": "v4",
++      "waiting": "0"
++    },
++    {
++      "id": "dep-bump",
++      "blocked": "0",
++      "exceptions": "0",
++      "idle": "true",
++      "lastactivity": "2d",
++      "name": "dep-bump",
++      "queued": "0",
++      "review": "0",
++      "running": "0",
++      "shape": "3 items",
++      "version": "v2",
++      "waiting": "0"
++    },
++    {
++      "id": "nectar-preview",
++      "blocked": "0",
++      "exceptions": "0",
++      "idle": "true",
++      "lastactivity": "5d",
++      "name": "nectar-preview",
++      "queued": "0",
++      "review": "0",
++      "running": "0",
++      "shape": "4 items \u00b7 1 deploy",
++      "version": "v1",
++      "waiting": "0"
++    }
++  ],
++  "spinerows": [
++    {
++      "id": "n1",
++      "arm": "",
++      "depth": "0",
++      "detail": "every changed file, plus the packet it hangs off",
++      "lane": "",
++      "name": "Read the diff",
++      "state": "done",
++      "type": "action"
++    },
++    {
++      "id": "n2",
++      "arm": "",
++      "depth": "0",
++      "detail": "max 3 \u00b7 claude \u00b7 one lens each",
++      "lane": "",
++      "name": "Fan out reviewers",
++      "state": "done",
++      "type": "orchestrate"
++    },
++    {
++      "id": "n3",
++      "arm": "",
++      "depth": "0",
++      "detail": "both lanes must land before the gate",
++      "lane": "",
++      "name": "Parallel",
++      "state": "done",
++      "type": "branch"
++    },
++    {
++      "id": "n3a",
++      "arm": "",
++      "depth": "1",
++      "detail": "pnpm -w typecheck && lint",
++      "lane": "A",
++      "name": "Typecheck & lint",
++      "state": "done",
++      "type": "action"
++    },
++    {
++      "id": "n3b",
++      "arm": "",
++      "depth": "1",
++      "detail": "pnpm test \u2014 352 tests",
++      "lane": "B",
++      "name": "Run the suite",
++      "state": "pending",
++      "type": "action"
++    },
++    {
++      "id": "n4",
++      "arm": "",
++      "depth": "0",
++      "detail": "a human verdict on the packet",
++      "lane": "",
++      "name": "Verdict gate",
++      "state": "pending",
++      "type": "review"
++    },
++    {
++      "id": "n4d",
++      "arm": "DENIED",
++      "depth": "1",
++      "detail": "then back to the gate",
++      "lane": "",
++      "name": "Fix findings",
++      "state": "pending",
++      "type": "action"
++    },
++    {
++      "id": "n5",
++      "arm": "",
++      "depth": "0",
++      "detail": "nectar \u00b7 label review",
++      "lane": "",
++      "name": "Publish preview",
++      "state": "pending",
++      "type": "deploy"
++    },
++    {
++      "id": "n6",
++      "arm": "",
++      "depth": "0",
++      "detail": "blocking \u2014 the agent stops here",
++      "lane": "",
++      "name": "Ship it?",
++      "state": "pending",
++      "type": "ask"
++    }
++  ],
++  "attached": [
++    {
++      "id": "drone-12",
++      "age": "12m",
++      "at": "Run the suite",
++      "exceptions": "1",
++      "harness": "claude \u00b7 opus 4.8",
++      "name": "drone-12",
++      "note": "skipped Typecheck & lint \u2014 ran the suite first",
++      "position": "5",
++      "state": "running",
++      "total": "9"
++    },
++    {
++      "id": "wren-2",
++      "age": "3m",
++      "at": "Fan out reviewers",
++      "exceptions": "0",
++      "harness": "claude \u00b7 sonnet 5",
++      "name": "wren-2",
++      "note": "",
++      "position": "2",
++      "state": "running",
++      "total": "9"
++    },
++    {
++      "id": "scout-4",
++      "age": "41m",
++      "at": "Verdict gate",
++      "exceptions": "0",
++      "harness": "codex",
++      "name": "scout-4",
++      "note": "waiting on a human verdict",
++      "position": "6",
++      "state": "review",
++      "total": "9"
++    }
++  ],
++  "exceptions": [
++    {
++      "id": "x1",
++      "age": "9m",
++      "at": "Typecheck & lint",
++      "bee": "drone-12",
++      "what": "ran the suite first, then came back \u2014 lint was still installing"
++    }
++  ],
++  "queued": [
++    {
++      "id": "bumble-7",
++      "behind": "pr-triage",
++      "name": "bumble-7",
++      "position": "1"
++    },
++    {
++      "id": "mite-3",
++      "behind": "spec-round",
++      "name": "mite-3",
++      "position": "2"
++    }
++  ],
++  "proposal": [
++    {
++      "id": "p1",
++      "detail": "nectar \u00b7 label review \u2014 after the gate, before the ask",
++      "mark": "+",
++      "name": "Publish preview",
++      "type": "deploy"
++    },
++    {
++      "id": "p2",
++      "detail": "denied arm gains \u2192 Fix findings",
++      "mark": "~",
++      "name": "Verdict gate",
++      "type": "review"
++    },
++    {
++      "id": "p3",
++      "detail": "superseded by the preview",
++      "mark": "\u2212",
++      "name": "Manual smoke test",
++      "type": "action"
++    }
++  ]
++}
+diff --git a/.foundation/environment.ts b/.foundation/environment.ts
+new file mode 100644
+index 000000000..70088c5cb
+--- /dev/null
++++ b/.foundation/environment.ts
+@@ -0,0 +1,14 @@
++let fixture: any
++const noop = () => undefined
++const app = { layout: { setPaneMeta: noop, updatePaneParams: noop }, commands: { onDidExecute: () => noop, execute: noop } }
++export function setFixture(value: any): void { fixture = value }
++export const useApp = () => app
++export const useAllSessions = () => fixture.sessions
++export const useTracksMirror = () => ({ mirror: fixture.mirror, loading: false, error: null })
++export const useTracksProposal = () => ({ proposal: fixture.proposal, loading: false })
++export const useContextualCreateShortcut = noop
++export const useWindowKeybindings = noop
++export const useSelectableListNavigation = () => ({ rowProps: () => ({}), onKeyDown: noop })
++export const isEditableTarget = () => false
++export const listScopeAllowsTarget = () => true
++export const yieldsToNativeActivation = () => false
+diff --git a/.foundation/fixtures.ts b/.foundation/fixtures.ts
+new file mode 100644
+index 000000000..05fb31081
+--- /dev/null
++++ b/.foundation/fixtures.ts
+@@ -0,0 +1,29 @@
++import type { TrackDefinitionV2, TrackItem, TrackNode, TrackAttachment, TrackStateItem } from '../packages/core/src/index'
++import data from './design-data.json'
++const rows = data.spinerows
++function node(row: typeof rows[number]): TrackNode {
++  const base = { id: row.id, name: row.name }
++  switch (row.type) {
++    case 'review': return { ...base, type: 'review', denied: rows.filter(r => r.arm === 'DENIED').map(node) }
++    case 'deploy': return { ...base, type: 'deploy', target: { kind: 'nectar', label: 'review' } }
++    case 'ask': return { ...base, type: 'ask', question: row.detail, blocking: true }
++    case 'orchestrate': return { ...base, type: 'orchestrate', instruction: row.detail, subAgents: { max: 3, harness: 'claude' } }
++    default: return { ...base, type: 'action', instruction: row.detail }
++  }
++}
++const items: TrackItem[] = rows.filter(r => r.depth === '0').map(r => r.type === 'branch' ? { branch: ['A', 'B'].map(lane => rows.filter(r => r.lane === lane).map(node)) } : node(r))
++const definitions: TrackDefinitionV2[] = data.tracks.map((row, i) => ({ schemaVersion: 2, name: row.name, version: Number(row.version.slice(1)), items: i === 0 ? items : items.slice(0, i === 5 ? 3 : 4) }))
++const epoch = Date.parse('2026-07-31T12:00:00Z')
++const age = (minutes: number) => new Date(epoch - minutes * 60000).toISOString()
++const attachments: TrackAttachment[] = data.attached.map((bee, i) => {
++  const current = ['n3b', 'n2', 'n4'][i]
++  const runtimeNode = (entry: TrackNode): any => ({ ...entry, status: entry.id === current ? 'pending' : ['n1', 'n2', 'n3a'].includes(entry.id) ? 'done' : 'pending', updatedAt: age(Number.parseInt(bee.age)), history: [], subTasks: [], ...(entry.type === 'review' ? { denied: entry.denied?.map(runtimeNode) } : {}) })
++  return { schemaVersion: 2, track: 'review-and-ship', version: 3, bee: bee.name, beeId: bee.id, attachedAt: age(60), updatedAt: age(Number.parseInt(bee.age)), items: items.map(item => 'branch' in item ? { branch: item.branch.map(lane => lane.map(runtimeNode)) } : runtimeNode(item)) as TrackStateItem[], steps: [], exceptions: i === 0 ? [{ note: data.exceptions[0]!.what, at: age(9), stepId: 'n3a' }] : [], queue: i === 0 ? data.queued.map(q => ({ track: q.behind, queuedAt: age(2), queuedBy: q.name })) : [] }
++})
++const props = { pane: { id: 'foundation-tracks', viewType: 'hive.tracks', params: { track: 'review-and-ship' } }, focused: false, active: false }
++const base = { props, mirror: { definitions, attachments }, sessions: [], proposal: null }
++export const atRest = { ...base }
++export const trackSelected = { ...base }
++const beforeItems = items.map(item => 'branch' in item ? item : item.id === 'n5' ? { id: 'n5old', type: 'action' as const, name: 'Manual smoke test', instruction: 'superseded by the preview' } : item.type === 'review' ? { ...item, denied: undefined } : item)
++export const proposalPending = { ...base, mirror: { ...base.mirror, definitions: [{ ...definitions[0]!, items: beforeItems }, ...definitions.slice(1)] }, proposal: { definition: definitions[0], rationale: 'Publish preview after the gate; add Fix findings on denial; replace Manual smoke test', proposedAt: age(2), baseVersion: 3 } }
++export const empty = { ...base, mirror: { definitions: [], attachments: [] }, props: { ...props, pane: { ...props.pane, params: {} } } }
+diff --git a/.foundation/fonts/DEJAVU-LICENSE b/.foundation/fonts/DEJAVU-LICENSE
+new file mode 100644
+index 000000000..b3d93a123
+--- /dev/null
++++ b/.foundation/fonts/DEJAVU-LICENSE
+@@ -0,0 +1,78 @@
++Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
++Upstream-Name: DejaVu fonts
++Upstream-Author: Stepan Roh <src@users.sourceforge.net> (original author),
++                  see /usr/share/doc/fonts-dejavu-core/AUTHORS for full list
++Source: https://dejavu-fonts.github.io/
++
++Files: *
++Copyright: Copyright (c) 2003 by Bitstream, Inc. All Rights Reserved. 
++ Bitstream Vera is a trademark of Bitstream, Inc.
++ DejaVu changes are in public domain.
++License: bitstream-vera
++ Permission is hereby granted, free of charge, to any person obtaining a copy
++ of the fonts accompanying this license ("Fonts") and associated
++ documentation files (the "Font Software"), to reproduce and distribute the
++ Font Software, including without limitation the rights to use, copy, merge,
++ publish, distribute, and/or sell copies of the Font Software, and to permit
++ persons to whom the Font Software is furnished to do so, subject to the
++ following conditions:
++ .
++ The above copyright and trademark notices and this permission notice shall
++ be included in all copies of one or more of the Font Software typefaces.
++ .
++ The Font Software may be modified, altered, or added to, and in particular
++ the designs of glyphs or characters in the Fonts may be modified and
++ additional glyphs or characters may be added to the Fonts, only if the fonts
++ are renamed to names not containing either the words "Bitstream" or the word
++ "Vera".
++ .
++ This License becomes null and void to the extent applicable to Fonts or Font
++ Software that has been modified and is distributed under the "Bitstream
++ Vera" names.
++ .
++ The Font Software may be sold as part of a larger software package but no
++ copy of one or more of the Font Software typefaces may be sold by itself.
++ .
++ THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
++ OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY,
++ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT,
++ TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL BITSTREAM OR THE GNOME
++ FOUNDATION BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING
++ ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES,
++ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
++ THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM OTHER DEALINGS IN THE
++ FONT SOFTWARE.
++ .
++ Except as contained in this notice, the names of Gnome, the Gnome
++ Foundation, and Bitstream Inc., shall not be used in advertising or
++ otherwise to promote the sale, use or other dealings in this Font Software
++ without prior written authorization from the Gnome Foundation or Bitstream
++ Inc., respectively. For further information, contact: fonts at gnome dot
++ org.
++
++Files: debian/*
++Copyright: (C) 2005-2006 Peter Cernak <pce@users.sourceforge.net> 
++           (C) 2006-2011 Davide Viti <zinosat@tiscali.it>
++           (C) 2011-2013 Christian Perrier <bubulle@debian.org>
++           (C) 2013 Fabian Greffrath <fabian+debian@greffrath.com>
++License: GPL-2+
++ This program is free software; you can redistribute it
++ and/or modify it under the terms of the GNU General Public
++ License as published by the Free Software Foundation; either
++ version 2 of the License, or (at your option) any later
++ version.
++ .
++ This program is distributed in the hope that it will be
++ useful, but WITHOUT ANY WARRANTY; without even the implied
++ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
++ PURPOSE.  See the GNU General Public License for more
++ details.
++ .
++ You should have received a copy of the GNU General Public
++ License along with this package; if not, write to the Free
++ Software Foundation, Inc., 51 Franklin St, Fifth Floor,
++ Boston, MA  02110-1301 USA
++ .
++ On Debian systems, the full text of the GNU General Public
++ License version 2 can be found in the file
++ /usr/share/common-licenses/GPL-2'.
+diff --git a/.foundation/fonts/DejaVuSans-Bold.ttf b/.foundation/fonts/DejaVuSans-Bold.ttf
+new file mode 100644
+index 000000000..426812b9b
+Binary files /dev/null and b/.foundation/fonts/DejaVuSans-Bold.ttf differ
+diff --git a/.foundation/fonts/DejaVuSans.ttf b/.foundation/fonts/DejaVuSans.ttf
+new file mode 100644
+index 000000000..fb0bd945a
+Binary files /dev/null and b/.foundation/fonts/DejaVuSans.ttf differ
+diff --git a/.foundation/fonts/DejaVuSansMono-Bold.ttf b/.foundation/fonts/DejaVuSansMono-Bold.ttf
+new file mode 100644
+index 000000000..eeff2f2d5
+Binary files /dev/null and b/.foundation/fonts/DejaVuSansMono-Bold.ttf differ
+diff --git a/.foundation/fonts/DejaVuSansMono.ttf b/.foundation/fonts/DejaVuSansMono.ttf
+new file mode 100644
+index 000000000..538ee2723
+Binary files /dev/null and b/.foundation/fonts/DejaVuSansMono.ttf differ
+diff --git a/.foundation/fonts/LIBERATION-LICENSE b/.foundation/fonts/LIBERATION-LICENSE
+new file mode 100644
+index 000000000..18ec71bce
+--- /dev/null
++++ b/.foundation/fonts/LIBERATION-LICENSE
+@@ -0,0 +1,130 @@
++Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
++Upstream-Name: Liberation Fonts
++Source: https://github.com/liberationfonts
++
++Files: *
++Copyright:
++ Digitized data copyright (c) 2010 Google Corporation with Reserved Font Arimo, Tinos and Cousine.
++ Copyright (c) 2012 Red Hat, Inc. with Reserved Font Name Liberation.
++License: SIL-OFL-1.1
++ This Font Software is licensed under the SIL Open Font License,
++ Version 1.1.
++ .
++ This license is copied below, and is also available with a FAQ at:
++ http://scripts.sil.org/OFL
++ .
++ SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
++ .
++ PREAMBLE The goals of the Open Font License (OFL) are to stimulate
++ worldwide development of collaborative font projects, to support the font
++ creation efforts of academic and linguistic communities, and to provide
++ a free and open framework in which fonts may be shared and improved in
++ partnership with others.
++ .
++ The OFL allows the licensed fonts to be used, studied, modified and
++ redistributed freely as long as they are not sold by themselves.
++ The fonts, including any derivative works, can be bundled, embedded,
++ redistributed and/or sold with any software provided that any reserved
++ names are not used by derivative works.  The fonts and derivatives,
++ however, cannot be released under any other type of license.  The
++ requirement for fonts to remain under this license does not apply to
++ any document created using the fonts or their derivatives.
++ .
++ .
++ .
++ DEFINITIONS
++ "Font Software" refers to the set of files released by the Copyright
++ Holder(s) under this license and clearly marked as such.
++ This may include source files, build scripts and documentation.
++ .
++ "Reserved Font Name" refers to any names specified as such after the
++ copyright statement(s).
++ .
++ "Original Version" refers to the collection of Font Software components
++ as distributed by the Copyright Holder(s).
++ .
++ "Modified Version" refers to any derivative made by adding to, deleting,
++ or substituting ? in part or in whole ?
++ any of the components of the Original Version, by changing formats or
++ by porting the Font Software to a new environment.
++ .
++ "Author" refers to any designer, engineer, programmer, technical writer
++ or other person who contributed to the Font Software.
++ .
++ .
++ PERMISSION & CONDITIONS
++ .
++ Permission is hereby granted, free of charge, to any person obtaining a
++ copy of the Font Software, to use, study, copy, merge, embed, modify,
++ redistribute, and sell modified and unmodified copies of the Font
++ Software, subject to the following conditions:
++ .
++ 1) Neither the Font Software nor any of its individual components,in
++    Original or Modified Versions, may be sold by itself.
++ .
++ 2) Original or Modified Versions of the Font Software may be bundled,
++    redistributed and/or sold with any software, provided that each copy
++    contains the above copyright notice and this license. These can be
++    included either as stand-alone text files, human-readable headers or
++    in the appropriate machine-readable metadata fields within text or
++    binary files as long as those fields can be easily viewed by the user.
++ .
++ 3) No Modified Version of the Font Software may use the Reserved Font
++    Name(s) unless explicit written permission is granted by the
++    corresponding Copyright Holder. This restriction only applies to the
++    primary font name as presented to the users.
++ .
++ 4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
++    Software shall not be used to promote, endorse or advertise any
++    Modified Version, except to acknowledge the contribution(s) of the
++    Copyright Holder(s) and the Author(s) or with their explicit written
++    permission.
++ .
++ 5) The Font Software, modified or unmodified, in part or in whole, must
++    be distributed entirely under this license, and must not be distributed
++    under any other license. The requirement for fonts to remain under
++    this license does not apply to any document created using the Font
++    Software.
++ .
++ .
++ .
++ TERMINATION
++ This license becomes null and void if any of the above conditions are not met.
++ .
++ .
++ .
++ DISCLAIMER
++ THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
++ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
++ OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT.  IN NO EVENT SHALL THE
++ COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
++ INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
++ DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++ FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM OTHER
++ DEALINGS IN THE FONT SOFTWARE.
++ .
++
++Files: debian/*
++Copyright:
++ 2008 Alan Baghumian <alan@technotux.org>
++ 2008-2018 Holger Levsen <holger@debian.org>
++ 2009-2012 Christian Perrier <bubulle@debian.org>
++ 2011-2023 Fabian Greffrath <fabian@debian.org>
++ 2018 Rene Engelhard <rene@debian.org>
++License: GPL-2+
++ This package is free software; you can redistribute it and/or modify
++ it under the terms of the GNU General Public License as published by
++ the Free Software Foundation; either version 2 of the License, or
++ (at your option) any later version.
++ .
++ This package is distributed in the hope that it will be useful,
++ but WITHOUT ANY WARRANTY; without even the implied warranty of
++ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ GNU General Public License for more details.
++ .
++ You should have received a copy of the GNU General Public License
++ along with this program. If not, see <https://www.gnu.org/licenses/>
++ .
++ On Debian systems, the complete text of the GNU General
++ Public License version 2 can be found in "/usr/share/common-licenses/GPL-2".
+diff --git a/.foundation/fonts/LiberationSans-Bold.ttf b/.foundation/fonts/LiberationSans-Bold.ttf
+new file mode 100644
+index 000000000..ee102d8bf
+Binary files /dev/null and b/.foundation/fonts/LiberationSans-Bold.ttf differ
+diff --git a/.foundation/fonts/LiberationSans-Regular.ttf b/.foundation/fonts/LiberationSans-Regular.ttf
+new file mode 100644
+index 000000000..7769c4119
+Binary files /dev/null and b/.foundation/fonts/LiberationSans-Regular.ttf differ
+diff --git a/.foundation/fonts/LiberationSerif-Bold.ttf b/.foundation/fonts/LiberationSerif-Bold.ttf
+new file mode 100644
+index 000000000..ff9543557
+Binary files /dev/null and b/.foundation/fonts/LiberationSerif-Bold.ttf differ
+diff --git a/.foundation/fonts/LiberationSerif-Regular.ttf b/.foundation/fonts/LiberationSerif-Regular.ttf
+new file mode 100644
+index 000000000..44c465480
+Binary files /dev/null and b/.foundation/fonts/LiberationSerif-Regular.ttf differ
+diff --git a/.foundation/links.json b/.foundation/links.json
+new file mode 100644
+index 000000000..1c95f59bf
+--- /dev/null
++++ b/.foundation/links.json
+@@ -0,0 +1,174 @@
++{
++  "schema": "fdn-links/0",
++  "designFile": "packages/proof/fixtures/design/tracks-pane.fdn.html",
++  "designHead": "da6f965fcc33d4ac33d47ffd1cc04da2d288cd113b5ed263501dc50b2bac189d",
++  "viteConfig": "apps/next-desktop-beta/foundation.vite.config.ts",
++  "harness": "foundation.harness.tsx",
++  "artboards": [
++    {
++      "id": "tracks-pane",
++      "component": "apps/desktop/src/renderer/src/panes/TracksPane.tsx#TracksPane",
++      "designNode": "n97::n71",
++      "viewport": {
++        "width": 1416,
++        "height": 720,
++        "dpr": 1
++      },
++      "states": [
++        {
++          "name": "at-rest",
++          "fixture": ".foundation/fixtures.ts#atRest",
++          "designState": "at-rest",
++          "designNode": "n97::n71",
++          "provable": false,
++          "reason": "Classic TracksPane always selects a track; dedicated at-rest view is unavailable"
++        },
++        {
++          "name": "track-selected",
++          "fixture": ".foundation/fixtures.ts#trackSelected",
++          "designState": "track-selected",
++          "designNode": "n212::n136"
++        },
++        {
++          "name": "proposal-pending",
++          "fixture": ".foundation/fixtures.ts#proposalPending",
++          "designState": "proposal-pending",
++          "designNode": "n212::n136"
++        },
++        {
++          "name": "empty",
++          "fixture": ".foundation/fixtures.ts#empty",
++          "designState": "at-rest",
++          "designNode": "n284::n265"
++        }
++      ],
++      "components": [
++        {
++          "designComponent": "TrackRow",
++          "code": "apps/desktop/src/renderer/src/panes/tracks/TracksRail.tsx#TracksRail",
++          "selector": "[data-foundation-track-row]"
++        }
++      ]
++    }
++  ],
++  "fonts": [
++    {
++      "family": "Hanken Grotesk",
++      "weight": "400",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-400-normal.woff2",
++      "sha256": "787b3fdd0b7e6d59ae7ce14ce7a41d1a44616584b4c919b527da951972d5d87d",
++      "postScriptName": "HankenGrotesk-Regular"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "500",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-500-normal.woff2",
++      "sha256": "31f666af7bff625900c46aa34a05d8620482ba2db37db7b63749b693ab0c72ec",
++      "postScriptName": "HankenGrotesk-Medium"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "600",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-600-normal.woff2",
++      "sha256": "58f23b7ae3e13b21a4dca4c05360be87b3531d60fc1cbff89732cac8fb3019ae",
++      "postScriptName": "HankenGrotesk-SemiBold"
++    },
++    {
++      "family": "IBM Plex Mono",
++      "weight": "400",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2",
++      "sha256": "08949f728dc52d528e69b1667d15c89a5686a4ee9a296ff90983985f99c380f7",
++      "postScriptName": "IBMPlexMono-Regular"
++    },
++    {
++      "family": "Foundation Design Sans",
++      "weight": "400",
++      "path": ".foundation/fonts/LiberationSans-Regular.ttf",
++      "format": "truetype",
++      "sha256": "4659bc0c58c5028dd488ec928d41d9265db43d9b669fc14ca8b0832daca7b144",
++      "postScriptName": "LiberationSans"
++    },
++    {
++      "family": "Foundation Design Sans",
++      "weight": "700",
++      "path": ".foundation/fonts/LiberationSans-Bold.ttf",
++      "format": "truetype",
++      "sha256": "3973aa5054fb467dd5627245d3dc82e37bf16fe075756156a570455871351582",
++      "postScriptName": "LiberationSans-Bold"
++    },
++    {
++      "family": "Foundation Design Mono",
++      "weight": "400",
++      "path": ".foundation/fonts/DejaVuSansMono.ttf",
++      "format": "truetype",
++      "sha256": "c805f9436dbc268644c1d9584f01a601a653e028e08fd74b9b949f6cf8304d88",
++      "postScriptName": "DejaVuSansMono"
++    },
++    {
++      "family": "Foundation Design Mono",
++      "weight": "700",
++      "path": ".foundation/fonts/DejaVuSansMono-Bold.ttf",
++      "format": "truetype",
++      "sha256": "3a3c502eeff669a231549e80df9f7c49de109bafe303170409e905d0b31a38fe",
++      "postScriptName": "DejaVuSansMono-Bold"
++    },
++    {
++      "family": "Foundation Design Serif",
++      "weight": "400",
++      "path": ".foundation/fonts/LiberationSerif-Regular.ttf",
++      "format": "truetype",
++      "sha256": "705903ae1382f0150f115d6f10a30f5b2f3d6ade649c474afe6366c39174fb65",
++      "postScriptName": "LiberationSerif"
++    },
++    {
++      "family": "Foundation Design Serif",
++      "weight": "700",
++      "path": ".foundation/fonts/LiberationSerif-Bold.ttf",
++      "format": "truetype",
++      "sha256": "9e66c25e20868756bf12eb24a520a4552727c9cd108f577f7ae33e3c0110e39c",
++      "postScriptName": "LiberationSerif-Bold"
++    },
++    {
++      "family": "Foundation Symbols",
++      "weight": "400",
++      "path": ".foundation/fonts/DejaVuSans.ttf",
++      "format": "truetype",
++      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
++      "postScriptName": "DejaVuSans"
++    },
++    {
++      "family": "Foundation Symbols",
++      "weight": "700",
++      "path": ".foundation/fonts/DejaVuSans-Bold.ttf",
++      "format": "truetype",
++      "sha256": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895",
++      "postScriptName": "DejaVuSans-Bold"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "700",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-700-normal.woff2",
++      "format": "woff2",
++      "sha256": "d85de6e272296d06f8205ad11e27140274e0ef97050232777d146eabb71c312d",
++      "postScriptName": "HankenGrotesk-Bold"
++    },
++    {
++      "family": "IBM Plex Mono",
++      "weight": "500",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2",
++      "format": "woff2",
++      "sha256": "01d285447409c8a588692162439a038b8cbd7871309ee20267b0d2d91c6e8e22",
++      "postScriptName": "IBMPlexMono-Medium"
++    }
++  ],
++  "binding": "chain-head",
++  "fontPolicy": {
++    "sans": "Foundation Design Sans",
++    "mono": "Foundation Design Mono",
++    "serif": "Foundation Design Serif",
++    "fallback": "Foundation Symbols",
++    "requireCustomFonts": true
++  },
++  "browserVersion": "151.0.7922.34",
++  "platform": "linux"
++}
+diff --git a/.foundation/preview.html b/.foundation/preview.html
+new file mode 100644
+index 000000000..6eea9dad6
+--- /dev/null
++++ b/.foundation/preview.html
+@@ -0,0 +1 @@
++<!doctype html><html><head><meta charset="utf-8"><title>Real TracksPane harness</title></head><body style="margin:0"><div id="foundation-root" style="width:100vw;height:100vh;overflow:hidden"></div><script type="module" src="./preview.ts"></script></body></html>
+diff --git a/.foundation/preview.ts b/.foundation/preview.ts
+new file mode 100644
+index 000000000..bf34add2c
+--- /dev/null
++++ b/.foundation/preview.ts
+@@ -0,0 +1,14 @@
++async function start(): Promise<void> {
++  const harness = await import('../foundation.harness')
++  const state = new URLSearchParams(location.search).get('state') ?? 'track-selected'
++  harness.prepare()
++  const fixtures = await import('./fixtures')
++  const key = ({ 'at-rest': 'atRest', 'track-selected': 'trackSelected', 'proposal-pending': 'proposalPending', empty: 'empty' } as const)[state as 'track-selected']
++  if (!key) throw new Error(`Unknown fixture ${state}`)
++  const { TracksPane } = await import('../apps/desktop/src/renderer/src/panes/TracksPane')
++  await harness.mount({ Component: TracksPane, fixture: fixtures[key], root: document.getElementById('foundation-root')!, state })
++  await document.fonts.ready
++  await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
++  Object.assign(window, { __foundationReady: true })
++}
++void start().catch(error => { Object.assign(window, { __foundationError: String(error) }); console.error(error) })
+diff --git a/.foundation/tsconfig.json b/.foundation/tsconfig.json
+new file mode 100644
+index 000000000..65899542c
+--- /dev/null
++++ b/.foundation/tsconfig.json
+@@ -0,0 +1,34 @@
++{
++  "extends": "../tsconfig.base.json",
++  "compilerOptions": {
++    "noEmit": true,
++    "lib": [
++      "ES2022",
++      "DOM",
++      "DOM.Iterable"
++    ],
++    "types": [
++      "node",
++      "react",
++      "react-dom"
++    ],
++    "resolveJsonModule": true,
++    "allowImportingTsExtensions": true,
++    "typeRoots": [
++      "../apps/next-desktop-beta/node_modules/@types",
++      "../apps/desktop/node_modules/@types"
++    ],
++    "paths": {
++      "@apiary/core": [
++        "../packages/core/src/index.ts"
++      ]
++    }
++  },
++  "include": [
++    "../foundation.harness.tsx",
++    "fixtures.ts",
++    "environment.ts",
++    "../apps/next-desktop-beta/foundation.vite.config.ts",
++    "types.d.ts"
++  ]
++}
+diff --git a/.foundation/types.d.ts b/.foundation/types.d.ts
+new file mode 100644
+index 000000000..ef6d741f6
+--- /dev/null
++++ b/.foundation/types.d.ts
+@@ -0,0 +1 @@
++declare module "*.css" {}
+diff --git a/apps/desktop/src/renderer/src/panes/tracks/TracksRail.tsx b/apps/desktop/src/renderer/src/panes/tracks/TracksRail.tsx
+index 965a19b3e..ce41958c3 100644
+--- a/apps/desktop/src/renderer/src/panes/tracks/TracksRail.tsx
++++ b/apps/desktop/src/renderer/src/panes/tracks/TracksRail.tsx
+@@ -155,6 +155,7 @@ export function TracksRail({
+           return (
+             <button
+               key={definition.name}
++              data-foundation-track-row={definition.name}
+               {...rowProps}
+               type="button"
+               {...stylex.props(styles.trackRow, active && styles.trackRowActive)}
+diff --git a/apps/next-desktop-beta/foundation.vite.config.ts b/apps/next-desktop-beta/foundation.vite.config.ts
+new file mode 100644
+index 000000000..326303357
+--- /dev/null
++++ b/apps/next-desktop-beta/foundation.vite.config.ts
+@@ -0,0 +1,22 @@
++import base from './vite.config'
++import { createRequire } from 'node:module'
++import { resolve, dirname } from 'node:path'
++import { fileURLToPath } from 'node:url'
++const require = createRequire(import.meta.url)
++const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
++const sources = ['state', 'sessionsStore', 'tracksMirror', 'tracksProposal', 'keybindings']
++export default {
++  ...base,
++  root,
++  optimizeDeps: { include: ['@stylexjs/stylex', '@stylexjs/stylex/lib/stylex-inject'] },
++  build: { rollupOptions: { input: resolve(root, '.foundation/preview.html') } },
++  resolve: { ...base.resolve, dedupe: ['react', 'react-dom'], alias: [{ find: /^@stylexjs\/stylex$/, replacement: require.resolve('@stylexjs/stylex') }, { find: /^@stylexjs\/stylex\/lib\/stylex-inject$/, replacement: require.resolve('@stylexjs/stylex/lib/stylex-inject') }, { find: 'react', replacement: resolve(root, 'apps/next-desktop-beta/node_modules/react') }, { find: 'react-dom', replacement: resolve(root, 'apps/next-desktop-beta/node_modules/react-dom') }, ...sources.map(name => ({ find: resolve(root, `apps/desktop/src/renderer/src/${name}`), replacement: resolve(root, '.foundation/environment.ts') }))] },
++  plugins: [...base.plugins ?? [], {
++    name: 'foundation-boundaries', enforce: 'pre',
++    resolveId(source: string, importer?: string) {
++      if (!importer || !source.startsWith('.')) return
++      const full = resolve(dirname(importer.split('?')[0]!), source).replace(/\.tsx?$/, '')
++      if (sources.some(name => full === resolve(root, `apps/desktop/src/renderer/src/${name}`))) return resolve(root, '.foundation/environment.ts')
++    },
++  }],
++}
+diff --git a/foundation.harness.tsx b/foundation.harness.tsx
+new file mode 100644
+index 000000000..00c12fc0b
+--- /dev/null
++++ b/foundation.harness.tsx
+@@ -0,0 +1,20 @@
++import { createElement, type ComponentType } from 'react'
++import { createRoot } from 'react-dom/client'
++import './packages/ui/src/base.css'
++import './apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/latin-400.css'
++import './apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/latin-500.css'
++import './apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/latin-600.css'
++import './apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/latin-400.css'
++import { setFixture } from './.foundation/environment'
++
++export function prepare(): void {
++  Object.defineProperty(window, 'apiary', { configurable: true, value: new Proxy({}, { get: (_, method) => { throw new Error(`Unconfigured IPC: ${String(method)}`) } }) })
++}
++
++export async function mount({ Component, fixture, root }: { Component: ComponentType<any>; fixture: any; root: HTMLElement; state: string }): Promise<() => void> {
++  setFixture(fixture)
++  root.style.display = 'flex'
++  const renderer = createRoot(root)
++  renderer.render(createElement(Component, fixture.props))
++  return () => renderer.unmount()
++}
