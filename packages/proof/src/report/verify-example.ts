@@ -1,6 +1,7 @@
 /** Run real CLI checks against a temporary git repository and genuine Foundation chain. */
 import { createHash } from "node:crypto";
 import { compareDirectories } from "../compare/index.ts";
+import { policyFromLinks } from "./policy.ts";
 import { defaults } from "../compare/types.ts";
 import {
   mkdtemp,
@@ -321,6 +322,72 @@ runs.push({
   exitCode: tamper.status,
   stdout: tamper.stdout.trim(),
 });
+// Exercise the strict policy with real pinned capture bytes as an unchanged control.
+const pinnedSource =
+  "packages/proof/fixtures/sample-captures/tracks-pane/empty/1416x720@1/design";
+for (const name of ["design", "code"]) {
+  for (const file of ["dom.json", "screenshot.png"])
+    await copyFile(
+      path.join(pinnedSource, file),
+      path.join(scratch, name, file),
+    );
+  const meta = JSON.parse(
+    await readFile(path.join(pinnedSource, "meta.json"), "utf8"),
+  );
+  Object.assign(meta, {
+    file: binding.design.file,
+    designHead: head,
+    htmlSha256: binding.design.htmlSha256,
+    binding: "chain-head",
+    commit,
+    repo: "fixture",
+    root: "TracksPane",
+    source: name,
+  });
+  await writeFile(path.join(scratch, name, "meta.json"), JSON.stringify(meta));
+}
+const pinnedMatch = await compareDirectories(
+  path.join(scratch, "design"),
+  path.join(scratch, "code"),
+  path.join(scratch, "replay"),
+);
+const linkedPolicy = policyFromLinks(
+  JSON.parse(
+    await readFile(
+      "packages/proof/src/report/evidence/reviewed-links.json",
+      "utf8",
+    ),
+  ),
+);
+const strictPolicy = {
+  ...linkedPolicy,
+  required: [
+    {
+      artboard: pinnedMatch.artboard,
+      state: pinnedMatch.state,
+      viewport: pinnedMatch.viewport,
+    },
+  ],
+};
+await writeFile(policyFile, JSON.stringify(strictPolicy));
+await run("pinned-environment-match", pinnedMatch, 0);
+await writeFile(
+  policyFile,
+  JSON.stringify({
+    ...strictPolicy,
+    captureEnvironment: {
+      ...strictPolicy.captureEnvironment,
+      browserVersion: "wrong-browser",
+    },
+  }),
+);
+await run("wrong-browser-policy", pinnedMatch, 1);
+const wrongFontPolicy = structuredClone(strictPolicy);
+if (!wrongFontPolicy.captureEnvironment)
+  throw Error("Reviewed links did not pin environment");
+wrongFontPolicy.captureEnvironment.fontAssets[0]!.sha256 = "0".repeat(64);
+await writeFile(policyFile, JSON.stringify(wrongFontPolicy));
+await run("wrong-font-policy", pinnedMatch, 1);
 await mkdir("packages/proof/src/report/evidence", { recursive: true });
 await writeFile(
   "packages/proof/src/report/evidence/verify-runs.json",

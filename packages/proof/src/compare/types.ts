@@ -8,6 +8,7 @@ export interface CaptureNode {
   text?: string;
   box: Box;
   style: Record<string, string>;
+  authoredFontFamily?: string;
   vars?: Record<string, string>;
 }
 export interface Capture {
@@ -39,6 +40,7 @@ export interface Drift {
   property: string;
   design?: unknown;
   code?: unknown;
+  rendered?: { design: string; code: string };
   token?: { design: string | null; code: string | null };
   designBox?: Box;
   codeBox?: Box;

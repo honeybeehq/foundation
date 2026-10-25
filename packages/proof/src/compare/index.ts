@@ -126,8 +126,15 @@ export function compare(
         )
       )
         continue;
-      const av = a.style[p],
-        bv = b.style[p];
+      const authored =
+        p === "font-family" &&
+        a.authoredFontFamily !== undefined &&
+        b.authoredFontFamily !== undefined;
+      const av = authored ? a.authoredFontFamily : a.style[p],
+        bv = authored ? b.authoredFontFamily : b.style[p];
+      const provenance = authored
+        ? { rendered: { design: a.style[p] ?? "", code: b.style[p] ?? "" } }
+        : {};
       if (av === undefined && bv === undefined) continue;
       if (av === undefined || bv === undefined) {
         add({
@@ -145,6 +152,7 @@ export function compare(
           ct = token(bv, tokens);
         add({
           ...base,
+          ...provenance,
           kind: dt ? "token" : "style",
           property: p,
           design: av,

@@ -45,7 +45,9 @@ export function fontAssets(value: unknown): FontAsset[] {
         postScriptName: a.postScriptName,
       };
     })
-    .sort((a, b) => canonical(a).localeCompare(canonical(b)));
+    .sort((a, b) =>
+      canonical(a) < canonical(b) ? -1 : canonical(a) > canonical(b) ? 1 : 0,
+    );
 }
 export function fontPolicy(value: unknown): FontPolicy {
   const p = value as FontPolicy;
@@ -92,6 +94,17 @@ export function pinnedFontIssues(capture: Capture): string[] {
       (!glyphs.length && capture.nodes.some((n) => n.text?.trim()))
     )
       return ["Actual rendered font glyph inventory is missing"];
+    if (
+      capture.nodes.some(
+        (n) =>
+          (n.text?.trim() ||
+            ["input", "button", "select", "textarea", "svg"].includes(n.tag)) &&
+          (typeof n.authoredFontFamily !== "string" || !n.authoredFontFamily),
+      )
+    )
+      return [
+        "Authored font-family provenance before normalization is missing",
+      ];
     for (const font of glyphs) {
       if (!Number.isInteger(font.glyphCount) || font.glyphCount < 0)
         return ["Actual rendered font glyph inventory is invalid"];

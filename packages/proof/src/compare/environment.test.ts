@@ -8,6 +8,10 @@ beforeAll(async () => {
   );
   base = {
     ...capture,
+    nodes: capture.nodes.map((n) => ({
+      ...n,
+      authoredFontFamily: n.style["font-family"],
+    })),
     meta: {
       ...capture.meta,
       fontPolicy: {
@@ -113,4 +117,39 @@ it("carries the reviewed links font environment into verification policy", async
     "captureEnvironment.browserVersion",
     "151.0.7922.34",
   );
+});
+
+it("detects an authored family change hidden by normalized rendered stacks", () => {
+  const index = base.nodes.findIndex((n) => n.text?.trim());
+  const design = {
+    ...base,
+    nodes: base.nodes.map((n, i) =>
+      i === index ? { ...n, authoredFontFamily: "system-ui" } : n,
+    ),
+  };
+  const code = {
+    ...base,
+    nodes: base.nodes.map((n, i) =>
+      i === index ? { ...n, authoredFontFamily: "Arial" } : n,
+    ),
+  };
+  const r = compare(design, code).report;
+  expect(r.verdict).toBe("drift");
+  expect(r.drifts).toHaveLength(1);
+  expect(r.drifts[0]).toMatchObject({
+    property: "font-family",
+    design: "system-ui",
+    code: "Arial",
+  });
+});
+it("rejects pinned text without pre-normalization font provenance", () => {
+  const index = base.nodes.findIndex((n) => n.text?.trim());
+  expect(
+    compare(base, {
+      ...base,
+      nodes: base.nodes.map((n, i) =>
+        i === index ? { ...n, authoredFontFamily: undefined } : n,
+      ),
+    }).report.verdict,
+  ).toBe("not-provable");
 });
