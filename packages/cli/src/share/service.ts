@@ -4,6 +4,7 @@ import { mkdir, cp, writeFile, rm } from 'node:fs/promises'
 import { resolve, join } from 'node:path'
 import { acquireDocumentLock } from '../document-lock.js'
 import { CombBridge, validateAppendReceipt, type Frame } from '../sync/bridge.js'
+import { ShareAuth, ShareAuthError, type PublicAccess } from './auth.js'
 import { ShareServiceStore, backupShareMetadata, type ShareDevice, type ShareSpace, type ShareWrap } from './service-store.js'
 
 export interface ShareServiceConfig {
@@ -14,6 +15,8 @@ export interface ShareServiceConfig {
   oauthClientId?: string
   /** Complete stopped local backend snapshot for nightly backup. */
   backupLocalStore?: string
+  /** Operator-owned GitHub App installation token: repository Metadata read only. */
+  githubPermissionToken?: string
   /** DEVELOPMENT ONLY: GitHub stub on a literal loopback address. Never a remote API override. */
   githubApiUrl?: string
 }
@@ -34,7 +37,7 @@ function repoName(value: unknown): string {
 function deviceStatement(value: unknown, space: ShareSpace, identity: {login: string; id: number}): ShareDevice {
   const d = object(value)
   exact(d, ['id', 'service', 'login', 'githubId', 'boxPublicKey', 'signPublicKey', 'signature'])
-  requireThat(d.login === identity.login && d.githubId === identity.id && Number.isSafeInteger(d.githubId), 'device identity mismatch', 403)
+  requireThat(typeof d.login === 'string' && d.githubId > 0 && d.login === identity.login && d.githubId === identity.id && Number.isSafeInteger(d.githubId), 'device identity mismatch', 403)
   requireThat(base64(d.boxPublicKey, 32) && base64(d.signPublicKey, 32) && typeof d.signature === 'string' && d.signature.startsWith('-----BEGIN SSH SIGNATURE-----') && d.signature.trimEnd().endsWith('-----END SSH SIGNATURE-----') && d.signature.length < 16384, 'invalid device keys/signature')
   requireThat(typeof d.service === 'string', 'device.service required')
   const url = new URL(d.service)
@@ -43,14 +46,15 @@ function deviceStatement(value: unknown, space: ShareSpace, identity: {login: st
   requireThat(d.id === createHash('sha256').update(canonical).digest('hex'), 'device id does not match statement')
   return d as ShareDevice
 }
-function ciphertext(payload: unknown, epoch: number): string {
+function ciphertext(payload: unknown, epoch: number, senderId: string): string {
   requireThat(typeof payload === 'string' && payload.length > 0 && payload.length <= 980000 && /^(?:[a-f0-9]{2})+$/.test(payload), 'invalid payload_hex')
   let record: Record<string, any>
   try { record = object(JSON.parse(new TextDecoder('utf-8', {fatal: true}).decode(Buffer.from(payload, 'hex')))) } catch { throw new HttpError(400, 'expected encrypted envelope') }
-  exact(record, ['v', 'epoch', 'dedup', 'nonce', 'ciphertext'])
-  requireThat(record.v === 1 && record.epoch === epoch && HEX.test(record.dedup) && base64(record.nonce, 24) && base64(record.ciphertext) && Buffer.from(record.ciphertext, 'base64').length >= 16, 'invalid encrypted envelope')
+  exact(record, ['v', 'epoch', 'dedup', 'nonce', 'ciphertext', 'keyId', 'senderId', 'signature'])
+  requireThat(record.v === 1 && record.epoch === epoch && typeof record.keyId === 'string' && /^[a-f0-9]{32}$/.test(record.keyId) && record.senderId === senderId && HEX.test(record.senderId) && base64(record.signature,64) && HEX.test(record.dedup) && base64(record.nonce, 24) && base64(record.ciphertext) && Buffer.from(record.ciphertext, 'base64').length >= 16, 'invalid encrypted envelope')
   return payload
 }
+type ServiceSpace = ShareSpace & { publicAccess?: PublicAccess; accessLost?: string[] }
 interface Token { space: string; device: string; permission: 'read'|'write'; expiresAt: number }
 const active = new Set<string>()
 
@@ -67,47 +71,31 @@ export async function startShareService(config: ShareServiceConfig) {
   const release = acquireDocumentLock(join(stateDir, 'service'), 100)
   let store: ShareServiceStore
   try { store = await ShareServiceStore.open(stateDir) } catch (error) { release(); throw error }
-  const accessLost = new Map<string, Set<string>>()
+  const githubAuth = new ShareAuth({...config, githubApiUrl: config.githubApiUrl ? github : undefined})
   const tokens = new Map<string, Token>()
   const relays = new Map<ServerResponse, { token: string; timer: NodeJS.Timeout }>()
   const queues = new Map<string, Promise<unknown>>()
   const bridges = new Set<CombBridge>()
   let closing = false
   const bridge = () => { const b = new CombBridge(config.comb.binary, config.comb.args); bridges.add(b); return b }
-  async function githubRequest(path: string, token: string): Promise<any> {
-    let response: Response
-    try { response = await fetch(`${github}${path}`, {headers: {Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'User-Agent': 'foundation-share'}, redirect: 'error', signal: AbortSignal.timeout(10000)}) } catch { throw new HttpError(502, 'GitHub authorization unavailable') }
-    if (response.status === 401 || response.status === 404) throw new HttpError(403, 'GitHub access denied')
-    requireThat(response.ok, 'GitHub authorization unavailable', 502)
-    const chunks: Uint8Array[] = []; let size = 0
-    for await (const chunk of response.body!) {
-      size += chunk.length
-      requireThat(size <= LIMIT, 'GitHub response too large', 502)
-      chunks.push(chunk)
+  async function permission(space: ServiceSpace, device: ShareDevice) {
+    const result = await githubAuth.permission(space.repo, device.login, space.publicAccess ?? 'repo-read')
+    if (result === 'none') {
+      await store.update(spaces => {
+        const current = spaces.find(s => s.space === space.space) as ServiceSpace | undefined
+        if (!current) return
+        current.accessLost = [...new Set([...(current.accessLost ?? []), ...current.devices.filter(d => d.githubId === device.githubId).map(d => d.id)])]
+      })
+      disconnectRevoked()
+      throw new HttpError(403, 'GitHub repo access denied')
     }
-    const bytes = Buffer.concat(chunks).toString('utf8')
-    try { return JSON.parse(bytes) } catch { throw new HttpError(502, 'invalid GitHub response') }
+    return result
   }
-  async function permission(repo: string, bearer: string) {
-    const user = await githubRequest('/user', bearer)
-    requireThat(typeof user.login === 'string' && Number.isSafeInteger(user.id), 'invalid GitHub identity', 502)
-    const result = await githubRequest(`/repos/${repo.slice('github.com/'.length)}`, bearer)
-    const p = result.permissions
-    if (p && p.pull === false && p.push === false && !p.admin && !p.maintain) {
-      for (const space of store.spaces().filter(s => s.repo === repo)) {
-        const lost = accessLost.get(space.space) ?? new Set<string>()
-        for (const device of space.devices.filter(d => d.githubId === user.id)) lost.add(device.id)
-        accessLost.set(space.space, lost)
-      }
-    }
-    requireThat(p && (p.pull === true || p.push === true || p.admin === true || p.maintain === true), 'GitHub repo access denied', 403)
-    return { user, permission: (p.push === true || p.admin === true || p.maintain === true ? 'write' : 'read') as 'write'|'read' }
-  }
-  function authenticate(bearer: string): {token: Token; space: ShareSpace} {
+  function authenticate(bearer: string): {token: Token; space: ServiceSpace} {
     const token = tokens.get(bearer)
     requireThat(token && token.expiresAt > Date.now(), 'invalid or expired token', 401)
-    const space = store.get(token.space)
-    requireThat(space && !space.revoked.includes(token.device), 'device revoked', 403)
+    const space = store.get(token.space) as ServiceSpace | undefined
+    requireThat(space && !space.revoked.includes(token.device) && !space.accessLost?.includes(token.device), 'device revoked', 403)
     return { token, space }
   }
   function disconnectRevoked() {
@@ -128,8 +116,22 @@ export async function startShareService(config: ShareServiceConfig) {
       const method = request.method
       if (method === 'GET' && path === '/v1/oauth') { send(200, {clientId: config.oauthClientId ?? null}); return }
       const auth = request.headers.authorization
-      requireThat(auth?.startsWith('Bearer ') && auth.length < 16384, 'bearer token required', 401)
-      const bearer = auth!.slice(7)
+      if (method === 'GET' && path === '/v1/challenge') {
+        requireThat(!auth, 'never send GitHub credentials to the share service')
+        const id = requestUrl.searchParams.get('space')
+        const repoQuery = requestUrl.searchParams.get('repo')
+        requireThat(!!id !== !!repoQuery, 'supply space or repo')
+        if (id) {
+          const space = store.get(id)
+          requireThat(space, 'unknown space', 404)
+          send(200, githubAuth.challenge('token', space.space, space.repo))
+        } else {
+          const repo = repoName(repoQuery)
+          const existing = store.spaces().find(s => s.repo === repo)
+          send(200, githubAuth.challenge('create', existing?.space ?? `sp_${randomBytes(16).toString('hex')}`, repo))
+        }
+        return
+      }
       let body: Record<string, any> = {}
       if (method === 'POST') {
         let size = 0; const chunks: Buffer[] = []
@@ -137,44 +139,62 @@ export async function startShareService(config: ShareServiceConfig) {
         try { body = object(JSON.parse(Buffer.concat(chunks).toString('utf8'))) } catch (error) { if (error instanceof HttpError) throw error; throw new HttpError(400, 'invalid JSON') }
       }
       if (method === 'POST' && path === '/v1/spaces') {
-        exact(body, ['repo']); const repo = repoName(body.repo)
-        const access = await permission(repo, bearer)
-        requireThat(access.permission === 'write', 'write permission required', 403)
+        requireThat(!auth, 'never send GitHub credentials to the share service')
+        exact(body, ['repo','device','challenge','proof','publicAccess'])
+        const repo = repoName(body.repo)
+        const challenge = githubAuth.consume(body.challenge, 'create')
+        requireThat(challenge.repo === repo, 'challenge repo mismatch', 401)
+        const publicAccess = body.publicAccess ?? 'repo-read'
+        requireThat(['repo-read','collaborators'].includes(publicAccess), 'invalid public access policy')
+        const candidate: ServiceSpace = {space:challenge.space,repo,publicAccess,epoch:0,devices:[],wraps:[],revoked:[]}
+        const device = deviceStatement(body.device, candidate, {login:body.device?.login,id:body.device?.githubId})
+        await githubAuth.verifyDevice(device,repo,candidate.space,body.challenge,body.proof)
+        const access = await permission(candidate,device)
+        requireThat(access === 'write', 'write permission required', 403)
         const result = await store.update(spaces => {
-          const existing = spaces.find(s => s.repo === repo)
-          if (existing) return {space: existing.space, repo}
-          const space = `sp_${randomBytes(16).toString('hex')}`
-          spaces.push({space, repo, epoch: 0, devices: [], wraps: [], revoked: []})
-          return {space, repo}
+          const existing = spaces.find(s => s.repo === repo) as ServiceSpace | undefined
+          if (existing) {
+            requireThat(existing.space === challenge.space, 'space created concurrently; request new challenge', 409)
+            requireThat((existing.publicAccess ?? 'repo-read') === publicAccess, 'immutable public access policy', 409)
+            return {space:existing.space,repo,publicAccess:existing.publicAccess ?? 'repo-read'}
+          }
+          spaces.push(candidate)
+          return {space:candidate.space,repo,publicAccess}
         })
         send(200, result); return
       }
       if (method === 'POST' && path === '/v1/token') {
-        exact(body, ['space', 'device']); const space = store.get(body.space)
-        requireThat(space, 'unknown space', 404)
-        const access = await permission(space.repo, bearer)
-        const device = deviceStatement(body.device, space, access.user)
+        requireThat(!auth, 'never send GitHub credentials to the share service')
+        exact(body, ['space','device','challenge','proof'])
+        const challenge = githubAuth.consume(body.challenge, 'token')
+        requireThat(challenge.space === body.space, 'challenge space mismatch', 401)
+        const space = store.get(body.space) as ServiceSpace | undefined
+        requireThat(space && space.repo === challenge.repo, 'unknown space', 404)
+        const device = deviceStatement(body.device, space, {login:body.device?.login,id:body.device?.githubId})
+        await githubAuth.verifyDevice(device,space.repo,space.space,body.challenge,body.proof)
+        const access = await permission(space, device)
         await store.update(spaces => {
-          const current = spaces.find(s => s.space === space.space)!
+          const current = spaces.find(s => s.space === space.space)! as ServiceSpace
           requireThat(!current.revoked.includes(device.id), 'device revoked', 403)
           const old = current.devices.find(d => d.id === device.id)
-          requireThat(!old || JSON.stringify(old) === JSON.stringify(device), 'immutable device binding', 409)
+          requireThat(!old || (['id','service','login','githubId','boxPublicKey','signPublicKey'] as const).every(key => old[key] === device[key]), 'immutable device binding', 409)
           if (!old) { requireThat(current.devices.length < 1000, 'device registry full', 409); current.devices.push(device) }
+          current.accessLost = (current.accessLost ?? []).filter(id => !current.devices.some(d => d.id === id && d.githubId === device.githubId))
           requireThat(Buffer.byteLength(JSON.stringify(current)) < LIMIT - 1024, 'space metadata full', 409)
         })
         const token = randomBytes(32).toString('base64url'); const expiresAt = Date.now() + 3600000
         for (const [key, value] of tokens) if (value.expiresAt <= Date.now()) tokens.delete(key)
         requireThat(tokens.size < 10000, 'token capacity reached', 503)
-        const lost = accessLost.get(space.space)
-        for (const known of store.get(space.space)!.devices.filter(d => d.githubId === access.user.id)) lost?.delete(known.id)
-        tokens.set(token, {space: space.space, device: device.id, permission: access.permission, expiresAt})
-        send(200, {token, expiresAt, permission: access.permission, space: space.space, repo: space.repo, epoch: store.get(space.space)!.epoch, accessLost: [...(accessLost.get(space.space) ?? [])]}); return
+        tokens.set(token, {space: space.space, device: device.id, permission: access, expiresAt})
+        send(200, {token,expiresAt,permission:access,space:space.space,repo:space.repo,epoch:store.get(space.space)!.epoch,accessLost:(store.get(space.space) as ServiceSpace).accessLost ?? []}); return
       }
+      requireThat(auth?.startsWith('Bearer ') && auth.length < 16384, 'bearer token required', 401)
+      const bearer = auth!.slice(7)
       const { token, space } = authenticate(bearer)
       const requestedSpace = method === 'GET' ? requestUrl.searchParams.get('space') : body.space
       requireThat(requestedSpace === undefined || requestedSpace === null || requestedSpace === space.space, 'token space mismatch', 403)
       delete body.space
-      if (method === 'GET' && path === '/v1/state') { send(200, space); return }
+      if (method === 'GET' && path === '/v1/state') { send(200, {...space,publicAccess:space.publicAccess ?? 'repo-read',accessLost:space.accessLost ?? []}); return }
       if (method === 'GET' && path === '/v1/relay') {
         requireThat(relays.size < 256, 'relay capacity reached', 503)
         response.writeHead(200, {'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store', Connection: 'keep-alive'})
@@ -186,18 +206,18 @@ export async function startShareService(config: ShareServiceConfig) {
       if (method === 'POST' && path === '/v1/keys') {
         exact(body, ['expectedEpoch', 'epoch', 'wraps', 'revoke', 'recoveryPublicKey'])
         const result = await store.update(spaces => {
-          const current = spaces.find(s => s.space === space.space)!
+          const current = spaces.find(s => s.space === space.space)! as ServiceSpace
           requireThat(!current.revoked.includes(token.device), 'device revoked', 403)
           requireThat(token.permission === 'write' || (body.epoch === current.epoch && current.epoch > 0), 'write permission required for rotation', 403)
           requireThat(body.expectedEpoch === current.epoch, 'epoch conflict', 409)
           requireThat(Number.isSafeInteger(body.epoch) && body.epoch >= 1 && (body.epoch === current.epoch || body.epoch === current.epoch + 1), 'invalid epoch')
-          requireThat(Array.isArray(body.wraps) && body.wraps.length <= 1001 && Array.isArray(body.revoke ?? []) && (body.revoke ?? []).every((id: unknown) => typeof id === 'string' && current.devices.some(d => d.id === id)), 'invalid wraps/revocations')
+          requireThat(Array.isArray(body.wraps) && body.wraps.length <= 1001 && Array.isArray(body.revoke ?? []) && (body.revoke ?? []).every((id: unknown) => typeof id === 'string' && HEX.test(id)), 'invalid wraps/revocations')
           const revoke: string[] = body.revoke ?? []
           requireThat(!revoke.length || body.epoch === current.epoch + 1, 'revocation requires new epoch')
           requireThat(token.permission === 'write' || (body.epoch === current.epoch && !revoke.length && body.recoveryPublicKey === undefined && body.wraps.every((w: unknown) => object(w).deviceId !== 'recovery')), 'write permission required for rotation/recovery', 403)
           const oldRecovery = current.recoveryPublicKey
           if (body.recoveryPublicKey !== undefined) {
-            requireThat(base64(body.recoveryPublicKey, 32) && (oldRecovery ? oldRecovery === body.recoveryPublicKey : current.epoch === 0), 'immutable recovery key')
+            requireThat(base64(body.recoveryPublicKey, 32) && (oldRecovery === body.recoveryPublicKey || current.epoch === 0 || body.epoch === current.epoch + 1), 'immutable recovery key')
             current.recoveryPublicKey = body.recoveryPublicKey
           }
           const wraps: ShareWrap[] = body.wraps.map((value: unknown) => {
@@ -209,9 +229,10 @@ export async function startShareService(config: ShareServiceConfig) {
           requireThat(!current.recoveryPublicKey || body.epoch === current.epoch || wraps.some(w => w.deviceId === 'recovery'), 'new epoch requires recovery wrap')
           for (const w of wraps) {
             const old = current.wraps.find(x => x.epoch === w.epoch && x.deviceId === w.deviceId)
-            requireThat(!old || JSON.stringify(old) === JSON.stringify(w), 'immutable epoch wrap', 409)
+            requireThat(!old || (['epoch','deviceId','senderId','box','signature'] as const).every(key => old[key] === w[key]), 'immutable epoch wrap', 409)
             if (!old) current.wraps.push(w)
           }
+          if (body.epoch > current.epoch) current.accessLost = (current.accessLost ?? []).filter(id => !revoke.includes(id))
           current.epoch = body.epoch
           current.revoked = [...new Set([...current.revoked, ...revoke])]
           requireThat(Buffer.byteLength(JSON.stringify(current)) < LIMIT - 1024, 'space metadata full', 409)
@@ -234,7 +255,8 @@ export async function startShareService(config: ShareServiceConfig) {
           exact(body, ['op','log','idempotency_key','payload_hex','epoch'])
           requireThat(token.permission === 'write', 'write permission required', 403)
           requireThat(body.epoch === space.epoch && space.epoch > 0, 'stale epoch', 409)
-          const payload = ciphertext(body.payload_hex, body.epoch)
+          requireThat(!space.accessLost?.length, 'access loss requires epoch rotation', 409)
+          const payload = ciphertext(body.payload_hex, body.epoch, token.device)
           requireThat(typeof body.idempotency_key === 'string' && HEX.test(body.idempotency_key), 'invalid idempotency key')
           const envelope = JSON.parse(Buffer.from(payload, 'hex').toString('utf8'))
           requireThat(envelope.dedup === body.idempotency_key, 'idempotency key must match encrypted dedup')
@@ -251,10 +273,39 @@ export async function startShareService(config: ShareServiceConfig) {
         } else exact(body, ['op','log'])
         const run = async () => {
           const current = authenticate(bearer)
-          if (body.op === 'append') requireThat(current.space.epoch === body.epoch, 'stale epoch', 409)
+          if (body.op === 'append') { requireThat(current.space.epoch === body.epoch, 'stale epoch', 409); requireThat(!current.space.accessLost?.length, 'access loss requires epoch rotation', 409) }
           const b = bridge()
           try {
             await b.hello()
+            if (body.op === 'append') {
+              // Randomized encryption produces different bytes for the same keyed identity.
+              // Coalesce against durable events, never relay hints or an in-memory promise.
+              // Pages stay bounded; full-feed scans deliberately trade speed for bounded memory.
+              const head = await b.request('head', {log:physical})
+              requireThat(head.log === physical && typeof head.cursor === 'string' && /^[1-9][0-9]*$/.test(head.cursor), 'invalid durable feed head', 502)
+              const limit = BigInt(head.cursor as string)
+              let cursor = 1n
+              while (cursor < limit) {
+                const count = Number(limit-cursor > 128n ? 128n : limit-cursor)
+                const page = await b.request('read', {log:physical,cursor:String(cursor),max_events:count,max_bytes:491520})
+                requireThat(page.log === physical && Array.isArray(page.events) && page.events.length > 0 && page.events.length <= count, 'invalid durable feed page', 502)
+                for (const raw of page.events as unknown[]) {
+                  const event = object(raw)
+                  requireThat(event.seq === String(cursor) && typeof event.payload_hex === 'string' && /^(?:[a-f0-9]{2})+$/.test(event.payload_hex), 'invalid durable event', 502)
+                  let record: Record<string, any>
+                  try { record = JSON.parse(Buffer.from(event.payload_hex,'hex').toString('utf8')) } catch { throw new HttpError(502,'invalid durable ciphertext record') }
+                  if (record?.dedup === body.idempotency_key && record.epoch === body.epoch) {
+                    const latest = authenticate(bearer).space
+                    requireThat(latest.epoch === body.epoch && !latest.accessLost?.length, 'epoch rotation required', 409)
+                    return {v:1,id:head.id,op:'append',ok:true,log:body.log,first:String(cursor),last:String(cursor),cursor:String(cursor+1n)}
+                  }
+                  cursor++
+                }
+                requireThat(page.next_cursor === String(cursor), 'invalid durable page cursor', 502)
+              }
+              const latest = authenticate(bearer).space
+              requireThat(latest.epoch === body.epoch && !latest.accessLost?.length, 'epoch rotation required', 409)
+            }
             const frame = await b.request(body.op, fields)
             if (body.op === 'append') validateAppendReceipt(frame, physical)
             return {...frame, log: body.log}
@@ -270,7 +321,7 @@ export async function startShareService(config: ShareServiceConfig) {
         send(200, result); return
       }
       throw new HttpError(404, 'unknown endpoint')
-    } catch (error) { if (!response.headersSent) send(error instanceof HttpError ? error.status : 502, {error: error instanceof HttpError ? error.message : 'share service operation failed'}); else response.end() }
+    } catch (error) { if (!response.headersSent) send(error instanceof HttpError || error instanceof ShareAuthError ? error.status : 502, {error: error instanceof HttpError || error instanceof ShareAuthError ? error.message : 'share service operation failed'}); else response.end() }
   })
   server.requestTimeout = 15000; server.headersTimeout = 10000; server.maxConnections = 512
   try { await new Promise<void>((resolve, reject) => { server.once('error', reject); server.listen(config.port ?? 0, config.host ?? '127.0.0.1', () => { server.removeListener('error', reject); resolve() }) }) } catch (error) { release(); throw error }
