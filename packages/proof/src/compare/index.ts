@@ -264,12 +264,14 @@ export function compare(
     drifts,
     defects,
     summary: {
-      uniqueDefects: defects.filter(d => d.classification === "product").length,
+      uniqueDefects: defects.filter((d) => d.classification === "product")
+        .length,
       accepted: 0,
       raw: drifts.length,
-      uncertainMatches: matches.filter(m => m.uncertain).length,
-      environment: defects.filter(d => d.classification === "environment").length,
-      uncertain: defects.filter(d => d.classification === "uncertain").length,
+      uncertainMatches: matches.filter((m) => m.uncertain).length,
+      environment: defects.filter((d) => d.classification === "environment")
+        .length,
+      uncertain: defects.filter((d) => d.classification === "uncertain").length,
     },
     matches: matches.map((m) => ({
       designNode: m.design.fdnId || m.design.path,

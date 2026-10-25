@@ -90,9 +90,14 @@ function cost(
   shapes: Map<CaptureNode, string>,
 ) {
   if ((a.tag === "svg") !== (b.tag === "svg")) return 1;
-  if (["circle", "path", "rect", "line", "polygon"].includes(a.tag) && a.tag !== b.tag) return 1;
+  if (
+    ["circle", "path", "rect", "line", "polygon"].includes(a.tag) &&
+    a.tag !== b.tag
+  )
+    return 1;
   // Primitive structure separates unrelated anonymous icons; position is not identity.
-  if (a.tag === "svg" && b.tag === "svg" && shapes.get(a) !== shapes.get(b)) return 1;
+  if (a.tag === "svg" && b.tag === "svg" && shapes.get(a) !== shapes.get(b))
+    return 1;
   const text = (a.text || a.name || "").trim(),
     other = (b.text || b.name || "").trim();
   if (
@@ -130,7 +135,11 @@ function cost(
   }
   return (
     0.4 * textDistance +
-    0.15 * (a.tag === b.tag || (!text && !other && a.tag !== "svg" && b.tag !== "svg") ? 0 : 1) +
+    0.15 *
+      (a.tag === b.tag ||
+      (!text && !other && a.tag !== "svg" && b.tag !== "svg")
+        ? 0
+        : 1) +
     0.15 *
       ((a.role || "") === (b.role || "") && (a.name || "") === (b.name || "")
         ? 0
@@ -244,9 +253,18 @@ export function matchNodes(
         usedC.add(b);
       }
     }
-  const shapes = new Map([...design, ...code].filter(n => n.tag === "svg").map(n => [n,
-    (design.includes(n) ? design : code).filter(c => c.path.startsWith(n.path + "/") && c.tag !== "g").map(c => c.tag).sort().join(",")
-  ]));
+  const shapes = new Map(
+    [...design, ...code]
+      .filter((n) => n.tag === "svg")
+      .map((n) => [
+        n,
+        (design.includes(n) ? design : code)
+          .filter((c) => c.path.startsWith(n.path + "/") && c.tag !== "g")
+          .map((c) => c.tag)
+          .sort()
+          .join(","),
+      ]),
+  );
   const dc = contexts(design),
     cc = contexts(code);
   const da = anchorContexts(design, code, dc),
@@ -263,10 +281,26 @@ export function matchNodes(
       const j = assignment[i]!;
       if (j >= 0 && j < right.length && matrix[i]![j]! < 0.48) {
         const b = right[j]!;
-        const alternatives = right.filter((other, k) => k !== j && Math.abs(matrix[i]![k]! - matrix[i]![j]!) < 0.035);
-        const ambiguous = alternatives.length > 0 && !(a.text?.trim() && a.text.trim() === b.text?.trim() && da.counts.get(a.text.trim()) === 1 && ca.counts.get(a.text.trim()) === 1);
+        const alternatives = right.filter(
+          (other, k) =>
+            k !== j && Math.abs(matrix[i]![k]! - matrix[i]![j]!) < 0.035,
+        );
+        const ambiguous =
+          alternatives.length > 0 &&
+          !(
+            a.text?.trim() &&
+            a.text.trim() === b.text?.trim() &&
+            da.counts.get(a.text.trim()) === 1 &&
+            ca.counts.get(a.text.trim()) === 1
+          );
         matches.push({
-          ...(ambiguous ? { uncertain: true as const, reason: "Several candidates have indistinguishable correspondence evidence" } : {}),
+          ...(ambiguous
+            ? {
+                uncertain: true as const,
+                reason:
+                  "Several candidates have indistinguishable correspondence evidence",
+              }
+            : {}),
           design: a,
           code: b,
           kind: "heuristic",
@@ -282,14 +316,55 @@ export function matchNodes(
   for (const m of matches) {
     const wrappers = { design: [] as string[], code: [] as string[] };
     for (const [side, nodes, used, matched] of [
-      ["design", d, usedD, m.design], ["code", c, usedC, m.code],
+      ["design", d, usedD, m.design],
+      ["code", c, usedC, m.code],
     ] as const) {
       for (const n of nodes) {
-        if (used.has(n) || !matched.path.startsWith(n.path + "/") || n.fdnId || n.text?.trim() || n.role || n.name) continue;
-        if (!clear(n.style["background-color"]) || !clear(n.style["background-image"]) || !clear(n.style["box-shadow"]) || ["top","right","bottom","left"].some(k => parseFloat(n.style[`border-${k}-width`] || "0") > 0)) continue;
-        if (!n.box.every((v,i) => Math.abs(v - matched.box[i]!) < 0.05)) continue;
-        const descendants = nodes.filter(x => x.path.startsWith(n.path + "/") && x !== matched && !x.path.startsWith(matched.path + "/") && !matched.path.startsWith(x.path + "/"));
-        if (descendants.length) continue;
+        if (
+          used.has(n) ||
+          !matched.path.startsWith(n.path + "/") ||
+          n.fdnId ||
+          n.text?.trim() ||
+          n.role ||
+          n.name
+        )
+          continue;
+        if (
+          !clear(n.style["background-color"]) ||
+          !clear(n.style["background-image"]) ||
+          !clear(n.style["box-shadow"]) ||
+          ["top", "right", "bottom", "left"].some(
+            (k) => parseFloat(n.style[`border-${k}-width`] || "0") > 0,
+          )
+        )
+          continue;
+        const coextensive = n.box.every(
+          (v, i) => Math.abs(v - matched.box[i]!) < 0.05,
+        );
+        const subtree = nodes.filter((x) => x.path.startsWith(n.path + "/"));
+        const ownPaint = (x: CaptureNode) =>
+          !!x.text?.trim() ||
+          !!x.role ||
+          !!x.name ||
+          ["svg", "img", "button", "input", "canvas", "video"].includes(
+            x.tag,
+          ) ||
+          !clear(x.style["background-color"]) ||
+          !clear(x.style["background-image"]) ||
+          !clear(x.style["box-shadow"]) ||
+          ["top", "right", "bottom", "left"].some(
+            (k) => parseFloat(x.style[`border-${k}-width`] || "0") > 0,
+          );
+        if (!coextensive && subtree.some((x) => ownPaint(x) && !used.has(x)))
+          continue;
+        const descendants = nodes.filter(
+          (x) =>
+            x.path.startsWith(n.path + "/") &&
+            x !== matched &&
+            !x.path.startsWith(matched.path + "/") &&
+            !matched.path.startsWith(x.path + "/"),
+        );
+        if (coextensive && descendants.length) continue;
         used.add(n);
         wrappers[side].push(n.fdnId || n.path);
       }
