@@ -39,6 +39,7 @@ import { oppositeStep, placementHistory, undoOps, undoStep, type UndoStep } from
 export interface SessionOptions {
   path: string
   create?: boolean
+  readOnly?: boolean
   title?: string
   author?: string
   send: (message: WireServiceMessage) => void
@@ -75,6 +76,8 @@ class DesignSession implements Session {
   private readonly chainPath: string
   private readonly log: (line: string) => void
   private phase: 'waiting' | 'open' | 'closed' = 'waiting'
+  private readMode = false
+  private sourcePending = false
   private author = ''
   private protocol: SessionProtocol = SESSION_PROTOCOL
   private earlyResult = false
@@ -110,6 +113,7 @@ class DesignSession implements Session {
   private helloWaitStarted: number | null = null
 
   constructor(private readonly options: SessionOptions) {
+    this.readMode = options.readOnly === true
     this.path = documentPath(options.path)
     this.displayPath = resolve(options.path)
     this.chainPath = `${this.path}.chain`
@@ -127,8 +131,9 @@ class DesignSession implements Session {
       return
     }
     if (message.t === 'hello' && !isSessionProtocol(message.protocol)) return this.fault('protocol', `protocol ${message.protocol} is not supported; use ${LEGACY_SESSION_PROTOCOL} or ${SESSION_PROTOCOL}`, 2)
+    if (this.phase === 'waiting' && message.t === 'hello') this.readMode ||= message.mode === 'read'
     try {
-      if (message.t === 'hello' && this.options.create) mkdirSync(dirname(this.path), { recursive: true })
+      if (message.t === 'hello' && this.options.create && !this.readMode) mkdirSync(dirname(this.path), { recursive: true })
       this.inTransaction(() => this.dispatch(message), message.t === 'hello' ? 0 : 100)
     } catch (err) {
       if (err instanceof DocumentBusyError && this.phase === 'waiting') {
@@ -146,10 +151,15 @@ class DesignSession implements Session {
 
   sync(): void {
     if (this.phase !== 'open') return
+    if (this.readMode) {
+      this.syncCurrent()
+      this.seenSignature = this.fileSignature()
+      return
+    }
     if (!this.locked && isDocumentLocked(this.path)) { this.scheduleSync(); return }
-    if (this.locked) return this.syncLocked()
+    if (this.locked) return this.syncCurrent()
     try {
-      this.inTransaction(() => this.syncLocked(), 0)
+      this.inTransaction(() => this.syncCurrent(), 0)
       this.seenSignature = this.fileSignature()
     } catch (err) {
       if (!(err instanceof DocumentBusyError)) throw err
@@ -158,6 +168,7 @@ class DesignSession implements Session {
   }
 
   private inTransaction(run: () => void, timeoutMs = 100): void {
+    if (this.readMode) return run()
     this.outbox = []
     try {
       withDocumentLock(this.path, () => {
@@ -179,13 +190,14 @@ class DesignSession implements Session {
     else this.options.send(wire)
   }
 
-  private syncLocked(): void {
+  private syncCurrent(): void {
     if (this.phase !== 'open') return
     if (this.pendingSync) clearTimeout(this.pendingSync)
     this.pendingSync = null
     const before = this.docText
+    const sourcePending = this.sourcePending
     const author = this.syncFromDisk()
-    if (this.docText !== before) this.announce({ kind: 'external', author: author ?? null })
+    if (this.docText !== before || this.sourcePending !== sourcePending) this.announce({ kind: 'external', author: author ?? null })
   }
 
   close(): void {
@@ -224,6 +236,7 @@ class DesignSession implements Session {
       if (message.t !== 'hello') return this.fault('protocol', `expected hello, got ${message.t}`, 2)
       return this.hello(message)
     }
+    if (this.readMode && (message.t === 'commit' || message.t === 'anchor' || message.t === 'undo' || message.t === 'redo')) return this.reject(message.id, { code: 'invalid-op', message: 'This is a read-only session; mutations are not allowed.' })
     switch (message.t) {
       case 'hello':
         return this.fault('protocol', 'hello was already received', null)
@@ -293,7 +306,7 @@ class DesignSession implements Session {
     this.artboardFrames = message.artboardFrames === true
     const created = this.open()
     if (created === null) return
-    if (this.earlyResult && !this.chain && !this.invalidExternalTokens && this.docId) {
+    if (!this.readMode && this.earlyResult && !this.chain && !this.invalidExternalTokens && this.docId) {
       this.preparedChain = { text: this.docText, actor: this.actor, docId: this.docId, finish: prepareChain(this.doc, { actor: this.actor, docId: this.docId }) }
     }
     this.phase = 'open'
@@ -305,6 +318,7 @@ class DesignSession implements Session {
       docId: this.docId,
       chain: this.chain !== null,
       created,
+      ...(this.readMode ? { mode: 'read' as const } : {}),
       ...this.documentView(),
     })
     if (this.invalidExternalTokens) this.fault('unreadable', this.invalidExternalTokens, null)
@@ -313,6 +327,15 @@ class DesignSession implements Session {
   }
 
   private open(): boolean | null {
+    if (this.readMode) {
+      try {
+        if (this.readSnapshot()) return false
+        this.fault('not-found', `${this.path} does not exist; a read-only session cannot create it`, 1)
+      } catch (err) {
+        this.fault('unreadable', `could not read ${this.path}: ${err instanceof Error ? err.message : String(err)}`, 1)
+      }
+      return null
+    }
     let text: string | null
     try {
       text = readTextIfPresent(this.path)
@@ -423,7 +446,53 @@ class DesignSession implements Session {
     this.seenSignature = this.fileSignature()
   }
 
+  private readSnapshot(): boolean {
+    const bytes = readBytesIfPresent(this.chainPath)
+    if (bytes) {
+      const changed = !this.chain || !sameBytes(bytes, this.diskChain)
+      if (changed) {
+        const chain = loadChain(bytes, { actor: this.actor })
+        this.chain = chain
+        this.diskChain = bytes
+        this.docId = chain.docId() ?? null
+        this.setDoc(chain.doc())
+      }
+      let text: string | null
+      try { text = readTextIfPresent(this.path) } catch {
+        this.diskText = null
+        this.sourcePending = true
+        return true
+      }
+      if (changed || text !== this.diskText) {
+        this.diskText = text
+        try {
+          const parsed = text === null ? null : parseDocument(text)
+          this.sourcePending = !parsed || parsed.report.lines.some(line => line.severity === 'error') || canonicalText(parsed.doc) !== canonicalText(parseDocument(this.docText).doc)
+        } catch { this.sourcePending = true }
+      }
+      return true
+    }
+    const text = readTextIfPresent(this.path)
+    if (text === null) return false
+    if (this.chain || text !== this.diskText) {
+      const parsed = parseDocument(text)
+      this.chain = null
+      this.diskChain = null
+      this.diskText = text
+      this.docId = readDocIdAttr(text)
+      this.sourcePending = false
+      this.setDoc(normalizeDocument(parsed.doc))
+      this.issues = [...parsed.report.lines, ...this.issues]
+    }
+    return true
+  }
+
   private syncFromDisk(): string | null | undefined {
+    if (this.readMode) {
+      const previous = this.diskChain
+      if (!this.readSnapshot()) return undefined
+      return previous !== this.diskChain ? this.chain?.head().author ?? null : null
+    }
     let author: string | null | undefined
     let chainAhead = false
 
@@ -655,8 +724,9 @@ class DesignSession implements Session {
 
   private syncAndAnnounce(): void {
     const before = this.docText
+    const sourcePending = this.sourcePending
     const author = this.syncFromDisk()
-    if (this.docText !== before) this.announce({ kind: 'external', author: author ?? null })
+    if (this.docText !== before || this.sourcePending !== sourcePending) this.announce({ kind: 'external', author: author ?? null })
   }
 
   private accept(id: string, cause: Cause, impact: BakeImpact, componentSwaps: InstanceSwapReport[] = [], componentDetaches: InstanceDetachReport[] = []): void {
@@ -686,6 +756,7 @@ class DesignSession implements Session {
   }
 
   private readOnlyReason(): string | null {
+    if (this.readMode) return 'This is a read-only session; mutations are not allowed.'
     return this.doc.specVersion === ARTBOARD_FRAME_VERSION && !this.artboardFrames ? 'This design uses artboard frame styles. Update this client to edit it.' : null
   }
 
@@ -697,7 +768,7 @@ class DesignSession implements Session {
       head: this.head(),
       history: this.readOnlyReason() ? { canUndo: false, canRedo: false, undoLabel: null, redoLabel: null } : { canUndo: this.undoStack.length > 0, canRedo: this.redoStack.length > 0, undoLabel: top(this.undoStack), redoLabel: top(this.redoStack) },
       ...(this.readOnlyReason() ? { readOnly: this.readOnlyReason()! } : {}),
-      issues: this.issues,
+      issues: this.sourcePending ? [...this.issues, { code: 'read-only-source-pending', severity: 'info', message: 'The source is missing or differs from saved history. This read-only session shows the saved chain without ingesting source edits.' }] : this.issues,
       pages: artboardPages(this.doc),
       boards: boardViews(this.doc),
       unavailableBoards: this.unavailableBoards(),

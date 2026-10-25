@@ -1393,3 +1393,36 @@ reason, history is disabled, and commit/Undo/Redo/anchor refuse, including after
 peer promotion. Legacy0.1 negotiation keeps its existing first-board read-only
 adapter. Updated semantic CLI/MCP editing declares frame support. File-format
 promotion is document-wide and older T105a writers refuse the new version.
+
+
+### Read-only session mode
+
+A hello may request `mode:"read"`; `foundation session --read-only` enforces
+the same mode even when hello omits it. It is latched before document locks,
+recovery, directory creation or opening. The welcome acknowledges only an
+active reader with `mode:"read"`. Ordinary writer packets are unchanged.
+Unknown mode values are malformed on an updated server. Older servers ignore
+the additive hello field and omit the acknowledgement; Apiary intentionally
+keeps its existing reader behavior in that fallback until its minimum runtime
+includes this capability.
+
+A reader never acquires a document lock, creates a document/chain/docId,
+recovers a pending save, ingests text or persists source/projection/history.
+Commit, Undo, Redo and anchor requests return id-bearing `invalid-op` results
+with a read-only-session reason. Read views, subscriptions, swap previews,
+log and incremental activity remain available. History actions are disabled
+and the document view reports the read-only reason. Renegotiating hello
+cannot change the mode. `--create` cannot create a missing read-only file.
+
+When a saved chain exists, the reader adopts each atomically published chain
+snapshot directly. It does not merge local state or create ingest envelopes.
+A chainless file is parsed for viewing without minting an identity. Source
+text missing, malformed or different at the parse(project(chain)) boundary
+adds an informational `read-only-source-pending` issue; the saved chain remains
+authoritative. The flag may appear briefly between a writer's chain and HTML
+renames and clears on a later refresh. No recovery is attempted, even when a
+pending journal exists. Un-ingested text edits are disclosed, not displayed
+as committed history. Reader and writer activity tokens are interchangeable
+for the same saved lineage; the existing docId-less baseline remains local
+to its session. A changed chain reloads from its snapshot, retaining the
+existing cold-load cost; unchanged bytes are reused.

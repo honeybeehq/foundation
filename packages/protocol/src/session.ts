@@ -67,7 +67,7 @@ export type ComponentOp =
 export type SessionOp = PatchOp | PlacementOp | TokenModeOp | ComponentOp | ArtboardOp
 
 export type ClientMessage =
-  | { t: 'hello'; protocol: string; client: string; author: string; earlyResult?: boolean; artboardFrames?: boolean }
+  | { t: 'hello'; protocol: string; client: string; author: string; earlyResult?: boolean; artboardFrames?: boolean; mode?: 'read' }
   | { t: 'view'; boards: BoardRef[]; components: boolean; bakeDiffs?: boolean }
   | { t: 'commit'; id: string; base: number; ops: SessionOp[]; label: string }
   | { t: 'preview-instance-swap'; id: string; op: Extract<ComponentOp, { op: 'swap-instance' | 'set-instance-variant' }> }
@@ -81,7 +81,7 @@ export type LegacyClientMessage = Exclude<ClientMessage, { t: 'view' }> | { t: '
 export type WireClientMessage = ClientMessage | LegacyClientMessage
 
 export type ServiceMessage =
-  | ({ t: 'welcome'; protocol: string; path: string; docId: string | null; chain: boolean; created: boolean } & DocumentView)
+  | ({ t: 'welcome'; protocol: string; path: string; docId: string | null; chain: boolean; created: boolean; mode?: 'read' } & DocumentView)
   | ({ t: 'doc'; cause: Cause } & DocumentView)
   | ({ t: 'baked'; rev: number; html: string; report: ReportLine[] } & BoardView)
   | ({ t: 'baked-diff'; rev: number; baseRev: number; start: number; deleteCount: number; insert: string; report: ReportLine[] } & BoardView)
@@ -95,7 +95,7 @@ export type ServiceMessage =
 
 export type LegacyDocumentView = Omit<DocumentView, 'pages' | 'boards' | 'unavailableBoards'>
 export type LegacyServiceMessage =
-  | ({ t: 'welcome'; protocol: typeof LEGACY_SESSION_PROTOCOL; path: string; docId: string | null; chain: boolean; created: boolean } & LegacyDocumentView)
+  | ({ t: 'welcome'; protocol: typeof LEGACY_SESSION_PROTOCOL; path: string; docId: string | null; chain: boolean; created: boolean; mode?: 'read' } & LegacyDocumentView)
   | ({ t: 'doc'; cause: Cause } & LegacyDocumentView)
   | { t: 'baked'; rev: number; state: string | null; html: string; report: ReportLine[] }
   | { t: 'baked-diff'; rev: number; state: string | null; baseRev: number; start: number; deleteCount: number; insert: string; report: ReportLine[] }
@@ -303,7 +303,7 @@ const ARTBOARD_OPS: Record<ArtboardOp['op'], Check> = {
 const isArtboardOp: Check = (value) => isRecord(value) && typeof value.op === 'string' && Object.hasOwn(ARTBOARD_OPS, value.op) && ARTBOARD_OPS[value.op as ArtboardOp['op']](value)
 
 const CLIENT_MESSAGES: Record<ClientMessage['t'], Check> = {
-  hello: shape({ protocol: isString, client: isString, author: isString, earlyResult: optional(isBoolean), artboardFrames: optional(isBoolean) }),
+  hello: shape({ protocol: isString, client: isString, author: isString, earlyResult: optional(isBoolean), artboardFrames: optional(isBoolean), mode: optional(oneOf(['read'])) }),
   view: shape({ boards: arrayOf(isBoardRef), components: isBoolean, bakeDiffs: optional(isBoolean) }),
   'preview-instance-swap': shape({ id: isString, op: (value) => isRecord(value) && ['swap-instance', 'set-instance-variant'].includes(String(value.op)) && isComponentOp(value) }),
   commit: shape({ id: isString, base: isCount, ops: arrayOf((value) => isPatchOp(value) || isPlacementOp(value) || isTokenModeOp(value) || isComponentOp(value) || isArtboardOp(value)), label: isString }),
@@ -340,7 +340,7 @@ const isCause: Check = (value) => {
 const isView = shape({ rev: isCount, doc: isDocument, head: nullable(isEnvelope), history: isHistory, issues: isReport, pages: arrayOf(shape({ id: isString, name: isString, artboardIds: arrayOf(isString) })), boards: arrayOf(isBoardView), unavailableBoards: optional(arrayOf(isBoardRef)), readOnly: optional(isString) })
 
 const SERVICE_MESSAGES: Record<ServiceMessage['t'], Check> = {
-  welcome: (value) => isView(value) && shape({ protocol: isString, path: isString, docId: nullable(isString), chain: isBoolean, created: isBoolean })(value),
+  welcome: (value) => isView(value) && shape({ protocol: isString, path: isString, docId: nullable(isString), chain: isBoolean, created: isBoolean, mode: optional(oneOf(['read'])) })(value),
   doc: (value) => isView(value) && shape({ cause: isCause })(value),
   baked: (value) => isBoardView(value) && shape({ rev: isCount, state: nullable(isString), html: isString, report: isReport })(value),
   'baked-diff': (value) => isBoardView(value) && shape({ rev: isCount, state: nullable(isString), baseRev: isCount, start: isCount, deleteCount: isCount, insert: isString, report: isReport })(value),

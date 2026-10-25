@@ -4,7 +4,7 @@ import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
 import { createSession } from '../session/session.js'
 
-const USAGE = 'usage: foundation session <file.fdn.html> [--create] [--title T] [--author A]'
+const USAGE = 'usage: foundation session <file.fdn.html> [--create] [--title T] [--author A] [--read-only]'
 
 export async function runSession(args: string[], io: CliIO): Promise<number> {
   const { positionals, flags } = parseArgs(args)
@@ -21,6 +21,7 @@ export async function runSession(args: string[], io: CliIO): Promise<number> {
   const session = createSession({
     path: file,
     create: flags.create === true,
+    readOnly: flags['read-only'] === true,
     title: flagString(flags, 'title'),
     author: flagString(flags, 'author'),
     send: (message) => process.stdout.write(`${JSON.stringify(message)}\n`),
