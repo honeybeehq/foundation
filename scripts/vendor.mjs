@@ -19,6 +19,7 @@ if (git('status', '--porcelain')) {
 
 const files = [
   ['packages/protocol/src/session.ts', 'session.ts'],
+  ['packages/protocol/src/ids.ts', 'ids.ts'],
   ['packages/engine/src/types.ts', 'document.ts'],
 ]
 const vendored = new Set(files.map(([, to]) => `./${to}`))
