@@ -34,7 +34,7 @@ const dirty = execFileSync('git', ['status', '--porcelain'], { cwd: repo, encodi
 if (dirty && !args.includes('--allow-dirty')) throw new Error('Code checkout is dirty; commit it or use --allow-dirty for exploratory captures')
 const rendererRepo = resolve(import.meta.dirname, '../../../..')
 const rendererCommit = execFileSync('git', ['rev-parse', 'HEAD'], {cwd: rendererRepo, encoding:'utf8'}).trim()
-const rendererDirty = Boolean(execFileSync('git', ['status', '--porcelain'], {cwd: rendererRepo, encoding:'utf8'}).trim())
+const rendererDirty = Boolean(execFileSync('git', ['status', '--porcelain', '--', 'packages/engine', 'packages/proof/src', 'package.json', 'pnpm-lock.yaml'], {cwd: rendererRepo, encoding:'utf8'}).trim())
 const target = await startCodeServer(repo, links)
 const browser = await getBrowser()
 try {
