@@ -1,13 +1,14 @@
 import Foundation
 import Security
 
+let service = "foundation-share-native-v1"
+
 func fail(_ status: OSStatus) -> Never {
     FileHandle.standardError.write(Data("Foundation Keychain operation failed (\(status)).\n".utf8))
     exit(status == errSecItemNotFound ? 44 : 1)
 }
 
 func readPassword(_ keychain: SecKeychain, _ account: String) {
-    let service = "foundation-share-v1"
     var length: UInt32 = 0
     var bytes: UnsafeMutableRawPointer?
     let status = service.withCString { servicePointer in
@@ -25,7 +26,6 @@ func readPassword(_ keychain: SecKeychain, _ account: String) {
 }
 
 func writePassword(_ keychain: SecKeychain, _ account: String, _ data: Data) {
-    let service = "foundation-share-v1"
     var item: SecKeychainItem?
     let found = service.withCString { servicePointer in
         account.withCString { accountPointer in
