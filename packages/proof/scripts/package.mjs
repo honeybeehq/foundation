@@ -49,7 +49,7 @@ await writeFile(
   JSON.stringify(
     {
       name: "foundation-proof",
-      version: "0.2.0-proto.2",
+      version: "0.2.0-proto.3",
       type: "module",
       bin: { "foundation-proof": "cli.mjs" },
       dependencies: {
@@ -88,7 +88,7 @@ await writeFile(
     2,
   ) + "\n",
 );
-await rm(path.join(out,'npm-shrinkwrap.json'),{force:true});
+await rm(path.join(out, "npm-shrinkwrap.json"), { force: true });
 execFileSync(
   "npm",
   [

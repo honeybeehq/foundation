@@ -14,6 +14,7 @@
     "empty/drift-report.json: def-70fa105a918ce9890316: design changed since this difference was accepted; re-review or update the design",
     "empty/drift-report.json: accepted list hash/content mismatch; regenerate the proof",
     "empty/drift-report.json: accepted defect annotations mismatch",
+    "empty/drift-report.json: accepted pixel residual replay mismatch",
     "empty/drift-report.json: summary replay mismatch",
     "empty/drift-report.json: replay found drift or incomplete captures",
     "empty/drift-report.json: drift exceeds tolerance"

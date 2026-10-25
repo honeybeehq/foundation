@@ -18,7 +18,7 @@ jobs:
     timeout-minutes: 15
     env:
       # Reviewed base revision. Protect workflow edits before adopting a required PR check.
-      POLICY_REF: 9dfaac66c49da5bc94e0889f03b42277a2a08d42
+      POLICY_REF: e3d034a28e40690db0d7310434d07ec73cd35245
       MODE: ${{ inputs.mode || 'advisory' }}
       ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
