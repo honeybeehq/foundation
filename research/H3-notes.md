@@ -11,10 +11,10 @@ already enabled. HTTPS is **tailnet only**:
 `127.0.0.1:19487`. No Funnel or public listener was configured.
 
 Foundation was installed with the supported `foundation install --from CELL --sha
-05363939f7a2966bfc18123340ede2653e153562` into an isolated runtime HOME at
+a99b5773b3429d286108aec2b5f16e04e7e40a40` into an isolated runtime HOME at
 `/home/trmd/.config/foundation-share/data/runtime-home`. The node's ordinary
-Foundation launcher and gateway registry were not replaced. This is an interim
-revision pending H2's independent relay-hint fix before the two-host measurement.
+Foundation launcher and gateway registry were not replaced. This integrated revision includes the independently reviewed H2 relay-hint fix.
+Both clients are pinned to the same revision before measurement.
 Comb was freshly cloned inside this Cell, checked out at
 `b73e9bb3ff5e8850a77f36a95df40428fc722891` and built with
 `cargo build -p combctl --bin comb-bridge --release`. Its installed executable is
@@ -205,3 +205,29 @@ restart, restoring that backup on failure. A stale service.json.new causes safe
 refusal: inspect the private file and ensure no activation is running before
 removing only that temporary file and retrying. This helper targets task member
 trmdy explicitly. Its real App execution is still pending App creation.
+
+## Integrated transport verification
+
+H2 author commits3c49364+723891d applied with git am without conflicts as
+`d163d5e`+`a99b577`. Reviewer af916bea (claude-opus-5-5) reviewed the author's
+exact hint delta and independently reran held-storage/control/all-relay-lost
+checks; no claim that the ops reviewer reviewed this delta. Our integrated
+share/sync run passes59tests/16files and root tsc, with separate exit receipts.
+
+The integrated actual-Comb held-storage drill on netcup-1 passes five visibility
+samples49–53ms, unchanged durable cursor before release, durable convergence
+after release, refusal/rotation/cryptographic negatives, outage and backup.
+Compact receipt packages/cli/performance/H3-held-netcup.json retains every sample.
+Its original collector hard-coded a metal3 series label; the compact receipt
+corrects only that metadata to netcup1, retaining the original raw receipt.
+This is local labelled-GitHub-stub recipe proof, not two-host/App acceptance.
+
+Performance-map drift now has zero unaccounted/dead entries. The original S5
+cross-host and capability startup receipts stay explicitly stale (four changed
+owner hashes); no old S5 timing is treated as the H3 baseline. Cold GitHub App
+setup/token refresh has explicit unmeasured gaps outside warm relay timing.
+
+Studio has completed real client GitHub identity/SSH share init against the
+labelled service19488, reaching shared epoch1. Metal-3 real same-account login
+succeeds but automatic key handover is under investigation. No two-host timing
+claim until both clients hold the key and run final daemons.
