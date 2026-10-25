@@ -84,6 +84,7 @@ if (command === "capture-code") {
     opt("--mode", "advisory")!,
     opt("--artifact-url", ".")!,
     { compareVerifyMs: Math.round(performance.now() - started) },
+    policy.environmentCauses,
   );
   await writeFile(path.join(out, "summary.md"), summary);
   if (process.env.GITHUB_STEP_SUMMARY)

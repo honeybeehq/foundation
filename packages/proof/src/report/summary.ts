@@ -12,6 +12,7 @@ export function jobSummary(
   mode: string,
   artifactUrl: string,
   timings: unknown,
+  environmentCauses: string[] = [],
 ) {
   const lines = [
     "# Design proof",
@@ -28,7 +29,10 @@ export function jobSummary(
   for (const a of verification.accepted ?? [])
     lines.push(`- ${cell(a.state)}: ${cell(a.id)} — ${cell(a.reason)}`);
   if (!verification.accepted?.length) lines.push("None.");
-  lines.push("", "Candidate groups need review; their count is not a count of confirmed product bugs.");
+  lines.push(
+    "",
+    "Candidate groups need review; their count is not a count of confirmed product bugs.",
+  );
   for (const r of reports) {
     lines.push("", `## ${cell(r.state)}`);
     if (!r.provable) {
@@ -36,7 +40,10 @@ export function jobSummary(
       continue;
     }
     lines.push(
+      `Accepted pixel bounds exclude ${((r.acceptedPixels?.excludedRatio ?? 0) * 100).toFixed(3)}% of the image; residual difference outside them: ${((r.acceptedPixels?.residualRatio ?? r.pixels.diffRatio) * 100).toFixed(3)}%. Allowlisted environment groups: ${defectsOf(r).filter((d) => d.classification === "environment" && environmentCauses.includes(d.cause)).length}; unreviewed environment groups: ${defectsOf(r).filter((d) => d.classification === "environment" && !environmentCauses.includes(d.cause)).length}.`,
       `Images: [Design](${artifactUrl}) (\`${cell(r.state)}/design.png\`), [Code](${artifactUrl}) (\`${cell(r.state)}/code.png\`), [Diff](${artifactUrl}) (\`${cell(r.state)}/diff.png\`). Links download the image artifact.`,
+      "",
+      `<details><summary>Candidate table (${defectsOf(r).length} groups, including uncertain/environment groups)</summary>`,
       "",
       "| Layer (design → code) | What differs | Design → code values | Status |",
       "|---|---|---|---|",
@@ -53,8 +60,9 @@ export function jobSummary(
           )
           .join(
             "; ",
-          )} | ${d.accepted ? `Accepted: ${cell(d.accepted.reason)}` : d.classification === "environment" ? "Environment" : d.classification === "uncertain" ? "Uncertain" : "Drift"} |`,
+          )} | ${d.accepted ? `Accepted: ${cell(d.accepted.reason)}` : d.classification === "environment" ? (environmentCauses.includes(d.cause) ? "Allowlisted environment" : "Unreviewed environment") : d.classification === "uncertain" ? "Uncertain" : "Drift"} |`,
       );
+    lines.push("", "</details>");
   }
   lines.push(
     "",

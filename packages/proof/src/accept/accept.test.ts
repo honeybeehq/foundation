@@ -1,4 +1,5 @@
 import { test, expect } from "vitest";
+import { PNG } from "pngjs";
 import {
   makeAcceptance,
   emptyList,
@@ -9,6 +10,7 @@ import {
 } from "./index.ts";
 const report = () => ({
   provable: true,
+  acceptancePixelHashes: { f1: "f".repeat(64) },
   code: { root: "component.tsx#View" },
   artboard: "tracks",
   state: "empty",
@@ -181,8 +183,24 @@ test("same-box extra subtree content change makes acceptance stale", async () =>
     tag: "span",
     text: "Before",
   };
-  const design = { nodes: [], meta: {}, screenshot: Buffer.alloc(0) },
-    code = { nodes: [n, child], meta: {}, screenshot: Buffer.alloc(0) };
+  const design = {
+      nodes: [],
+      meta: {},
+      screenshot: (() => {
+        const p = new PNG({ width: 100, height: 100 });
+        p.data.fill(255);
+        return PNG.sync.write(p);
+      })(),
+    },
+    code = {
+      nodes: [n, child],
+      meta: {},
+      screenshot: (() => {
+        const p = new PNG({ width: 100, height: 100 });
+        p.data.fill(255);
+        return PNG.sync.write(p);
+      })(),
+    };
   expect(() => makeAcceptance(r, "f1", "Keep subtree", "Reviewer")).toThrow(
     "without captured contents",
   );
@@ -213,6 +231,32 @@ test("a different linked component invalidates acceptance", () => {
   const r = report();
   r.code.root = "different.tsx#View";
   expect(evaluateAccepted(r, accepted()).errors[0]).toContain(
+    "code or measured value changed",
+  );
+});
+
+test("invisible DOM pixel changes inside accepted bounds make acceptance stale", async () => {
+  const { withAcceptanceInputs } = await import("./index.ts");
+  const r: any = report();
+  r.drifts[0].designBox = [0, 0, 20, 20];
+  r.drifts[0].codeBox = [0, 0, 20, 20];
+  const image = new PNG({ width: 100, height: 100 });
+  image.data.fill(255);
+  const capture = () => ({
+    nodes: [],
+    meta: {},
+    screenshot: PNG.sync.write(image),
+  });
+  const design = capture(),
+    before = withAcceptanceInputs(r, { design, code: capture() });
+  const list = {
+    schema: "fdn-accepted/0" as const,
+    entries: [makeAcceptance(before, "f1", "Keep text", "Reviewer")],
+  };
+  image.data[0] = 0;
+  const after = withAcceptanceInputs(r, { design, code: capture() });
+  expect(after.drifts).toEqual(before.drifts);
+  expect(evaluateAccepted(after, list).errors[0]).toContain(
     "code or measured value changed",
   );
 });
