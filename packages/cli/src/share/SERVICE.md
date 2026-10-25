@@ -13,7 +13,7 @@ task; this change starts no permanent service.
   "allowedRepoOwners": ["honeybeehq"],
   "stateDir": "/var/lib/foundation-share/metadata",
   "comb": {"binary": "/opt/comb-bridge", "args": ["--dir", "/etc/foundation-comb"]},
-  "githubPermissionToken": "METADATA_ONLY_GITHUB_APP_INSTALLATION_TOKEN",
+  "githubAppConfig": "/home/share/.config/foundation-share/github-app.json",
   "oauthClientId": "OPTIONAL_OAUTH_APP_DEVICE_FLOW_CLIENT_ID",
   "backupLocalStore": "/var/lib/foundation-share/objects"
 }
@@ -23,9 +23,12 @@ Protect this file with 0600 permissions. The GitHub App must have repository
 Metadata read plus Single file read limited to exactly `.foundation/share.json`,
 no Contents access, and be installed on the selected repos. `publicUrl` pins the
 public HTTPS origin even behind a loopback proxy. Optional `allowedRepoOwners`
-restricts this deployment to named GitHub owners at challenge and every access. Supply
-and renew its short-lived installation token through operator config and restart
-the service when it changes. The optional OAuth App needs device flow enabled;
+restricts this deployment to named GitHub owners at challenge and every access.
+Set githubAppConfig to the absolute private 0600 JSON path. The service mints
+repository-scoped installation tokens with only Metadata and the pinned single
+file permission, refreshing before expiry. Restart after rotating the App key or
+accepting new permissions. Static githubPermissionToken remains for test fixtures.
+The optional OAuth App needs device flow enabled;
 its client id enables local client sign-in. User GitHub tokens never reach this
 service, including when the client uses gh. A client signs a single-use 60-second
 nonce with its device key; the service verifies its SSH attestation against GitHub

@@ -1,10 +1,11 @@
 import { createServer, type ServerResponse } from 'node:http'
 import { createHash, randomBytes } from 'node:crypto'
 import { mkdir, cp, writeFile, rm } from 'node:fs/promises'
-import { resolve, join, sep } from 'node:path'
+import { resolve, join, sep, isAbsolute } from 'node:path'
 import { acquireDocumentLock } from '../document-lock.js'
 import { CombBridge, validateAppendReceipt, type Frame } from '../sync/bridge.js'
 import { serviceUrl } from './config.js'
+import { readGithubAppConfig } from './github-app.js'
 import { ShareAuth, ShareAuthError, type PublicAccess } from './auth.js'
 import {
   ShareServiceStore,
@@ -24,7 +25,9 @@ export interface ShareServiceConfig {
   oauthClientId?: string
   /** Complete stopped local backend snapshot for nightly backup. */
   backupLocalStore?: string
-  /** Operator-owned GitHub App installation token: repository Metadata read only. */
+  /** Absolute path to private GitHub App config; tokens mint and refresh per repository. */
+  githubAppConfig?: string
+  /** Test-only static GitHub App installation token: repository Metadata read only. */
   githubPermissionToken?: string
   /** DEVELOPMENT ONLY: GitHub stub on a literal loopback address. Never a remote API override. */
   githubApiUrl?: string
@@ -153,6 +156,11 @@ interface Token {
 const active = new Set<string>()
 
 export async function startShareService(config: ShareServiceConfig) {
+  if (config.githubAppConfig) {
+    requireThat(isAbsolute(config.githubAppConfig), 'githubAppConfig must be an absolute path')
+    requireThat(!config.githubPermissionToken && !config.githubApiUrl, 'githubAppConfig cannot be combined with static token or development stub')
+    await readGithubAppConfig(config.githubAppConfig)
+  }
   if (!config.githubApiUrl && !config.publicUrl) throw new Error('publicUrl is required for a production share service')
   let publicOrigin = config.publicUrl ? serviceUrl(config.publicUrl) : ''
   if (publicOrigin && !config.githubApiUrl && !publicOrigin.startsWith('https://')) throw new Error('production publicUrl requires HTTPS')
