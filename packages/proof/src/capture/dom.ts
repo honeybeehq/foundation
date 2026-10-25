@@ -1,19 +1,8 @@
 import type { Page } from 'playwright'
 
-export const STYLE_PROPERTIES = [
-  'display', 'visibility', 'position', 'box-sizing', 'overflow-x', 'overflow-y',
-  'color', 'background-color', 'opacity', 'font-family', 'font-size', 'font-weight',
-  'font-style', 'line-height', 'letter-spacing', 'text-align', 'text-decoration-line',
-  'white-space', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
-  'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'border-top-width',
-  'border-right-width', 'border-bottom-width', 'border-left-width', 'border-top-color',
-  'border-right-color', 'border-bottom-color', 'border-left-color', 'border-top-style',
-  'border-top-left-radius', 'border-top-right-radius', 'border-bottom-left-radius',
-  'border-bottom-right-radius', 'box-shadow', 'gap', 'row-gap', 'column-gap',
-  'flex-direction', 'align-items', 'justify-content', 'flex-grow', 'flex-shrink',
-  'background-image', 'text-shadow', 'text-transform', 'border-right-style',
-  'border-bottom-style', 'border-left-style',
-] as const
+import { properties } from '../compare/style.js'
+
+export const STYLE_PROPERTIES = properties
 
 export async function collectDom(page: Page, root: string) {
   return page.evaluate(({ root, properties }) => {
