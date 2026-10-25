@@ -1,6 +1,6 @@
 /** Build a stamped, explicitly selected test runtime without installing into HOME. */
 import { build } from 'esbuild'
-import { mkdirSync, readdirSync, symlinkSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readdirSync, writeFileSync } from 'node:fs'
 import { isAbsolute, join } from 'node:path'
 import { sourceRoot, runtimeVersion } from '../src/runtime-version.js'
 const out = process.argv[2]
@@ -20,6 +20,5 @@ if [ "$1" = doctor ]; then
 fi
 exec ${quote(process.execPath)} ${quote(join(sourceRoot, 'node_modules/tsx/dist/cli.mjs'))} ${quote(join(sourceRoot, 'packages/cli/src/main.ts'))} "$@"
 `, { mode: 0o755, flag: 'wx' })
-symlinkSync(join(sourceRoot, 'packages'), join(out, 'packages'), 'dir')
 writeFileSync(join(out, 'foundation-install.json'), JSON.stringify({ kind: 'isolated-source-runtime', runtime, sourceRoot, builtAt: new Date().toISOString() }, null, 2), { flag: 'wx' })
 console.log(JSON.stringify({ kind: 'isolated-source-runtime', path: join(out, 'foundation'), sourceSha: runtime.sourceSha, dirty: runtime.dirty }))

@@ -5,10 +5,10 @@ import { afterEach, expect, it, vi } from 'vitest'
 import { createChain } from 'foundation-engine'
 import { skeletonDocument } from '../src/commands/new.js'
 import type { CatalogueRecord } from '../src/sync/catalogue.js'
-import { activityBatch, catalogueCachePath, catalogueSnapshot, foldCatalogue, initializeActivityJournal, newCatalogueCache, persistModel, readCatalogueCache, recordActivity } from '../src/sync/local-model.js'
+import { activityBatch, catalogueCachePath, catalogueSnapshot, foldCatalogue, initializeActivityJournal, flushActivityJournal, recordCatalogueContact, newCatalogueCache, persistModel, readCatalogueCache, recordActivity } from '../src/sync/local-model.js'
 
 let root: string
-afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); if (root) rmSync(root, { recursive: true, force: true }) })
+afterEach(() => { flushActivityJournal();vi.unstubAllEnvs(); vi.unstubAllGlobals(); if (root) rmSync(root, { recursive: true, force: true }) })
 function setup() { root = mkdtempSync(join(tmpdir(), 'sync-local-model-')); vi.stubEnv('FOUNDATION_REPLICA_STORE', join(root, 'store')) }
 const record = (node = 'metal-3', generation = 1, deleted = false): CatalogueRecord => ({ version: 1, workspaceId: 'w', productId: 'p', docId: 'doc', repoRelativePath: 'design/board.fdn.html', title: 'Private draft', originNode: { id: node, name: node }, replicaId: 'replica', generation, headHash: 'a'.repeat(64), lastAuthor: 'author', lastWallTime: null, lastAgentEdit: null, deleted })
 
@@ -48,18 +48,36 @@ it('persists cross-copy hash dedup and resumes validated facts without upgrading
   const design = { docId: 'doc', workspace: 'w', product: 'p', file: join(root, 'board.fdn.html') }
   const options = { ownerNodeId: 'Studio', repo: 'github.com/team/repo', delivery: 'baseline' as const }
   recordActivity(design, chain, [chain.head().hash], options)
+  flushActivityJournal()
   const baseline = activityBatch(undefined, 'w')
   expect(baseline.events).toHaveLength(1)
   expect(baseline.events[0]!.source).toBe('local')
   expect(baseline.events[0]).toMatchObject({ delivery: 'baseline', originNode: null, originAssurance: null, signatureVerified: false, entry: { originNode: null, boardKeys: [] } })
-  const bytes = readFileSync(join(root, 'store/read-model/activity.json'))
+  const bytes = readFileSync(join(root, 'store/read-model/activity-index.json'))
   recordActivity({ ...design, file: '/another-copy' }, chain, [chain.head().hash], { ...options, delivery: 'live', signatureVerified: true })
-  expect(readFileSync(join(root, 'store/read-model/activity.json'))).toEqual(bytes)
+  flushActivityJournal()
+  expect(readFileSync(join(root, 'store/read-model/activity-index.json'))).toEqual(bytes)
   chain.apply({ author: 'agent:writer', message: 'edit', originNode: 'metal-3', wallTime: new Date().toISOString() }, [{ op: 'set-text', id: 'n1', text: 'Changed' }])
   recordActivity(design, chain, [chain.head().hash], { ...options, delivery: 'live', signatureVerified: true, source: 'import' })
+  flushActivityJournal()
   const resumed = activityBatch(baseline.cursor, 'w')
   expect(resumed.events).toHaveLength(1)
   expect(resumed.events[0]).toMatchObject({ source: 'import', document: { ownerNodeId: 'Studio' }, originNode: { id: 'metal-3' }, originAssurance: 'writer-stated', signatureVerified: true, entry: { nodes: { changed: ['n1'] }, nodeIds: ['n1'], factsComplete: true } })
   expect(activityBatch(resumed.cursor, 'w').events).toEqual([])
   expect(() => activityBatch('sync-activity1:foreign:0')).toThrow('stale activity cursor')
+})
+
+it('reports quarantine warnings without pinning freshness stale and excludes stopped repos from the contact minimum', () => {
+  setup()
+  const active=newCatalogueCache('sp_active','github.com/team/active','/active')
+  foldCatalogue(active,record());foldCatalogue(active,{...record(),version:99})
+  persistModel(catalogueCachePath(active.space),active)
+  recordCatalogueContact(active.space,{following:true,lastContactAt:Date.now(),error:null})
+  const stopped=newCatalogueCache('sp_stopped','github.com/team/stopped','/stopped')
+  foldCatalogue(stopped,{...record('old'),docId:'older'})
+  persistModel(catalogueCachePath(stopped.space),stopped)
+  recordCatalogueContact(stopped.space,{following:false,lastContactAt:1,error:'stopped'})
+  const value=catalogueSnapshot('w')
+  expect(value.records).toHaveLength(2);expect(value.errors.length).toBeGreaterThan(0)
+  expect(value.freshness.state).toBe('fresh');expect(value.freshness.lastContactAt).toBeGreaterThan(1)
 })

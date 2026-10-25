@@ -1,0 +1,136 @@
+{
+  "protocolVersion": 1,
+  "id": "local-activity-journal",
+  "title": "Local activity notice with ten thousand cached facts",
+  "lane": "streaming",
+  "processes": [
+    "main"
+  ],
+  "owners": [
+    "packages/cli/src/sync/activity-journal.ts@1e5a9d56f568c4b14173c9b9b053d0aed95b8c9c"
+  ],
+  "effect": {
+    "user": "Activity metadata storage does not hold the live import/hint callback while rewriting retained history.",
+    "assertions": [
+      "A new validated fact becomes durable after queued flush",
+      "A fact older than the retained tail is not emitted twice, as live or baseline",
+      "Cached fact payload retention stays at or below10000 rows"
+    ],
+    "exclusions": [
+      "UI paint",
+      "Cross-host latency",
+      "Machine attestation",
+      "Real GitHub permission checks"
+    ]
+  },
+  "accounts": [
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/sync/activity-journal.ts:recordActivity"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/sync/activity-journal.ts:activityBatch"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/sync/activity-journal.ts:flushActivityJournal"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/sync/activity-journal.ts:initializeActivityJournal"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/sync/activity-journal.ts:closeActivityJournal"
+    }
+  ],
+  "states": {
+    "idle": {
+      "matters": false,
+      "why": "Outside this bounded local recipe"
+    },
+    "first-use": {
+      "matters": false,
+      "why": "Outside this bounded local recipe"
+    },
+    "repeated": {
+      "matters": true,
+      "why": "Declared local ten-thousand-fact storage recipe"
+    },
+    "scale": {
+      "matters": true,
+      "why": "Declared local ten-thousand-fact storage recipe"
+    },
+    "background": {
+      "matters": false,
+      "why": "Outside this bounded local recipe"
+    },
+    "release": {
+      "matters": false,
+      "why": "Outside this bounded local recipe"
+    },
+    "recovery": {
+      "matters": false,
+      "why": "Outside this bounded local recipe"
+    }
+  },
+  "fixture": {
+    "preset": "10000 synthetic cached fact bodies and five real engine envelope edits; private local state",
+    "isolationPolicy": 1,
+    "scaleAxes": [
+      {
+        "axis": "retained facts",
+        "values": [
+          10000
+        ],
+        "unit": "rows"
+      }
+    ]
+  },
+  "recipe": {
+    "driver": "journal-proof.ts",
+    "command": "FOUNDATION_JOURNAL_RECEIPT=/absolute/receipt.json pnpm exec tsx packages/cli/scripts/journal-proof.ts",
+    "readiness": "Initialized private journal; no network or credentials",
+    "completion": "Five new notices persist, old evicted hash stays deduplicated",
+    "reset": "Fresh private replica store per run",
+    "teardown": "Retain receipts; no service or children started",
+    "serial": true,
+    "requires": [
+      "Node/tsx"
+    ]
+  },
+  "metrics": [
+    {
+      "id": "journalNoticeMax",
+      "unit": "ms",
+      "scope": "Synchronous recordActivity callback at10000 cached facts; flush measured separately",
+      "collector": "performance.now around real engine notice; no profiling",
+      "aggregation": "max",
+      "kind": "upper-bound",
+      "status": "recipe-only",
+      "states": [
+        "repeated",
+        "scale"
+      ],
+      "betterWhen": "lower",
+      "budget": {
+        "value": 10,
+        "unit": "ms",
+        "comparator": "<=",
+        "status": "proposed",
+        "source": "Local engineering gate after reviewer measured60ms whole-journal rewrite",
+        "condition": "Five notices on declared local shared-host fixture; not a population SLO"
+      },
+      "invariant": "An evicted old hash emits neither duplicate live nor baseline facts and retained payload rows stay bounded.",
+      "noise": "Shared metal-3 host; local recipe only"
+    }
+  ],
+  "linked": [],
+  "gaps": [
+    "Cross-host source and presence latency are measured separately by S7 integration"
+  ],
+  "updatedAt": "2026-10-25",
+  "updatedBy": "S7f",
+  "readiness": "Recipe declared before append-segment fix; baseline source0a014bd."
+}

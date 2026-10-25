@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { readFileSync, statSync } from 'node:fs'
 import { loadChain } from 'foundation-engine'
 import { liveDesigns } from '../sync-store.js'
 import { readVault } from '../share/vault.js'
@@ -6,7 +6,7 @@ import { findShareRoot, readShareConfig, type ShareConfig } from '../share/confi
 import { createBridge } from '../share/transport.js'
 import { dirname } from 'node:path'
 import { catalogueLog } from './catalogue.js'
-import { catalogueCachePath, foldCatalogue, persistModel, readCatalogueCache } from './local-model.js'
+import { catalogueCachePath, foldCatalogue, persistModel, readCatalogueCache, recordCatalogueContact } from './local-model.js'
 import type { CombConfig } from './daemon.js'
 
 const wait = async (signal: AbortSignal): Promise<void> => {
@@ -20,7 +20,14 @@ async function follow(root: string, share: ShareConfig, signal: AbortSignal): Pr
   const cache = readCatalogueCache(share.space, share.repo, root)
   const log = catalogueLog('catalogue') // Share transport uses the repo-wide logical catalogue address.
   let reader = createBridge({ binary: '', args: [], share, shareLog: 'foundation-share-catalogue-v1' })
-  const checkpoint = (): void => persistModel(catalogueCachePath(share.space), cache)
+  let saved=''
+  const localHeads=new Map<string,{signature:string;docId:string|null;headHash:string}>()
+  const checkpoint = (): void => {
+    const value=JSON.stringify([cache.cursor,cache.records,cache.localReplicas,cache.errors,cache.repoRoot])
+    if(value===saved)return
+    persistModel(catalogueCachePath(share.space),cache);saved=value
+  }
+  const contact=(following=true):void=>recordCatalogueContact(share.space,{following,lastContactAt:cache.lastContactAt,error:cache.error})
   try {
     checkpoint()
     while (!signal.aborted) {
@@ -28,11 +35,14 @@ async function follow(root: string, share: ShareConfig, signal: AbortSignal): Pr
           try {
             const repoRoot = design.repoRoot ?? findShareRoot(dirname(design.file))
             if (repoRoot !== root) return []
-            const chain = loadChain(readFileSync(`${design.file}.chain`))
-            if (chain.docId() !== design.docId) return []
-            return [{ workspaceId: design.workspace, productId: design.product, docId: design.docId, path: design.file, repoPath: root, headHash: chain.head().hash }]
+            const path=`${design.file}.chain`,stat=statSync(path),signature=JSON.stringify([stat.ino,stat.mtimeMs,stat.size])
+            let head=localHeads.get(path)
+            if(head?.signature!==signature){const chain=loadChain(readFileSync(path));head={signature,docId:chain.docId(),headHash:chain.head().hash};localHeads.set(path,head)}
+            if (head.docId !== design.docId) return []
+            return [{ workspaceId: design.workspace, productId: design.product, docId: design.docId, path: design.file, repoPath: root, headHash: head.headHash }]
           } catch { return [] }
-        })
+        }).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b)))
+        const paths=new Set(cache.localReplicas.map(r=>r.path+'.chain'));for(const path of localHeads.keys())if(!paths.has(path))localHeads.delete(path)
 
       try {
         await reader.hello()
@@ -52,15 +62,15 @@ async function follow(root: string, share: ShareConfig, signal: AbortSignal): Pr
           if (page.next_cursor !== String(cursor)) throw new Error('catalogue next cursor mismatch')
           cache.cursor = String(cursor); checkpoint()
         }
-        cache.lastContactAt = Date.now(); cache.error = null; checkpoint()
+        cache.lastContactAt = Date.now(); cache.error = null; checkpoint();contact()
       } catch (error) {
-        cache.error = error instanceof Error ? error.message : String(error); checkpoint()
+        cache.error = error instanceof Error ? error.message : String(error); checkpoint();contact()
         reader.close(); reader = createBridge({ binary: '', args: [], share, shareLog: 'foundation-share-catalogue-v1' })
       }
       await wait(signal)
     }
   } finally {
-    reader.close(); cache.error = 'local catalogue follower stopped'; checkpoint()
+    reader.close(); cache.error = 'local catalogue follower stopped'; contact(false)
   }
 }
 /** Network work belongs to daemon-owned per-repo workers, never the catalogue read command. */

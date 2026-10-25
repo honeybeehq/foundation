@@ -52,17 +52,19 @@ export function materializeConfig(root: string, configFile?: string): CombConfig
     return config
   }
   const share = readShareConfig(root)
-  if (!share) throw new MaterializeError('history-unavailable', 'repository has no live sharing configuration')
+  if (!share) throw new MaterializeError('unavailable', 'repository has no live sharing configuration')
   return { binary: '', args: [], share }
 }
 /** One daemon owns this journal. Each explicit request settles once, including typed refusals. */
 export async function processMaterializeJobs(signal: AbortSignal, log: (message: string) => void): Promise<void> {
+  const reported=new Set<string>()
   while (!signal.aborted) {
     try {
       let files: string[] = []
       try { files = readdirSync(requestDir()).filter(f => /^[a-f0-9]{64}\.json$/.test(f)) } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error }
       for (const file of files) {
         if (signal.aborted) break
+        try {
         const job = JSON.parse(readFileSync(join(requestDir(), file), 'utf8')) as Job
         if (job.version !== 1 || typeof job.requestKey !== 'string' || !job.request || file !== `${keyHash(job.requestKey)}.json`) throw new Error('invalid queued materialize request')
         if (materializeStatus(job.requestKey).state !== 'pending') continue
@@ -71,9 +73,10 @@ export async function processMaterializeJobs(signal: AbortSignal, log: (message:
           const ready = await materialize(job.request, materializeConfig(job.request.checkoutRoot, job.configFile))
           result = { ...ready, version: 1, requestKey: job.requestKey }
         } catch (error) {
-          result = { version: 1, requestKey: job.requestKey, state: 'refused', code: error instanceof MaterializeError ? error.code : 'history-unavailable', message: error instanceof Error ? error.message : String(error), ...(error instanceof MaterializeError && error.path ? { path: error.path } : {}) }
+          result = { version: 1, requestKey: job.requestKey, state: 'refused', code: error instanceof MaterializeError ? error.code : 'unavailable', message: error instanceof Error ? error.message : String(error), ...(error instanceof MaterializeError && error.path ? { path: error.path } : {}) }
         }
         persistModel(resultPath(job.requestKey), result)
+        } catch { if(!reported.has(file)){log(`materialize request ${file}: invalid local request/result; retry with a new key`);reported.add(file);if(reported.size>1000)reported.delete(reported.values().next().value!)} }
       }
     } catch (error) { log(`materialize jobs: ${String(error)}`) }
     if (!signal.aborted) await new Promise<void>(done => {

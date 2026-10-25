@@ -11,7 +11,7 @@ import { registerDesign, liveDesigns, statePath, writeSyncState } from '../sync-
 import { findShareRoot } from '../share/config.js'
 
 export class MaterializeError extends Error {
-  constructor(public code: 'path-conflict' | 'product-unavailable' | 'history-unavailable' | 'deleted-source' | 'invalid-history' | 'invalid-path' | 'local-io' | 'registration-failed', message: string, public path?: string) { super(message) }
+  constructor(public code: 'unavailable' | 'path-conflict' | 'product-unavailable' | 'history-unavailable' | 'deleted-source' | 'invalid-history' | 'invalid-path' | 'local-io' | 'registration-failed', message: string, public path?: string) { super(message) }
 }
 export interface MaterializeRequest {
   workspaceId: string
@@ -94,6 +94,7 @@ export async function materialize(request: MaterializeRequest, config: CombConfi
           return { state: 'ready' as const, workspaceId: request.workspaceId, productId: request.productId, docId: request.docId, path: file, repoPath: root, headHash: chain.head().hash, requestKey: request.requestKey ?? null, fromCache: true }
         } catch (error) {
           if (error instanceof MaterializeError) throw error
+          if (String(error).includes('path-conflict:')) throw new MaterializeError('path-conflict',String(error),file)
           if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw new MaterializeError('local-io', String(error), file)
         }
       }
@@ -157,6 +158,6 @@ export async function materialize(request: MaterializeRequest, config: CombConfi
     return { state: 'ready' as const, workspaceId: request.workspaceId, productId: request.productId, docId: request.docId, path: file, repoPath: root, headHash: chain.head().hash, requestKey: request.requestKey ?? null }
   } catch (err) {
     if (err instanceof MaterializeError) throw err
-    throw new MaterializeError(stage === 'history' ? 'history-unavailable' : stage === 'registration' ? 'registration-failed' : 'local-io', String(err), savedPath)
+    throw new MaterializeError(stage === 'history' ? 'unavailable' : stage === 'registration' ? 'registration-failed' : 'local-io', String(err), savedPath)
   } finally { bridge.close() }
 }

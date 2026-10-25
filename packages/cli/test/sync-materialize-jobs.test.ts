@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from 'node:fs'
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, expect, it, vi } from 'vitest'
@@ -15,6 +15,8 @@ it('accepts idempotently without network and settles missing-checkout refusal in
   expect(() => acceptMaterialize({ ...request, targetPath: 'other.fdn.html' })).toThrow('different materialization')
   expect(materializeStatus(request.requestKey).state).toBe('pending')
   expect(fetcher).not.toHaveBeenCalled()
+  mkdirSync(join(root,'store/read-model/materialize/requests'),{recursive:true})
+  writeFileSync(join(root,'store/read-model/materialize/requests','0'.repeat(64)+'.json'),'{broken')
   const controller = new AbortController(), run = processMaterializeJobs(controller.signal, () => {})
   try {
     const start = Date.now()
