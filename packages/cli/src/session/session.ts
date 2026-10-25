@@ -3,7 +3,7 @@ import { hasImageOperations, prepareImageOperations } from './images.js'
 import { listDocumentImages } from 'foundation-engine'
 import type { ImageImportResult } from 'foundation-protocol'
 import { legacyMessage, legacyBoardRef, legacyArtboardReason, legacyArtboardOpReason } from './legacy.js'
-import { ARTBOARD_FRAME_VERSION, ArtboardError, validateArtboards, explicitArtboards, artboardPages, boardViews, boardView, boardKey } from 'foundation-engine'
+import { ARTBOARD_FRAME_VERSION, ARTBOARD_TAGS, ArtboardError, validateArtboards, explicitArtboards, artboardPages, boardViews, boardView, boardKey } from 'foundation-engine'
 import type { BoardRef } from 'foundation-engine'
 import { bakeImpact, mergeBakeImpact, type BakeImpact } from './bake-impact.js'
 import { PlacementError } from './placement.js'
@@ -648,7 +648,8 @@ class DesignSession implements Session {
     let ops: PatchOp[]
     let singlePatch: ReturnType<typeof applyPatch> | undefined
     try {
-      if (message.ops.every((op): op is PatchOp => ['set-style', 'set-text', 'set-attr', 'set-style-ref', 'set-when'].includes(op.op))) {
+      const structuralNodes = explicitArtboards(this.doc) ? indexNodes(this.doc.body) : undefined
+      if (message.ops.every((op): op is PatchOp => ['set-style', 'set-text', 'set-attr', 'set-style-ref', 'set-when'].includes(op.op) && !('id' in op && ARTBOARD_TAGS.has(structuralNodes?.get(op.id)?.node.tag ?? '')))) {
         ops = message.ops
         singlePatch = applyPatch(this.doc, ops)
       } else {
