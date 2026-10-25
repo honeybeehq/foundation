@@ -3,7 +3,7 @@ import { mkdir, open, realpath, stat, unlink } from 'node:fs/promises'
 import { dirname, isAbsolute, join, resolve } from 'node:path'
 import { flagString, parseArgs } from '../argv.js'
 import type { CliIO } from '../io.js'
-import { checkContentsRefusal, defaultGithubAppPath, githubJson, githubRepo, githubRequest, mintMetadataToken, parseGithubAppConfig, readGithubAppConfig } from '../share/github-app.js'
+import { checkContentsRefusal, checkSingleFileRead, defaultGithubAppPath, githubJson, githubRepo, githubRequest, mintMetadataToken, parseGithubAppConfig, readGithubAppConfig } from '../share/github-app.js'
 
 async function outsideRepo(path: string): Promise<string> {
   const absolute = resolve(path)
@@ -47,7 +47,7 @@ export async function finishGithubApp(code: string, out: string, fetcher: typeof
 export async function runShareGithubApp(args: string[], io: CliIO): Promise<number> {
   const { positionals, flags } = parseArgs(args)
   const command = positionals[0]
-  const usage = 'foundation share github-app finish --code CODE [--out ~/.foundation/share-service/github-app.json]\nfoundation share github-app check --user LOGIN [--config PATH] [--repo honeybeehq/foundation]'
+  const usage = 'foundation share github-app finish --code CODE [--out ~/.foundation/share-service/github-app.json]\nfoundation share github-app check --user LOGIN [--config PATH] [--repo honeybeehq/foundation] [--single-file]'
   if (flags.help || !command) { io.stdout(usage); return flags.help ? 0 : 2 }
   try {
     if (command === 'finish') {
@@ -64,12 +64,14 @@ export async function runShareGithubApp(args: string[], io: CliIO): Promise<numb
       const configPath = flagString(flags, 'config') ?? defaultGithubAppPath
       if (!isAbsolute(configPath)) throw new Error('--config must be an absolute private path')
       const config = await readGithubAppConfig(configPath)
-      const { token } = await mintMetadataToken(repo, config)
+      const { token, singleFile } = await mintMetadataToken(repo, config)
+      if (flags['single-file'] && !singleFile) throw new Error('Enable Single file: read for .foundation/share.json in App settings, then accept the updated installation permissions')
       const metadata = await githubJson(await githubRequest(`/repos/${repo}/collaborators/${encodeURIComponent(user)}/permission`, token))
       if (typeof metadata.permission !== 'string') throw new Error('GitHub returned no user permission')
       io.stdout(`Metadata allowed: ${user} on ${repo}: ${metadata.permission}`)
+      if (singleFile) io.stdout(await checkSingleFileRead(repo, token))
       io.stdout(await checkContentsRefusal(repo, config, token))
-      io.stdout('App permissions verified: Metadata read only; no Contents. Installation token minted successfully.')
+      io.stdout(singleFile ? 'App permissions verified: Metadata read and Single file read limited to .foundation/share.json; no Contents.' : 'App permissions verified: Metadata read only; no Contents. Installation token minted successfully.')
       return 0
     }
     throw new Error(usage)

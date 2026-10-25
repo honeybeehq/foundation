@@ -63,24 +63,49 @@ export async function githubJson(response: Response): Promise<Record<string, unk
   } catch { throw new Error('GitHub returned an invalid response') }
 }
 
-export function requireMetadataOnly(permissions: unknown): void {
-  if (!permissions || typeof permissions !== 'object' || Array.isArray(permissions) || Object.entries(permissions).some(([key, value]) => key !== 'metadata' || value !== 'read') || (permissions as Record<string, unknown>).metadata !== 'read') throw new Error('GitHub App must have only Metadata: read permission; remove all other permissions')
+export const shareDescriptorPath = '.foundation/share.json'
+
+export function requireSharePermissions(permissions: unknown): boolean {
+  if (!permissions || typeof permissions !== 'object' || Array.isArray(permissions)) throw new Error('Invalid GitHub App permissions')
+  const grants = permissions as Record<string, unknown>
+  if (grants.metadata !== 'read' || Object.entries(grants).some(([key, value]) => !['metadata', 'single_file'].includes(key) || value !== 'read')) throw new Error('GitHub App may grant only Metadata: read and Single file: read; no Contents or other permissions')
+  return grants.single_file === 'read'
 }
 
-const tokens = new Map<string, { token: string; expires: number }>()
+export function requireDescriptorPath(installation: Record<string, unknown>): void {
+  const name = installation.single_file_name
+  const paths = installation.single_file_paths
+  if (installation.has_multiple_single_files === true || (name != null && name !== shareDescriptorPath) || (paths !== undefined && (!Array.isArray(paths) || paths.some(path => path !== shareDescriptorPath) || paths.length > 1)) || (name !== shareDescriptorPath && (!Array.isArray(paths) || paths.length !== 1))) throw new Error(`Single file permission must be limited to exactly ${shareDescriptorPath}`)
+}
 
-export async function mintMetadataToken(repo: string, config: GithubAppConfig, fetcher: typeof fetch = fetch): Promise<{ token: string; expires: number }> {
+const tokens = new Map<string, { token: string; expires: number; singleFile: boolean }>()
+
+export async function mintMetadataToken(repo: string, config: GithubAppConfig, fetcher: typeof fetch = fetch): Promise<{ token: string; expires: number; singleFile: boolean }> {
   const jwt = appJwt(config)
   const app = await githubJson(await githubRequest('/app', jwt, 'GET', undefined, fetcher))
-  requireMetadataOnly(app.permissions)
+  const appSingleFile = requireSharePermissions(app.permissions)
   const installation = await githubJson(await githubRequest(`/repos/${githubRepo(repo)}/installation`, jwt, 'GET', undefined, fetcher))
   if (!Number.isSafeInteger(installation.id)) throw new Error('GitHub returned an invalid installation')
-  requireMetadataOnly(installation.permissions)
-  const result = await githubJson(await githubRequest(`/app/installations/${installation.id}/access_tokens`, jwt, 'POST', { permissions: { metadata: 'read' }, repositories: [githubRepo(repo).split('/')[1]] }, fetcher))
-  requireMetadataOnly(result.permissions)
+  const singleFile = requireSharePermissions(installation.permissions)
+  if (singleFile && !appSingleFile) throw new Error('GitHub App and installation permissions disagree')
+  if (singleFile) requireDescriptorPath(installation)
+  const permissions = singleFile ? { metadata: 'read', single_file: 'read' } : { metadata: 'read' }
+  const result = await githubJson(await githubRequest(`/app/installations/${installation.id}/access_tokens`, jwt, 'POST', { permissions, repositories: [githubRepo(repo).split('/')[1]] }, fetcher))
+  if (requireSharePermissions(result.permissions) !== singleFile) throw new Error('Minted token permissions do not match requested permissions')
   const expires = typeof result.expires_at === 'string' ? Date.parse(result.expires_at) : NaN
   if (typeof result.token !== 'string' || !result.token || !Number.isFinite(expires) || expires <= Date.now() + 60_000) throw new Error('GitHub returned an invalid installation token')
-  return { token: result.token, expires }
+  return { token: result.token, expires, singleFile }
+}
+
+export async function checkSingleFileRead(repo: string, token: string, fetcher: typeof fetch = fetch): Promise<string> {
+  const result = await githubJson(await githubRequest(`/repos/${githubRepo(repo)}/contents/${shareDescriptorPath}`, token, 'GET', undefined, fetcher))
+  if (result.path !== shareDescriptorPath || result.type !== 'file' || result.encoding !== 'base64' || typeof result.content !== 'string' || typeof result.size !== 'number' || result.size > 65_536 || result.size <= 0 || result.content.length > 90_000) throw new Error('GitHub returned an invalid or oversized share descriptor')
+  const bytes = Buffer.from(result.content, 'base64')
+  if (bytes.length !== result.size) throw new Error('GitHub share descriptor size mismatch')
+  let descriptor: unknown
+  try { descriptor = JSON.parse(bytes.toString('utf8')) } catch { throw new Error('Committed share descriptor is not JSON') }
+  if (!descriptor || typeof descriptor !== 'object' || Array.isArray(descriptor) || (descriptor as Record<string, unknown>).version !== 1) throw new Error('Committed share descriptor must be a version 1 object')
+  return `Single file read allowed: ${shareDescriptorPath} on the default branch (HTTP 200)`
 }
 
 export async function metadataToken(repo: string, configPath: string): Promise<string> {
