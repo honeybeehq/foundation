@@ -1,3 +1,4 @@
+import { shareStateDir } from './share-path.js'
 import { createHash, randomUUID } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 import { chmodSync, closeSync, fsyncSync, lstatSync, openSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
@@ -10,7 +11,7 @@ import { acquireDocumentLock } from '../document-lock.js'
 function helper(): string {
   const source = join(sourceRoot, 'packages/cli/src/share/keychain-helper.swift')
   const digest = createHash('sha256').update(readFileSync(source)).digest('hex')
-  const parent = join(homedir(), '.foundation', 'share')
+  const parent = shareStateDir()
   const directory = join(parent, 'helpers')
   for (const path of [parent, directory]) {
     mkdirSync(path, { recursive: true, mode: 0o700 })
@@ -61,7 +62,7 @@ function helper(): string {
   }
 }
 function scope(keychain?: string): string {
-  return join(homedir(), '.foundation', 'share', `native-keychain-${createHash('sha256').update(keychain ?? 'default').digest('hex')}`)
+  return join(shareStateDir(), `native-keychain-${createHash('sha256').update(keychain ?? 'default').digest('hex')}`)
 }
 function observed(keychain?: string): boolean {
   try {
@@ -79,7 +80,7 @@ function markObserved(keychain?: string): void {
   try {
     const fd = openSync(scope(keychain) + '.json', 'wx', 0o600)
     try { writeFileSync(fd, '{"nativeSeen":true}\n'); fsyncSync(fd) } finally { closeSync(fd) }
-    const parent = openSync(join(homedir(), '.foundation', 'share'), 'r')
+    const parent = openSync(shareStateDir(), 'r')
     try { fsyncSync(parent) } finally { closeSync(parent) }
   }
   catch (error) { if ((error as NodeJS.ErrnoException).code !== 'EEXIST' || !observed(keychain)) throw error }

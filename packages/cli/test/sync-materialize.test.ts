@@ -1,14 +1,14 @@
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { afterEach, expect, it } from 'vitest'
+import { afterEach, expect, it, vi } from 'vitest'
 import { createChain } from 'foundation-engine'
 import { skeletonDocument } from '../src/commands/new.js'
 import { encodeBlob, importChangeBlobs, restoreChangeBlobs } from '../../engine/src/chain/blob.js'
 import { materializeDocument, updateDocument } from '../src/disk.js'
-import { materializePath } from '../src/sync/materialize.js'
+import { materialize, materializePath } from '../src/sync/materialize.js'
 let root: string | undefined
-afterEach(() => { if (root) rmSync(root, { recursive: true, force: true }) })
+afterEach(() => { vi.unstubAllEnvs(); if (root) rmSync(root, { recursive: true, force: true }) })
 const seed = () => createChain(skeletonDocument('Restore'), { author: 'seed', message: 'init' }, { docId: 'restore' })
 it('does not rewrite either file when a validated duplicate page arrives under the save lock', () => {
   root = mkdtempSync(join(tmpdir(), 'sync-duplicate-')); const file = join(root, 'board.fdn.html'), chain = seed()
@@ -56,4 +56,15 @@ it('confines paths, including symlink escapes', () => {
   symlinkSync(join(root, 'missing'), join(repo, 'dangling.fdn.html.chain'))
   expect(() => materializePath(repo, 'dangling.fdn.html')).toThrow('symlinks')
   symlinkSync(root, join(repo, 'escape')); expect(() => materializePath(repo, 'escape/file.fdn.html')).toThrow('symlink')
+})
+
+it('opens complete matching local history offline without a bridge or overwrite', async () => {
+  root = mkdtempSync(join(tmpdir(), 'materialize-offline-')); vi.stubEnv('FOUNDATION_REPLICA_STORE',join(root,'store'))
+  const file=join(root,'board.fdn.html'),chain=seed()
+  chain.upgradeStorage()
+  materializeDocument(file,chain)
+  const before=[readFileSync(file),readFileSync(file+'.chain')]
+  const result=await materialize({workspaceId:'w',productId:'p',docId:'restore',checkoutRoot:root,targetPath:'board.fdn.html',expectedHead:chain.head().hash},{binary:'/no-network-bridge',args:[]})
+  expect(result).toMatchObject({state:'ready',fromCache:true,docId:'restore',headHash:chain.head().hash})
+  expect([readFileSync(file),readFileSync(file+'.chain')]).toEqual(before)
 })

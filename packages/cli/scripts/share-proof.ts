@@ -23,6 +23,7 @@ import { decrypt, opaqueName, ready } from '../src/share/crypto.js'
 const root = mkdtempSync(resolve('.audit/share-run-')),
   main = resolve('packages/cli/src/main.ts'),
   binary = resolve(process.argv[2] ?? '.audit/comb-source/target/debug/comb-bridge')
+const localModelMode=process.argv.includes('--local-model')
 const heldMode = process.argv.includes('--held-store'),
   holdFile = join(root, 'hold-append'),
   heldFeed = join(root, 'held-feed'),
@@ -144,6 +145,7 @@ function cli(index: number, ...args: string[]): Promise<{ code: number; out: str
       env: {
         ...process.env,
         HOME: homes[index],
+        FOUNDATION_SHARE_STATE_DIR: join(homes[index]!,".foundation/share"),
         FOUNDATION_SHARE_TEST_GITHUB: github,
         FOUNDATION_REPLICA_STORE: join(homes[index]!, 'replicas'),
         FOUNDATION_NODE_ID: ids[index]
@@ -169,6 +171,7 @@ function daemon(index: number) {
     env: {
       ...process.env,
       HOME: homes[index],
+      FOUNDATION_SHARE_STATE_DIR: join(homes[index]!,".foundation/share"),
       FOUNDATION_SHARE_TEST_GITHUB: github,
       FOUNDATION_REPLICA_STORE: join(homes[index]!, 'replicas'),
       FOUNDATION_NODE_ID: ids[index]
@@ -178,6 +181,14 @@ function daemon(index: number) {
   children.push(child)
   child.stderr!.on('data', (d) => log(`daemon ${ids[index]}: ${String(d).trim()}`))
   return child
+}
+function activityFollow(index:number,workspace:string,cursor?:string) {
+  const records:any[]=[]
+  const child=spawn(process.execPath,['--import','tsx',main,'sync','activity','--workspace',workspace,'--follow','--json',...(cursor?['--cursor',cursor]:[])],{env:{...process.env,HOME:homes[index],FOUNDATION_SHARE_STATE_DIR:join(homes[index]!,".foundation/share"),FOUNDATION_SHARE_TEST_GITHUB:github,FOUNDATION_REPLICA_STORE:join(homes[index]!,'replicas'),FOUNDATION_NODE_ID:ids[index]},stdio:['ignore','pipe','pipe']})
+  children.push(child);let buffer=''
+  child.stdout!.on('data',chunk=>{buffer+=String(chunk);let end:number;while((end=buffer.indexOf('\n'))>=0){const line=buffer.slice(0,end);buffer=buffer.slice(end+1);if(line)records.push(JSON.parse(line))}})
+  child.stderr!.on('data',chunk=>log(`activity ${ids[index]}: ${String(chunk).trim()}`))
+  return {child,records}
 }
 async function until(check: () => boolean | Promise<boolean>, label: string, timeout = 20000) {
   const start = Date.now()
@@ -256,6 +267,8 @@ try {
     const rows = JSON.parse(await ok(0, 'sync', 'status', '--json'))
     return rows[0]?.status === 'shared'
   }, 'genesis durably acknowledged')
+  let activity:ReturnType<typeof activityFollow>|undefined
+  if(localModelMode){activity=activityFollow(1,'machine-B');await until(()=>activity!.records.some(r=>r.type==='ready'),'activity baseline caught-up marker');assert.ok(activity.records.filter(r=>r.entry).every(r=>r.delivery==='baseline'))}
   for (const [from, to, id, word] of [
     [0, 1, 'n1', 'SECRET-ALICE-TEXT'],
     [1, 0, 'n2', 'SECRET-BOB-TEXT']
@@ -274,6 +287,30 @@ try {
     const elapsed = Date.now() - saved
     log(`save-to-remote visibility ${ids[from]}: ${elapsed}ms`)
     assert.ok(elapsed < 1000, `sub-second visibility ${elapsed}`)
+  }
+  if(localModelMode) {
+    await until(()=>activity!.records.some(r=>r.entry?.author==='alice'&&r.delivery==='live'),'signed ephemeral hint yields live imported activity')
+    const event=activity!.records.find(r=>r.entry?.author==='alice'&&r.delivery==='live')
+    assert.equal(event.originNode.id,chain(0).log().find(e=>e.author==='alice')!.originNode);assert.equal(event.originAssurance,'writer-stated');assert.equal(event.signatureVerified,true)
+    assert.equal(event.document.ownerNodeId,'bob');assert.ok(event.entry.nodeIds.includes('n1'))
+    log(`ACTIVITY: signed writer-stated ${event.originNode.id} origin retained on bob-owned replica; touched n1; no owner substitution`)
+    const token=activity!.records.filter(r=>r.entry).at(-1).cursor
+    activity!.child.kill('SIGTERM')
+    const resumed=activityFollow(1,'machine-B',token)
+    await until(()=>resumed.records.some(r=>r.type==='ready'),'activity cursor resume caught-up marker')
+    assert.ok(resumed.records.filter(r=>r.entry).every(r=>r.delivery==='baseline'));resumed.child.kill('SIGTERM')
+    const snapshot=async()=>JSON.parse(await ok(1,'sync','catalogue','--workspace','machine-A','--json'))
+    await until(async()=>(await snapshot()).records.some((r:any)=>r.docId===chain(0).docId()),'remote-only catalogue persisted on second HOME')
+    const index=await snapshot(),record=index.records.find((r:any)=>r.docId===chain(0).docId())
+    assert.equal(index.version,1);assert.equal(index.localReplicas.length,0)
+    log(`CATALOGUE: cached remote-only row ${record.docId}; origin ${record.originNode.id}; revision ${index.revision}`)
+    const key='S7-open-'+record.docId
+    const accepted=JSON.parse(await ok(1,'sync','materialize',record.docId,'remote-open.fdn.html','--repo-root',repos[1]!,'--workspace','machine-A','--product','local-A','--source-replica',record.replicaId,'--expected-head',record.headHash,'--request-key',key,'--json','--accept'))
+    assert.equal(accepted.state,'accepted')
+    let settled:any
+    await until(async()=>{settled=JSON.parse(await ok(1,'sync','materialize-status',key,'--json'));if(settled.state==='refused')throw new Error(JSON.stringify(settled));return settled.state==='ready'},'encrypted materialization accepted then ready')
+    assert.equal(settled.path,join(repos[1]!,'remote-open.fdn.html'));assert.equal(loadChain(readFileSync(settled.path+'.chain')).docId(),record.docId)
+    log('MATERIALIZE: asynchronous accepted/ready; verified encrypted history; confined local path; original document identity')
   }
   if (heldMode) {
     await until(
@@ -503,6 +540,11 @@ try {
   const port = (service.server.address() as { port: number }).port
   await service.close()
   log('OUTAGE: service stopped')
+  if(localModelMode){
+    await until(async()=>JSON.parse(await ok(1,'sync','catalogue','--workspace','machine-A','--json')).freshness.state==='stale','catalogue marks service outage stale')
+    const cached=JSON.parse(await ok(1,'sync','catalogue','--workspace','machine-A','--json'))
+    assert.ok(cached.records.length>0);log('OFFLINE CACHE: cached remote rows retained; read succeeds with service stopped, no scan/network wait')
+  }
   await ok(
     0,
     'edit',

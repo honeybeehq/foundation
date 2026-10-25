@@ -1,7 +1,7 @@
+import { shareStateDir } from './share-path.js'
 import { acquireDocumentLock } from '../document-lock.js'
-import { homedir } from 'node:os'
 import { join, isAbsolute } from 'node:path'
-import { mkdirSync, lstatSync, readFileSync, writeFileSync, renameSync, chmodSync } from 'node:fs'
+import { lstatSync, readFileSync, writeFileSync, renameSync, chmodSync } from 'node:fs'
 import { readKeychain, writeKeychain } from './keychain.js'
 import type { Device, DeviceSecret, EpochKey } from './crypto.js'
 export interface Session {
@@ -24,13 +24,7 @@ export interface Session {
 interface Vault {
   sessions: Record<string, Session>
 }
-function location(): string {
-  const dir = join(homedir(), '.foundation', 'share')
-  mkdirSync(dir, { recursive: true, mode: 0o700 })
-  const stat = lstatSync(dir)
-  if (stat.isSymbolicLink() || stat.mode & 0o077) throw new Error('share key directory must be private (0700)')
-  return join(dir, 'keys.json')
-}
+function location(): string { return join(shareStateDir(), 'keys.json') }
 /** Optional dedicated macOS keychain for isolated service/test HOMEs. Never changes defaults. */
 function keychainPath(): string | undefined {
   const path = process.env.FOUNDATION_SHARE_KEYCHAIN

@@ -1,3 +1,4 @@
+import { shareStateDir } from '../share/share-path.js'
 import { sessionFor, saveSession } from '../share/vault.js'
 import { readFileSync, mkdirSync, writeFileSync, existsSync } from 'node:fs'
 import { join, resolve } from 'node:path'
@@ -115,8 +116,8 @@ export async function runShare(args: string[], io: CliIO): Promise<number> {
         const recovery = recoveryKeypair()
         const config: ShareConfig = { version:1,mode:'self-hosted',service,space:`sp_${randomBytes(16).toString('hex')}`,repo,encryption:'e2e-v1',publicAccess:flags['public-access']==='repo-read'?'repo-read':'collaborators',recoveryPublicKey:recovery.publicKey }
         mkdirSync(join(root,'.foundation'),{recursive:true})
-        mkdirSync(join(homedir(),'.foundation','share'),{recursive:true,mode:0o700})
-        writeFileSync(join(homedir(),'.foundation','share',`recovery-${config.space}.txt`),recovery.code+'\n',{mode:0o600,flag:'wx'})
+        shareStateDir()
+        writeFileSync(join(shareStateDir(),`recovery-${config.space}.txt`),recovery.code+'\n',{mode:0o600,flag:'wx'})
         writeFileSync(join(root,'.foundation/share.json'),JSON.stringify(config,null,2)+'\n',{flag:'wx'})
         io.stdout('Prepared .foundation/share.json locally; no space, token or live data has been created. Commit it to the repository default branch, then rerun foundation share init with the same --repo-root.')
         return 0
@@ -128,7 +129,7 @@ export async function runShare(args: string[], io: CliIO): Promise<number> {
       await createSpace(existing,result.challenge,{...(await prepareDevice(existing,token,sshKey(flags))),repoRoot:root})
       const status = await api<{epoch:number}>(existing,`state?space=${existing.space}`,sessionFor(existing.space).token)
       if (status.epoch === 0) {
-        const recoveryFile=join(homedir(),'.foundation','share',`recovery-${existing.space}.txt`)
+        const recoveryFile=join(shareStateDir(),`recovery-${existing.space}.txt`)
         await initializeKeys(existing,readFileSync(recoveryFile,'utf8').trim())
         io.stdout(`Live sharing enabled for ${existing.repo}. Recovery code saved privately to ${recoveryFile}; move it offline.`)
       } else io.stdout(`Live sharing already enabled for ${existing.repo}.`)
@@ -150,7 +151,7 @@ export async function runShare(args: string[], io: CliIO): Promise<number> {
         }
         if (positionals[1] !== 'rotate') throw new Error('usage: share recovery rotate')
         const code = await rotateRecovery(config),
-          path = join(homedir(), '.foundation', 'share', `recovery-${config.space}-${Date.now()}.txt`)
+          path = join(shareStateDir(), `recovery-${config.space}-${Date.now()}.txt`)
         writeFileSync(path, code + '\n', { mode: 0o600, flag: 'wx' })
         writeFileSync(join(root, '.foundation/share.json'), JSON.stringify(config, null, 2) + '\n')
         io.stdout(`Recovery key rotated. Commit share.json and have teammates pull it. Move ${path} offline.`)

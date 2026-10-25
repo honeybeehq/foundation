@@ -138,7 +138,8 @@ class ShareBridge implements Bridge {
                 session,
                 this.address === 'foundation-share-catalogue-v1'
               )
-            ).toString('hex')
+            ).toString('hex'),
+            writerSignatureVerified: true
           }
         })
       )
@@ -153,7 +154,7 @@ export async function shareRelay(
   config: ShareConfig,
   logical: string,
   signal: AbortSignal,
-  onBytes: (bytes: Uint8Array) => void
+  onBytes: (bytes: Uint8Array, signatureVerified: boolean, source: 'hint'|'append') => void
 ): Promise<void> {
   while (!signal.aborted) {
     try {
@@ -194,7 +195,7 @@ export async function shareRelay(
                         String(event.payload_hex),
                         await stateFor(config, await authorizedSession(config), true),
                         sessionFor(config.space)
-                      )
+                      ), true, event.source === 'hint' ? 'hint' : 'append'
                     )
                   } catch {
                     /* durable replay validates and reports failures */
@@ -293,7 +294,7 @@ export async function prepareSharingRead(config: ShareConfig): Promise<void> {
 
 /** Bounded best-effort hints run independently of the durable publisher. The chain remains the outbox. */
 export class ShareHints {
-  private pending = new Map<string, string>()
+  private pending = new Map<string, {hex:string;at:number}>()
   private bytes = 0
   private stopped = false
   private task: Promise<void> | undefined
@@ -308,9 +309,9 @@ export class ShareHints {
     if (this.stopped) return []
     const accepted: string[] = []
     for (const change of changes) {
-      const next = this.bytes + change.hex.length / 2 - (this.pending.get(change.hash)?.length ?? 0) / 2
+      const next = this.bytes + change.hex.length / 2 - (this.pending.get(change.hash)?.hex.length ?? 0) / 2
       if ((this.pending.size >= 32 && !this.pending.has(change.hash)) || next > 1048576) break
-      this.pending.set(change.hash, change.hex)
+      this.pending.set(change.hash, {hex:change.hex,at:Date.now()})
       this.bytes = next
       accepted.push(change.hash)
     }
@@ -326,9 +327,11 @@ export class ShareHints {
   }
   private async drain(): Promise<void> {
     while (!this.stopped && this.pending.size) {
-      const [hash, hex] = this.pending.entries().next().value!
+      const [hash, pending] = this.pending.entries().next().value!
+      const {hex,at}=pending
       this.pending.delete(hash)
       this.bytes -= hex.length / 2
+      if(Date.now()-at>2000)continue
       try {
         await this.bridge.request('hint', { log: this.log, idempotency_key: hash, payload_hex: hex })
       } catch {

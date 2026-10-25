@@ -561,7 +561,7 @@ export async function startShareService(config: ShareServiceConfig) {
               const other = authenticate(relay.token)
               if (
                 other.space.space === space.space &&
-                !client.write(`data: ${JSON.stringify({ log: body.log, payload_hex: payload, epoch: body.epoch })}\n\n`)
+                !client.write(`data: ${JSON.stringify({ log: body.log, payload_hex: payload, epoch: body.epoch, source: body.op })}\n\n`)
               )
                 client.destroy()
             } catch {
