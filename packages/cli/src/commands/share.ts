@@ -120,7 +120,7 @@ export async function runShare(args: string[], io: CliIO): Promise<number> {
         space: result.space,
         repo: result.repo,
         encryption: 'e2e-v1',
-        publicAccess: flags['public-access'] === 'collaborators' ? 'collaborators' : 'repo-read'
+        publicAccess: flags['public-access'] === 'repo-read' ? 'repo-read' : 'collaborators'
       }
       await createSpace(config, result.challenge, {
         ...(await prepareDevice(config, token, sshKey(flags))),
@@ -159,7 +159,7 @@ export async function runShare(args: string[], io: CliIO): Promise<number> {
         return 0
       }
       case 'login':
-        await login(config, await tokenFor(config.service, flags, io), sshKey(flags))
+        await login(config, await tokenFor(config.service, flags, io), sshKey(flags), !!flags.reattest)
         saveSession(config.space, { ...sessionFor(config.space), repoRoot: root })
         break
       case 'grant':
@@ -173,7 +173,7 @@ export async function runShare(args: string[], io: CliIO): Promise<number> {
         break
       default:
         throw new Error(
-          'usage: foundation share init --service URL | login [--oauth | --token-stdin] [--ssh-key PATH] | status | grant | revoke-device ID | serve --config FILE | backup DEST --config FILE'
+          'usage: foundation share init --service URL | login [--oauth | --token-stdin] [--ssh-key PATH] [--reattest] | status | grant | revoke-device ID | serve --config FILE | backup DEST --config FILE'
         )
     }
     const status = await sharingStatus(config)

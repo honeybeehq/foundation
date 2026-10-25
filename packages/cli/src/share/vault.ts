@@ -3,8 +3,11 @@ import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { mkdirSync, lstatSync, readFileSync, writeFileSync, renameSync, chmodSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
-import type { DeviceSecret, EpochKey } from './crypto.js'
+import type { Device, DeviceSecret, EpochKey } from './crypto.js'
 export interface Session {
+  deviceWarnings?: string[]
+  trustedDevices?: Device[]
+  writerDevices?: string[]
   rotationRequiredAtEpoch?: number
   rotationRequired?: boolean
   pendingRevocations?: string[]
@@ -53,14 +56,21 @@ export function readVault(): Vault {
     throw e
   }
 }
-export function saveSession(space: string, session: Session): void {
+export function saveSession(space: string, session: Session, replaceDevice = false): void {
   const lockPath = location()
   const release = acquireDocumentLock(lockPath, 5000)
   try {
     const vault = readVault()
     const old = vault.sessions[space]
     if (old) {
-      if (old.device.device.id !== session.device.device.id) throw new Error('device binding changed unexpectedly')
+      if (!replaceDevice && old.device.device.id !== session.device.device.id)
+        throw new Error('device binding changed unexpectedly')
+      session.writerDevices = [...new Set([...(old.writerDevices ?? []), ...(session.writerDevices ?? [])])].slice(
+        -1000
+      )
+      session.trustedDevices = [
+        ...new Map([...(old.trustedDevices ?? []), ...(session.trustedDevices ?? [])].map((d) => [d.id, d])).values()
+      ].slice(-1000)
       const merged = new Map(old.keys.map((k) => [k.epoch, k]))
       for (const key of session.keys) {
         const prior = merged.get(key.epoch)

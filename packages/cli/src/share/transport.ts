@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+import { decodeBlob } from '../../../engine/src/chain/blob.js'
 import { mkdirSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { writeAtomic } from '../disk.js'
@@ -8,7 +10,7 @@ import { readShareConfig, findShareRoot, type ShareConfig } from './config.js'
 import { authorizedSession, api, maintainKeys, stateFor } from './client.js'
 import { encrypt, decrypt, opaqueName, ready } from './crypto.js'
 import { memberAccess, verifyDevice } from './github.js'
-import { sessionFor, readVault } from './vault.js'
+import { sessionFor, readVault, saveSession } from './vault.js'
 export interface Bridge {
   hello(): Promise<void>
   request(op: string, fields?: Frame): Promise<Frame>
@@ -72,7 +74,7 @@ class ShareBridge implements Bridge {
   ) {}
   async hello(): Promise<void> {
     await ready
-    await refreshKeys(this.config)
+    await prepareSharingRead(this.config)
     const session = sessionFor(this.config.space)
     if (!session.keys.length) throw new Error("Waiting for a teammate's machine to share the key")
   }
@@ -85,10 +87,12 @@ class ShareBridge implements Bridge {
   async request(op: string, fields: Frame = {}): Promise<Frame> {
     if (this.closed) throw new Error('share transport closed')
     await ready
-    await refreshKeys(this.config)
+    if (op === 'append') await refreshKeys(this.config)
+    else await prepareSharingRead(this.config)
     const session = await authorizedSession(this.config),
-      state = await stateFor(this.config, session)
-    const key = session.keys.find((key) => key.epoch === state.epoch)
+      state = await stateFor(this.config, session, op !== 'append')
+    const key =
+      session.keys.find((key) => key.epoch === state.epoch) ?? (op !== 'append' ? session.keys.at(-1) : undefined)
     if (!key) {
       await refreshKeys(this.config)
       throw new Error(`waiting for key epoch ${state.epoch}`)
@@ -126,7 +130,14 @@ class ShareBridge implements Bridge {
           return {
             ...value,
             payload_hex: Buffer.from(
-              await verifiedDecrypt(this.config, log, String(value.payload_hex), state, session)
+              await verifiedDecrypt(
+                this.config,
+                log,
+                String(value.payload_hex),
+                state,
+                session,
+                this.address === 'foundation-share-catalogue-v1'
+              )
             ).toString('hex')
           }
         })
@@ -147,7 +158,7 @@ export async function shareRelay(
   while (!signal.aborted) {
     try {
       await ready
-      await refreshKeys(config)
+      await prepareSharingRead(config)
       const session = await authorizedSession(config),
         key = session.keys.at(-1)
       if (!key) throw new Error('waiting for key')
@@ -181,7 +192,7 @@ export async function shareRelay(
                         config,
                         log,
                         String(event.payload_hex),
-                        await stateFor(config, await authorizedSession(config)),
+                        await stateFor(config, await authorizedSession(config), true),
                         sessionFor(config.space)
                       )
                     )
@@ -207,22 +218,56 @@ async function verifiedDecrypt(
   log: string,
   hex: string,
   state: import('./client.js').ShareState,
-  session: import('./vault.js').Session
+  session: import('./vault.js').Session,
+  catalogue = false
 ): Promise<Uint8Array> {
   const record = JSON.parse(Buffer.from(hex, 'hex').toString('utf8')) as { senderId: string; epoch: number }
   const sender = state.devices.find((d) => d.id === record.senderId)
   if (!sender) throw new Error('unknown encrypted-record writer')
-  const cache = `${config.space}:${sender.id}:${record.epoch === state.epoch ? 'current' : 'history'}`
+  const currentEpoch = Math.max(0, ...session.keys.map((k) => k.epoch))
+  const cache = `${config.space}:${sender.id}:${record.epoch === currentEpoch ? 'current' : 'history'}`
+  const key = session.keys.find((k) => k.epoch === record.epoch)
+  const known = [
+    session.device.device,
+    ...(session.trustedDevices ?? []),
+    ...session.keys.flatMap((k) => (k.issuer ? [k.issuer] : []))
+  ].some(
+    (d) => d.id === sender.id && d.signPublicKey === sender.signPublicKey && d.boxPublicKey === sender.boxPublicKey
+  )
+  const knownWriter =
+    (session.writerDevices ?? []).includes(sender.id) || session.keys.some((k) => k.issuer?.id === sender.id)
+  let checkedWriter = false
   if (Date.now() - (writerChecks.get(cache) ?? 0) > 120000) {
-    await verifyDevice(config, sender)
-    if (
-      record.epoch === state.epoch &&
-      (await memberAccess(config, sender.login, sender.githubId, session.githubToken)) !== 'write'
-    )
-      throw new Error('encrypted record is not from a repo writer')
-    writerChecks.set(cache, Date.now())
+    let refused = false
+    try {
+      await verifyDevice(config, sender, session.githubToken)
+      if (
+        record.epoch === currentEpoch &&
+        (await memberAccess(config, sender.login, sender.githubId, session.githubToken)) !== 'write'
+      ) {
+        refused = true
+        throw new Error('encrypted record is not from a repo writer')
+      }
+      checkedWriter = record.epoch === currentEpoch
+      writerChecks.set(cache, Date.now())
+    } catch (error) {
+      if (refused || !known || (record.epoch === currentEpoch && !knownWriter)) throw error
+    }
   }
-  return decrypt(config.space, log, hex, session.keys, sender)
+  const plain = decrypt(config.space, log, hex, session.keys, sender)
+  if (!key) throw new Error('waiting for epoch key')
+  const identity = catalogue ? createHash('sha256').update(plain).digest('hex') : decodeBlob(plain).envelope.hash
+  const expected = opaqueName(JSON.stringify(['dedup-v1', log, identity]), key.dedupKey)
+  if ((JSON.parse(Buffer.from(hex, 'hex').toString('utf8')) as { dedup: string }).dedup !== expected)
+    throw new Error('encrypted dedup identity mismatch')
+  if (checkedWriter) {
+    session.trustedDevices = [
+      ...new Map([...(session.trustedDevices ?? []), sender].map((d) => [d.id, d])).values()
+    ].slice(-1000)
+    session.writerDevices = [...new Set([...(session.writerDevices ?? []), sender.id])].slice(-1000)
+    saveSession(config.space, session)
+  }
+  return plain
 }
 
 /** Key handover continues for signed-in repositories even when no design is open. */
@@ -235,5 +280,13 @@ export async function maintainKnownRepos(): Promise<void> {
     } catch {
       /* per-space status contains the reason; local editing remains available */
     }
+  }
+}
+
+export async function prepareSharingRead(config: ShareConfig): Promise<void> {
+  try {
+    await refreshKeys(config)
+  } catch (error) {
+    if (!sessionFor(config.space).keys.length) throw error
   }
 }
