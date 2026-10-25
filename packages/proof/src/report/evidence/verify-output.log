@@ -54,6 +54,12 @@
     "stderr": ""
   },
   {
+    "name": "capture-not-provable",
+    "exitCode": 1,
+    "stdout": "{\n  \"passed\": false,\n  \"errors\": [\n    \"replay/drift-report.json: not-provable: Classic has no dedicated at-rest state\"\n  ],\n  \"reports\": 1\n}",
+    "stderr": ""
+  },
+  {
     "name": "chain-sha256-match",
     "exitCode": 0,
     "stdout": "{\n  \"passed\": true,\n  \"errors\": [],\n  \"reports\": 1\n}",

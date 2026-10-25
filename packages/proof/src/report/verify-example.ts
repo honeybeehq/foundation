@@ -202,6 +202,11 @@ await run("dirty-source", match, 1);
 await (
   await import("node:fs/promises")
 ).unlink(path.join(root, "extra-code.ts"));
+const unavailableMeta=path.join(scratch,'code/meta.json'),availableMeta=JSON.parse(await readFile(unavailableMeta,'utf8'));
+await writeFile(unavailableMeta,JSON.stringify({...availableMeta,provable:false,reason:'Classic has no dedicated at-rest state'}));
+const unavailableReport=await compareDirectories(path.join(scratch,'design'),path.join(scratch,'code'),path.join(scratch,'replay'));
+if(unavailableReport.verdict!=='not-provable'||unavailableReport.provable!==false)throw Error('Capture failure was lost');
+await run('capture-not-provable',unavailableReport,1);await writeFile(unavailableMeta,JSON.stringify(availableMeta));
 const shaHead = createHash("sha256")
   .update(await readFile(path.join(root, "boards/tracks-pane.fdn.html.chain")))
   .digest("hex");
