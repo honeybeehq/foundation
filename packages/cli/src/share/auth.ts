@@ -75,6 +75,28 @@ export class ShareAuth {
       throw new ShareAuthError(502, 'invalid GitHub verification response')
     }
   }
+  private descriptors = new Map<string, number>()
+  /** Omitted ref means GitHub's default branch; never follow a supplied download URL. */
+  async descriptor(repo: string, service: string, space: string): Promise<void> {
+    const key = JSON.stringify([repo, service, space])
+    if (Date.now() - (this.descriptors.get(key) ?? 0) < 30000) return
+    const result = await this.request(`/repos/${repo.slice(11)}/contents/.foundation/share.json`)
+    if (result.status !== 200)
+      throw new ShareAuthError(412, 'Commit .foundation/share.json naming this service and space to the repository default branch before enabling live sharing (App single-file read permission required)')
+    let descriptor: Record<string, unknown>
+    try {
+      const file = JSON.parse(result.text)
+      if (file.type !== 'file' || file.path !== '.foundation/share.json' || file.encoding !== 'base64' || typeof file.content !== 'string' || file.content.length > 65536) throw new Error('invalid descriptor file')
+      const encoded = file.content.replace(/\s/g, '')
+      const bytes = Buffer.from(encoded, 'base64')
+      if (bytes.length > 32768 || bytes.toString('base64') !== encoded) throw new Error('invalid descriptor encoding')
+      descriptor = JSON.parse(bytes.toString('utf8'))
+    } catch { throw new ShareAuthError(412, 'Default-branch .foundation/share.json must be a valid regular JSON file') }
+    if (!descriptor || descriptor.version !== 1 || !['self-hosted', 'hosted'].includes(String(descriptor.mode)) || descriptor.encryption !== 'e2e-v1' || descriptor.repo !== repo || descriptor.service !== service || descriptor.space !== space)
+      throw new ShareAuthError(412, 'Default-branch .foundation/share.json does not authorize this service and space')
+    if (this.descriptors.size >= 4096) this.descriptors.delete(this.descriptors.keys().next().value!)
+    this.descriptors.set(key, Date.now())
+  }
   async verifyDevice(
     device: ShareDevice,
     repo: string,

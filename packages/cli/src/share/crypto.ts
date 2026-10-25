@@ -267,6 +267,8 @@ export function decrypt(space: string, log: string, hex: string, keys: EpochKey[
     unb64(key.key, 32)
   )
 }
+export function recoveryPublicKey(code: string): string { return b64(sodium.crypto_scalarmult_base(unb64(code.trim(), 32))) }
+
 export function recoveryKeypair(): { code: string; publicKey: string } {
   const pair = sodium.crypto_box_keypair()
   return { code: b64(pair.privateKey), publicKey: b64(pair.publicKey) }

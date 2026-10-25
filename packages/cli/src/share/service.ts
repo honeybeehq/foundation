@@ -4,6 +4,7 @@ import { mkdir, cp, writeFile, rm } from 'node:fs/promises'
 import { resolve, join, sep } from 'node:path'
 import { acquireDocumentLock } from '../document-lock.js'
 import { CombBridge, validateAppendReceipt, type Frame } from '../sync/bridge.js'
+import { serviceUrl } from './config.js'
 import { ShareAuth, ShareAuthError, type PublicAccess } from './auth.js'
 import {
   ShareServiceStore,
@@ -18,6 +19,8 @@ export interface ShareServiceConfig {
   port?: number
   stateDir: string
   comb: { binary: string; args: string[] }
+  publicUrl?: string
+  allowedRepoOwners?: string[]
   oauthClientId?: string
   /** Complete stopped local backend snapshot for nightly backup. */
   backupLocalStore?: string
@@ -140,7 +143,7 @@ function ciphertext(payload: unknown, epoch: number, senderId: string): string {
   )
   return payload
 }
-type ServiceSpace = ShareSpace & { publicAccess?: PublicAccess; accessLost?: string[] }
+type ServiceSpace = ShareSpace & { service?: string; publicAccess?: PublicAccess; accessLost?: string[] }
 interface Token {
   space: string
   device: string
@@ -150,6 +153,13 @@ interface Token {
 const active = new Set<string>()
 
 export async function startShareService(config: ShareServiceConfig) {
+  if (!config.githubApiUrl && !config.publicUrl) throw new Error('publicUrl is required for a production share service')
+  let publicOrigin = config.publicUrl ? serviceUrl(config.publicUrl) : ''
+  if (publicOrigin && !config.githubApiUrl && !publicOrigin.startsWith('https://')) throw new Error('production publicUrl requires HTTPS')
+  if (config.allowedRepoOwners && (!Array.isArray(config.allowedRepoOwners) || !config.allowedRepoOwners.length || config.allowedRepoOwners.some(owner => typeof owner !== 'string' || !/^[A-Za-z0-9-]+$/.test(owner)))) throw new Error('allowedRepoOwners must be a nonempty array of GitHub owner names')
+  const allowRepo = (repo: string): void => {
+    requireThat(!config.allowedRepoOwners || config.allowedRepoOwners.some(owner => owner.toLowerCase() === repo.split('/')[1]?.toLowerCase()), 'repository owner is not allowed on this service', 403)
+  }
   const stateDir = resolve(config.stateDir)
   requireThat(!active.has(stateDir), 'service already running for stateDir', 409)
   let github = 'https://api.github.com'
@@ -188,6 +198,9 @@ export async function startShareService(config: ShareServiceConfig) {
     return b
   }
   async function permission(space: ServiceSpace, device: ShareDevice) {
+    allowRepo(space.repo)
+    requireThat(device.service === publicOrigin, 'device service differs from configured publicUrl', 403)
+    await githubAuth.descriptor(space.repo, publicOrigin, space.space)
     const result = await githubAuth.permission(space.repo, device.login, space.publicAccess ?? 'collaborators')
     if (result === 'none') {
       await store.update((spaces) => {
@@ -216,6 +229,7 @@ export async function startShareService(config: ShareServiceConfig) {
       'device revoked',
       403
     )
+    allowRepo(space.repo)
     return { token, space }
   }
   function disconnectRevoked() {
@@ -229,6 +243,16 @@ export async function startShareService(config: ShareServiceConfig) {
       }
     }
   }
+  const descriptorTimer = setInterval(() => {
+    for (const [response, relay] of relays) {
+      const space = store.get(tokens.get(relay.token)?.space ?? '') as ServiceSpace | undefined
+      if (!space) continue
+      void githubAuth.descriptor(space.repo, publicOrigin, space.space).catch(() => {
+        tokens.delete(relay.token); response.end()
+      })
+    }
+  }, 30000)
+  descriptorTimer.unref()
   const server = createServer(async (request, response) => {
     const send = (status: number, value: unknown) => {
       const data = JSON.stringify(value)
@@ -256,11 +280,15 @@ export async function startShareService(config: ShareServiceConfig) {
         if (id) {
           const space = store.get(id)
           requireThat(space, 'unknown space', 404)
+          allowRepo(space.repo)
           send(200, githubAuth.challenge('token', space.space, space.repo))
         } else {
           const repo = repoName(repoQuery)
+          allowRepo(repo)
           const existing = store.spaces().find((s) => s.repo === repo)
-          send(200, githubAuth.challenge('create', existing?.space ?? `sp_${randomBytes(16).toString('hex')}`, repo))
+          const requested = requestUrl.searchParams.get('requestedSpace')
+          requireThat(!requested || /^sp_[a-f0-9]{32}$/.test(requested), 'invalid requested space')
+          send(200, githubAuth.challenge('create', existing?.space ?? requested ?? `sp_${randomBytes(16).toString('hex')}`, repo))
         }
         return
       }
@@ -284,6 +312,7 @@ export async function startShareService(config: ShareServiceConfig) {
         requireThat(!auth, 'never send GitHub credentials to the share service')
         exact(body, ['repo', 'device', 'challenge', 'proof', 'publicAccess'])
         const repo = repoName(body.repo)
+        allowRepo(repo)
         const challenge = githubAuth.consume(body.challenge, 'create')
         requireThat(challenge.repo === repo, 'challenge repo mismatch', 401)
         const publicAccess = body.publicAccess ?? 'collaborators'
@@ -298,6 +327,7 @@ export async function startShareService(config: ShareServiceConfig) {
           revoked: []
         }
         const device = deviceStatement(body.device, candidate, { login: body.device?.login, id: body.device?.githubId })
+        candidate.service = device.service
         await githubAuth.verifyDevice(device, repo, candidate.space, body.challenge, body.proof)
         const access = await permission(candidate, device)
         requireThat(access === 'write', 'write permission required', 403)
@@ -365,6 +395,7 @@ export async function startShareService(config: ShareServiceConfig) {
       requireThat(auth?.startsWith('Bearer ') && auth.length < 16384, 'bearer token required', 401)
       const bearer = auth!.slice(7)
       const { token, space } = authenticate(bearer)
+      await githubAuth.descriptor(space.repo, publicOrigin, space.space)
       const requestedSpace = method === 'GET' ? requestUrl.searchParams.get('space') : body.space
       requireThat(
         requestedSpace === undefined || requestedSpace === null || requestedSpace === space.space,
@@ -680,12 +711,14 @@ export async function startShareService(config: ShareServiceConfig) {
   active.add(stateDir)
   const address = server.address() as { address: string; port: number }
   const host = address.address.includes(':') ? `[${address.address}]` : address.address
+  publicOrigin ||= `http://${host}:${address.port}`
   return {
     server,
     url: `http://${host}:${address.port}`,
     close: async () => {
       if (closing) return
       closing = true
+      clearInterval(descriptorTimer)
       for (const [response, relay] of relays) {
         clearTimeout(relay.timer)
         response.end()

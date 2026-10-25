@@ -9,6 +9,8 @@ task; this change starts no permanent service.
 {
   "host": "127.0.0.1",
   "port": 19487,
+  "publicUrl": "https://netcup-1.tailff9529.ts.net:19487",
+  "allowedRepoOwners": ["honeybeehq"],
   "stateDir": "/var/lib/foundation-share/metadata",
   "comb": {"binary": "/opt/comb-bridge", "args": ["--dir", "/etc/foundation-comb"]},
   "githubPermissionToken": "METADATA_ONLY_GITHUB_APP_INSTALLATION_TOKEN",
@@ -18,7 +20,10 @@ task; this change starts no permanent service.
 ```
 
 Protect this file with 0600 permissions. The GitHub App must have repository
-Metadata read, no Contents access, and be installed on the selected repos. Supply
+Metadata read plus Single file read limited to exactly `.foundation/share.json`,
+no Contents access, and be installed on the selected repos. `publicUrl` pins the
+public HTTPS origin even behind a loopback proxy. Optional `allowedRepoOwners`
+restricts this deployment to named GitHub owners at challenge and every access. Supply
 and renew its short-lived installation token through operator config and restart
 the service when it changes. The optional OAuth App needs device flow enabled;
 its client id enables local client sign-in. User GitHub tokens never reach this
@@ -88,3 +93,18 @@ unavailable, keep git/current local chains, select a fresh empty service stateDi
 and backend namespace, save/remove the old descriptor, and run share init again.
 Commit the new descriptor, sign devices in and reopen designs to reseed a fresh
 space from retained chains. Do not delete the old store until recovery is verified.
+
+## Committed descriptor authority
+
+First `share init` writes a secret-free descriptor and a private recovery code
+locally, without creating any service space or token. Commit the descriptor to the
+repository default branch, then rerun `share init` to register that same space and
+initialize its encrypted keys. The service reads only the exact descriptor path
+through the App Single file grant, using the Contents API with no `ref` (default
+branch). It validates a bounded regular JSON file naming the configured public
+origin, space and repository with E2E enabled. It never follows `download_url`.
+A mismatch or missing file refuses creation, renewal and existing-token requests
+with HTTP 412 and a commit instruction. Positive checks cache for 30 seconds;
+quiet relay connections are rechecked every 30 seconds and disconnected on failure
+(within 60 seconds of a file change). Removing the descriptor stops live serving.
+A working-tree file or non-default branch cannot authorize the service.

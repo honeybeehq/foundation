@@ -1,6 +1,8 @@
 import { sessionFor, saveSession } from '../share/vault.js'
 import { readFileSync, mkdirSync, writeFileSync, existsSync } from 'node:fs'
 import { join, resolve } from 'node:path'
+import { randomBytes } from 'node:crypto'
+import { ready, recoveryKeypair } from '../share/crypto.js'
 import { homedir } from 'node:os'
 import { execFileSync } from 'node:child_process'
 import { parseArgs, flagString } from '../argv.js'
@@ -99,41 +101,37 @@ export async function runShare(args: string[], io: CliIO): Promise<number> {
     }
     const root = rootAt(flags)
     if (positionals[0] === 'init') {
-      const service = serviceUrl(flagString(flags, 'service') ?? ''),
-        token = await tokenFor(service, flags, io)
-      let repo = flagString(flags, 'repo')
-      if (!repo) {
-        const remote = execFileSync('git', ['remote', 'get-url', 'origin'], { cwd: root, encoding: 'utf8' }).trim()
-        const match = remote.match(/github\.com[:/]([^/]+)\/(.+?)(?:\.git)?$/)
-        if (!match) throw new Error('pass --repo github.com/OWNER/REPO')
-        repo = `github.com/${match[1]}/${match[2]}`
+      const existing = readShareConfig(root)
+      if (!existing) {
+        const service = serviceUrl(flagString(flags, 'service') ?? '')
+        let repo = flagString(flags, 'repo')
+        if (!repo) {
+          const remote = execFileSync('git', ['remote', 'get-url', 'origin'], { cwd: root, encoding: 'utf8' }).trim()
+          const match = remote.match(/github\.com[:/]([^/]+)\/(.+?)(?:\.git)?$/)
+          if (!match) throw new Error('pass --repo github.com/OWNER/REPO')
+          repo = `github.com/${match[1]}/${match[2]}`
+        }
+        await ready
+        const recovery = recoveryKeypair()
+        const config: ShareConfig = { version:1,mode:'self-hosted',service,space:`sp_${randomBytes(16).toString('hex')}`,repo,encryption:'e2e-v1',publicAccess:flags['public-access']==='repo-read'?'repo-read':'collaborators',recoveryPublicKey:recovery.publicKey }
+        mkdirSync(join(root,'.foundation'),{recursive:true})
+        mkdirSync(join(homedir(),'.foundation','share'),{recursive:true,mode:0o700})
+        writeFileSync(join(homedir(),'.foundation','share',`recovery-${config.space}.txt`),recovery.code+'\n',{mode:0o600,flag:'wx'})
+        writeFileSync(join(root,'.foundation/share.json'),JSON.stringify(config,null,2)+'\n',{flag:'wx'})
+        io.stdout('Prepared .foundation/share.json locally; no space, token or live data has been created. Commit it to the repository default branch, then rerun foundation share init with the same --repo-root.')
+        return 0
       }
-      if (existsSync(join(root, '.foundation/share.json'))) throw new Error('share.json already exists')
-      const result = await api<{ space: string; repo: string; challenge: string }>(
-        { service },
-        `challenge?repo=${encodeURIComponent(repo)}`
-      )
-      const config: ShareConfig = {
-        version: 1,
-        mode: 'self-hosted',
-        service,
-        space: result.space,
-        repo: result.repo,
-        encryption: 'e2e-v1',
-        publicAccess: flags['public-access'] === 'repo-read' ? 'repo-read' : 'collaborators'
-      }
-      await createSpace(config, result.challenge, {
-        ...(await prepareDevice(config, token, sshKey(flags))),
-        repoRoot: root
-      })
-      const code = await initializeKeys(config)
-      mkdirSync(join(root, '.foundation'), { recursive: true })
-      writeFileSync(join(root, '.foundation/share.json'), JSON.stringify(config, null, 2) + '\n', { flag: 'wx' })
-      const recoveryFile = join(homedir(), '.foundation', 'share', `recovery-${config.space}.txt`)
-      writeFileSync(recoveryFile, code + '\n', { mode: 0o600, flag: 'wx' })
-      io.stdout(
-        `Live sharing enabled for ${config.repo}. Commit .foundation/share.json. Recovery code saved privately to ${recoveryFile}; move it offline.`
-      )
+      if (flagString(flags,'service') && serviceUrl(flagString(flags,'service')!) !== existing.service) throw new Error('service differs from prepared share.json')
+      const token = await tokenFor(existing.service, flags, io)
+      const result = await api<{space:string;repo:string;challenge:string}>({service:existing.service},`challenge?repo=${encodeURIComponent(existing.repo)}&requestedSpace=${encodeURIComponent(existing.space)}`)
+      if (result.space !== existing.space) throw new Error('repo already has another space; use its committed share.json')
+      await createSpace(existing,result.challenge,{...(await prepareDevice(existing,token,sshKey(flags))),repoRoot:root})
+      const status = await api<{epoch:number}>(existing,`state?space=${existing.space}`,sessionFor(existing.space).token)
+      if (status.epoch === 0) {
+        const recoveryFile=join(homedir(),'.foundation','share',`recovery-${existing.space}.txt`)
+        await initializeKeys(existing,readFileSync(recoveryFile,'utf8').trim())
+        io.stdout(`Live sharing enabled for ${existing.repo}. Recovery code saved privately to ${recoveryFile}; move it offline.`)
+      } else io.stdout(`Live sharing already enabled for ${existing.repo}.`)
       return 0
     }
     const config = readShareConfig(root)
