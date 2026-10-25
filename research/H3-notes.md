@@ -11,7 +11,7 @@ already enabled. HTTPS is **tailnet only**:
 `127.0.0.1:19487`. No Funnel or public listener was configured.
 
 Foundation was installed with the supported `foundation install --from CELL --sha
-65946e350b339bda8a23d022c73e6782643a9aad` into an isolated runtime HOME at
+05363939f7a2966bfc18123340ede2653e153562` into an isolated runtime HOME at
 `/home/trmd/.config/foundation-share/data/runtime-home`. The node's ordinary
 Foundation launcher and gateway registry were not replaced. This is an interim
 revision pending H2's independent relay-hint fix before the two-host measurement.
@@ -53,7 +53,7 @@ App/static-token/stub mixtures are refused; static token remains for fixtures.
 Errors from the provider are redacted. H2 lead reviewed the patch with no findings
 (source review; did not independently rerun our tests).
 
-Verification: 34 share tests in six files pass, and `tsc --noEmit` passes. The
+Verification: 35 share tests in seven files pass, and `tsc --noEmit` passes. The
 actual Comb/CLI two-HOME drill passes key handover, subsecond edits both ways,
 outsider refusal, removal/rotation, raw-store plaintext and docId grep, tamper and
 rollback refusals, outage/recovery and stopped-store backup. GitHub identities in
@@ -145,3 +145,39 @@ had been initialized; after initialization the real backup unit passed and
 restored to a separate scratch directory with a successful Comb handshake.
 This first deployment restore contains an empty registry; populated proof is
 pending. Deployment scripts now initialize an empty registry before first start.
+
+## Deployment review and updated receipts
+
+Independent claude-opus-5-5 reviewed the auth seam, scripts and decision trail.
+It found a health/maintenance race and missing safe App diagnostics. Both were
+fixed; it independently reran all 35 share tests, TypeScript and shell syntax
+checks at `99bdffd`, with no Medium-or-higher findings remaining. Follow-up low
+risks prompted Restart=always (explicit systemctl stop still stays stopped),
+backup lock waiting and stopping both timers during a restore.
+
+`H3-service-restart.txt` records SIGKILL of the full process group, automatic
+restart after three seconds, NRestarts=1 and healthy HTTPS.
+`H3-health-backup-lock.txt` proves health skips a stopped service while backup
+holds its lock. `H3-health-intentional-stop.txt` separately proves an intentional
+stop remains stopped even without that lock. The backup unit was rerun after
+these fixes and passed.
+
+The populated **labelled stub** snapshot was restored to a scratch tree: registry
+and all 148 object files matched SHA256, and the actual Comb bridge replayed
+8 and 5 records from its two feeds. This is populated stub-store recovery, not
+real-App production recovery.
+
+`scripts/share-deploy/activate-app.sh PINNED_FOUNDATION PRIVATE_CONFIG OWNER/REPO`
+will verify Metadata-only permission and Contents refusal, then atomically set
+the production config's absolute App path and restart. It refuses a stub/static
+production configuration. Run it only after H2c reports private file transfer
+complete; the private file never enters the repo.
+
+A separate temporary service at tailnet HTTPS port19488 runs
+`scripts/share-deploy/h3-labelled-stub.ts`. Its ONLY granted login is trmdy;
+server repo permissions are explicitly stubbed. It fetches real public GitHub
+identity/SSH keys and the clients retain direct real GitHub checks. Its state and
+Comb credentials are private outside the repo under
+`~/.config/foundation-share/h3-stub`. Production19487 remains separate and
+unconfigured. Disable its proxy and stop `foundation-share-h3-stub.service`
+after the transport drill.
