@@ -114,6 +114,13 @@ DOC_HEAD = '''    <fdn-params>
         <fdn-entry key="removed" value="var(--color-text-muted)"></fdn-entry>
         <fdn-entry key="upcoming" value="var(--color-text-muted)"></fdn-entry>
       </fdn-lookup>
+      <fdn-lookup name="titlewrap">
+        <fdn-entry key="current" value="normal"></fdn-entry>
+        <fdn-entry key="definition" value="nowrap"></fdn-entry>
+        <fdn-entry key="done" value="normal"></fdn-entry>
+        <fdn-entry key="removed" value="nowrap"></fdn-entry>
+        <fdn-entry key="upcoming" value="normal"></fdn-entry>
+      </fdn-lookup>
       <fdn-lookup name="titleweight">
         <fdn-entry key="current" value="var(--font-weight-semibold)"></fdn-entry>
         <fdn-entry key="definition" value="var(--font-weight-medium)"></fdn-entry>
@@ -152,6 +159,38 @@ cur = cur[:first] + ''.join(new[k] for k in sorted(new)) + cur[last:]
 # ——— boards ———
 a = cur.index('  <main>'); b = cur.index('  </main>') + len('  </main>\n')
 cur = cur[:a] + open(GEN + 'main.html').read() + cur[b:]
+
+# ——— Apiary base.css: every box is border-box; buttons reset to plain boxes ———
+NAMED_KEYS = {n: set(re.findall(r'\s([a-z-]+)="', body)) for n, body in re.findall(r'<fdn-style name="([\w-]+)"([^>]*)>', STYLES)}
+BORDER_BOX = {'ActionButton','FlowGlyph','StatusDot','ArmLabels','FlowCard','LiveFlow','PixelBee','ProposalBar','ProposedCard','ProposalFlow','RailRow','SegmentedView','SidecarRail','TracksPane'}
+def base_box(m):
+    block = m.group(0)
+    if m.group(1) not in BORDER_BOX: return block
+    def add(t):
+        tag, attrs = t.group(1), t.group(2)
+        if tag.startswith('fdn-') or tag in ('g', 'path', 'circle'): return t.group(0)
+        extra = [('box-sizing', 'border-box')]
+        if tag == 'button':
+            extra += [('background-color', 'transparent'), ('border-width', '0'), ('padding', '0'), ('margin', '0'),
+                      ('font-family', 'inherit'), ('font-size', 'inherit'), ('line-height', 'inherit'),
+                      ('color', 'inherit'), ('cursor', 'pointer')]
+        m = re.search(r'(?<![\w-])style="([^"]*)"', attrs)
+        st = m.group(1) if m else ''
+        named = re.search(r'data-fdn-style="([^"]*)"', attrs)
+        keys = {d.split(':', 1)[0].strip() for d in st.split(';') if ':' in d}
+        if named: keys |= NAMED_KEYS.get(named.group(1), set())
+        def taken(k):
+            pattern = {'padding': r'padding(-\w+)?$', 'margin': r'margin(-\w+)?$',
+                       'border-width': r'border(-(top|right|bottom|left))?(-width)?$',
+                       'background-color': r'background(-color)?$'}.get(k, re.escape(k) + '$')
+            return any(re.match(pattern, x) for x in keys)
+        add_decls = ';'.join(f'{k}:{v}' for k, v in extra if not taken(k))
+        if not add_decls: return t.group(0)
+        if m: attrs = attrs[:m.start(1)] + (st + ';' if st else '') + add_decls + attrs[m.end(1):]
+        else: attrs += f' style="{add_decls}"'
+        return f'<{tag}{attrs}>'
+    return re.sub(r'<([a-z][\w-]*)((?:\s[^>]*)?)>', add, block)
+cur = re.sub(r'  <fdn-component name="(\w+)" hidden>.*?</fdn-component>\n', base_box, cur, flags=re.S)
 
 # ——— ids for every new element (n400+), so diffs and anchors stay stable ———
 counter = [400]

@@ -5,14 +5,14 @@
       <fdn-prop name="variant" type="enum" default="default" values="default,accent"></fdn-prop>
       <fdn-prop name="disabled" type="enum" default="no" values="yes,no"></fdn-prop>
     </fdn-props>
-    <span data-fdn-id="n37" when="prop.variant == 'default'" data-fdn-style="pill-btn" style="opacity:{{ prop.disabled == 'yes' ? '0.45' : '1' }}">
+    <button data-fdn-id="n37" when="prop.variant == 'default'" data-fdn-style="pill-btn" style="opacity:{{ prop.disabled == 'yes' ? '0.45' : '1' }}">
       <span data-fdn-id="n38">{{ prop.label }}</span>
       <span data-fdn-id="n39" when="prop.hint" style="color:var(--color-text-muted);font-family:var(--font-mono);font-size:var(--font-size-2xs);opacity:0.8">{{ prop.hint }}</span>
-    </span>
-    <span data-fdn-id="n40" when="prop.variant == 'accent'" data-fdn-style="pill-btn-accent">
+    </button>
+    <button data-fdn-id="n40" when="prop.variant == 'accent'" data-fdn-style="pill-btn-accent">
       <span data-fdn-id="n41">{{ prop.label }}</span>
       <span data-fdn-id="n42" when="prop.hint" style="font-family:var(--font-mono);font-size:var(--font-size-meta);opacity:0.8">{{ prop.hint }}</span>
-    </span>
+    </button>
   </fdn-component>
   <fdn-component name="ArmLabels" hidden>
     <div style="align-items:flex-start;display:flex;flex:none;height:64px;width:480px">
@@ -29,12 +29,12 @@
       <fdn-prop name="glyph" type="enum" default="lines" values="lines,orchestrate,gate,ask,deploy"></fdn-prop>
       <fdn-prop name="fit" type="enum" default="spine" values="spine,lane,wide"></fdn-prop>
     </fdn-props>
-    <div data-fdn-style="flow-card" style="box-shadow:{{ cardshadow[prop.state] }};column-gap:{{ prop.state == 'current' ? '8px' : cardgap[prop.fit] }};opacity:{{ cardopacity[prop.state] }};padding-bottom:{{ cardpady[prop.state] }};padding-left:{{ prop.state == 'current' ? '14px' : cardpadx[prop.fit] }};padding-right:{{ prop.state == 'current' ? '14px' : cardpadx[prop.fit] }};padding-top:{{ cardpady[prop.state] }};width:{{ cardwidth[prop.fit] }}">
+    <div data-fdn-style="flow-card" style="box-shadow:{{ cardshadow[prop.state] }};gap:{{ prop.state == 'current' ? '8px' : cardgap[prop.fit] }};opacity:{{ cardopacity[prop.state] }};padding-bottom:{{ cardpady[prop.state] }};padding-left:{{ prop.state == 'current' ? '14px' : cardpadx[prop.fit] }};padding-right:{{ prop.state == 'current' ? '14px' : cardpadx[prop.fit] }};padding-top:{{ cardpady[prop.state] }};width:{{ cardwidth[prop.fit] }}">
       <fdn-use when="prop.state == 'done'" component="FlowGlyph" data-fdn-prop-name="done" data-fdn-prop-color="var(--color-status-running)"></fdn-use>
       <span when="prop.state == 'current'" style="background-color:var(--color-status-running);border-radius:50%;flex:none;height:8px;width:8px"></span>
       <span when="prop.state == 'upcoming'" style="border:1px solid var(--color-border-input);border-radius:50%;box-sizing:border-box;flex:none;height:12px;width:12px"></span>
       <fdn-use when="prop.state == 'definition' || prop.state == 'removed'" component="FlowGlyph" data-fdn-prop-name="{{ prop.glyph }}" data-fdn-prop-color="{{ glyphcolor[prop.glyph] }}" data-fdn-prop-size="{{ prop.glyph == 'orchestrate' ? '15' : '14' }}"></fdn-use>
-      <span data-fdn-style="card-title" style="color:{{ titlecolor[prop.state] }};font-weight:{{ titleweight[prop.state] }};text-decoration-line:{{ prop.state == 'removed' ? 'line-through' : 'none' }}">{{ prop.title }}</span>
+      <span data-fdn-style="card-title" style="white-space:{{ titlewrap[prop.state] }};color:{{ titlecolor[prop.state] }};font-weight:{{ titleweight[prop.state] }};text-decoration-line:{{ prop.state == 'removed' ? 'line-through' : 'none' }}">{{ prop.title }}</span>
       <span when="prop.meta" data-fdn-style="card-meta" style="color:{{ prop.state == 'current' ? 'var(--color-status-running)' : 'var(--color-text-faint)' }};font-size:{{ metasize[prop.state] }}">{{ prop.meta }}</span>
     </div>
   </fdn-component>
@@ -44,7 +44,7 @@
       <fdn-prop name="size" type="number" default="14"></fdn-prop>
       <fdn-prop name="color" type="token" default="var(--color-text-muted)"></fdn-prop>
     </fdn-props>
-    <svg fill="none" height="{{ prop.size }}" viewBox="0 0 16 16" width="{{ prop.size }}" style="color:{{ prop.color }};flex:none">
+    <svg fill="none" height="{{ prop.size }}" viewBox="0 0 16 16" width="{{ prop.size }}" style="color:{{ prop.color }}">
       <g when="prop.name == 'done'">
         <circle cx="8" cy="8" r="6.3" stroke="currentColor" stroke-width="1.3"></circle>
         <path d="M5.5 8.2l1.8 1.8 3.2-3.6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
@@ -79,7 +79,7 @@
     <div data-fdn-style="flow-canvas">
       <div data-fdn-style="flow-viewport">
       <div data-fdn-style="flow-graph">
-        <div style="align-items:center;column-gap:6px;color:var(--color-meta-faint);display:flex;font-family:var(--font-mono);font-size:var(--font-size-xs);margin-bottom:14px;white-space:nowrap;width:480px">
+        <div style="align-items:center;gap:6px;color:var(--color-meta-faint);display:flex;font-family:var(--font-mono);font-size:var(--font-size-xs);margin-bottom:14px;width:480px">
           <span style="border:1px solid var(--color-meta-faint);border-radius:50%;box-sizing:border-box;flex:none;height:6px;width:6px"></span>
           <span>read-only while attached — edits fork the definition for the next run</span>
         </div>
@@ -93,10 +93,14 @@
           </div>
           <div data-fdn-style="lanes" style="margin-bottom:42.5px;margin-top:-87.5px">
             <div data-fdn-style="lane">
-              <fdn-use component="FlowCard" data-fdn-prop-title="Typecheck &amp; lint" data-fdn-prop-meta="done · 11:48" data-fdn-prop-state="done" data-fdn-prop-fit="lane"></fdn-use>
+              <div style="display:flex;flex-direction:column">
+                <fdn-use component="FlowCard" data-fdn-prop-title="Typecheck &amp; lint" data-fdn-prop-meta="done · 11:48" data-fdn-prop-state="done" data-fdn-prop-fit="lane"></fdn-use>
+              </div>
             </div>
             <div data-fdn-style="lane">
-              <fdn-use component="FlowCard" data-fdn-prop-title="Run the suite" data-fdn-prop-meta="current" data-fdn-prop-state="current" data-fdn-prop-fit="lane"></fdn-use>
+              <div style="display:flex;flex-direction:column">
+                <fdn-use component="FlowCard" data-fdn-prop-title="Run the suite" data-fdn-prop-meta="current" data-fdn-prop-state="current" data-fdn-prop-fit="lane"></fdn-use>
+              </div>
             </div>
           </div>
         </div>
@@ -116,7 +120,7 @@
         <fdn-use component="FlowCard" data-fdn-prop-title="Publish preview" data-fdn-prop-meta="upcoming · nectar" data-fdn-prop-state="upcoming"></fdn-use>
         <span data-fdn-style="spine-link"></span>
         <fdn-use component="FlowCard" data-fdn-prop-title="Ship it?" data-fdn-prop-meta="upcoming · blocking ask" data-fdn-prop-state="upcoming"></fdn-use>
-        <div style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-xs);margin-top:18px;width:480px">up next · pr-triage · queued by bumble-7 · 11:58 — spec-round · queued</div>
+        <div style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-xs);margin-top:18px;width:480px">up next · pr-triage · queued by bumble-7 · 11:58 — spec-round · queued by mite-3 · 11:58</div>
       </div>
       </div>
     </div>
@@ -127,15 +131,15 @@
     </div>
   </fdn-component>
   <fdn-component name="ProposalBar" hidden>
-    <div style="align-items:center;background-color:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-dock);box-sizing:border-box;column-gap:8px;display:flex;flex:none;padding:8px 10px;width:480px">
+    <div style="align-items:center;background-color:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-dock);box-sizing:border-box;gap:8px;display:flex;flex:none;padding:8px 10px;width:480px">
       <span style="color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-sm);white-space:nowrap">3 changes</span>
       <span style="color:var(--color-meta-faint);font-family:var(--font-mono);font-size:var(--font-size-sm);overflow:hidden;white-space:nowrap">+n4d · +n5 · −n5old</span>
-      <span data-fdn-style="pill-btn-accent" style="column-gap:5px;font-size:var(--font-size-base);height:26px;margin-left:auto;padding-left:12px;padding-right:12px">
+      <span data-fdn-style="pill-btn-accent" style="gap:5px;font-size:var(--font-size-base);height:26px;margin-left:auto;padding-left:12px;padding-right:12px">
         <span>Accept</span>
         <span style="font-family:var(--font-mono);font-size:var(--font-size-2xs);opacity:0.8">⌘↵</span>
       </span>
       <span data-fdn-style="pill-btn" style="font-size:var(--font-size-base);height:26px;padding-left:12px;padding-right:12px">Refine</span>
-      <span style="align-items:center;border-radius:var(--radius-md);color:var(--color-text-muted);column-gap:5px;display:flex;flex:none;font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);height:26px;padding-left:12px;padding-right:12px">
+      <span style="align-items:center;border-radius:var(--radius-md);color:var(--color-text-muted);gap:5px;display:flex;flex:none;font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);height:26px;padding-left:12px;padding-right:12px">
         <span>Discard</span>
         <span style="font-family:var(--font-mono);font-size:var(--font-size-2xs);opacity:0.8">⌘⌫</span>
       </span>
@@ -152,7 +156,7 @@
       <fdn-prop name="fit" type="enum" default="wide" values="lane,wide"></fdn-prop>
     </fdn-props>
     <div style="background-color:var(--color-proposal-wash);border:1px dashed var(--color-status-merged);border-radius:var(--radius-lg);box-sizing:border-box;display:flex;flex-direction:column;padding-bottom:10px;padding-left:{{ prop.fit == 'lane' ? '13px' : '14px' }};padding-right:{{ prop.fit == 'lane' ? '13px' : '14px' }};padding-top:10px;row-gap:8px;width:{{ cardwidth[prop.fit] }}">
-      <div style="align-items:center;column-gap:8px;display:flex">
+      <div style="align-items:center;gap:8px;display:flex">
         <fdn-use component="FlowGlyph" data-fdn-prop-name="{{ prop.glyph }}" data-fdn-prop-color="{{ glyphcolor[prop.glyph] }}" data-fdn-prop-size="{{ prop.glyph == 'deploy' ? '13' : '14' }}"></fdn-use>
         <span style="color:{{ glyphcolor[prop.glyph] }};font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium)">{{ prop.type }}</span>
         <span style="color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-meta);margin-left:auto;white-space:nowrap">{{ prop.ref }} · proposed</span>
@@ -178,10 +182,14 @@
           </div>
           <div data-fdn-style="lanes" style="margin-bottom:42px;margin-top:-83px">
             <div data-fdn-style="lane">
-              <fdn-use component="FlowCard" data-fdn-prop-title="Typecheck &amp; lint" data-fdn-prop-state="definition" data-fdn-prop-fit="lane"></fdn-use>
+              <div style="display:flex;flex-direction:column">
+                <fdn-use component="FlowCard" data-fdn-prop-title="Typecheck &amp; lint" data-fdn-prop-state="definition" data-fdn-prop-fit="lane"></fdn-use>
+              </div>
             </div>
             <div data-fdn-style="lane">
-              <fdn-use component="FlowCard" data-fdn-prop-title="Run the suite" data-fdn-prop-state="definition" data-fdn-prop-fit="lane"></fdn-use>
+              <div style="display:flex;flex-direction:column">
+                <fdn-use component="FlowCard" data-fdn-prop-title="Run the suite" data-fdn-prop-state="definition" data-fdn-prop-fit="lane"></fdn-use>
+              </div>
             </div>
           </div>
         </div>
@@ -201,9 +209,9 @@
         <fdn-use component="ProposedCard" data-fdn-prop-type="DEPLOY" data-fdn-prop-glyph="deploy" data-fdn-prop-ref="n5" data-fdn-prop-title="Publish preview" data-fdn-prop-field="TARGET" data-fdn-prop-value="nectar &quot;review&quot;"></fdn-use>
         <span data-fdn-style="spine-link"></span>
         <fdn-use component="FlowCard" data-fdn-prop-title="Ship it?" data-fdn-prop-meta="blocking" data-fdn-prop-state="definition" data-fdn-prop-glyph="ask" data-fdn-prop-fit="wide"></fdn-use>
-        <div style="align-items:center;color:var(--color-mono-meta);column-gap:8px;display:flex;font-family:var(--font-mono);font-size:var(--font-size-xs);margin-top:19px;width:480px">
+        <div style="align-items:center;color:var(--color-mono-meta);gap:8px;display:flex;font-family:var(--font-mono);font-size:var(--font-size-xs);margin-top:19px;width:480px">
           <span style="background-color:var(--color-status-merged);border-radius:50%;flex:none;height:6px;width:6px"></span>
-          <span>Publish preview after the gate; add Fix findings on denial; replace Manual smoke test.</span>
+          <span>Publish preview after the gate; add Fix findings on denial; replace Manual smoke test</span>
         </div>
       </div>
       </div>
@@ -219,14 +227,16 @@
       <fdn-prop name="selected" type="enum" default="no" values="yes,no"></fdn-prop>
       <fdn-prop name="attached" type="enum" default="no" values="yes,no"></fdn-prop>
     </fdn-props>
-    <div data-fdn-style="rail-row" style="background-color:{{ prop.selected == 'yes' ? 'var(--color-rail-selection)' : 'transparent' }}">
-      <fdn-use component="FlowGlyph" data-fdn-prop-name="track" data-fdn-prop-color="var(--color-chip-ink)"></fdn-use>
-      <span style="display:flex;flex-direction:column;flex-grow:1;min-width:0">
-        <span style="color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ prop.name }}</span>
-        <span data-fdn-style="meta-10" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ prop.meta }}</span>
+    <button data-fdn-style="rail-row" style="background-color:{{ prop.selected == 'yes' ? 'var(--color-rail-selection)' : 'transparent' }}">
+      <span style="display:block;flex-shrink:0;height:14px;width:14px">
+        <fdn-use component="FlowGlyph" data-fdn-prop-name="track" data-fdn-prop-color="var(--color-chip-ink)"></fdn-use>
+      </span>
+      <span style="display:block;flex-grow:1;min-width:0">
+        <span style="color:var(--color-text-primary);display:block;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ prop.name }}</span>
+        <span data-fdn-style="meta-10" style="display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ prop.meta }}</span>
       </span>
       <fdn-use when="prop.attached == 'yes'" component="StatusDot" data-fdn-prop-state="running"></fdn-use>
-    </div>
+    </button>
   </fdn-component>
   <fdn-component name="SectionLabel" hidden>
     <fdn-props>
@@ -242,27 +252,27 @@
     <fdn-props>
       <fdn-prop name="code" type="enum" default="enabled" values="enabled,disabled"></fdn-prop>
     </fdn-props>
-    <span style="align-items:center;background-color:var(--color-chip-bg);border-radius:var(--radius-md);column-gap:2px;display:flex;flex:none;padding:2px">
-      <span data-fdn-style="segment" style="background-color:var(--color-segment-on);box-shadow:var(--shadow-segment);color:var(--color-text-primary)">Flow</span>
-      <span data-fdn-style="segment" style="color:var(--color-text-muted);opacity:{{ prop.code == 'disabled' ? '0.45' : '1' }}">Code</span>
+    <span style="align-items:center;background-color:var(--color-chip-bg);border-radius:var(--radius-md);gap:2px;display:flex;flex:none;padding:2px">
+      <button data-fdn-style="segment" style="background-color:var(--color-segment-on);box-shadow:var(--shadow-segment);color:var(--color-text-primary)">Flow</button>
+      <button data-fdn-style="segment" style="color:var(--color-text-muted);opacity:{{ prop.code == 'disabled' ? '0.45' : '1' }}">Code</button>
     </span>
   </fdn-component>
   <fdn-component name="SidecarRail" hidden>
     <fdn-props>
       <fdn-prop name="pending" type="enum" default="none" values="pending,none"></fdn-prop>
     </fdn-props>
-    <div style="align-items:center;border-left:1px solid var(--color-divider);box-sizing:border-box;display:flex;flex:none;flex-direction:column;padding-bottom:12px;padding-top:12px;width:36px">
+    <button style="align-items:center;border-bottom-width:0;border-left:1px solid var(--color-divider);border-right-width:0;border-top-width:0;box-sizing:border-box;color:var(--color-text-muted);display:flex;flex:none;flex-direction:column;padding-bottom:12px;padding-left:0;padding-right:0;padding-top:12px;width:36px">
       <span style="display:flex;flex-direction:column;align-items:flex-end;height:15px;width:15px">
-        <fdn-use component="FlowGlyph" data-fdn-prop-name="sidecar" data-fdn-prop-size="15"></fdn-use>
+        <fdn-use component="FlowGlyph" data-fdn-prop-name="sidecar" data-fdn-prop-size="15" data-fdn-prop-color="currentColor"></fdn-use>
         <span when="prop.pending == 'pending'" style="background-color:var(--color-status-merged);border:1.5px solid var(--color-surface);border-radius:50%;box-sizing:border-box;flex:none;height:7px;margin-right:-4px;margin-top:-18px;width:7px"></span>
       </span>
       <span style="color:var(--color-meta-faint);font-family:var(--font-mono);font-size:var(--font-size-2xs);margin-top:10px;writing-mode:vertical-rl">⌘⌃B</span>
-    </div>
+    </button>
   </fdn-component>
   <fdn-component name="StatusDot" hidden>
     <fdn-props>
       <fdn-prop name="state" type="enum" required="true" values="blocked,done,merged,review,running,waiting"></fdn-prop>
       <fdn-prop name="size" type="string" default="7px"></fdn-prop>
     </fdn-props>
-    <span data-fdn-id="n25" style="background:{{ statuscolor[prop.state] }};border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;flex:none;height:{{ prop.size }};width:{{ prop.size }}"></span>
+    <span data-fdn-id="n25" style="background:{{ statuscolor[prop.state] }};border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex-shrink:0;height:{{ prop.size }};width:{{ prop.size }}"></span>
   </fdn-component>
