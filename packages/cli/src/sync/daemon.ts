@@ -9,7 +9,7 @@ import { updateDocument } from '../disk.js'
 import { liveDesigns, replicaRoot, readSyncState, writeSyncState, type LiveDesign } from '../sync-store.js'
 import { CatalogueQueue } from './catalogue.js'
 import { validateAppendReceipt, type Frame } from './bridge.js'
-import { createBridge, configForDesign, shareRelay, maintainKnownRepos, type Bridge } from '../share/transport.js'
+import { createBridge, configForDesign, shareRelay, maintainKnownRepos, ShareHints, type Bridge } from '../share/transport.js'
 import type { ShareConfig } from '../share/config.js'
 import { DirectChanges, writeDirectStatus, type DirectConfig } from './direct.js'
 
@@ -85,10 +85,11 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
       updateError('connection', null); updateError(side, null)
     }
     let catalogueHead: string | undefined
+    const shareHints=transport.share&&process.env.FOUNDATION_SHARE_HINTS!=='0'?new ShareHints(transport,feed):undefined
     const hinted = new Set<string>()
     let hintSignature = '', directPoll: NodeJS.Timeout | undefined
     const pushDirect = (): void => {
-      if (!direct || signal.aborted) return
+      if ((!direct&&!shareHints) || signal.aborted) return
       try {
         const stat = statSync(`${design.file}.chain`), signature = `${stat.ino}:${stat.size}:${stat.mtimeMs}`
         if (signature === hintSignature) return
@@ -99,21 +100,24 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
         const batch: { hash: string; hex: string }[] = []; let bytes = 0
         for (const change of changes) {
           const blob = encodeBlob(change.envelope, change.bytes)
-          if (blob.length > 491520) { hinted.add(change.envelope.hash); continue }
+          if (blob.length > (shareHints?350000:491520)) { hinted.add(change.envelope.hash); continue }
           if (batch.length === 16 || bytes + blob.length > 500000) break
           batch.push({ hash: change.envelope.hash, hex: Buffer.from(blob).toString('hex') }); bytes += blob.length
         }
         if (batch.length) {
           syncTrace('direct.notice', () => ({ docId: design.docId, hashes: batch.map(change => change.hash) }))
-          direct.push({ workspace: design.workspace, product: design.product, docId: design.docId, blobs: batch.map(change => change.hex) })
-          for (const change of batch) hinted.add(change.hash)
+          direct?.push({ workspace: design.workspace, product: design.product, docId: design.docId, blobs: batch.map(change => change.hex) })
+          const accepted=shareHints?shareHints.push(batch):batch.map(c=>c.hash)
+          for (const hash of accepted) hinted.add(hash)
         }
-        if (batch.length === changes.length) hintSignature = signature
+        if (batch.length === changes.length&&batch.every(c=>hinted.has(c.hash))) hintSignature = signature
       } catch { /* Atomic replacement or an unavailable optional peer never blocks Comb. */ }
     }
     const relayController = new AbortController()
-    const relay = transport.share ? shareRelay(transport.share, transport.shareLog??feed, AbortSignal.any([signal,relayController.signal]), bytes => {
-      updateDocument(design.file, chain => { if(chain.docId()!==design.docId)throw new Error('document identity mismatch');importChangeBlobs(chain,[bytes]) },true)
+    const relay = transport.share&&process.env.FOUNDATION_SHARE_RELAY!=='0' ? shareRelay(transport.share, transport.shareLog??feed, AbortSignal.any([signal,relayController.signal]), bytes => {
+      let imported=0
+      updateDocument(design.file, chain => { if(chain.docId()!==design.docId)throw new Error('document identity mismatch');imported=importChangeBlobs(chain,[bytes]) },true)
+      if(!imported)return
       const received=directReceived.get(key)??new Map<string,number>(); const hash=decodeBlob(bytes).envelope.hash
       if(!received.has(hash))received.set(hash,Date.now()+5000);directReceived.set(key,received);wake?.()
     }) : undefined
@@ -121,7 +125,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
     signal.addEventListener('abort', stop)
     try {
       try { watcher = watch(dirname(design.file), (_event, name) => { if (name === null || design.file.endsWith(`/${name}`) || `${design.file}.chain`.endsWith(`/${name}`)) { syncTrace('daemon.notice', () => ({ docId: design.docId, chain: name === null || String(name).endsWith('.chain') })); pushDirect(); wake?.() } }); watcher.on('error', () => watcher?.close()) } catch { /* Poll remains active on unsupported filesystems. */ }
-      if (direct) { directPoll = setInterval(pushDirect, 250); pushDirect() }
+      if (direct||shareHints) { directPoll = setInterval(pushDirect, 250); pushDirect() }
       while (!signal.aborted) {
         let receiveError: unknown, publishingHash: string | undefined
         try {
@@ -210,7 +214,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
           await delay(Math.round(retry[side] * (0.5 + Math.random() / 2))); retry[side] = Math.min(retry[side] * 2, 5000)
         }
       }
-    } finally { relayController.abort();await relay; if (directPoll) clearInterval(directPoll); watcher?.close(); signal.removeEventListener('abort', stop) }
+    } finally { relayController.abort();await relay;await shareHints?.close(); if (directPoll) clearInterval(directPoll); watcher?.close(); signal.removeEventListener('abort', stop) }
   }
   try {
     while (!signal.aborted) {

@@ -486,7 +486,7 @@ export async function startShareService(config: ShareServiceConfig) {
         return
       }
       if (method === 'POST' && path === '/v1/rpc') {
-        requireThat(['hello', 'head', 'read', 'append'].includes(body.op), 'unsupported RPC')
+        requireThat(['hello', 'head', 'read', 'append', 'hint'].includes(body.op), 'unsupported RPC')
         if (body.op === 'hello') {
           exact(body, ['op', 'require'])
           const b = bridge()
@@ -502,7 +502,7 @@ export async function startShareService(config: ShareServiceConfig) {
         requireThat(typeof body.log === 'string' && HEX.test(body.log), 'invalid opaque log')
         const physical = `share-${space.space}-${body.log}`
         const fields: Frame = { log: physical }
-        if (body.op === 'append') {
+        if (body.op === 'append' || body.op === 'hint') {
           exact(body, ['op', 'log', 'idempotency_key', 'payload_hex', 'epoch'])
           requireThat(token.permission === 'write', 'write permission required', 403)
           requireThat(body.epoch === space.epoch && space.epoch > 0, 'stale epoch', 409)
@@ -547,6 +547,10 @@ export async function startShareService(config: ShareServiceConfig) {
             max_bytes: body.max_bytes ?? 491520
           })
         } else exact(body, ['op', 'log'])
+        if (body.op === 'hint') {
+          send(200, { v: 1, op: 'hint', ok: true, log: body.log, accepted: true })
+          return
+        }
         const run = async () => {
           const current = authenticate(bearer)
           if (body.op === 'append') {

@@ -41,7 +41,8 @@ export async function api<T>(
   config: Pick<ShareConfig, 'service'>,
   path: string,
   token?: string,
-  body?: unknown
+  body?: unknown,
+  timeoutMs = 35000
 ): Promise<T> {
   const response = await fetch(`${config.service}/v1/${path}`, {
     method: body === undefined ? 'GET' : 'POST',
@@ -50,7 +51,7 @@ export async function api<T>(
       ...(body === undefined ? {} : { 'Content-Type': 'application/json' })
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-    signal: AbortSignal.timeout(35000),
+    signal: AbortSignal.timeout(timeoutMs),
     redirect: 'error'
   })
   if (!response.ok) {
