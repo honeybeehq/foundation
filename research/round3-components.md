@@ -1,6 +1,6 @@
 # How accurate was the count on each component?
 
-**Keycap is close after a scoring correction; InboxRow substantially over-counts. HelpCenter labels are pending.** These are candidate differences against the design, not confirmed implementation bugs. Real production exports were rendered, with independent hand labels made blind to reports. No matcher or grouping rule was tuned to these components.
+**Keycap finds all three labelled differences after a scoring correction but adds one false candidate. InboxRow and HelpCenter substantially over-count: HelpCenter reports 124 candidates against 21 hand-labelled causes, with only 13 supported.** These are candidate differences against the design, not confirmed implementation bugs. Real production exports were rendered, with independent hand labels made blind to reports. No matcher or grouping rule was tuned to these components.
 
 ## Count accuracy
 
@@ -14,8 +14,8 @@ One compatible raw drift is enough to support a multi-finding group. Scope match
 | InboxRow · selected | no-ids | 16 | 7 | 5 | 11 | 2 | 31.2% | 71.4% |
 | InboxRow · failed | ids | 17 | 6 | 4 | 13 | 2 | 23.5% | 66.7% |
 | InboxRow · failed | no-ids | 18 | 6 | 4 | 14 | 2 | 22.2% | 66.7% |
-| HelpCenter · agent-run | ids | 124 | pending | pending | pending | pending | pending | pending |
-| HelpCenter · agent-run | no-ids | 119 | pending | pending | pending | pending | pending | pending |
+| HelpCenter · agent-run | ids | 124 | 21 | 13 | 111 | 8 | 10.5% | 61.9% |
+| HelpCenter · agent-run | no-ids | 119 | 21 | 12 | 107 | 9 | 10.1% | 57.1% |
 
 Keycap has only three labelled differences, so its percentages have little statistical weight. InboxRow's two states share markup and do not count as independent components. HelpCenter has one fixture: agent-run context, initial shortcuts topic, no query.
 
@@ -31,6 +31,8 @@ Only sure hand labels are scored. An abstention is a recall miss; precision excl
 | InboxRow · selected | no-ids | 5 | 1 | 2 | 83.3% | 71.4% | 0 |
 | InboxRow · failed | ids | 8 | 0 | 1 | 100.0% | 88.9% | 0 |
 | InboxRow · failed | no-ids | 7 | 1 | 2 | 87.5% | 77.8% | 0 |
+| HelpCenter · agent-run | ids | 17 | 0 | 35 | 100.0% | 32.7% | 77 |
+| HelpCenter · agent-run | no-ids | 16 | 0 | 36 | 100.0% | 30.8% | 77 |
 
 Without ids, the InboxRow outer design row pairs with the capture wrapper instead of the real button (0 instead of 0/0). Three cheap fixture anchors per row improve correspondence partly by construction: they manually declare the known mapping. They do not repair the defect count; no-ids results are shown alongside.
 
@@ -46,6 +48,8 @@ The original frozen scorer required literal property equality: a `border-color` 
 | InboxRow · selected | no-ids | 5 → 5 | 31.2% → 31.2% | 71.4% → 71.4% |
 | InboxRow · failed | ids | 4 → 4 | 23.5% → 23.5% | 66.7% → 66.7% |
 | InboxRow · failed | no-ids | 4 → 4 | 22.2% → 22.2% | 66.7% → 66.7% |
+| HelpCenter · agent-run | ids | 11 → 13 | 8.9% → 10.5% | 52.4% → 61.9% |
+| HelpCenter · agent-run | no-ids | 10 → 12 | 8.4% → 10.1% | 47.6% → 57.1% |
 
 Nine shorthand regressions failed before the fix; all ten cases pass after it, including a negative control. The same scorer was applied to all six frozen Tracks R2 reports. Only anchored empty changes: 10→11 supported out of 20, precision 50→55%, recall 71.4→78.6%. Anchored selected stays 10/24, proposal 11/24. Unanchored selected/proposal/empty stay 6/11, 6/11, 5/6. This replay uses saved R2 reports, not a claim that unanchored legacy captures equal current anchored captures. Full strict/corrected results: `evidence/tracks-shorthand-scores.json`.
 
@@ -65,6 +69,8 @@ One measured run on netcup-2; milliseconds. Capture columns are per-side work af
 - **Keycap:** all three hand causes—height/box sizing, ink and border colour—have support after correction. The fourth candidate is authored font-family syntax despite identical pinned rendered mono faces. The initial score's missed border was a scorer vocabulary bug, not failed detection.
 - **InboxRow selected:** the model-logo replacement and lower glyph alignment have no supported candidate. The checker produces many layout/configuration and authored font-stack groups without independent labelled causes. With ids, 11 of 16 candidates remain unsupported.
 - **InboxRow failed:** the changed recovery note and lower glyph alignment are missed by one-to-one support. Thirteen of 17 anchored candidates are unsupported. These include repeated layout/configuration groups and authored mono-font syntax. The note can leave structural missing/extra evidence without satisfying a text cause; this is a grouping/evidence limitation, not proof that the code lacks the new note.
+
+- **HelpCenter:** anchored support is 13/124 (10.5% precision, 61.9% recall); without ids it is 12/119 (10.1%, 57.1%). Misses include truncated command names, changed section header, changed topic copy, shortcut totals, anchor catalogue and focused-search border. Repeated layout and font-stack groups, plus 37 clipped-catalogue subtrees, inflate the candidate count. The hand baseline groups many changed catalogue rows into one cause, while the checker reports many local consequences. Label H-02 is explicitly partly fixture-derived because the fixture lacks production availability and plugin commands. Thus even the 21 product-labelled causes are not a pure production-app bug list. Of correspondence labels, 77 are unsure and excluded: sure-pair recall 32.7% with ids and 30.8% without is the useful warning beside 100% certain-pair precision.
 
 See each accuracy JSON for exact candidate ids, assignments, false candidates and missed labels. The hand list includes likely intentional evolution; it is not a bug oracle.
 
@@ -109,7 +115,9 @@ The first script writes candidate reports/diff without loading labels; the secon
 
 Verification: 53 comparison/acceptance tests pass; Foundation typecheck passes; Apiary TS7 harness check passes through `node scripts/tsc7.cjs --noEmit -p .foundation/tsconfig.json`. Electron was not launched. No repository verification skill is installed in Foundation; Apiary core-work and verify-apiary were read, but no Electron integration claim is made.
 
-The labeller session is f764521f-44e4-4b1d-9137-7d9c15700459, instructed to see capture directories only and no reports/counts. Capture commits preceded each received label.
+The labeller session is f764521f-44e4-4b1d-9137-7d9c15700459, instructed to see capture directories only and no reports/counts. Capture commits preceded each received label. L1 explicitly confirmed it never opened reports/, drift-report.json, captures/index.html, candidate counts or code-repo links manifests; it used only capture PNG/DOM/meta, the design and Apiary source. Final Help labels are cae0e28ab9dde59564d2f6b9aec52dc6f8f3a517, checked against 50b24cf.
+
+Studio Apiary collection failed (Landing Project T49). The orchestrator explicitly authorized the new Foundation prototype branch `proto/dtc-r3-components`; it contains the committed captures/report and will be collected onto the Project branch when service recovers. No force push or main push was made. The labeller branch diverged from the current source, so only its final ground-truth/help-center files were imported; the divergent old captures were not merged. Partial Project inputs/help-* base64 copies were an unused evidence-only fallback before the branch workaround, not authoritative captures.
 
 Preview publication attempted with Nectar on netcup-2; failed `E_QUOTA`: serving web environment quota 12 reached. No live URL is claimed; the standalone gallery and primary screenshots remain committed.
 
