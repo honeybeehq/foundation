@@ -20,6 +20,7 @@ const repo = resolve(option('--code', '.')!)
 const linksPath = resolve(repo, option('--links', '.foundation/links.json')!)
 const out = resolve(option('--out', 'captures')!)
 const designPath = resolve(option('--design', resolve(import.meta.dirname, '../../fixtures/design/tracks-pane.fdn.html'))!)
+const codeBoundary = option('--code-boundary')
 const started = performance.now()
 const links = JSON.parse(await readFile(linksPath, 'utf8')) as Links
 if (links.schema !== 'fdn-links/0' || !links.artboards?.length) throw new Error('Expected fdn-links/0 with artboards')
@@ -110,6 +111,14 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
             document.body.style.margin = '0'
           }, state.designNode ?? board.designNode)
         }
+        if (codeBoundary) await page.evaluate(({side, selector}) => {
+          const root = document.querySelector('#foundation-root')!
+          const selected = side === 'code' ? root.querySelector(selector) : root.firstElementChild
+          if (!(selected instanceof HTMLElement)) throw new Error(`Missing capture boundary: ${selector}`)
+          const {width, height} = selected.getBoundingClientRect()
+          root.replaceChildren(selected)
+          Object.assign(selected.style, {position:'relative', inset:'auto', left:'0px', top:'0px', margin:'0px', width:`${width}px`, height:`${height}px`})
+        }, {side, selector:codeBoundary})
         await page.addStyleTag({ content: fontAssets.map(font => font.css).join('\n') + '\n*{animation:none!important;transition:none!important;caret-color:transparent!important} #foundation-root{width:100vw;height:100vh;overflow:hidden}' })
         await page.evaluate(() => document.fonts.ready)
         const fontSubstitutions = await pinFontStacks(page, links.fontPolicy)
@@ -131,7 +140,7 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
         await page.screenshot({ path: join(destination, 'screenshot.png'), animations: 'disabled' })
         const fullExtent = await captureFullExtent(page, '#foundation-root', join(destination, 'full-extent.png'))
         await writeFile(join(destination, 'dom.json'), JSON.stringify(dom, null, 2) + '\n')
-        const meta = { schema: 'fdn-capture/0', ...provenance, rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, extent: dom.extent, fullExtent, frame, url, fonts, fontPolicy: links.fontPolicy, fontSubstitutions, platformFonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
+        const meta = { schema: 'fdn-capture/0', ...provenance, rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, extent: dom.extent, fullExtent, frame, ...(codeBoundary ? {boundary:{codeSelector:codeBoundary, originNormalized:true, sizePreserved:true}} : {}), url, fonts, fontPolicy: links.fontPolicy, fontSubstitutions, platformFonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
         await writeFile(join(destination, 'meta.json'), JSON.stringify(meta, null, 2) + '\n')
         console.log(`${board.id}/${state.name} ${side}: ${dom.nodes.length} nodes, ${meta.timingsMs.capture} ms`)
       } finally { await context.close() }
