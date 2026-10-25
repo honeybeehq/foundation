@@ -231,3 +231,54 @@ Studio has completed real client GitHub identity/SSH share init against the
 labelled service19488, reaching shared epoch1. Metal-3 real same-account login
 succeeds but automatic key handover is under investigation. No two-host timing
 claim until both clients hold the key and run final daemons.
+
+## macOS vault size bug found by the real drill
+
+Key handover exposed a real Mac-only bug in the original H2 vault. The daemon
+blocked inside `security -i` while holding its vault lock; SIGTERM could not run
+because that child call was synchronous and unbounded. Direct reads succeeded.
+A controlled size-only reproduction passed64B/2KiB updates but hung at8KiB and
+20,019B under a bounded timeout. Apple's SecurityTool source defines an
+interactive line maximum of4096 bytes:
+https://github.com/apple-oss-distributions/Security/blob/main/SecurityTool/macOS/security.c
+The real stored JSON was3509B and its escaped update command4009B before adding
+the pending peer. No secret value was printed during diagnosis.
+
+`8848c86` replaces interactive writes with a small Swift Security.framework helper,
+compiled lazily once from pinned source using Xcode Command Line Tools. The
+source SHA256 selects a private per-HOME cache under
+`~/.foundation/share/helpers`; each call checks user ownership, permissions,
+symlinks and source/binary hash manifest. Compilation publishes an atomic cache
+directory under a lock. Compiler input contains code only. Vault payloads travel
+on helper stdin/stdout, never in arguments; native operations time out after10s.
+The helper disables user interaction only inside its own process, so denied or
+locked Keychains fail visibly instead of opening an unattended dialog. Linux's
+private-file vault is unchanged. These older SecKeychain APIs are deprecated;
+replacing them is future platform work.
+
+Native apps have different Keychain ACLs from `/usr/bin/security`. The new item
+uses `foundation-share-native-v1`. Only on first missing native item can the
+wrapper read the old `foundation-share-v1` item using a bounded, read-only
+security command, then copy and verify exact bytes through the native helper.
+The old item remains untouched. A fsynced0600 marker records any successful
+native read/write; if the native item disappears later, the wrapper refuses to
+resurrect stale legacy keys. Migration/writes share a per-scope lock. Unit checks
+cover payload size, command secrecy, timeout, missing items, cache corruption,
+legacy copy and missing-native-after-migration refusal.
+
+**Keep the cached helper with its Keychain and migration marker. Never delete
+`~/.foundation/share/helpers` on a machine with a vault.** The Keychain trusts the
+compiled helper's code identity. Ordinary Foundation upgrades with identical
+Swift source reuse that executable; changing helper source, losing the cache or
+rebuilding with another toolchain can require explicit recovery. Preserve the
+old helper until any future helper migration is verified. No ACL weakening or
+stale-legacy fallback was introduced. Native-item loss is intentionally loud.
+
+Studio's actual native test created65555B, updated192019B and read both back
+exactly; Keychain mode stayed0600 and user defaults/search remained unchanged.
+A dummy-account legacy-to-native exact-copy test also passed. The wrapper and
+marker have independent Opus review with no Medium-or-higher findings; it reran
+root tsc and share tests on Linux. These raw Swift/dummy tests do not yet establish
+the real wrapper migration or automatic peer key grant; the actual two-host run
+is retrying that step on exact8848c86. Full integrated tests65/17files and root
+tsc pass with separate exit receipts.
