@@ -45,9 +45,22 @@ export interface Drift {
   designBox?: Box;
   codeBox?: Box;
 }
+export interface Defect {
+  id: string;
+  layer: { design?: string; code?: string };
+  kind: Drift["kind"];
+  classification: "product" | "environment" | "uncertain";
+  cause: string;
+  findings: string[];
+  summary: string;
+  accepted?: { entryId: string; reason: string };
+}
 export interface Match {
   design: CaptureNode;
   code: CaptureNode;
   kind: "id" | "heuristic";
   confidence: number;
+  uncertain?: true;
+  reason?: string;
+  wrappers?: { design: string[]; code: string[] };
 }

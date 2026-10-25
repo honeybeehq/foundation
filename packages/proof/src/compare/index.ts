@@ -4,6 +4,7 @@ import { readFile, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { PNG } from "pngjs";
 import pixelmatch from "pixelmatch";
+import { groupDefects } from "./defects.ts";
 import { matchNodes } from "./match.ts";
 import { properties, equal, token } from "./style.ts";
 import {
@@ -86,6 +87,7 @@ export function compare(
         codeNode: b.fdnId || b.path,
         match: m.kind,
         confidence: m.confidence,
+        ...(m.uncertain ? { uncertain: true as const, reason: m.reason! } : {}),
         designBox: a.box,
         codeBox: b.box,
       };
@@ -205,6 +207,7 @@ export function compare(
         ? "Capture lacks visual properties: " + unavailable.join(", ")
         : null;
   const meta = design.meta;
+  const defects = groupDefects(drifts, matches, design, code);
   const report = {
     schema: "fdn-drift/0",
     artboard: meta.artboard ?? "unknown",
@@ -259,11 +262,22 @@ export function compare(
       codeImage: "code.png",
     },
     drifts,
+    defects,
+    summary: {
+      uniqueDefects: defects.filter(d => d.classification === "product").length,
+      accepted: 0,
+      raw: drifts.length,
+      uncertainMatches: matches.filter(m => m.uncertain).length,
+      environment: defects.filter(d => d.classification === "environment").length,
+      uncertain: defects.filter(d => d.classification === "uncertain").length,
+    },
     matches: matches.map((m) => ({
       designNode: m.design.fdnId || m.design.path,
       codeNode: m.code.fdnId || m.code.path,
       kind: m.kind,
       confidence: m.confidence,
+      ...(m.uncertain ? { uncertain: true as const, reason: m.reason! } : {}),
+      ...(m.wrappers ? { wrappers: m.wrappers } : {}),
     })),
     verdict: reason
       ? "not-provable"
