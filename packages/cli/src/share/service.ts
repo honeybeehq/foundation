@@ -158,6 +158,7 @@ export async function startShareService(config: ShareServiceConfig) {
           const old = current.devices.find(d => d.id === device.id)
           requireThat(!old || JSON.stringify(old) === JSON.stringify(device), 'immutable device binding', 409)
           if (!old) { requireThat(current.devices.length < 1000, 'device registry full', 409); current.devices.push(device) }
+          requireThat(Buffer.byteLength(JSON.stringify(current)) < LIMIT - 1024, 'space metadata full', 409)
         })
         const token = randomBytes(32).toString('base64url'); const expiresAt = Date.now() + 3600000
         for (const [key, value] of tokens) if (value.expiresAt <= Date.now()) tokens.delete(key)
