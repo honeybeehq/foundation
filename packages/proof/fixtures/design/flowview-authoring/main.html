@@ -1,0 +1,77 @@
+  <main>
+    <div data-fdn-id="n190" data-fdn-style="page">
+      <header data-fdn-id="n91" style="display:flex;flex-direction:column;row-gap:8px">
+        <h1 data-fdn-id="n92" style="color:var(--color-text-primary);font-family:var(--font-sans);font-size:19px;font-weight:var(--font-weight-semibold);margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">Apiary — Tracks pane · Flow View</h1>
+        <div data-fdn-id="n93" style="color:var(--color-text-muted);font-family:var(--font-sans);font-size:13px;line-height:1.55;max-width:760px">A track is an expected sequence of steps clipped onto one agent. The pane is a rail of definitions on the left and the selected definition drawn as a flow on a canvas — live while an agent is attached, and as a diff while a sidecar proposal is pending.</div>
+        <div data-fdn-id="n94" data-fdn-style="meta-mono" style="color:var(--color-text-disabled)">Flow View · brought up to date with Classic TracksPane (apiary proto/design-to-code-tracks) · supersedes the list-based spine layout</div>
+      </header>
+      <section data-fdn-id="n95" style="display:flex;flex-direction:column">
+        <fdn-use data-fdn-id="n96" component="BoardCaption" data-fdn-prop-body="There is no unselected pane: opening Tracks selects the first definition and draws it. The rail lists definitions — name, step count and type mix — and a green dot marks the one with a live attachment. Selection is the soft rail blue, never honey." data-fdn-prop-index="BOARD 1" data-fdn-prop-title="TRACKS AT REST"></fdn-use>
+        <div data-fdn-id="n191" style="display:flex;flex-direction:column;row-gap:22px">
+          <fdn-use data-fdn-id="n97" component="TracksPane" data-fdn-prop-mode="rest"></fdn-use>
+          <aside data-fdn-id="n192" style="display:flex;flex-direction:column;max-width:1080px;row-gap:18px">
+            <div data-fdn-id="n193">
+              <fdn-use data-fdn-id="n194" component="SectionLabel" data-fdn-prop-text="HOW TO READ THE FLOW"></fdn-use>
+              <div data-fdn-id="n195" style="column-gap:28px;display:grid;grid-template-columns:1fr 1fr;row-gap:16px">
+                <div data-fdn-id="n196" style="display:flex;flex-direction:column;row-gap:5px">
+                  <span data-fdn-id="n197" style="color:var(--color-text-tertiary);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);letter-spacing:.08em">THE RAIL — DEFINITIONS</span>
+                  <span data-fdn-id="n198" style="color:var(--color-text-secondary);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">One row per definition. The second line is its shape: step count, then the type mix. Live state does not live on the row — only a running dot for the track an agent is on.</span>
+                </div>
+                <div data-fdn-id="n199" style="display:flex;flex-direction:column;row-gap:5px">
+                  <span data-fdn-id="n200" style="color:var(--color-text-tertiary);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);letter-spacing:.08em">THE CANVAS — ONE FLOW</span>
+                  <span data-fdn-id="n201" style="color:var(--color-text-secondary);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">Steps are cards on a dot grid, joined by hairlines. Parallel lanes sit side by side inside a branch frame; a review gate's denied arm drops to the right and rejoins the spine.</span>
+                </div>
+                <div data-fdn-id="n202" style="display:flex;flex-direction:column;row-gap:5px">
+                  <span data-fdn-id="n203" style="color:var(--color-text-tertiary);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);letter-spacing:.08em">LIVE REGISTER</span>
+                  <span data-fdn-id="n204" style="color:var(--color-text-secondary);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">While attached, the flow is read-only: done steps fade back with a check, the current step lifts with a running dot, upcoming steps wait as hollow rings. The canvas pans; steps past the fold are still there.</span>
+                </div>
+                <div data-fdn-id="n205" style="display:flex;flex-direction:column;row-gap:5px">
+                  <span data-fdn-id="n206" style="color:var(--color-status-blocked);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);letter-spacing:.08em">EXCEPTIONS</span>
+                  <span data-fdn-id="n207" style="color:var(--color-text-secondary);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">Deviation is counted quietly in the footer — a waiting dot and “1 exception” — and opens on click. It is visible, never punished.</span>
+                </div>
+              </div>
+            </div>
+            <div data-fdn-id="n208" style="border-top:1px solid var(--color-border);display:flex;flex-direction:column;padding-top:14px;row-gap:5px">
+              <span data-fdn-id="n209" style="color:var(--color-text-muted);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">No honey in the live register: it is spent once per pane, on accepting a proposal or on New track.</span>
+            </div>
+          </aside>
+        </div>
+      </section>
+      <section data-fdn-id="n210" style="display:flex;flex-direction:column">
+        <fdn-use data-fdn-id="n211" component="BoardCaption" data-fdn-prop-body="The selected track, live: the header says who is attached and how far along, the canvas draws the flow, the footer carries hints and the exception count. With a proposal pending, the same canvas becomes the diff — proposed steps dashed in violet, the removed step struck through — and the accept / refine / discard bar is docked at the bottom of the canvas so the one decision is always in view. Honey moves to Accept." data-fdn-prop-index="BOARD 2" data-fdn-prop-title="ONE TRACK SELECTED"></fdn-use>
+        <fdn-use data-fdn-id="n212" component="TracksPane" data-fdn-prop-mode="selected"></fdn-use>
+      </section>
+      <section data-fdn-id="n281" style="display:flex;flex-direction:column">
+        <fdn-use data-fdn-id="n282" component="BoardCaption" data-fdn-prop-body="Nothing defined yet. The rail stays, empty, so the pane keeps its shape. The canvas says what a track is in one sentence and spends its one honey moment on New track. One small pixel-art moment, per the personality budget; never wallpaper." data-fdn-prop-index="BOARD 3" data-fdn-prop-title="EMPTY — NO TRACKS DEFINED"></fdn-use>
+        <div data-fdn-id="n283" style="align-items:flex-start;column-gap:32px;display:flex">
+          <fdn-use data-fdn-id="n284" component="TracksPane" data-fdn-prop-mode="empty"></fdn-use>
+          <aside data-fdn-id="n285" style="display:flex;flex:1;flex-direction:column;min-width:0;padding-top:4px;row-gap:18px">
+            <div data-fdn-id="n286">
+              <fdn-use data-fdn-id="n287" component="SectionLabel" data-fdn-prop-text="WHY THIS EMPTY STATE IS NOT A GALLERY"></fdn-use>
+              <div data-fdn-id="n288" style="column-gap:28px;display:grid;grid-template-columns:1fr 1fr;row-gap:16px">
+                <div data-fdn-id="n289" style="display:flex;flex-direction:column;row-gap:5px">
+                  <span data-fdn-id="n290" style="color:var(--color-text-tertiary);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);letter-spacing:.08em">NO BLUEPRINT LAYER</span>
+                  <span data-fdn-id="n291" style="color:var(--color-text-secondary);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">A starter-template grid is the obvious empty state and the wrong one: a template layer is an explicit non-goal. So the affordance is the real verb — write one down.</span>
+                </div>
+                <div data-fdn-id="n292" style="display:flex;flex-direction:column;row-gap:5px">
+                  <span data-fdn-id="n293" style="color:var(--color-text-tertiary);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);letter-spacing:.08em">TRACK ≠ MACHINE</span>
+                  <span data-fdn-id="n294" style="color:var(--color-text-secondary);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">A machine is a canvas with triggers built in, holding many jobs, alive for years. A track is the small thing: one agent, one expected sequence. Tracks work on agents inside machines, but neither feature needs the other.</span>
+                </div>
+                <div data-fdn-id="n295" style="display:flex;flex-direction:column;row-gap:5px">
+                  <span data-fdn-id="n296" style="color:var(--color-text-tertiary);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);letter-spacing:.08em">THE SAME FRAME</span>
+                  <span data-fdn-id="n297" style="color:var(--color-text-secondary);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">Rail, canvas and sidecar rail are all still there with zero tracks, so the first definition appears in place rather than replacing a splash screen.</span>
+                </div>
+                <div data-fdn-id="n298" style="display:flex;flex-direction:column;row-gap:5px">
+                  <span data-fdn-id="n299" style="color:var(--color-text-tertiary);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);letter-spacing:.08em">ONE PIXEL MOMENT</span>
+                  <span data-fdn-id="n300" style="color:var(--color-text-secondary);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">Art tokens are declared separately from chrome tokens on purpose: the bee may be vivid, the UI palette stays restrained, and the two never bleed into each other.</span>
+                </div>
+              </div>
+            </div>
+            <div data-fdn-id="n301" style="border-top:1px solid var(--color-border);display:flex;flex-direction:column;padding-top:14px;row-gap:5px">
+              <span data-fdn-id="n302" style="color:var(--color-text-muted);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">Honey once per pane: New track here, Accept on a proposal. Never two at once.</span>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </div>
+  </main>
