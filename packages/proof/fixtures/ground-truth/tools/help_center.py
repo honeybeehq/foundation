@@ -2,7 +2,7 @@
 
 python3 -I tools/help_center.py <captures/help-center/agent-run/1480x830@1> <out.csv>
 A visual design layer is a node with own text, paint (bg/border/shadow), an icon root, or a visible
-row/section block, whose box intersects the 1064x720 frame. Fails if a layer has no rule or a rule
+row/section block, whose box intersects the 1062x718 frame. Fails if a layer has no rule or a rule
 names a code path that does not exist.
 """
 import csv, json, sys
@@ -20,7 +20,7 @@ def painted(n):
 
 def visible(n):
     x, y, w, h = n['box']
-    return w > 0 and h > 0 and y < 720 and y + h > 0 and x < 1064
+    return w > 0 and h > 0 and y < 718 and y + h > 0 and x < 1062
 
 fid = lambda n: n.get('fdnId') or ''
 ROWBLOCK = ('::n2', '::n12', '::n9')  # ShortcutRow row, NavRow row, SectionHead row

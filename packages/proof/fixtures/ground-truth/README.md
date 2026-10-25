@@ -42,5 +42,5 @@ DOM dump used while labelling (`dump.py`). Run with `python3 -I tools/label.py <
 blind from `../components/<component>/captures/**/{design,code}` plus the .fdn.html and the Apiary
 `proto/design-to-code-components` source. Id prefixes: `K-` Keycap, `IS-`/`IF-` InboxRow selected/failed, `H-` HelpCenter.
 HelpCenter correspondence is written by `tools/help_center.py`; only design layers whose box intersects the
-1064×720 frame are labelled. `evidence/r3-*.png` are annotated crops (`tools/annotate_round3.py`).
+1062×718 frame are labelled. `evidence/r3-*.png` are annotated crops (`tools/annotate_round3.py`).
 Slugs shared across components name the same cause: `[box-sizing]` = Keycap `[cap-height]`, `[cap-ink]`, `[cap-border]`, `[harness-bg]`.
