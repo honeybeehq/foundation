@@ -7,6 +7,7 @@ The code repository owns `.foundation/accepted.json`. Its root is
 - `scope`: exact `artboard`, `state`, and `viewport: {width,height,dpr}`.
 - `layer`: design id and code `data-fdn-id` or captured DOM path.
 - `code.component`: the linked code export path; changing it requires review.
+- `code.pixelsSha256`: the captured code pixels inside every excluded rectangle; image/canvas/SVG edits inside accepted bounds also go stale. The summary displays the excluded image area.
 - `kind` and `values`: the kind plus all constituent findings' layer, property,
   design/code values (and missing/extra boxes), sorted independently of raw ids.
 - `reason`, `reviewer`, and ISO `date`.

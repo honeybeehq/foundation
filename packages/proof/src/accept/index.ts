@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { canonical, hash, seal } from "../compare/canonical.ts";
 import { PNG } from "pngjs";
@@ -13,7 +14,7 @@ export interface Acceptance {
   };
   layer: { design?: string; code?: string };
   kind: string;
-  code: { component: string };
+  code: { component: string; pixelsSha256: string };
   values: unknown[];
   reason: string;
   reviewer: string;
@@ -50,6 +51,7 @@ export function parseList(value: any): AcceptedList {
       typeof e.kind !== "string" ||
       typeof e.code?.component !== "string" ||
       !e.code.component ||
+      !/^[a-f0-9]{64}$/.test(e.code.pixelsSha256 ?? "") ||
       !Array.isArray(e.values) ||
       !e.values.length ||
       ![e.reason, e.reviewer].every((v) => typeof v === "string" && v.trim()) ||
@@ -150,7 +152,10 @@ export function makeAcceptance(
     scope: scopeOf(r),
     layer: defect.layer,
     kind: defect.kind,
-    code: { component: r.code?.root },
+    code: {
+      component: r.code?.root,
+      pixelsSha256: r.acceptancePixelHashes?.[id],
+    },
     values: valuesOf(r, defect),
     reason,
     reviewer,
@@ -185,6 +190,7 @@ export function evaluateAccepted(r: any, list: AcceptedList) {
       canonical(e.layer) !== canonical(d.layer) ||
       e.kind !== d.kind ||
       e.code.component !== r.code?.root ||
+      e.code.pixelsSha256 !== r.acceptancePixelHashes?.[d.id] ||
       canonical(e.values) !== canonical(valuesOf(r, d))
     )
       errors.push(
@@ -281,7 +287,54 @@ export function withAcceptanceInputs(
         })),
     );
   }
-  return { ...r, acceptanceSubtrees: subtrees };
+  const image = PNG.sync.read(captures.code.screenshot),
+    pixelHashes: Record<string, string> = {};
+  for (const defect of defectsOf(r)) {
+    const ids = new Set(defect.findings),
+      boxes = (r.drifts as Drift[])
+        .filter((d) => ids.has(d.id))
+        .flatMap((d) => [d.designBox, d.codeBox].filter(Boolean));
+    const unique = [...new Set(boxes.map((b) => canonical(b)))]
+      .sort()
+      .map((b) => JSON.parse(b));
+    const digest = createHash("sha256");
+    digest.update(
+      canonical({
+        width: image.width,
+        height: image.height,
+        dpr: r.viewport.dpr,
+        boxes: unique,
+      }),
+    );
+    for (const [x, y, w, h] of unique) {
+      const left = Math.min(
+          image.width,
+          Math.max(0, Math.floor(x * r.viewport.dpr)),
+        ),
+        right = Math.min(
+          image.width,
+          Math.max(0, Math.ceil((x + w) * r.viewport.dpr)),
+        );
+      for (
+        let row = Math.max(0, Math.floor(y * r.viewport.dpr));
+        row < Math.min(image.height, Math.ceil((y + h) * r.viewport.dpr));
+        row++
+      )
+        if (right > left)
+          digest.update(
+            image.data.subarray(
+              (row * image.width + left) * 4,
+              (row * image.width + right) * 4,
+            ),
+          );
+    }
+    pixelHashes[defect.id] = digest.digest("hex");
+  }
+  return {
+    ...r,
+    acceptanceSubtrees: subtrees,
+    acceptancePixelHashes: pixelHashes,
+  };
 }
 /** Count real pixel changes outside accepted layers; source images remain untouched. */
 export function residualPixels(
@@ -333,5 +386,7 @@ export function residualPixels(
     residualPixels: residual,
     residualRatio: residual / (a.width * a.height),
     excludedBoxes: boxes,
+    excludedPixels: covered.reduce((sum, p) => sum + p, 0),
+    excludedRatio: covered.reduce((sum, p) => sum + p, 0) / covered.length,
   };
 }

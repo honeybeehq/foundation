@@ -270,6 +270,12 @@ export async function verify(
             compare(d, c, r.tolerances).report,
             { design: d, code: c },
           );
+          if (
+            r.acceptancePixelHashes !== undefined &&
+            canonical(r.acceptancePixelHashes) !==
+              canonical(actual.acceptancePixelHashes)
+          )
+            errors.push(`${entry.path}: accepted pixel value replay mismatch`);
           const pixels = residualPixels(actual, acceptedList, {
             design: d,
             code: c,
