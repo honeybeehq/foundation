@@ -10,7 +10,11 @@ import { liveDesigns, replicaRoot, readSyncState, writeSyncState, type LiveDesig
 import { CatalogueQueue } from './catalogue.js'
 import { validateAppendReceipt, type Frame } from './bridge.js'
 import { createBridge, configForDesign, shareRelay, maintainKnownRepos, ShareHints, type Bridge } from '../share/transport.js'
-import type { ShareConfig } from '../share/config.js'
+import { findShareRoot, readShareConfig, type ShareConfig } from '../share/config.js'
+import { followLocalCatalogues } from './catalogue-follower.js'
+import { processMaterializeJobs } from './materialize-jobs.js'
+import { initializeActivityJournal, recordActivity } from './local-model.js'
+import type { FdnChain } from 'foundation-engine'
 import { DirectChanges, writeDirectStatus, type DirectConfig } from './direct.js'
 
 export interface CombConfig { binary: string; args: string[]; node?: { id: string; name: string }; direct?: DirectConfig; share?: ShareConfig; shareLog?: string }
@@ -24,20 +28,39 @@ export function publishablePrefix<T extends { envelope: { hash: string } }>(unsh
   return waitingParent < 0 ? unshared : unshared.slice(0, waitingParent)
 }
 const delay = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms))
-function page(frame: Frame, cursor: string): { blobs: Uint8Array[]; next: string } {
+function page(frame: Frame, cursor: string): { blobs: Uint8Array[]; next: string; signatures: Set<string> } {
   if (!Array.isArray(frame.events) || typeof frame.next_cursor !== 'string' || !/^[1-9][0-9]*$/.test(frame.next_cursor)) throw new Error('invalid Comb page')
   let expected = BigInt(cursor)
+  const signatures = new Set<string>()
   const blobs = frame.events.map((event: unknown) => {
     const e = event as Frame
     if (!e || e.seq !== String(expected++) || typeof e.payload_hex !== 'string' || !/^(?:[a-fA-F0-9]{2})+$/.test(e.payload_hex)) throw new Error('invalid Comb event or cursor gap')
-    const bytes = Buffer.from(e.payload_hex, 'hex'); decodeBlob(bytes); return bytes
+    const bytes = Buffer.from(e.payload_hex, 'hex'); const decoded=decodeBlob(bytes); if(e.writerSignatureVerified === true)signatures.add(decoded.envelope.hash); return bytes
   })
   if (String(expected) !== frame.next_cursor) throw new Error('invalid Comb next cursor')
-  return { blobs, next: frame.next_cursor }
+  return { blobs, next: frame.next_cursor, signatures }
 }
 export async function serveSync(config: CombConfig, signal: AbortSignal, log: (text: string) => void): Promise<void> {
   mkdirSync(replicaRoot(), { recursive: true })
   const release = acquireDocumentLock(join(replicaRoot(), 'daemon'), 100)
+  try { initializeActivityJournal() } catch (error) { log(`activity journal: ${String(error)}`) }
+  const catalogueFollower = followLocalCatalogues(config, signal, log)
+  const materializeJobs = processMaterializeJobs(signal, log)
+  const ownerNodeId = config.node?.id ?? process.env.FOUNDATION_NODE_ID ?? ''
+  const observe = (design: LiveDesign, chain: FdnChain, hashes: string[], delivery: 'baseline'|'live', verified: boolean | ReadonlySet<string> = false, importedHashes?: ReadonlySet<string>): void => {
+    try {
+      const root=design.repoRoot??findShareRoot(dirname(design.file))
+      const repo=root?readShareConfig(root)?.repo??null:null
+      recordActivity(design,chain,hashes,{ownerNodeId,repo,delivery,importedHashes,...(typeof verified==='boolean'?{signatureVerified:verified}:{signatures:verified})})
+    } catch (error) { log(`activity facts: ${String(error)}`) }
+  }
+  const pendingFacts = new Set<NodeJS.Timeout>()
+  // Give a fresh ephemeral hint time to win dedup over its durable echo. Only
+  // hints can produce live facts; a late outbox append always remains baseline.
+  const baselineLater = (design: LiveDesign, chain: FdnChain, hashes: string[], verified: boolean | ReadonlySet<string>, importedHashes?: ReadonlySet<string>): void => {
+    const timer=setTimeout(()=>{pendingFacts.delete(timer);observe(design,chain,hashes,'baseline',verified,importedHashes)},200)
+    pendingFacts.add(timer)
+  }
   const directReceived = new Map<string, Map<string, number>>()
   let direct: DirectChanges | undefined
   try { direct = config.direct ? new DirectChanges(config.direct, config.node?.id ?? '', change => {
@@ -46,10 +69,14 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
     const blobs = change.blobs.map(blob => Buffer.from(blob, 'hex'))
     for (const design of copies) {
       const received = directReceived.get(copyKey(design)) ?? new Map<string, number>()
-      updateDocument(design.file, chain => {
+      const fresh=new Set<string>()
+      const importedChain=updateDocument(design.file, chain => {
+      const known=new Set(chain.log().map(c=>c.hash));for(const blob of blobs){const hash=decodeBlob(blob).envelope.hash;if(!known.has(hash))fresh.add(hash)}
       if (chain.docId() !== change.docId) throw new Error('document identity mismatch')
       importChangeBlobs(chain, blobs)
+      return chain
     }, true)
+      observe(design,importedChain,blobs.map(b=>decodeBlob(b).envelope.hash),'baseline',false,fresh)
       for (const blob of blobs) { const hash = decodeBlob(blob).envelope.hash; if (!received.has(hash)) received.set(hash, Date.now() + 5000 + Math.floor(Math.random() * 5000)) }
       directReceived.set(copyKey(design), received)
     }
@@ -68,6 +95,10 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
       if (chain.docId() !== design.docId) throw new Error('live path now holds another design')
       chain.upgradeStorage()
     }, true)
+    const baseline = loadChain(readFileSync(`${design.file}.chain`))
+    if (baseline.verify().ok) observe(design,baseline,baseline.changes().map(c=>c.envelope.hash),'baseline')
+    let receivingLive = false
+    const importedHashes = new Set<string>()
     const key = copyKey(design), state = readSyncState(key), feed = combLog(design)
     let bridge: Bridge | undefined, watcher: FSWatcher | undefined, wake: (() => void) | undefined
     const retry = { receive: 250, publish: 250, connection: 250 }
@@ -86,7 +117,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
     }
     let catalogueHead: string | undefined
     const shareHints=transport.share&&process.env.FOUNDATION_SHARE_HINTS!=='0'?new ShareHints(transport,feed):undefined
-    const hinted = new Set<string>()
+    const hinted = new Set<string>(transport.share?baseline.changes().map(c=>c.envelope.hash):[])
     let hintSignature = '', directPoll: NodeJS.Timeout | undefined
     const pushDirect = (): void => {
       if ((!direct&&!shareHints) || signal.aborted) return
@@ -114,9 +145,11 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
       } catch { /* Atomic replacement or an unavailable optional peer never blocks Comb. */ }
     }
     const relayController = new AbortController()
-    const relay = transport.share&&process.env.FOUNDATION_SHARE_RELAY!=='0' ? shareRelay(transport.share, transport.shareLog??feed, AbortSignal.any([signal,relayController.signal]), bytes => {
+    const relay = transport.share&&process.env.FOUNDATION_SHARE_RELAY!=='0' ? shareRelay(transport.share, transport.shareLog??feed, AbortSignal.any([signal,relayController.signal]), (bytes,signatureVerified,source) => {
       let imported=0
-      updateDocument(design.file, chain => { if(chain.docId()!==design.docId)throw new Error('document identity mismatch');imported=importChangeBlobs(chain,[bytes]) },true)
+      const importedChain=updateDocument(design.file, chain => { if(chain.docId()!==design.docId)throw new Error('document identity mismatch');const hash=decodeBlob(bytes).envelope.hash;const present=chain.log().some(c=>c.hash===hash);imported=importChangeBlobs(chain,[bytes]);if(!present)importedHashes.add(hash);return chain },true)
+      if(source==='hint')observe(design,importedChain,[decodeBlob(bytes).envelope.hash],receivingLive?'live':'baseline',signatureVerified,importedHashes)
+      else baselineLater(design,importedChain,[decodeBlob(bytes).envelope.hash],signatureVerified,importedHashes)
       if(!imported)return
       const received=directReceived.get(key)??new Map<string,number>(); const hash=decodeBlob(bytes).envelope.hash
       if(!received.has(hash))received.set(hash,Date.now()+5000);directReceived.set(key,received);wake?.()
@@ -129,6 +162,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
       while (!signal.aborted) {
         let receiveError: unknown, publishingHash: string | undefined
         try {
+          receivingLive = false
           bridge = createBridge(transport); await bridge.hello()
           const active = bridge
           let failed: unknown
@@ -140,11 +174,15 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
               const incoming = page(response, state.cursor); decode({ count: incoming.blobs.length })
               if (incoming.blobs.length) {
                 const done = syncTraceSpan('receive.locked-import', () => ({ docId: design.docId, cursor: state.cursor, hashes: incoming.blobs.map(blob => decodeBlob(blob).envelope.hash) }))
-                let imported = 0, ok = false
-                try { updateDocument(design.file, chain => {
+                let imported = 0, ok = false, importedChain: FdnChain | undefined
+                try { importedChain=updateDocument(design.file, chain => {
                   if (chain.docId() !== design.docId) throw new Error('live path now holds another design')
+                  const previousHashes=new Set(chain.log().map(c=>c.hash))
                   imported = importChangeBlobs(chain, incoming.blobs, syncTraceEnabled ? (stage, durationMs) => syncTrace(`receive.${stage}`, () => ({ docId: design.docId, durationMs })) : undefined)
+                  for(const blob of incoming.blobs){const hash=decodeBlob(blob).envelope.hash;if(!previousHashes.has(hash))importedHashes.add(hash)}
+                  return chain
                 }, true); ok = true } finally { done({ imported, ok }) }
+                if(importedChain)baselineLater(design,importedChain,incoming.blobs.map(blob=>decodeBlob(blob).envelope.hash),transport.share?incoming.signatures:false,importedHashes)
                 // Delivery itself proves durable sharing, even when the append acknowledgement was lost.
                 const shared = new Set(state.published)
                 for (const blob of incoming.blobs) shared.add(decodeBlob(blob).envelope.hash)
@@ -152,9 +190,9 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
                 state.cursor = incoming.next; state.updatedAt = new Date().toISOString(); writeSyncState(key, state)
               }
               succeeded('receive')
-              if (!incoming.blobs.length) await delay(250)
+              if (!incoming.blobs.length) { receivingLive=true;await delay(250) }
             }
-          })().catch(err => { failed = err; receiveError = err; active.close(); wake?.() })
+          })().catch(err => { receivingLive=false;failed = err; receiveError = err; active.close(); wake?.() })
           try {
             while (!signal.aborted && !failed) {
               const chain = loadChain(readFileSync(`${design.file}.chain`))
@@ -183,6 +221,7 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
                     if (bytes.length > 491520) throw new Error(`change ${change.envelope.hash} exceeds Comb append limit (491520 bytes)`)
                     const receipt = await writer.request('append', { log: feed, idempotency_key: change.envelope.hash, payload_hex: Buffer.from(bytes).toString('hex') })
                     validateAppendReceipt(receipt, feed)
+                    baselineLater(design,chain,[change.envelope.hash],!!transport.share,importedHashes)
                     if (!state.published.includes(change.envelope.hash)) state.published.push(change.envelope.hash)
                     state.pending = Math.max(0, state.pending - 1); state.updatedAt = new Date().toISOString(); succeeded('publish'); writeSyncState(key, state)
                   }
@@ -254,5 +293,5 @@ export async function serveSync(config: CombConfig, signal: AbortSignal, log: (t
     }
     await Promise.all([...workers.values()].map(worker => worker.done))
     await catalogueQueue.close()
-  } finally { clearInterval(keyTimer);await keyMaintenance;await direct?.close(); writeDirectStatus('disabled', 'daemon stopped'); release() }
+  } finally { clearInterval(keyTimer);await keyMaintenance;await catalogueFollower;await materializeJobs;for(const timer of pendingFacts)clearTimeout(timer);await direct?.close(); writeDirectStatus('disabled', 'daemon stopped'); release() }
 }

@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto'
-import { closeSync, fsyncSync, mkdirSync, openSync, readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs'
+import { closeSync, fsyncSync, mkdirSync, openSync, readFileSync, readdirSync, renameSync, writeFileSync, statSync } from 'node:fs'
 import { dirname, isAbsolute, join, resolve } from 'node:path'
 import type { ChainLogEntry, FdnChain } from 'foundation-engine'
 import { replicaRoot, type LiveDesign } from '../sync-store.js'
@@ -43,7 +43,7 @@ const address = (r: DesignRef): string => JSON.stringify([r.workspaceId, r.produ
 const replicaKey = (r: CatalogueRecord): string => JSON.stringify([r.workspaceId, r.productId, r.docId, r.originNode.id, r.replicaId])
 function validRecord(value: unknown): CatalogueRecord {
   const r = value as CatalogueRecord
-  if (!r || r.version !== 1 || ![r.workspaceId, r.productId, r.docId].every(v => typeof v === 'string' && /^[A-Za-z0-9._-]+$/.test(v)) || typeof r.replicaId !== 'string' || !r.replicaId || r.replicaId.length > 256 || !r.originNode || typeof r.originNode.id !== 'string' || !r.originNode.id || r.originNode.id.length > 256 || typeof r.originNode.name !== 'string' || r.originNode.name.length > 4096 || !Number.isSafeInteger(r.generation) || r.generation < 1 || typeof r.repoRelativePath !== 'string' || isAbsolute(r.repoRelativePath) || r.repoRelativePath.includes('\\') || r.repoRelativePath.split('/').some(p => !p || p === '.' || p === '..') || !r.repoRelativePath.endsWith('.fdn.html') || typeof r.title !== 'string' || r.title.length > 4096 || !/^[a-f0-9]{64}$/.test(r.headHash) || typeof r.deleted !== 'boolean' || !(r.lastAuthor === null || typeof r.lastAuthor === 'string') || !(r.lastWallTime === null || (typeof r.lastWallTime === 'number' && Number.isFinite(r.lastWallTime)))) throw new Error('unsupported or invalid catalogue record/path')
+  if (!r || r.version !== 1 || ![r.workspaceId, r.productId, r.docId].every(v => typeof v === 'string' && /^[A-Za-z0-9._-]+$/.test(v)) || typeof r.replicaId !== 'string' || !r.replicaId || r.replicaId.length > 256 || !r.originNode || typeof r.originNode.id !== 'string' || !r.originNode.id || r.originNode.id.length > 256 || typeof r.originNode.name !== 'string' || r.originNode.name.length > 4096 || !Number.isSafeInteger(r.generation) || r.generation < 1 || typeof r.repoRelativePath !== 'string' || isAbsolute(r.repoRelativePath) || r.repoRelativePath.includes('\\') || r.repoRelativePath.length > 4096 || /[\u0000-\u001f\u007f]/.test(r.repoRelativePath) || r.repoRelativePath.split('/').some(p => !p || p === '.' || p === '..' || p === '.git') || !r.repoRelativePath.endsWith('.fdn.html') || typeof r.title !== 'string' || r.title.length > 4096 || !/^[a-f0-9]{64}$/.test(r.headHash) || typeof r.deleted !== 'boolean' || !(r.lastAuthor === null || typeof r.lastAuthor === 'string') || !(r.lastWallTime === null || (typeof r.lastWallTime === 'number' && Number.isFinite(r.lastWallTime)))) throw new Error('unsupported or invalid catalogue record/path')
   // A catalogue claim alone cannot authenticate a Hive agent session.
   return { version: 1, workspaceId: r.workspaceId, productId: r.productId, docId: r.docId, repoRelativePath: r.repoRelativePath, title: r.title, originNode: { id: r.originNode.id, name: r.originNode.name }, replicaId: r.replicaId, generation: r.generation, headHash: r.headHash, lastAuthor: r.lastAuthor, lastWallTime: r.lastWallTime, lastAgentEdit: null, deleted: r.deleted }
 }
@@ -91,7 +91,7 @@ export function catalogueSnapshot(workspace?: string, repoRoot?: string) {
 export interface ImportedFact {
   version: 1; cursor: string; document: DesignRef & { ownerNodeId: string }; repo: string | null
   originNode: NodeRef | null; originAssurance: 'writer-stated' | null; signatureVerified: boolean
-  entry: ChainLogEntry & { boardKeys: string[] }; delivery: 'baseline' | 'live'; observedAt: number
+  source: 'local' | 'import'; entry: ChainLogEntry & { boardKeys: string[] }; delivery: 'baseline' | 'live'; observedAt: number
 }
 interface Journal { version: 1; id: string; next: number; seen: Record<string, string[]>; events: ImportedFact[] }
 function journalPath(): string { return join(modelRoot(), 'activity.json') }
@@ -110,7 +110,7 @@ export function initializeActivityJournal(): void {
 }
 const cursor = (state: Journal, seq: number): string => `sync-activity1:${state.id}:${seq}`
 /** Called only with a successfully validated local chain, after import or publish. */
-export function recordActivity(design: LiveDesign, chain: FdnChain, hashes: readonly string[], options: { ownerNodeId: string; repo: string | null; delivery: 'baseline' | 'live'; signatureVerified?: boolean }): void {
+export function recordActivity(design: LiveDesign, chain: FdnChain, hashes: readonly string[], options: { ownerNodeId: string; repo: string | null; delivery: 'baseline' | 'live'; signatureVerified?: boolean; signatures?: ReadonlySet<string>; source?: 'local'|'import'; importedHashes?: ReadonlySet<string> }): void {
   if (!options.ownerNodeId || chain.docId() !== design.docId) return
   const document = { workspaceId: design.workspace, productId: design.product, docId: design.docId, ownerNodeId: options.ownerNodeId }
   const state = journal(), key = address(document), seen = new Set(state.seen[key] ?? [])
@@ -125,19 +125,22 @@ export function recordActivity(design: LiveDesign, chain: FdnChain, hashes: read
   } while (before && wanted.size)
   if (wanted.size) throw new Error('validated activity hashes absent from chain')
   for (const raw of entries.reverse()) {
-    const verified = options.signatureVerified === true, origin = verified ? raw.originNode : null
+    const verified = options.signatureVerified === true || options.signatures?.has(raw.hash) === true, origin = verified ? raw.originNode : null
     const entry = { ...raw, originNode: origin, boardKeys: (raw as ChainLogEntry & {boardKeys?:string[]}).boardKeys ?? [] }
-    state.events.push({ version: 1, cursor: cursor(state, state.next++), document, repo: options.repo, originNode: origin ? { id: origin, name: origin } : null, originAssurance: origin ? 'writer-stated' : null, signatureVerified: verified, entry, delivery: options.delivery, observedAt: Date.now() })
+    state.events.push({ version: 1, source: options.source ?? (options.importedHashes ? (options.importedHashes.has(raw.hash) ? 'import' : 'local') : 'local'), cursor: cursor(state, state.next++), document, repo: options.repo, originNode: origin ? { id: origin, name: origin } : null, originAssurance: origin ? 'writer-stated' : null, signatureVerified: verified, entry, delivery: options.delivery, observedAt: Date.now() })
     seen.add(raw.hash)
   }
   state.seen[key] = [...seen]
   state.events = state.events.slice(-10000)
   persistModel(journalPath(), state)
 }
+let activityReadCache: { signature: string; state: Journal } | undefined
 export function activityBatch(token?: string, workspace?: string): { events: ImportedFact[]; cursor: string } {
   // The daemon establishes the journal id; readers never create local state.
-  readFileSync(journalPath())
-  const state = journal()
+  const stat=statSync(journalPath())
+  const signature=JSON.stringify([journalPath(),stat.ino,stat.mtimeMs,stat.size])
+  if(activityReadCache?.signature!==signature)activityReadCache={signature,state:journal()}
+  const state = activityReadCache.state
   let after = 0
   if (token) {
     const prefix = `sync-activity1:${state.id}:`

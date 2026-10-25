@@ -1,12 +1,14 @@
-import { mkdirSync, realpathSync, statSync, existsSync, lstatSync } from 'node:fs'
+import { mkdirSync, realpathSync, statSync, existsSync, lstatSync, readFileSync } from 'node:fs'
+import { loadChain } from 'foundation-engine'
 import { dirname, isAbsolute, relative, resolve } from 'node:path'
 import type { CatalogueRecord } from './catalogue.js'
 import { catalogueLog } from './catalogue.js'
-import { CombBridge } from './bridge.js'
+import { createBridge, type Bridge } from '../share/transport.js'
 import { combLog, copyKey, type CombConfig } from './daemon.js'
 import { restoreChangeBlobs } from '../../../engine/src/chain/blob.js'
 import { materializeDocument } from '../disk.js'
 import { registerDesign, liveDesigns, statePath, writeSyncState } from '../sync-store.js'
+import { findShareRoot } from '../share/config.js'
 
 export class MaterializeError extends Error {
   constructor(public code: 'path-conflict' | 'product-unavailable' | 'history-unavailable' | 'deleted-source' | 'invalid-history' | 'invalid-path' | 'local-io' | 'registration-failed', message: string, public path?: string) { super(message) }
@@ -24,7 +26,7 @@ export interface MaterializeRequest {
 }
 export function materializePath(root: string, path: string): string {
   root = realpathSync(root)
-  if (!path || path.includes('\\') || path.split('/').includes('..')) throw new MaterializeError('invalid-path', 'target must be a confined .fdn.html path')
+  if (typeof path !== 'string' || !path || path.includes('\\') || path.split('/').includes('..')) throw new MaterializeError('invalid-path', 'target must be a confined .fdn.html path')
   const target = resolve(root, path), rel = relative(root, target)
   if (!rel || isAbsolute(rel) || rel.split('/').includes('..') || !target.endsWith('.fdn.html')) throw new MaterializeError('invalid-path', 'target must stay inside the Product checkout')
   if (rel.split('/').includes('.git')) throw new MaterializeError('invalid-path', 'target cannot be inside Git metadata')
@@ -38,7 +40,7 @@ export function materializePath(root: string, path: string): string {
   if (isAbsolute(confined) || confined.split('/').includes('..')) throw new MaterializeError('invalid-path', 'target symlink escapes the Product checkout')
   return resolve(real, relative(ancestor, target))
 }
-async function replay(bridge: CombBridge, log: string, consume: (bytes: Uint8Array) => void): Promise<string> {
+async function replay(bridge: Bridge, log: string, consume: (bytes: Uint8Array) => void): Promise<string> {
   const head = await bridge.request('head', { log })
   if (head.log !== log || typeof head.cursor !== 'string' || !/^[1-9][0-9]*$/.test(head.cursor)) throw new MaterializeError('invalid-history', 'invalid feed head')
   const limit = BigInt(head.cursor)
@@ -65,13 +67,40 @@ function catalogueEntry(bytes: Uint8Array, request: MaterializeRequest): Catalog
   } catch { return null }
 }
 export async function materialize(request: MaterializeRequest, config: CombConfig) {
-  for (const part of [request.workspaceId, request.productId, request.docId]) if (!/^[A-Za-z0-9._-]+$/.test(part)) throw new MaterializeError('invalid-path', 'invalid design address')
+  for (const part of [request.workspaceId, request.productId, request.docId]) if (typeof part !== 'string' || !/^[A-Za-z0-9._-]+$/.test(part)) throw new MaterializeError('invalid-path', 'invalid design address')
   if (request.expectedHead && !/^[a-f0-9]{64}$/.test(request.expectedHead)) throw new MaterializeError('invalid-history', 'invalid expected head')
+  if (request.repoRelativePath && (isAbsolute(request.repoRelativePath) || request.repoRelativePath.includes('\\') || request.repoRelativePath.split('/').includes('..'))) throw new MaterializeError('invalid-path', 'advertised path must be repository-relative')
   let root: string
   try { root = realpathSync(request.checkoutRoot); if (!statSync(root).isDirectory()) throw new Error('not a directory') }
   catch { throw new MaterializeError('product-unavailable', 'Product checkout root does not exist; materialize never clones a repository') }
+  const localTarget = request.targetPath ?? request.repoRelativePath
+  if (localTarget) {
+    const file = materializePath(root, localTarget)
+    const foreignRegistration = liveDesigns().some(d => d.file === file && (d.workspace !== request.workspaceId || d.product !== request.productId))
+    if (foreignRegistration) throw new MaterializeError('path-conflict', 'target is already live under another workspace or product')
+    if (existsSync(file) && !existsSync(`${file}.chain`)) throw new MaterializeError('path-conflict', 'target is an untracked local file')
+    if (existsSync(`${file}.chain`) && loadChain(readFileSync(`${file}.chain`)).docId() !== request.docId) throw new MaterializeError('path-conflict', 'target belongs to another document')
+    // A validated local replica containing the requested head is complete enough
+    // to satisfy this explicit request offline. Sync merges later heads normally.
+    if (request.expectedHead) {
+      const candidates = [file, ...liveDesigns().filter(d => d.docId === request.docId && (d.repoRoot ?? findShareRoot(dirname(d.file))) === root).map(d => d.file)]
+      for (const candidate of new Set(candidates)) {
+        try {
+          const cached = loadChain(readFileSync(`${candidate}.chain`))
+          if (cached.docId() !== request.docId || !cached.verify().ok || !cached.changes().some(c => c.envelope.hash === request.expectedHead)) continue
+          mkdirSync(dirname(file), { recursive: true }); materializePath(root, file)
+          const chain = materializeDocument(file, cached)
+          registerDesign(file, request.workspaceId, request.productId, root)
+          return { state: 'ready' as const, workspaceId: request.workspaceId, productId: request.productId, docId: request.docId, path: file, repoPath: root, headHash: chain.head().hash, requestKey: request.requestKey ?? null, fromCache: true }
+        } catch (error) {
+          if (error instanceof MaterializeError) throw error
+          if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw new MaterializeError('local-io', String(error), file)
+        }
+      }
+    }
+  }
   let stage: 'history' | 'local' | 'registration' = 'history', savedPath: string | undefined
-  const bridge = new CombBridge(config.binary, config.args)
+  let bridge = createBridge({ ...config, ...(config.share ? { shareLog: 'foundation-share-catalogue-v1' } : {}) })
   try {
     await bridge.hello()
     let target = request.targetPath ?? request.repoRelativePath
@@ -97,6 +126,11 @@ export async function materialize(request: MaterializeRequest, config: CombConfi
     }
     checkAddress()
     stage = 'history'
+    if (config.share) {
+      await bridge.finish()
+      bridge = createBridge({ ...config, shareLog: JSON.stringify(['foundation-share-document-v1', request.docId]) })
+      await bridge.hello()
+    }
     const blobs: Uint8Array[] = []
     const replayedCursor = await replay(bridge, combLog({ workspace: request.workspaceId, product: request.productId, docId: request.docId, file }), bytes => blobs.push(bytes))
     if (!blobs.length) throw new MaterializeError('history-unavailable', 'design feed is empty or unavailable')

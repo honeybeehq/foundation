@@ -1,7 +1,7 @@
 import { readDirectStatus } from '../sync/direct.js'
 import { materialize, MaterializeError } from '../sync/materialize.js'
 import { readFileSync } from 'node:fs'
-import { join, dirname } from 'node:path'
+import { join, dirname, resolve } from 'node:path'
 import { findShareRoot, readShareConfig } from '../share/config.js'
 import { replicaRoot } from '../sync-store.js'
 import { loadChain } from 'foundation-engine'
@@ -9,11 +9,60 @@ import { parseArgs, flagString } from '../argv.js'
 import type { CliIO } from '../io.js'
 import { registerDesign, closeDesign, liveDesigns, readSyncState } from '../sync-store.js'
 import { serveSync, copyKey, feedName, type CombConfig } from '../sync/daemon.js'
+import { acceptMaterialize, materializeConfig, materializeStatus } from '../sync/materialize-jobs.js'
+import { readDocIdAttr } from '../docid.js'
+import { activityBatch, catalogueSnapshot } from '../sync/local-model.js'
 
 export async function runSync(args: string[], io: CliIO): Promise<number> {
   const { positionals, flags } = parseArgs(args)
   try {
     switch (positionals[0]) {
+      case 'verify': {
+        try {
+          const file = positionals[1]
+          if (!file) throw new Error('sync verify requires FILE')
+          const chain = loadChain(readFileSync(`${file}.chain`)), docId = chain.docId()
+          const expectedId = flagString(flags, 'doc-id'), expectedHead = flagString(flags, 'expected-head')
+          if (!docId || readDocIdAttr(readFileSync(file, 'utf8')) !== docId || (expectedId && docId !== expectedId)) {
+            io.stdout(JSON.stringify({ version: 1, state: 'refused', code: 'identity-mismatch', message: 'HTML and chain must match the expected document identity' })); return 1
+          }
+          if (!chain.verify().ok || (expectedHead && !chain.changes().some(c => c.envelope.hash === expectedHead))) {
+            io.stdout(JSON.stringify({ version: 1, state: 'refused', code: 'invalid-history', message: 'chain verification failed or expected head is unavailable' })); return 1
+          }
+          io.stdout(JSON.stringify({ version: 1, state: 'verified', docId, headHash: chain.head().hash, path: resolve(file), containsExpectedHead: true })); return 0
+        } catch (error) { io.stdout(JSON.stringify({ version: 1, state: 'refused', code: 'local-io', message: error instanceof Error ? error.message : String(error) })); return 1 }
+      }
+      case 'catalogue': {
+        io.stdout(JSON.stringify(catalogueSnapshot(flagString(flags, 'workspace'), flagString(flags, 'repo-root'))))
+        return 0
+      }
+      case 'activity': {
+        const workspace = flagString(flags, 'workspace') ?? process.env.FOUNDATION_WORKSPACE ?? 'default', controller = new AbortController()
+        const stop = (): void => controller.abort()
+        process.once('SIGTERM', stop); process.once('SIGINT', stop)
+        let cursor = flagString(flags, 'cursor'), initial = true
+        try {
+          do {
+            const batch = activityBatch(cursor, workspace)
+            for (const event of batch.events) io.stdout(JSON.stringify({ ...event, delivery: initial ? 'baseline' : event.delivery }))
+            cursor = batch.cursor
+            if (initial && flags.follow) io.stdout(JSON.stringify({ version: 1, type: 'ready', workspaceId: workspace, cursor }))
+            initial = false
+            if (flags.follow && !controller.signal.aborted) await new Promise<void>(done => {
+              const finish = (): void => { clearTimeout(timer); controller.signal.removeEventListener('abort', finish); done() }
+              const timer = setTimeout(finish, 100)
+              controller.signal.addEventListener('abort', finish, { once: true })
+            })
+          } while (flags.follow && !controller.signal.aborted)
+          return 0
+        } catch (error) {
+          io.stderr(error instanceof Error ? error.message : String(error)); return 2
+        } finally { process.off('SIGTERM', stop); process.off('SIGINT', stop) }
+      }
+      case 'materialize-status': {
+        if (!positionals[1]) throw new Error('materialize-status requires REQUEST_KEY')
+        io.stdout(JSON.stringify(materializeStatus(positionals[1]))); return 0
+      }
       case 'materialize':
       case 'materialise': {
         const entryFile = flagString(flags, 'entry')
@@ -22,19 +71,18 @@ export async function runSync(args: string[], io: CliIO): Promise<number> {
         const docId = positionals[1] ?? entry.docId
         const root = flagString(flags, 'repo-root')
         const configFile = flagString(flags, 'comb-config') ?? process.env.FOUNDATION_COMB_CONFIG
-        if (!docId || !root || !configFile) throw new Error('materialize requires DOC_ID (or --entry FILE), --repo-root ROOT and --comb-config FILE')
-        const config = JSON.parse(readFileSync(configFile, 'utf8')) as CombConfig
-        if (!config || typeof config.binary !== 'string' || !Array.isArray(config.args) || config.args.some(arg => typeof arg !== 'string')) throw new Error('invalid Comb process config')
-        const result = await materialize({
+        if (!docId || !root) throw new Error('materialize requires DOC_ID (or --entry FILE) and --repo-root ROOT')
+        const request = {
           docId, workspaceId: flagString(flags, 'workspace') ?? entry.workspaceId ?? process.env.FOUNDATION_WORKSPACE ?? 'default',
           productId: flagString(flags, 'product') ?? entry.productId ?? process.env.FOUNDATION_PRODUCT ?? 'default',
-          checkoutRoot: root, targetPath: positionals[2],
+          checkoutRoot: resolve(root), targetPath: positionals[2],
           repoRelativePath: flagString(flags, 'repo-relative-path') ?? entry.repoRelativePath,
           sourceReplica: flagString(flags, 'source-replica') ?? entry.replicaId,
           expectedHead: flagString(flags, 'expected-head') ?? entry.expectedHead ?? entry.headHash,
           requestKey: flagString(flags, 'request-key') ?? entry.requestKey,
-        }, config)
-        io.stdout(flags.json ? JSON.stringify(result) : `ready: ${result.path}`); return 0
+        }
+        const result = flags.accept ? acceptMaterialize(request, configFile ? resolve(configFile) : undefined) : await materialize(request, materializeConfig(root, configFile))
+        io.stdout(flags.json ? JSON.stringify(result) : ('path' in result ? `ready: ${result.path}` : `accepted: ${result.requestKey}`)); return 0
       }
       case 'open': {
         if (!positionals[1]) throw new Error('sync open requires a file')
