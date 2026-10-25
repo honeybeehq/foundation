@@ -169,6 +169,15 @@ export function compare(
   const unavailable = properties.filter((p) =>
     [...design.nodes, ...code.nodes].some((n) => n.style[p] === undefined),
   );
+  const failure = [design, code].find((c) => c.meta.provable === false);
+  const reason = failure
+    ? String(
+        failure.meta.reason ||
+          "Capture producer marked this state not-provable",
+      )
+    : unavailable.length
+      ? "Capture lacks visual properties: " + unavailable.join(", ")
+      : null;
   const meta = design.meta;
   const report = {
     schema: "fdn-drift/0",
@@ -186,10 +195,8 @@ export function compare(
       commit: code.meta.commit ?? null,
       root: code.meta.root ?? null,
     },
-    provable: unavailable.length === 0,
-    ...(unavailable.length
-      ? { reason: "Capture lacks visual properties: " + unavailable.join(", ") }
-      : {}),
+    provable: !reason,
+    ...(reason ? { reason } : {}),
     styles: { properties, unavailable },
     tolerances: t,
     pixels: {
@@ -206,7 +213,7 @@ export function compare(
       kind: m.kind,
       confidence: m.confidence,
     })),
-    verdict: unavailable.length
+    verdict: reason
       ? "not-provable"
       : drifts.length || count / (a.width * a.height) > t.pixelRatio
         ? "drift"
