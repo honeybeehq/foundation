@@ -87,5 +87,23 @@
     "name": "tampered-report",
     "exitCode": 1,
     "stdout": "{\n  \"passed\": false,\n  \"errors\": [\n    \"replay/drift-report.json: report hash mismatch\",\n    \"replay/drift-report.json: manifest identity mismatch\",\n    \"replay/drift-report.json: capture source binding mismatch\"\n  ],\n  \"reports\": 1\n}"
+  },
+  {
+    "name": "pinned-environment-match",
+    "exitCode": 0,
+    "stdout": "{\n  \"passed\": true,\n  \"errors\": [],\n  \"reports\": 1\n}",
+    "stderr": ""
+  },
+  {
+    "name": "wrong-browser-policy",
+    "exitCode": 1,
+    "stdout": "{\n  \"passed\": false,\n  \"errors\": [\n    \"replay/drift-report.json: capture environment differs from reviewed policy\"\n  ],\n  \"reports\": 1\n}",
+    "stderr": ""
+  },
+  {
+    "name": "wrong-font-policy",
+    "exitCode": 1,
+    "stdout": "{\n  \"passed\": false,\n  \"errors\": [\n    \"replay/drift-report.json: capture environment differs from reviewed policy\"\n  ],\n  \"reports\": 1\n}",
+    "stderr": ""
   }
 ]

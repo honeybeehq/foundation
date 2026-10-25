@@ -15,7 +15,7 @@
   "code": {
     "repo": "fixture",
     "root": "TracksPane",
-    "commit": "ec952ce73e765af014104f063458181f8ed53dc1"
+    "commit": "cbadd08af0ec802744f4a03f3b5d29e8ade2eeb7"
   },
   "schema": "fdn-drift/0",
   "provable": false,
@@ -27,5 +27,5 @@
     "fix": "Provide an isolated renderable fixture, then capture and verify this state again."
   },
   "drifts": [],
-  "reportHash": "7db2a485acba72eb8caf732fa80c7809f1373ef447dfc704dc2cf69952a37947"
+  "reportHash": "8e40df154ef1123149de0eca0d72902dadefa79ab423d6d41318e6535e54c351"
 }

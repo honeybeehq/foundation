@@ -19,3 +19,5 @@ The trusted runner must generate captures from the declared sources. Replay veri
 Generate the matrix directly from reviewed/base-revision links: `pnpm exec tsx packages/proof/src/report/cli.ts policy TRUSTED_LINKS.json proof-policy.json`. `policyFromLinks` uses every linked artboard/state/viewport and the common default tolerances. Review and protect the generated policy and source links; never derive required coverage from the candidate manifest.
 
 Not-provable reports include required `reason` and UI-compatible `notProvable: {reason, detail, fix}`. Capture-level isolation errors, blocked requests, or dirty code/renderer metadata also force not-provable, even if pixels happen to match.
+
+Reviewed links with fontPolicy produce a captureEnvironment policy pinning browser version, platform, font aliases, asset SHA256/format/PostScript identity. Verification compares both replay captures against that policy; an optional rendererSourceHash further pins renderer bytes. New pinned captures also require authored font-family provenance and custom declared glyphs. Legacy no-environment policies are local replay mechanics only, not a portability claim.

@@ -143,6 +143,22 @@
       "format": "truetype",
       "sha256": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895",
       "postScriptName": "DejaVuSans-Bold"
+    },
+    {
+      "family": "Hanken Grotesk",
+      "weight": "700",
+      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-700-normal.woff2",
+      "format": "woff2",
+      "sha256": "d85de6e272296d06f8205ad11e27140274e0ef97050232777d146eabb71c312d",
+      "postScriptName": "HankenGrotesk-Bold"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "weight": "500",
+      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2",
+      "format": "woff2",
+      "sha256": "01d285447409c8a588692162439a038b8cbd7871309ee20267b0d2d91c6e8e22",
+      "postScriptName": "IBMPlexMono-Medium"
     }
   ],
   "binding": "chain-head",

@@ -20,9 +20,9 @@
     "matches": 9,
     "idMatches": 0,
     "heuristicMatches": 9,
-    "pixelRatio": 0.01928652699309479,
-    "compareMs": 166.42995000000002,
-    "totalMs": 366.35610899999995,
+    "pixelRatio": 0.019232580037664784,
+    "compareMs": 182.57294200000007,
+    "totalMs": 383.197565,
     "design": {
       "file": "packages/proof/fixtures/design/tracks-pane.fdn.html",
       "head": "da6f965fcc33d4ac33d47ffd1cc04da2d288cd113b5ed263501dc50b2bac189d",
@@ -31,10 +31,10 @@
     },
     "code": {
       "repo": "honeybeehq/apiary",
-      "commit": "04c8939c5d022c8e0ba23e623af79138ebcfe0cf",
+      "commit": "ccbf95de70dd3ea8bbf439fcc2ae23aa086860e3",
       "root": "apps/desktop/src/renderer/src/panes/TracksPane.tsx#TracksPane"
     },
-    "reportHash": "bf2e3cec03f0d63000884c30dbc5a9e10e50aababb41ea308eb20f29c7782776"
+    "reportHash": "7f81f7f19b5d72e4504670b1b0ab9fbcc8dadf88b4096ea6772fe8d576873082"
   },
   {
     "state": "track-selected",
@@ -57,9 +57,9 @@
     "matches": 22,
     "idMatches": 0,
     "heuristicMatches": 22,
-    "pixelRatio": 0.027467827997489015,
-    "compareMs": 238.09750099999997,
-    "totalMs": 464.070975,
+    "pixelRatio": 0.02804947426239799,
+    "compareMs": 208.32924000000003,
+    "totalMs": 445.72700299999997,
     "design": {
       "file": "packages/proof/fixtures/design/tracks-pane.fdn.html",
       "head": "da6f965fcc33d4ac33d47ffd1cc04da2d288cd113b5ed263501dc50b2bac189d",
@@ -68,10 +68,10 @@
     },
     "code": {
       "repo": "honeybeehq/apiary",
-      "commit": "04c8939c5d022c8e0ba23e623af79138ebcfe0cf",
+      "commit": "ccbf95de70dd3ea8bbf439fcc2ae23aa086860e3",
       "root": "apps/desktop/src/renderer/src/panes/TracksPane.tsx#TracksPane"
     },
-    "reportHash": "0c2ec0e65562f4fd416a01d84ac3748870401d4183840f2cf56140e8ea49453f"
+    "reportHash": "bb7bc9870e9246968d5a71d37526c69e54ac434e8cc6e0e2d4ca61008c158f13"
   },
   {
     "state": "proposal-pending",
@@ -94,9 +94,9 @@
     "matches": 24,
     "idMatches": 0,
     "heuristicMatches": 24,
-    "pixelRatio": 0.031750235404896424,
-    "compareMs": 237.526922,
-    "totalMs": 470.7527870000001,
+    "pixelRatio": 0.03232207313245449,
+    "compareMs": 238.14541499999996,
+    "totalMs": 490.13158999999996,
     "design": {
       "file": "packages/proof/fixtures/design/tracks-pane.fdn.html",
       "head": "da6f965fcc33d4ac33d47ffd1cc04da2d288cd113b5ed263501dc50b2bac189d",
@@ -105,10 +105,10 @@
     },
     "code": {
       "repo": "honeybeehq/apiary",
-      "commit": "04c8939c5d022c8e0ba23e623af79138ebcfe0cf",
+      "commit": "ccbf95de70dd3ea8bbf439fcc2ae23aa086860e3",
       "root": "apps/desktop/src/renderer/src/panes/TracksPane.tsx#TracksPane"
     },
-    "reportHash": "300fa6d16eea19890d98b9b7fbd001ac2e1a11e95c4309c82cb62ad6169226df"
+    "reportHash": "eb31936f853f89c7805e127ec24b30c7d4bb5a72473bb34a0a04fb3368962b7b"
   },
   {
     "state": "empty",
@@ -131,9 +131,9 @@
     "matches": 2,
     "idMatches": 0,
     "heuristicMatches": 2,
-    "pixelRatio": 0.012342082548650345,
-    "compareMs": 70.12184700000012,
-    "totalMs": 163.08993099999998,
+    "pixelRatio": 0.012347967671060892,
+    "compareMs": 83.41251000000011,
+    "totalMs": 180.47161000000006,
     "design": {
       "file": "packages/proof/fixtures/design/tracks-pane.fdn.html",
       "head": "da6f965fcc33d4ac33d47ffd1cc04da2d288cd113b5ed263501dc50b2bac189d",
@@ -142,9 +142,9 @@
     },
     "code": {
       "repo": "honeybeehq/apiary",
-      "commit": "04c8939c5d022c8e0ba23e623af79138ebcfe0cf",
+      "commit": "ccbf95de70dd3ea8bbf439fcc2ae23aa086860e3",
       "root": "apps/desktop/src/renderer/src/panes/TracksPane.tsx#TracksPane"
     },
-    "reportHash": "dd416a80f08bedc5a4e299ecd538172f00de632006e1cf24c2db0abc472b6eb7"
+    "reportHash": "d1425507cb03877bf8b42c10ca7b0d486c7cb1bd3c6e4dafb7bb64d320d80d88"
   }
 ]

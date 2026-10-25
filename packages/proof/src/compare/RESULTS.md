@@ -27,20 +27,20 @@ These are exact single-change controls (11 positive events), not a statistical f
 
 ## Real Classic Tracks pair (final equal frames)
 
-Source: T2 final capture commit `3e3745b`, Apiary commit `04c8939`, clean renderer `8316606`. Both captures share viewport 1416×720 DPR1 and a measured natural design frame: 724×468 for rest/empty, 1416×525.5 selected, 1416×611 proposal. Capture repeatability: T2 records 16/16 PNG+DOM hash pairs identical. Reports and all source images, diffs, replay captures and manifest are committed in `packages/proof/fixtures/sample-reports/`.
+Source: frozen canonical capture commit `6a3dbb9`, Apiary commit `ccbf95de70dd3ea8bbf439fcc2ae23aa086860e3`, frozen renderer source `73211d0`. Both captures share viewport 1416×720 DPR1 and a measured natural design frame: 724×468 for rest/empty, 1416×525.5 selected, 1416×611 proposal. Final cold-start and cross-machine evidence: T2 cold repeats are byte-identical; independent metal-2 final two-run checks match all16 PNG/DOM pairs and all8 canonical PNGs. The earlier unpinned repeat claim was not portable; see the incident record below. Reports and all source images, diffs, replay captures and manifest are committed in `packages/proof/fixtures/sample-reports/`.
 
 | State | Verdict | Raw findings | Pixels different | Compare ms | Known false property findings |
 |---|---|---:|---:|---:|---:|
-| at-rest | not-provable | 250 | 1.9287% | 166 | 0 |
-| track-selected | drift | 513 | 2.7468% | 238 | 17 |
-| proposal-pending | drift | 581 | 3.1750% | 238 | 17 |
-| empty | drift | 83 | 1.2342% | 70 | 5 |
+| at-rest | not-provable | 250 | 1.9233% | 183 | 0 |
+| track-selected | drift | 513 | 2.8049% | 208 | 17 |
+| proposal-pending | drift | 581 | 3.2322% | 238 | 17 |
+| empty | drift | 83 | 1.2348% | 83 | 5 |
 
 At-rest findings are diagnostic only: Classic always auto-selects, so no claim of match or product drift is made for that state. The unavailable report carries top-level `reason` plus UI-compatible `notProvable:{reason,detail,fix}`. All remaining states visibly differ: editorial list/spine plus attached/queue/proposal columns in design versus a narrower rail and graph canvas in code; empty copy, bee, button text and placement differ. The code graph's clipped lower nodes are not counted as painted content.
 
 ### Visual correspondence audit and false positives
 
-I inspected all final full screenshots, correspondence groups and repeated-label cases. Raw output is preserved; `visual-audit.tsv` lists every finding and `visual-audit-summary.json` binds classifications to report hashes. Seven residual incorrect correspondence groups account for **39 known false property findings**: selected17, proposal17, empty5. Specifically, a design ellipsis icon is paired with a different sidecar hexagon control (5 each state), and two design inner containers are paired to broader code/harness containers (6+6 in each nonempty state). These remain documented prototype matcher limitations; confidence is not a guarantee. This is a lower bound on false product findings, not a fully adjudicated per-finding false-positive rate.
+I inspected all final full screenshots, correspondence groups and repeated-label cases. Raw output is preserved; `visual-audit.tsv` lists every finding and `visual-audit-summary.json` binds classifications to report hashes. All seven prior wrong pairs were rechecked against final pinned screenshots and nodes; their classifications are bound to the new report hashes. Seven residual incorrect correspondence groups account for **39 known false property findings**: selected17, proposal17, empty5. Specifically, a design ellipsis icon is paired with a different sidecar hexagon control (5 each state), and two design inner containers are paired to broader code/harness containers (6+6 in each nonempty state). These remain documented prototype matcher limitations; confidence is not a guarantee. This is a lower bound on false product findings, not a fully adjudicated per-finding false-positive rate.
 
 Unmatched-node findings are structural facts about the matcher, not independently confirmed missing product features. Many design labels recur in attached/queued/proposed rows; the code has them only in graph nodes or below a clipped scroll region. Inherited styles and multiple wrappers multiply counts. No corrected unique-defect count is claimed, and subtracting39 does not establish that every other raw finding is a separate genuine defect. Every raw row is classified, but correspondence-level visual review is not independent ground truth for every structural/property row.
 
@@ -64,10 +64,16 @@ reviewed by claude-opus-5-5
 - Composite shadows compare exact strings, ΔE is CIE76 not CIEDE2000, and equal token aliases map alphabetically. Token labels do not prove CSS variable usage.
 - No repository verification skill or AGENTS.md was found; no unavailable skill is claimed.
 
-## Reopened: independent fresh-capture reproduction (2026-10-25)
+## Reproduction incident and resolution (2026-10-25)
 
 The independent checker on metal-2 replayed the committed reports exactly and independently passed the verifier's stated mechanics, but fresh capture counts were249/491/594/83 (rest/selected/proposal/empty), not250/513/581/83. Fresh selected/proposal design heights were530.5/640 versus stored525.5/611. Keep these results separate; the earlier figures are stored-capture replay, not a portable from-scratch baseline. A local repeat differed by9 graph-decoration pixels, so the original16/16 bit-identical claim is not a cross-machine guarantee. See Project `research/e2e-check.md` for the independent cold-Vite failure, repeat and10-row visual sample (one ambiguous extra-content claim).
 
 A design-only red-capable command reproduces the fresh heights on metal-3 without Apiary: `pnpm exec tsx packages/proof/src/compare/diagnostics/design-fonts.ts packages/proof/src/compare/diagnostics/evidence --expect-stored` exits1. CDP reports actual WenQuanYi Zen Hei Mono for metadata node n212::n139, whose box is167.78125×14 instead of208.625×12, despite the same computed family/size/normal line-height. T2 independently measured metal-1's face as DejaVuSansMono. Sans title boxes are identical. Changing only the mono face to embedded LiberationMono changes frames to524.5/612 and metadata to207.9375×12, proving the font-metric dependency rather than attributing it vaguely to machines or source revisions.
 
-T2 owns the fix: bundle actual font bytes, pin alias resolution, audit rendered platform faces and fail closed on unbundled glyphs, and replace the cold Vite optimizer path. Do not overwrite the stored results until the fixed captures are independently checked. No new portable-equality or deterministic-repeat claim is made yet.
+Resolved by the frozen73211d0/6a3dbb9 captures: font bytes and browser/platform are pinned, every rendered glyph is audited as a custom declared face, a static built harness replaces the cold optimizer path, and rendererSourceHash binds source/package bytes independently of rebased commit ids. This defines an explicit Linux font-alias environment, not literal authored Mac-system-font appearance. Independent final cold repeats and canonical cross-machine hashes pass. Historical pre-fix failures remain in research/e2e-check.md.
+
+The smallest cause check turned green on metal-3 when only DejaVuSansMono.ttf (SHA256c805f9436dbc268644c1d9584f01a601a653e028e08fd74b9b949f6cf8304d88, published with the Apiary fixture fonts) replaced the mono fallback: frames525.5/611 and metadata208.625×12 were restored exactly. No engine/source/layout change was required. Diagnostic evidence includes no-override red, LiberationMono intermediate, and exact DejaVu green results.
+
+The comparator now independently rejects a declared pinned-font capture with system glyph fallback, missing actual glyph inventory, unlisted/unhashed assets, mismatched pair environment or missing pre-normalization family provenance. font-family drift uses authoredFontFamily when present and retains rendered normalized stacks in rendered:{design,code}; a shared alias can no longer hide system-ui versus Arial. Eight focused regression tests passed after demonstrating the previously accepted invalid cases and masked family change.
+
+The reviewed links snapshot in src/report/evidence/reviewed-links.json generates the manifest policy's captureEnvironment. Verification checks source-referenced browser/platform/font policy and exact font hashes (optional rendererSourceHash pin supported). An actual pinned unchanged capture-copy control exits0; wrong browser and wrong font policy each exit1. Legacy local control captures remain readable but do not establish portable rendering. T5 grouping plus the current hash-bound audit still projects28/30/5 non-excluded UI groups; ui-group-tally.json records the calculation. The UI must import the new report and audit hashes before displaying these as the current dataset.
