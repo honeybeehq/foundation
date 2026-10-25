@@ -31,3 +31,4 @@ export { detachInstance } from './components/detach.js'
 export * from './artboards/index.js'
 
 export { mintNodeId } from './node-id.js'
+export * from './assets/index.js'
