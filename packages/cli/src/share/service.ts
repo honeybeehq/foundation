@@ -1,4 +1,5 @@
 import { createServer, type ServerResponse } from 'node:http'
+import type { Socket } from 'node:net'
 import { createHash, randomBytes } from 'node:crypto'
 import { mkdir, cp, writeFile, rm } from 'node:fs/promises'
 import { resolve, join, sep, isAbsolute } from 'node:path'
@@ -200,6 +201,8 @@ export async function startShareService(config: ShareServiceConfig) {
   const queues = new Map<string, Promise<unknown>>()
   const bridges = new Set<CombBridge>()
   let closing = false
+  let closePromise: Promise<void> | undefined
+  const sockets = new Set<Socket>()
   const bridge = () => {
     const b = new CombBridge(config.comb.binary, config.comb.args)
     bridges.add(b)
@@ -262,6 +265,7 @@ export async function startShareService(config: ShareServiceConfig) {
   }, 30000)
   descriptorTimer.unref()
   const server = createServer(async (request, response) => {
+    response.once('finish', () => { if (closing) request.socket.end() })
     const send = (status: number, value: unknown) => {
       const data = JSON.stringify(value)
       if (Buffer.byteLength(data) > LIMIT) {
@@ -417,6 +421,7 @@ export async function startShareService(config: ShareServiceConfig) {
         return
       }
       if (method === 'GET' && path === '/v1/relay') {
+        requireThat(!closing, 'service closing', 503)
         requireThat(relays.size < 256, 'relay capacity reached', 503)
         response.writeHead(200, {
           'Content-Type': 'text/event-stream',
@@ -702,6 +707,10 @@ export async function startShareService(config: ShareServiceConfig) {
       else response.end()
     }
   })
+  server.on('connection', socket => {
+    sockets.add(socket)
+    socket.once('close', () => sockets.delete(socket))
+  })
   server.requestTimeout = 15000
   server.headersTimeout = 10000
   server.maxConnections = 512
@@ -724,22 +733,33 @@ export async function startShareService(config: ShareServiceConfig) {
   return {
     server,
     url: `http://${host}:${address.port}`,
-    close: async () => {
-      if (closing) return
+    close: (): Promise<void> => {
+      if (closePromise) return closePromise
       closing = true
       clearInterval(descriptorTimer)
-      for (const [response, relay] of relays) {
-        clearTimeout(relay.timer)
-        response.end()
-      }
-      for (const b of bridges) b.close()
-      await new Promise<void>((resolve, reject) => {
-        server.close((error) => (error ? reject(error) : resolve()))
+      closePromise = new Promise<void>((resolve, reject) => {
+        // Stop admission first. Responses admitted before shutdown may finish,
+        // including queued durable appends; SSE must never hold the drain open.
+        const deadline = setTimeout(() => {
+          for (const b of bridges) b.close()
+          for (const socket of sockets) socket.destroy()
+        }, 5000)
+        server.close(error => {
+          clearTimeout(deadline)
+          for (const b of bridges) b.close()
+          tokens.clear()
+          active.delete(stateDir)
+          release()
+          if (error) reject(error)
+          else resolve()
+        })
+        for (const [response, relay] of relays) {
+          clearTimeout(relay.timer)
+          response.end('event: close\ndata: {"reason":"service shutdown"}\n\n')
+        }
         server.closeIdleConnections()
       })
-      tokens.clear()
-      active.delete(stateDir)
-      release()
+      return closePromise
     }
   }
 }
