@@ -1,0 +1,36 @@
+{
+  "captureOnly": true,
+  "comparisonRun": false,
+  "freshContextReplay": [
+    {
+      "file": "keycap-command-enter/command-enter/160x60@1/design/screenshot.png",
+      "equal": true,
+      "sha256": "26141ea948d8b2baf0bfd3164eb321e1c93107729535beb1daaf4525fe5c0b6f"
+    },
+    {
+      "file": "keycap-command-enter/command-enter/160x60@1/design/dom.json",
+      "equal": true,
+      "sha256": "77ac00ba8fb8b6aefc283d8fc57a67638f8de66155ae2871ce65778cd25c37b4"
+    },
+    {
+      "file": "keycap-command-enter/command-enter/160x60@1/design/full-extent.png",
+      "equal": true,
+      "sha256": "c992cdd7eac11638c24026a12b0cc4284c4e2776fb1d2b61305e7f0bc106625b"
+    },
+    {
+      "file": "keycap-command-enter/command-enter/160x60@1/code/screenshot.png",
+      "equal": true,
+      "sha256": "60b74475937666cf0cc61f1296c0703f979429a9fb88a20cbb40c9a14b271d12"
+    },
+    {
+      "file": "keycap-command-enter/command-enter/160x60@1/code/dom.json",
+      "equal": true,
+      "sha256": "1d982e67c2a0fe258cfccf6f3c310711a0733a2555e7727c9c8a471b6f848e41"
+    },
+    {
+      "file": "keycap-command-enter/command-enter/160x60@1/code/full-extent.png",
+      "equal": true,
+      "sha256": "c34d34b0723122da803c8ce96b5cfd8a642fcf92052ef3c722d607077a1e7c9f"
+    }
+  ]
+}
