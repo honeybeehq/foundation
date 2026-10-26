@@ -33,7 +33,7 @@
       <fdn-use when="prop.state == 'done'" component="FlowGlyph" data-fdn-prop-name="done" data-fdn-prop-color="var(--color-status-running)"></fdn-use>
       <span when="prop.state == 'current'" style="background-color:var(--color-status-running);border-radius:50%;flex:none;height:8px;width:8px"></span>
       <span when="prop.state == 'upcoming'" style="border:1px solid var(--color-border-input);border-radius:50%;box-sizing:border-box;flex:none;height:12px;width:12px"></span>
-      <fdn-use when="prop.state == 'definition' || prop.state == 'removed'" component="FlowGlyph" data-fdn-prop-name="{{ prop.glyph }}" data-fdn-prop-color="{{ glyphcolor[prop.glyph] }}" data-fdn-prop-size="{{ prop.glyph == 'orchestrate' ? '15' : '14' }}"></fdn-use>
+      <fdn-use when="prop.state == 'definition' || prop.state == 'removed'" component="FlowGlyph" data-fdn-prop-name="{{ prop.glyph }}" data-fdn-prop-color="{{ glyphcolor[prop.glyph] }}" data-fdn-prop-size="{{ glyphsize[prop.glyph] }}"></fdn-use>
       <span data-fdn-style="card-title" style="white-space:{{ titlewrap[prop.state] }};color:{{ titlecolor[prop.state] }};font-weight:{{ titleweight[prop.state] }};text-decoration-line:{{ prop.state == 'removed' ? 'line-through' : 'none' }}">{{ prop.title }}</span>
       <span when="prop.meta" data-fdn-style="card-meta" style="color:{{ prop.state == 'current' ? 'var(--color-status-running)' : 'var(--color-text-faint)' }};font-size:{{ metasize[prop.state] }}">{{ prop.meta }}</span>
     </div>
@@ -132,8 +132,8 @@
   </fdn-component>
   <fdn-component name="ProposalBar" hidden>
     <div style="align-items:center;background-color:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-dock);box-sizing:border-box;gap:8px;display:flex;flex:none;padding:8px 10px;width:480px">
-      <span style="color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-sm);white-space:nowrap">3 changes</span>
-      <span style="color:var(--color-meta-faint);font-family:var(--font-mono);font-size:var(--font-size-sm);overflow:hidden;white-space:nowrap">+n4d · +n5 · −n5old</span>
+      <span style="color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-sm);white-space:nowrap">2 changes</span>
+      <span style="color:var(--color-meta-faint);font-family:var(--font-mono);font-size:var(--font-size-sm);overflow:hidden;white-space:nowrap">+n5a · +n5b</span>
       <span data-fdn-style="pill-btn-accent" style="gap:5px;font-size:var(--font-size-base);height:26px;margin-left:auto;padding-left:12px;padding-right:12px">
         <span>Accept</span>
         <span style="font-family:var(--font-mono);font-size:var(--font-size-2xs);opacity:0.8">⌘↵</span>
@@ -198,20 +198,24 @@
         <div style="display:flex;flex:none;flex-direction:column;width:480px">
           <fdn-use component="ArmLabels"></fdn-use>
           <div style="display:flex;justify-content:flex-end">
-            <fdn-use component="ProposedCard" data-fdn-prop-type="ACTION" data-fdn-prop-ref="n4d" data-fdn-prop-title="Fix findings" data-fdn-prop-field="INSTRUCTION" data-fdn-prop-value="then back to the gate" data-fdn-prop-fit="lane"></fdn-use>
+            <div style="width:232px">
+              <fdn-use component="FlowCard" data-fdn-prop-title="Fix findings" data-fdn-prop-state="definition" data-fdn-prop-fit="lane"></fdn-use>
+            </div>
           </div>
           <div data-fdn-style="arm-join">
             <span data-fdn-style="junction" style="margin-left:-3px"></span>
           </div>
         </div>
-        <fdn-use component="FlowCard" data-fdn-prop-title="Manual smoke test" data-fdn-prop-meta="n5old · removed" data-fdn-prop-state="removed" data-fdn-prop-fit="wide"></fdn-use>
+        <fdn-use component="FlowCard" data-fdn-prop-title="Publish preview" data-fdn-prop-meta="nectar" data-fdn-prop-state="definition" data-fdn-prop-glyph="deploy" data-fdn-prop-fit="wide"></fdn-use>
         <span data-fdn-style="spine-link"></span>
-        <fdn-use component="ProposedCard" data-fdn-prop-type="DEPLOY" data-fdn-prop-glyph="deploy" data-fdn-prop-ref="n5" data-fdn-prop-title="Publish preview" data-fdn-prop-field="TARGET" data-fdn-prop-value="nectar &quot;review&quot;"></fdn-use>
+        <fdn-use component="ProposedCard" data-fdn-prop-type="ACTION" data-fdn-prop-ref="n5a" data-fdn-prop-title="Smoke-test the preview" data-fdn-prop-field="INSTRUCTION" data-fdn-prop-value="open the preview and click through the changed screens"></fdn-use>
+        <span data-fdn-style="spine-link"></span>
+        <fdn-use component="ProposedCard" data-fdn-prop-type="ACTION" data-fdn-prop-ref="n5b" data-fdn-prop-title="Write release notes" data-fdn-prop-field="INSTRUCTION" data-fdn-prop-value="summarise what changed for the reviewer"></fdn-use>
         <span data-fdn-style="spine-link"></span>
         <fdn-use component="FlowCard" data-fdn-prop-title="Ship it?" data-fdn-prop-meta="blocking" data-fdn-prop-state="definition" data-fdn-prop-glyph="ask" data-fdn-prop-fit="wide"></fdn-use>
         <div style="align-items:center;color:var(--color-mono-meta);gap:8px;display:flex;font-family:var(--font-mono);font-size:var(--font-size-xs);margin-top:19px;width:480px">
           <span style="background-color:var(--color-status-merged);border-radius:50%;flex:none;height:6px;width:6px"></span>
-          <span>Publish preview after the gate; add Fix findings on denial; replace Manual smoke test</span>
+          <span>Smoke-test the preview before the ask; add release notes for the reviewer</span>
         </div>
       </div>
       </div>

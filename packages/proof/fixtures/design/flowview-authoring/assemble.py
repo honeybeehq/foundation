@@ -36,13 +36,13 @@ DOC_HEAD = '''    <fdn-params>
       <fdn-param name="proposalstate" type="enum" values="pending,none" default="pending" description="whether a sidecar agent has a track_propose edit awaiting the human's accept/refine/discard — at most one pending per track. Pending swaps the live register for the proposal register"></fdn-param>
     </fdn-params>
     <fdn-data name="tracks">
-      <fdn-item id="review-and-ship" attached="yes" meta="7 steps · action ×3 · orchestrate · review · deploy · ask" name="review-and-ship" proposalmeta="7 steps · action ×4 · orchestrate · review · ask"></fdn-item>
-      <fdn-item id="pr-triage" attached="no" meta="5 steps · action ×3 · orchestrate · review" name="pr-triage" proposalmeta="5 steps · action ×3 · orchestrate · review"></fdn-item>
-      <fdn-item id="spec-round" attached="no" meta="5 steps · action ×3 · orchestrate · review" name="spec-round" proposalmeta="5 steps · action ×3 · orchestrate · review"></fdn-item>
-      <fdn-item id="board-draw" attached="no" meta="5 steps · action ×3 · orchestrate · review" name="board-draw" proposalmeta="5 steps · action ×3 · orchestrate · review"></fdn-item>
-      <fdn-item id="flaky-hunt" attached="no" meta="5 steps · action ×3 · orchestrate · review" name="flaky-hunt" proposalmeta="5 steps · action ×3 · orchestrate · review"></fdn-item>
-      <fdn-item id="dep-bump" attached="no" meta="4 steps · action ×3 · orchestrate" name="dep-bump" proposalmeta="4 steps · action ×3 · orchestrate"></fdn-item>
-      <fdn-item id="nectar-preview" attached="no" meta="5 steps · action ×3 · orchestrate · review" name="nectar-preview" proposalmeta="5 steps · action ×3 · orchestrate · review"></fdn-item>
+      <fdn-item id="review-and-ship" attached="yes" meta="7 steps · action ×3 · orchestrate · review · deploy · ask" name="review-and-ship"></fdn-item>
+      <fdn-item id="pr-triage" attached="no" meta="5 steps · action ×3 · orchestrate · review" name="pr-triage"></fdn-item>
+      <fdn-item id="spec-round" attached="no" meta="5 steps · action ×3 · orchestrate · review" name="spec-round"></fdn-item>
+      <fdn-item id="board-draw" attached="no" meta="5 steps · action ×3 · orchestrate · review" name="board-draw"></fdn-item>
+      <fdn-item id="flaky-hunt" attached="no" meta="5 steps · action ×3 · orchestrate · review" name="flaky-hunt"></fdn-item>
+      <fdn-item id="dep-bump" attached="no" meta="4 steps · action ×3 · orchestrate" name="dep-bump"></fdn-item>
+      <fdn-item id="nectar-preview" attached="no" meta="5 steps · action ×3 · orchestrate · review" name="nectar-preview"></fdn-item>
     </fdn-data>
     <fdn-lookups>
       <fdn-lookup name="cardgap">
@@ -87,6 +87,13 @@ DOC_HEAD = '''    <fdn-params>
         <fdn-entry key="gate" value="var(--color-status-review)"></fdn-entry>
         <fdn-entry key="lines" value="var(--color-text-muted)"></fdn-entry>
         <fdn-entry key="orchestrate" value="var(--color-status-merged)"></fdn-entry>
+      </fdn-lookup>
+      <fdn-lookup name="glyphsize">
+        <fdn-entry key="ask" value="14"></fdn-entry>
+        <fdn-entry key="deploy" value="13"></fdn-entry>
+        <fdn-entry key="gate" value="14"></fdn-entry>
+        <fdn-entry key="lines" value="14"></fdn-entry>
+        <fdn-entry key="orchestrate" value="15"></fdn-entry>
       </fdn-lookup>
       <fdn-lookup name="metasize">
         <fdn-entry key="current" value="var(--font-size-xs)"></fdn-entry>

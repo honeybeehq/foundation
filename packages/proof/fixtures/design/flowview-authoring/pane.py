@@ -16,7 +16,7 @@ def live_root(root_id, ids, height, extra_when):
             </button>
           </div>
           <div{i('list')} data-fdn-style="rail-list">
-            <fdn-use component="RailRow" each="track in data.tracks" data-fdn-prop-name="{{{{ track.name }}}}" data-fdn-prop-meta="{{{{ param.proposalstate == 'pending' ? track.proposalmeta : track.meta }}}}" data-fdn-prop-selected="{{{{ track.id == param.selectedtrack ? 'yes' : 'no' }}}}" data-fdn-prop-attached="{{{{ track.attached }}}}"></fdn-use>
+            <fdn-use component="RailRow" each="track in data.tracks" data-fdn-prop-name="{{{{ track.name }}}}" data-fdn-prop-meta="{{{{ track.meta }}}}" data-fdn-prop-selected="{{{{ track.id == param.selectedtrack ? 'yes' : 'no' }}}}" data-fdn-prop-attached="{{{{ track.attached }}}}"></fdn-use>
           </div>
         </aside>
         <main{i('main')} data-fdn-style="fill-column">
@@ -28,7 +28,7 @@ def live_root(root_id, ids, height, extra_when):
             </span>
             <span when="param.proposalstate == 'pending'" data-fdn-style="flow-header-status" style="color:var(--color-status-merged)">
               <fdn-use component="StatusDot" data-fdn-prop-state="merged" data-fdn-prop-size="6px"></fdn-use>
-              <span>proposal · 3 changes</span>
+              <span>proposal · 2 changes</span>
             </span>
             <span style="flex-grow:1;min-width:0"></span>
             <fdn-use component="SegmentedView" data-fdn-prop-code="{{{{ param.proposalstate == 'pending' ? 'disabled' : 'enabled' }}}}"></fdn-use>

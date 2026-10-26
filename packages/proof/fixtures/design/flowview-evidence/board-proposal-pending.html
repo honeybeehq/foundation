@@ -104,7 +104,7 @@
                 </button>
               </div>
               <div data-fdn-style="rail-list" style="box-sizing:border-box;flex:1;min-height:0;overflow:hidden;padding-bottom:8px;padding-left:6px;padding-right:6px;padding-top:8px">
-                <fdn-use component="RailRow" data-fdn-prop-attached="yes" data-fdn-prop-meta="7 steps · action ×4 · orchestrate · review · ask" data-fdn-prop-name="review-and-ship" data-fdn-prop-selected="yes" style="display:contents">
+                <fdn-use component="RailRow" data-fdn-prop-attached="yes" data-fdn-prop-meta="7 steps · action ×3 · orchestrate · review · deploy · ask" data-fdn-prop-name="review-and-ship" data-fdn-prop-selected="yes" style="display:contents">
                   <button data-fdn-style="rail-row" style-hover="background:var(--color-hover)" style="align-items:center;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;column-gap:9px;cursor:pointer;display:flex;padding-bottom:7px;padding-left:8px;padding-right:8px;padding-top:7px;row-gap:9px;text-align:left;width:100%;background-color:var(--color-rail-selection);border-width:0;color:inherit;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
                     <span style="box-sizing:border-box;display:block;flex-shrink:0;height:14px;width:14px">
                       <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-chip-ink)" data-fdn-prop-name="track" data-fdn-prop-size="14" style="display:contents">
@@ -120,7 +120,7 @@
                     </span>
                     <span style="box-sizing:border-box;display:block;flex-grow:1;min-width:0">
                       <span style="box-sizing:border-box;color:var(--color-text-primary);display:block;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">review-and-ship</span>
-                      <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box;display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">7 steps · action ×4 · orchestrate · review · ask</span>
+                      <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box;display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">7 steps · action ×3 · orchestrate · review · deploy · ask</span>
                     </span>
                     <fdn-use component="StatusDot" data-fdn-prop-size="7px" data-fdn-prop-state="running" style="display:contents">
                       <span style="background:var(--color-status-running);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex-shrink:0;height:7px;width:7px"></span>
@@ -256,7 +256,7 @@
                   <fdn-use component="StatusDot" data-fdn-prop-size="6px" data-fdn-prop-state="merged" style="display:contents">
                     <span style="background:var(--color-status-merged);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex-shrink:0;height:6px;width:6px"></span>
                   </fdn-use>
-                  <span style="box-sizing:border-box">proposal · 3 changes</span>
+                  <span style="box-sizing:border-box">proposal · 2 changes</span>
                 </span>
                 <span style="box-sizing:border-box;flex-grow:1;min-width:0"></span>
                 <fdn-use component="SegmentedView" data-fdn-prop-code="disabled" style="display:contents">
@@ -362,59 +362,72 @@
                           </div>
                         </fdn-use>
                         <div style="box-sizing:border-box;display:flex;justify-content:flex-end">
-                          <fdn-use component="ProposedCard" data-fdn-prop-field="INSTRUCTION" data-fdn-prop-fit="lane" data-fdn-prop-glyph="lines" data-fdn-prop-ref="n4d" data-fdn-prop-title="Fix findings" data-fdn-prop-type="ACTION" data-fdn-prop-value="then back to the gate" style="display:contents">
-                            <div style="background-color:var(--color-proposal-wash);border:1px dashed var(--color-status-merged);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;flex-direction:column;padding-bottom:10px;padding-left:13px;padding-right:13px;padding-top:10px;row-gap:8px;width:100%">
-                              <div style="align-items:center;box-sizing:border-box;column-gap:8px;display:flex;row-gap:8px">
+                          <div style="box-sizing:border-box;width:232px">
+                            <fdn-use component="FlowCard" data-fdn-prop-fit="lane" data-fdn-prop-glyph="lines" data-fdn-prop-meta="" data-fdn-prop-state="definition" data-fdn-prop-title="Fix findings" style="display:contents">
+                              <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:8px;opacity:0.78;padding-bottom:10px;padding-left:13px;padding-right:13px;padding-top:10px;row-gap:8px;width:100%">
                                 <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-text-muted)" data-fdn-prop-name="lines" data-fdn-prop-size="14" style="display:contents">
                                   <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-text-muted)">
                                     <path d="M2.5 4.2h11M2.5 8h11M2.5 11.8h6.5" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
                                   </svg>
                                 </fdn-use>
-                                <span style="box-sizing:border-box;color:var(--color-text-muted);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium)">ACTION</span>
-                                <span style="box-sizing:border-box;color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-meta);margin-left:auto;white-space:nowrap">n4d · proposed</span>
+                                <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-primary);font-weight:var(--font-weight-medium);text-decoration-line:none;white-space:nowrap">Fix findings</span>
                               </div>
-                              <div style="box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-md);font-weight:var(--font-weight-semibold)">Fix findings</div>
-                              <div style="box-sizing:border-box;display:flex;flex-direction:column">
-                                <div style="box-sizing:border-box;color:var(--color-text-muted);font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);margin-bottom:4px">INSTRUCTION</div>
-                                <div style="background-color:var(--color-surface-alt);border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-base);padding-bottom:7px;padding-left:11px;padding-right:11px;padding-top:7px">then back to the gate</div>
-                              </div>
-                            </div>
-                          </fdn-use>
+                            </fdn-use>
+                          </div>
                         </div>
                         <div data-fdn-style="arm-join" style="align-items:flex-end;border-bottom:1px solid var(--color-border-input);border-bottom-right-radius:var(--radius-lg);border-right:1px solid var(--color-border-input);box-sizing:border-box;display:flex;flex:none;height:42px;margin-left:240px;width:125px">
                           <span data-fdn-style="junction" style="background:var(--color-border-input);border:1px solid var(--color-surface);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;display:block;flex:none;height:6px;margin-bottom:-3.5px;width:6px;margin-left:-3px"></span>
                         </div>
                       </div>
-                      <fdn-use component="FlowCard" data-fdn-prop-fit="wide" data-fdn-prop-glyph="lines" data-fdn-prop-meta="n5old · removed" data-fdn-prop-state="removed" data-fdn-prop-title="Manual smoke test" style="display:contents">
-                        <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:9px;opacity:0.55;padding-bottom:10px;padding-left:14px;padding-right:14px;padding-top:10px;row-gap:9px;width:480px">
-                          <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-text-muted)" data-fdn-prop-name="lines" data-fdn-prop-size="14" style="display:contents">
-                            <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-text-muted)">
-                              <path d="M2.5 4.2h11M2.5 8h11M2.5 11.8h6.5" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+                      <fdn-use component="FlowCard" data-fdn-prop-fit="wide" data-fdn-prop-glyph="deploy" data-fdn-prop-meta="nectar" data-fdn-prop-state="definition" data-fdn-prop-title="Publish preview" style="display:contents">
+                        <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:9px;opacity:0.78;padding-bottom:10px;padding-left:14px;padding-right:14px;padding-top:10px;row-gap:9px;width:480px">
+                          <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-status-blocked)" data-fdn-prop-name="deploy" data-fdn-prop-size="13" style="display:contents">
+                            <svg fill="none" height="13" viewBox="0 0 16 16" width="13" style="box-sizing:border-box;color:var(--color-status-blocked)">
+                              <g>
+                                <path d="M8 10.2V2.8M5.2 5.4 8 2.6l2.8 2.8" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
+                                <path d="M3 10.8V13h10v-2.2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
+                              </g>
                             </svg>
                           </fdn-use>
-                          <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-muted);font-weight:var(--font-weight-medium);text-decoration-line:line-through;white-space:nowrap">Manual smoke test</span>
-                          <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-text-faint);font-size:var(--font-size-meta)">n5old · removed</span>
+                          <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-primary);font-weight:var(--font-weight-medium);text-decoration-line:none;white-space:nowrap">Publish preview</span>
+                          <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-text-faint);font-size:var(--font-size-meta)">nectar</span>
                         </div>
                       </fdn-use>
                       <span data-fdn-style="spine-link" style="background:var(--color-border-input);display:block;flex:none;height:42px;width:1px;box-sizing:border-box"></span>
-                      <fdn-use component="ProposedCard" data-fdn-prop-field="TARGET" data-fdn-prop-fit="wide" data-fdn-prop-glyph="deploy" data-fdn-prop-ref="n5" data-fdn-prop-title="Publish preview" data-fdn-prop-type="DEPLOY" data-fdn-prop-value="nectar &quot;review&quot;" style="display:contents">
+                      <fdn-use component="ProposedCard" data-fdn-prop-field="INSTRUCTION" data-fdn-prop-fit="wide" data-fdn-prop-glyph="lines" data-fdn-prop-ref="n5a" data-fdn-prop-title="Smoke-test the preview" data-fdn-prop-type="ACTION" data-fdn-prop-value="open the preview and click through the changed screens" style="display:contents">
                         <div style="background-color:var(--color-proposal-wash);border:1px dashed var(--color-status-merged);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;flex-direction:column;padding-bottom:10px;padding-left:14px;padding-right:14px;padding-top:10px;row-gap:8px;width:480px">
                           <div style="align-items:center;box-sizing:border-box;column-gap:8px;display:flex;row-gap:8px">
-                            <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-status-blocked)" data-fdn-prop-name="deploy" data-fdn-prop-size="13" style="display:contents">
-                              <svg fill="none" height="13" viewBox="0 0 16 16" width="13" style="box-sizing:border-box;color:var(--color-status-blocked)">
-                                <g>
-                                  <path d="M8 10.2V2.8M5.2 5.4 8 2.6l2.8 2.8" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
-                                  <path d="M3 10.8V13h10v-2.2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
-                                </g>
+                            <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-text-muted)" data-fdn-prop-name="lines" data-fdn-prop-size="14" style="display:contents">
+                              <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-text-muted)">
+                                <path d="M2.5 4.2h11M2.5 8h11M2.5 11.8h6.5" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
                               </svg>
                             </fdn-use>
-                            <span style="box-sizing:border-box;color:var(--color-status-blocked);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium)">DEPLOY</span>
-                            <span style="box-sizing:border-box;color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-meta);margin-left:auto;white-space:nowrap">n5 · proposed</span>
+                            <span style="box-sizing:border-box;color:var(--color-text-muted);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium)">ACTION</span>
+                            <span style="box-sizing:border-box;color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-meta);margin-left:auto;white-space:nowrap">n5a · proposed</span>
                           </div>
-                          <div style="box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-md);font-weight:var(--font-weight-semibold)">Publish preview</div>
+                          <div style="box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-md);font-weight:var(--font-weight-semibold)">Smoke-test the preview</div>
                           <div style="box-sizing:border-box;display:flex;flex-direction:column">
-                            <div style="box-sizing:border-box;color:var(--color-text-muted);font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);margin-bottom:4px">TARGET</div>
-                            <div style="background-color:var(--color-surface-alt);border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-base);padding-bottom:7px;padding-left:11px;padding-right:11px;padding-top:7px">nectar "review"</div>
+                            <div style="box-sizing:border-box;color:var(--color-text-muted);font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);margin-bottom:4px">INSTRUCTION</div>
+                            <div style="background-color:var(--color-surface-alt);border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-base);padding-bottom:7px;padding-left:11px;padding-right:11px;padding-top:7px">open the preview and click through the changed screens</div>
+                          </div>
+                        </div>
+                      </fdn-use>
+                      <span data-fdn-style="spine-link" style="background:var(--color-border-input);display:block;flex:none;height:42px;width:1px;box-sizing:border-box"></span>
+                      <fdn-use component="ProposedCard" data-fdn-prop-field="INSTRUCTION" data-fdn-prop-fit="wide" data-fdn-prop-glyph="lines" data-fdn-prop-ref="n5b" data-fdn-prop-title="Write release notes" data-fdn-prop-type="ACTION" data-fdn-prop-value="summarise what changed for the reviewer" style="display:contents">
+                        <div style="background-color:var(--color-proposal-wash);border:1px dashed var(--color-status-merged);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;flex-direction:column;padding-bottom:10px;padding-left:14px;padding-right:14px;padding-top:10px;row-gap:8px;width:480px">
+                          <div style="align-items:center;box-sizing:border-box;column-gap:8px;display:flex;row-gap:8px">
+                            <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-text-muted)" data-fdn-prop-name="lines" data-fdn-prop-size="14" style="display:contents">
+                              <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-text-muted)">
+                                <path d="M2.5 4.2h11M2.5 8h11M2.5 11.8h6.5" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+                              </svg>
+                            </fdn-use>
+                            <span style="box-sizing:border-box;color:var(--color-text-muted);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium)">ACTION</span>
+                            <span style="box-sizing:border-box;color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-meta);margin-left:auto;white-space:nowrap">n5b · proposed</span>
+                          </div>
+                          <div style="box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-md);font-weight:var(--font-weight-semibold)">Write release notes</div>
+                          <div style="box-sizing:border-box;display:flex;flex-direction:column">
+                            <div style="box-sizing:border-box;color:var(--color-text-muted);font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);margin-bottom:4px">INSTRUCTION</div>
+                            <div style="background-color:var(--color-surface-alt);border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-base);padding-bottom:7px;padding-left:11px;padding-right:11px;padding-top:7px">summarise what changed for the reviewer</div>
                           </div>
                         </div>
                       </fdn-use>
@@ -432,15 +445,15 @@
                       </fdn-use>
                       <div style="align-items:center;box-sizing:border-box;color:var(--color-mono-meta);column-gap:8px;display:flex;font-family:var(--font-mono);font-size:var(--font-size-xs);margin-top:19px;row-gap:8px;width:480px">
                         <span style="background-color:var(--color-status-merged);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:6px;width:6px"></span>
-                        <span style="box-sizing:border-box">Publish preview after the gate; add Fix findings on denial; replace Manual smoke test</span>
+                        <span style="box-sizing:border-box">Smoke-test the preview before the ask; add release notes for the reviewer</span>
                       </div>
                     </div>
                   </div>
                   <div style="box-sizing:border-box;display:flex;flex:none;justify-content:center;padding-bottom:16px;padding-top:12px">
                     <fdn-use component="ProposalBar" style="display:contents">
                       <div style="align-items:center;background-color:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-shadow:var(--shadow-dock);box-sizing:border-box;column-gap:8px;display:flex;flex:none;padding-bottom:8px;padding-left:10px;padding-right:10px;padding-top:8px;row-gap:8px;width:480px">
-                        <span style="box-sizing:border-box;color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-sm);white-space:nowrap">3 changes</span>
-                        <span style="box-sizing:border-box;color:var(--color-meta-faint);font-family:var(--font-mono);font-size:var(--font-size-sm);overflow:hidden;white-space:nowrap">+n4d · +n5 · −n5old</span>
+                        <span style="box-sizing:border-box;color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-sm);white-space:nowrap">2 changes</span>
+                        <span style="box-sizing:border-box;color:var(--color-meta-faint);font-family:var(--font-mono);font-size:var(--font-size-sm);overflow:hidden;white-space:nowrap">+n5a · +n5b</span>
                         <span data-fdn-style="pill-btn-accent" style-hover="background:#A87826" style="align-items:center;background:var(--color-accent);border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);color:var(--color-on-honey);cursor:pointer;display:flex;font-family:var(--font-sans);font-weight:var(--font-weight-semibold);padding-bottom:0;padding-top:0;box-sizing:border-box;column-gap:5px;font-size:var(--font-size-base);height:26px;margin-left:auto;padding-left:12px;padding-right:12px;row-gap:5px">
                           <span style="box-sizing:border-box">Accept</span>
                           <span style="box-sizing:border-box;font-family:var(--font-mono);font-size:var(--font-size-2xs);opacity:0.8">⌘↵</span>
@@ -508,13 +521,13 @@
     </div>
   </section>
   <section style="display:flex;flex-direction:column">
-    <fdn-use component="BoardCaption" data-fdn-prop-body="The selected track, live: the header says who is attached and how far along, the canvas draws the flow, the footer carries hints and the exception count. With a proposal pending, the same canvas becomes the diff — proposed steps dashed in violet, the removed step struck through — and the accept / refine / discard bar is docked at the bottom of the canvas so the one decision is always in view. Honey moves to Accept." data-fdn-prop-index="BOARD 2" data-fdn-prop-title="ONE TRACK SELECTED" style="display:contents">
+    <fdn-use component="BoardCaption" data-fdn-prop-body="The selected track, live: the header says who is attached and how far along, the canvas draws the flow, the footer carries hints and the exception count. With a proposal pending, the same canvas becomes the diff — proposed new steps dashed in violet (here Smoke-test the preview and Write release notes) — and the accept / refine / discard bar is docked at the bottom of the canvas so the one decision is always in view. Honey moves to Accept." data-fdn-prop-index="BOARD 2" data-fdn-prop-title="ONE TRACK SELECTED" style="display:contents">
       <div style="display:flex;flex-direction:column;margin-bottom:14px;row-gap:6px">
         <div style="align-items:baseline;column-gap:10px;display:flex">
           <span style="color:var(--color-text-disabled);font-family:var(--font-mono);font-size:var(--font-size-xs);font-weight:var(--font-weight-medium);letter-spacing:.08em">BOARD 2</span>
           <span data-fdn-style="section-label" style="font-family:var(--font-sans);font-size:10px;font-weight:var(--font-weight-semibold);letter-spacing:.12em;color:var(--color-text-tertiary)">ONE TRACK SELECTED</span>
         </div>
-        <div style="color:var(--color-text-muted);font-family:var(--font-sans);font-size:12.5px;line-height:1.5;max-width:660px">The selected track, live: the header says who is attached and how far along, the canvas draws the flow, the footer carries hints and the exception count. With a proposal pending, the same canvas becomes the diff — proposed steps dashed in violet, the removed step struck through — and the accept / refine / discard bar is docked at the bottom of the canvas so the one decision is always in view. Honey moves to Accept.</div>
+        <div style="color:var(--color-text-muted);font-family:var(--font-sans);font-size:12.5px;line-height:1.5;max-width:660px">The selected track, live: the header says who is attached and how far along, the canvas draws the flow, the footer carries hints and the exception count. With a proposal pending, the same canvas becomes the diff — proposed new steps dashed in violet (here Smoke-test the preview and Write release notes) — and the accept / refine / discard bar is docked at the bottom of the canvas so the one decision is always in view. Honey moves to Accept.</div>
       </div>
     </fdn-use>
     <fdn-use component="TracksPane" data-fdn-prop-mode="selected" style="display:contents">
@@ -533,7 +546,7 @@
               </button>
             </div>
             <div data-fdn-style="rail-list" style="box-sizing:border-box;flex:1;min-height:0;overflow:hidden;padding-bottom:8px;padding-left:6px;padding-right:6px;padding-top:8px">
-              <fdn-use component="RailRow" data-fdn-prop-attached="yes" data-fdn-prop-meta="7 steps · action ×4 · orchestrate · review · ask" data-fdn-prop-name="review-and-ship" data-fdn-prop-selected="yes" style="display:contents">
+              <fdn-use component="RailRow" data-fdn-prop-attached="yes" data-fdn-prop-meta="7 steps · action ×3 · orchestrate · review · deploy · ask" data-fdn-prop-name="review-and-ship" data-fdn-prop-selected="yes" style="display:contents">
                 <button data-fdn-style="rail-row" style-hover="background:var(--color-hover)" style="align-items:center;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;column-gap:9px;cursor:pointer;display:flex;padding-bottom:7px;padding-left:8px;padding-right:8px;padding-top:7px;row-gap:9px;text-align:left;width:100%;background-color:var(--color-rail-selection);border-width:0;color:inherit;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
                   <span style="box-sizing:border-box;display:block;flex-shrink:0;height:14px;width:14px">
                     <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-chip-ink)" data-fdn-prop-name="track" data-fdn-prop-size="14" style="display:contents">
@@ -549,7 +562,7 @@
                   </span>
                   <span style="box-sizing:border-box;display:block;flex-grow:1;min-width:0">
                     <span style="box-sizing:border-box;color:var(--color-text-primary);display:block;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">review-and-ship</span>
-                    <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box;display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">7 steps · action ×4 · orchestrate · review · ask</span>
+                    <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box;display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">7 steps · action ×3 · orchestrate · review · deploy · ask</span>
                   </span>
                   <fdn-use component="StatusDot" data-fdn-prop-size="7px" data-fdn-prop-state="running" style="display:contents">
                     <span style="background:var(--color-status-running);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex-shrink:0;height:7px;width:7px"></span>
@@ -685,7 +698,7 @@
                 <fdn-use component="StatusDot" data-fdn-prop-size="6px" data-fdn-prop-state="merged" style="display:contents">
                   <span style="background:var(--color-status-merged);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex-shrink:0;height:6px;width:6px"></span>
                 </fdn-use>
-                <span style="box-sizing:border-box">proposal · 3 changes</span>
+                <span style="box-sizing:border-box">proposal · 2 changes</span>
               </span>
               <span style="box-sizing:border-box;flex-grow:1;min-width:0"></span>
               <fdn-use component="SegmentedView" data-fdn-prop-code="disabled" style="display:contents">
@@ -791,59 +804,72 @@
                         </div>
                       </fdn-use>
                       <div style="box-sizing:border-box;display:flex;justify-content:flex-end">
-                        <fdn-use component="ProposedCard" data-fdn-prop-field="INSTRUCTION" data-fdn-prop-fit="lane" data-fdn-prop-glyph="lines" data-fdn-prop-ref="n4d" data-fdn-prop-title="Fix findings" data-fdn-prop-type="ACTION" data-fdn-prop-value="then back to the gate" style="display:contents">
-                          <div style="background-color:var(--color-proposal-wash);border:1px dashed var(--color-status-merged);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;flex-direction:column;padding-bottom:10px;padding-left:13px;padding-right:13px;padding-top:10px;row-gap:8px;width:100%">
-                            <div style="align-items:center;box-sizing:border-box;column-gap:8px;display:flex;row-gap:8px">
+                        <div style="box-sizing:border-box;width:232px">
+                          <fdn-use component="FlowCard" data-fdn-prop-fit="lane" data-fdn-prop-glyph="lines" data-fdn-prop-meta="" data-fdn-prop-state="definition" data-fdn-prop-title="Fix findings" style="display:contents">
+                            <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:8px;opacity:0.78;padding-bottom:10px;padding-left:13px;padding-right:13px;padding-top:10px;row-gap:8px;width:100%">
                               <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-text-muted)" data-fdn-prop-name="lines" data-fdn-prop-size="14" style="display:contents">
                                 <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-text-muted)">
                                   <path d="M2.5 4.2h11M2.5 8h11M2.5 11.8h6.5" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
                                 </svg>
                               </fdn-use>
-                              <span style="box-sizing:border-box;color:var(--color-text-muted);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium)">ACTION</span>
-                              <span style="box-sizing:border-box;color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-meta);margin-left:auto;white-space:nowrap">n4d · proposed</span>
+                              <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-primary);font-weight:var(--font-weight-medium);text-decoration-line:none;white-space:nowrap">Fix findings</span>
                             </div>
-                            <div style="box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-md);font-weight:var(--font-weight-semibold)">Fix findings</div>
-                            <div style="box-sizing:border-box;display:flex;flex-direction:column">
-                              <div style="box-sizing:border-box;color:var(--color-text-muted);font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);margin-bottom:4px">INSTRUCTION</div>
-                              <div style="background-color:var(--color-surface-alt);border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-base);padding-bottom:7px;padding-left:11px;padding-right:11px;padding-top:7px">then back to the gate</div>
-                            </div>
-                          </div>
-                        </fdn-use>
+                          </fdn-use>
+                        </div>
                       </div>
                       <div data-fdn-style="arm-join" style="align-items:flex-end;border-bottom:1px solid var(--color-border-input);border-bottom-right-radius:var(--radius-lg);border-right:1px solid var(--color-border-input);box-sizing:border-box;display:flex;flex:none;height:42px;margin-left:240px;width:125px">
                         <span data-fdn-style="junction" style="background:var(--color-border-input);border:1px solid var(--color-surface);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;display:block;flex:none;height:6px;margin-bottom:-3.5px;width:6px;margin-left:-3px"></span>
                       </div>
                     </div>
-                    <fdn-use component="FlowCard" data-fdn-prop-fit="wide" data-fdn-prop-glyph="lines" data-fdn-prop-meta="n5old · removed" data-fdn-prop-state="removed" data-fdn-prop-title="Manual smoke test" style="display:contents">
-                      <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:9px;opacity:0.55;padding-bottom:10px;padding-left:14px;padding-right:14px;padding-top:10px;row-gap:9px;width:480px">
-                        <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-text-muted)" data-fdn-prop-name="lines" data-fdn-prop-size="14" style="display:contents">
-                          <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-text-muted)">
-                            <path d="M2.5 4.2h11M2.5 8h11M2.5 11.8h6.5" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+                    <fdn-use component="FlowCard" data-fdn-prop-fit="wide" data-fdn-prop-glyph="deploy" data-fdn-prop-meta="nectar" data-fdn-prop-state="definition" data-fdn-prop-title="Publish preview" style="display:contents">
+                      <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:9px;opacity:0.78;padding-bottom:10px;padding-left:14px;padding-right:14px;padding-top:10px;row-gap:9px;width:480px">
+                        <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-status-blocked)" data-fdn-prop-name="deploy" data-fdn-prop-size="13" style="display:contents">
+                          <svg fill="none" height="13" viewBox="0 0 16 16" width="13" style="box-sizing:border-box;color:var(--color-status-blocked)">
+                            <g>
+                              <path d="M8 10.2V2.8M5.2 5.4 8 2.6l2.8 2.8" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
+                              <path d="M3 10.8V13h10v-2.2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
+                            </g>
                           </svg>
                         </fdn-use>
-                        <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-muted);font-weight:var(--font-weight-medium);text-decoration-line:line-through;white-space:nowrap">Manual smoke test</span>
-                        <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-text-faint);font-size:var(--font-size-meta)">n5old · removed</span>
+                        <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-primary);font-weight:var(--font-weight-medium);text-decoration-line:none;white-space:nowrap">Publish preview</span>
+                        <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-text-faint);font-size:var(--font-size-meta)">nectar</span>
                       </div>
                     </fdn-use>
                     <span data-fdn-style="spine-link" style="background:var(--color-border-input);display:block;flex:none;height:42px;width:1px;box-sizing:border-box"></span>
-                    <fdn-use component="ProposedCard" data-fdn-prop-field="TARGET" data-fdn-prop-fit="wide" data-fdn-prop-glyph="deploy" data-fdn-prop-ref="n5" data-fdn-prop-title="Publish preview" data-fdn-prop-type="DEPLOY" data-fdn-prop-value="nectar &quot;review&quot;" style="display:contents">
+                    <fdn-use component="ProposedCard" data-fdn-prop-field="INSTRUCTION" data-fdn-prop-fit="wide" data-fdn-prop-glyph="lines" data-fdn-prop-ref="n5a" data-fdn-prop-title="Smoke-test the preview" data-fdn-prop-type="ACTION" data-fdn-prop-value="open the preview and click through the changed screens" style="display:contents">
                       <div style="background-color:var(--color-proposal-wash);border:1px dashed var(--color-status-merged);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;flex-direction:column;padding-bottom:10px;padding-left:14px;padding-right:14px;padding-top:10px;row-gap:8px;width:480px">
                         <div style="align-items:center;box-sizing:border-box;column-gap:8px;display:flex;row-gap:8px">
-                          <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-status-blocked)" data-fdn-prop-name="deploy" data-fdn-prop-size="13" style="display:contents">
-                            <svg fill="none" height="13" viewBox="0 0 16 16" width="13" style="box-sizing:border-box;color:var(--color-status-blocked)">
-                              <g>
-                                <path d="M8 10.2V2.8M5.2 5.4 8 2.6l2.8 2.8" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
-                                <path d="M3 10.8V13h10v-2.2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
-                              </g>
+                          <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-text-muted)" data-fdn-prop-name="lines" data-fdn-prop-size="14" style="display:contents">
+                            <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-text-muted)">
+                              <path d="M2.5 4.2h11M2.5 8h11M2.5 11.8h6.5" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
                             </svg>
                           </fdn-use>
-                          <span style="box-sizing:border-box;color:var(--color-status-blocked);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium)">DEPLOY</span>
-                          <span style="box-sizing:border-box;color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-meta);margin-left:auto;white-space:nowrap">n5 · proposed</span>
+                          <span style="box-sizing:border-box;color:var(--color-text-muted);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium)">ACTION</span>
+                          <span style="box-sizing:border-box;color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-meta);margin-left:auto;white-space:nowrap">n5a · proposed</span>
                         </div>
-                        <div style="box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-md);font-weight:var(--font-weight-semibold)">Publish preview</div>
+                        <div style="box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-md);font-weight:var(--font-weight-semibold)">Smoke-test the preview</div>
                         <div style="box-sizing:border-box;display:flex;flex-direction:column">
-                          <div style="box-sizing:border-box;color:var(--color-text-muted);font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);margin-bottom:4px">TARGET</div>
-                          <div style="background-color:var(--color-surface-alt);border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-base);padding-bottom:7px;padding-left:11px;padding-right:11px;padding-top:7px">nectar "review"</div>
+                          <div style="box-sizing:border-box;color:var(--color-text-muted);font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);margin-bottom:4px">INSTRUCTION</div>
+                          <div style="background-color:var(--color-surface-alt);border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-base);padding-bottom:7px;padding-left:11px;padding-right:11px;padding-top:7px">open the preview and click through the changed screens</div>
+                        </div>
+                      </div>
+                    </fdn-use>
+                    <span data-fdn-style="spine-link" style="background:var(--color-border-input);display:block;flex:none;height:42px;width:1px;box-sizing:border-box"></span>
+                    <fdn-use component="ProposedCard" data-fdn-prop-field="INSTRUCTION" data-fdn-prop-fit="wide" data-fdn-prop-glyph="lines" data-fdn-prop-ref="n5b" data-fdn-prop-title="Write release notes" data-fdn-prop-type="ACTION" data-fdn-prop-value="summarise what changed for the reviewer" style="display:contents">
+                      <div style="background-color:var(--color-proposal-wash);border:1px dashed var(--color-status-merged);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;flex-direction:column;padding-bottom:10px;padding-left:14px;padding-right:14px;padding-top:10px;row-gap:8px;width:480px">
+                        <div style="align-items:center;box-sizing:border-box;column-gap:8px;display:flex;row-gap:8px">
+                          <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-text-muted)" data-fdn-prop-name="lines" data-fdn-prop-size="14" style="display:contents">
+                            <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-text-muted)">
+                              <path d="M2.5 4.2h11M2.5 8h11M2.5 11.8h6.5" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+                            </svg>
+                          </fdn-use>
+                          <span style="box-sizing:border-box;color:var(--color-text-muted);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium)">ACTION</span>
+                          <span style="box-sizing:border-box;color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-meta);margin-left:auto;white-space:nowrap">n5b · proposed</span>
+                        </div>
+                        <div style="box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-md);font-weight:var(--font-weight-semibold)">Write release notes</div>
+                        <div style="box-sizing:border-box;display:flex;flex-direction:column">
+                          <div style="box-sizing:border-box;color:var(--color-text-muted);font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);margin-bottom:4px">INSTRUCTION</div>
+                          <div style="background-color:var(--color-surface-alt);border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-base);padding-bottom:7px;padding-left:11px;padding-right:11px;padding-top:7px">summarise what changed for the reviewer</div>
                         </div>
                       </div>
                     </fdn-use>
@@ -861,15 +887,15 @@
                     </fdn-use>
                     <div style="align-items:center;box-sizing:border-box;color:var(--color-mono-meta);column-gap:8px;display:flex;font-family:var(--font-mono);font-size:var(--font-size-xs);margin-top:19px;row-gap:8px;width:480px">
                       <span style="background-color:var(--color-status-merged);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:6px;width:6px"></span>
-                      <span style="box-sizing:border-box">Publish preview after the gate; add Fix findings on denial; replace Manual smoke test</span>
+                      <span style="box-sizing:border-box">Smoke-test the preview before the ask; add release notes for the reviewer</span>
                     </div>
                   </div>
                 </div>
                 <div style="box-sizing:border-box;display:flex;flex:none;justify-content:center;padding-bottom:16px;padding-top:12px">
                   <fdn-use component="ProposalBar" style="display:contents">
                     <div style="align-items:center;background-color:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-shadow:var(--shadow-dock);box-sizing:border-box;column-gap:8px;display:flex;flex:none;padding-bottom:8px;padding-left:10px;padding-right:10px;padding-top:8px;row-gap:8px;width:480px">
-                      <span style="box-sizing:border-box;color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-sm);white-space:nowrap">3 changes</span>
-                      <span style="box-sizing:border-box;color:var(--color-meta-faint);font-family:var(--font-mono);font-size:var(--font-size-sm);overflow:hidden;white-space:nowrap">+n4d · +n5 · −n5old</span>
+                      <span style="box-sizing:border-box;color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-sm);white-space:nowrap">2 changes</span>
+                      <span style="box-sizing:border-box;color:var(--color-meta-faint);font-family:var(--font-mono);font-size:var(--font-size-sm);overflow:hidden;white-space:nowrap">+n5a · +n5b</span>
                       <span data-fdn-style="pill-btn-accent" style-hover="background:#A87826" style="align-items:center;background:var(--color-accent);border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);color:var(--color-on-honey);cursor:pointer;display:flex;font-family:var(--font-sans);font-weight:var(--font-weight-semibold);padding-bottom:0;padding-top:0;box-sizing:border-box;column-gap:5px;font-size:var(--font-size-base);height:26px;margin-left:auto;padding-left:12px;padding-right:12px;row-gap:5px">
                         <span style="box-sizing:border-box">Accept</span>
                         <span style="box-sizing:border-box;font-family:var(--font-mono);font-size:var(--font-size-2xs);opacity:0.8">⌘↵</span>

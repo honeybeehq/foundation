@@ -56,5 +56,38 @@
         "pixelDiffPercent": 0
       }
     }
+  },
+  "round4": {
+    "apiary": "proto/design-to-code-components 501368d3e8888b11a6745580c3b380d860688b19",
+    "foundationCompare": "d854883 base (frozen matcher/grouping e419831 + O1 off-screen detector)",
+    "states": {
+      "track-selected": {
+        "rawFindings": 135,
+        "productCandidates": 29,
+        "uncertain": 38,
+        "offscreenCandidates": [],
+        "pixelDiffPercent": 0.227
+      },
+      "proposal-pending": {
+        "rawFindings": 168,
+        "productCandidates": 35,
+        "uncertain": 53,
+        "offscreenCandidates": [
+          "rendered outside the visible pane: ACTION",
+          "rendered outside the visible pane: INSTRUCTION",
+          "rendered outside the visible pane: ACTION",
+          "rendered outside the visible pane: INSTRUCTION",
+          "rendered outside the visible pane: 2 change s \u00b7 +n5a \u00b7 +n5b \u00b7 Accept \u00b7 \u2318\u21b5 \u00b7 Refine \u00b7 Discard \u00b7 \u2318\u232b"
+        ],
+        "pixelDiffPercent": 0.413
+      },
+      "empty": {
+        "rawFindings": 8,
+        "productCandidates": 7,
+        "uncertain": 0,
+        "offscreenCandidates": [],
+        "pixelDiffPercent": 0
+      }
+    }
   }
 }
