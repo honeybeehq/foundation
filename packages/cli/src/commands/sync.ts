@@ -45,9 +45,9 @@ export async function runSync(args: string[], io: CliIO): Promise<number> {
         try {
           do {
             const batch = activityBatch(cursor, workspace)
-            for (const event of batch.events) io.stdout(JSON.stringify({ ...event, delivery: initial ? 'baseline' : event.delivery }))
+            for (const event of batch.events) io.stdout(JSON.stringify({ ...event, delivery: initial || batch.reset ? 'baseline' : event.delivery }))
             cursor = batch.cursor
-            if (initial && flags.follow) io.stdout(JSON.stringify({ version: 1, type: 'ready', workspaceId: workspace, cursor }))
+            if ((initial || batch.reset) && flags.follow) io.stdout(JSON.stringify({ version: 1, type: 'ready', workspaceId: workspace, cursor }))
             initial = false
             if (flags.follow && !controller.signal.aborted) await new Promise<void>(done => {
               const finish = (): void => { clearTimeout(timer); controller.signal.removeEventListener('abort', finish); done() }

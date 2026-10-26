@@ -188,8 +188,15 @@ export function closeActivityJournal():void {
 }
 interface ReaderCache { root:string; signature:string; index:Index; rows:Map<number,{bytes:number;events:ImportedFact[]}> }
 let reader:ReaderCache|undefined
-export function activityBatch(token?:string,workspace?:string):{events:ImportedFact[];cursor:string}{
-  const root=modelRoot(),info=statSync(indexPath(root)),signature=JSON.stringify([info.ino,info.mtimeMs,info.size])
+const EMPTY_ACTIVITY_CURSOR='sync-activity1:empty:0'
+export function activityBatch(token?:string,workspace?:string):{events:ImportedFact[];cursor:string;reset?:boolean}{
+  const root=modelRoot(),info=(()=>{try{return statSync(indexPath(root))}catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return null;throw error}})()
+  if(!info){
+    if(reader?.root===root)reader=undefined
+    if(token!==undefined&&token!==EMPTY_ACTIVITY_CURSOR)throw new Error('invalid or stale activity cursor; establish a new baseline')
+    return {events:[],cursor:EMPTY_ACTIVITY_CURSOR}
+  }
+  const cold=token===EMPTY_ACTIVITY_CURSOR,signature=JSON.stringify([info.ino,info.mtimeMs,info.size])
   if(reader?.root!==root||reader.signature!==signature){
     const index=readIndex(root),rows=reader?.root===root&&reader.index.id===index.id?reader.rows:new Map<number,{bytes:number;events:ImportedFact[]}>()
     const active=new Set(index.segments.map(s=>s.first));for(const first of rows.keys())if(!active.has(first))rows.delete(first)
@@ -202,7 +209,7 @@ export function activityBatch(token?:string,workspace?:string):{events:ImportedF
   }
   const {index,rows}=reader
   let after=0
-  if(token){const prefix=`sync-activity1:${index.id}:`;if(!token.startsWith(prefix)||!/^\d+$/.test(token.slice(prefix.length)))throw new Error('invalid or stale activity cursor; establish a new baseline');after=Number(token.slice(prefix.length));const floor=index.segments[0]?.first??index.next;if(!Number.isSafeInteger(after)||after<floor-1||after>=index.next)throw new Error('invalid or stale activity cursor; establish a new baseline')}
+  if(token&&!cold){const prefix=`sync-activity1:${index.id}:`;if(!token.startsWith(prefix)||!/^\d+$/.test(token.slice(prefix.length)))throw new Error('invalid or stale activity cursor; establish a new baseline');after=Number(token.slice(prefix.length));const floor=index.segments[0]?.first??index.next;if(!Number.isSafeInteger(after)||after<floor-1||after>=index.next)throw new Error('invalid or stale activity cursor; establish a new baseline')}
   const events=index.segments.flatMap(s=>rows.get(s.first)!.events).filter(e=>Number(e.cursor.split(':').at(-1))>after&&(!workspace||e.document.workspaceId===workspace))
-  return {events,cursor:cursor(index,index.next-1)}
+  return {events:cold?events.map(event=>({...event,delivery:'baseline' as const})):events,cursor:cursor(index,index.next-1),...(cold?{reset:true}:{})}
 }

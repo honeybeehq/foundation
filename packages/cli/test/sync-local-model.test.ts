@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, existsSync, writeFileSync, mkdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, expect, it, vi } from 'vitest'
@@ -80,4 +80,30 @@ it('reports quarantine warnings without pinning freshness stale and excludes sto
   const value=catalogueSnapshot('w')
   expect(value.records).toHaveLength(2);expect(value.errors.length).toBeGreaterThan(0)
   expect(value.freshness.state).toBe('fresh');expect(value.freshness.lastContactAt).toBeGreaterThan(1)
+})
+
+it('reads an absent activity journal as empty without creating state, then catches up as baseline',()=>{
+  setup();const store=join(root,'store')
+  const empty=activityBatch(undefined,'w')
+  expect(empty.events).toEqual([]);expect(existsSync(store)).toBe(false)
+  expect(activityBatch(empty.cursor,'w')).toEqual(empty)
+  expect(()=>activityBatch('sync-activity1:wrong:0','w')).toThrow('stale activity cursor')
+  initializeActivityJournal()
+  const chain=createChain(skeletonDocument('First'),{author:'writer',message:'init'},{docId:'first'})
+  recordActivity({docId:'first',workspace:'w',product:'p',file:join(root,'first.fdn.html')},chain,[chain.head().hash],{ownerNodeId:'node',repo:null,delivery:'live'})
+  flushActivityJournal()
+  const caught=activityBatch(empty.cursor,'w')
+  expect(caught.events).toHaveLength(1);expect(caught.events[0]!.delivery).toBe('baseline');expect(caught.reset).toBe(true)
+  expect(activityBatch(caught.cursor,'w').events).toEqual([])
+  expect(()=>activityBatch('bad','w')).toThrow('stale activity cursor')
+})
+it('does not hide an activity index that is corrupt or disappears after a real cursor',()=>{
+  setup();initializeActivityJournal();const token=activityBatch().cursor
+  const path=join(root,'store','read-model','activity-index.json')
+  const original=readFileSync(path)
+  rmSync(path)
+  expect(()=>activityBatch(token)).toThrow('stale activity cursor')
+  mkdirSync(join(root,'store','read-model'),{recursive:true});writeFileSync(path,'{bad')
+  expect(()=>activityBatch()).toThrow()
+  writeFileSync(path,original)
 })

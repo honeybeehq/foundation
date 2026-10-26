@@ -1,0 +1,4 @@
+PASS actual CLI cold follow: empty ready, no state files or errors
+PASS actual CLI journal transition: caught-up baseline and new ready cursor
+PASS actual CLI subsequent fact: live only after catch-up
+PASS actual CLI SIGTERM: exit0, no activity error

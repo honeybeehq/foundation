@@ -208,3 +208,16 @@ not renew presence leases merely because History can display its machine.
 
 Receipts describe verification at observation time. Later membership loss does
 not erase that historical display assurance or authorize any new write.
+
+An absent local activity index is a valid cold start: reads return an empty
+baseline and follow emits the usual ready control without creating any state
+files. Its cursor is opaque. If the daemon later creates a real journal, the
+follower emits the caught-up records as baseline, then another ready control
+with the real cursor. Only subsequent new observations can be live. An invalid
+cursor, a real index disappearing after a real cursor, a corrupt index, missing
+segments and permission failures remain errors, rather than empty success.
+
+History-origin receipts are append-only and currently never pruned (about66
+bytes per assurance record, before directory/filesystem overhead). This retains
+display provenance after activity payload eviction; operators should include
+the private replica state in their normal local disk retention planning.
