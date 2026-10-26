@@ -1,6 +1,7 @@
 import { createServer } from 'node:http'
 import { createHash, generateKeyPairSync, sign, type KeyObject } from 'node:crypto'
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawn } from 'node:child_process'
+import { once } from 'node:events'
 import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -9,7 +10,7 @@ import { startShareService, backupShareService, type ShareServiceConfig } from '
 const cleanup: (() => Promise<unknown>)[] = []
 afterEach(async () => { vi.restoreAllMocks(); for (const fn of cleanup.splice(0).reverse()) await fn() })
 /** Explicit loopback GitHub stub + process-level Comb fixture; SSH verification is real ssh-keygen. */
-async function fixture(options: {isPublic?: boolean; publicAccess?: 'repo-read'|'collaborators'} = {}) {
+async function fixture(options: {isPublic?: boolean; publicAccess?: 'repo-read'|'collaborators'; delayAppendMs?: number} = {}) {
   const dir = await mkdtemp(join(tmpdir(), 'share-service-')); cleanup.push(() => rm(dir, {recursive: true, force: true}))
   const denied = new Set<string>(), ambiguous = new Set<string>()
   const identities = new Map<string, {id: number; ssh: string; publicSSH: string; ed: {publicKey:KeyObject;privateKey:KeyObject}}>()
@@ -39,7 +40,7 @@ async function fixture(options: {isPublic?: boolean; publicAccess?: 'repo-read'|
   await new Promise<void>(r => github.listen(0,'127.0.0.1',r))
   cleanup.push(() => new Promise<void>(r => github.close(() => r())))
   const bridge = join(dir,'bridge.mjs')
-  await writeFile(bridge, `import {createInterface} from 'node:readline';import {readFileSync,writeFileSync} from 'node:fs';const file=${JSON.stringify(join(dir,'backend.json'))};createInterface({input:process.stdin}).on('line',line=>{const r=JSON.parse(line);let state={};try{state=JSON.parse(readFileSync(file,'utf8'))}catch{};let x={v:1,id:r.id,op:r.op,ok:true,log:r.log};if(r.op==='hello')Object.assign(x,{protocol:1,capabilities:{durable_idempotency:true,bounded_memory_read:true}});else {const events=state[r.log]??=[];if(r.op==='append'){let index=events.findIndex(e=>e.idempotency_key===r.idempotency_key);if(index>=0&&events[index].payload_hex!==r.payload_hex){process.stdout.write(JSON.stringify({v:1,id:r.id,ok:false,error:{code:'idempotency_conflict'}})+'\\n');return}if(index<0){index=events.length;events.push({seq:String(index+1),payload_hex:r.payload_hex,idempotency_key:r.idempotency_key});writeFileSync(file,JSON.stringify(state))}Object.assign(x,{first:String(index+1),last:String(index+1),cursor:String(index+2)})}else if(r.op==='head')x.cursor=String(events.length+1);else Object.assign(x,{events:events.slice(Number(r.cursor)-1),next_cursor:String(events.length+1)})}process.stdout.write(JSON.stringify(x)+'\\n')});`)
+  await writeFile(bridge, `import {createInterface} from 'node:readline';import {readFileSync,writeFileSync} from 'node:fs';const file=${JSON.stringify(join(dir,'backend.json'))};createInterface({input:process.stdin}).on('line',async line=>{const r=JSON.parse(line);let state={};try{state=JSON.parse(readFileSync(file,'utf8'))}catch{};let x={v:1,id:r.id,op:r.op,ok:true,log:r.log};if(r.op==='hello')Object.assign(x,{protocol:1,capabilities:{durable_idempotency:true,bounded_memory_read:true}});else {const events=state[r.log]??=[];if(r.op==='append'){writeFileSync(${JSON.stringify(join(dir,'append-started'))},'started');await new Promise(r=>setTimeout(r,${options.delayAppendMs ?? 0}));let index=events.findIndex(e=>e.idempotency_key===r.idempotency_key);if(index>=0&&events[index].payload_hex!==r.payload_hex){process.stdout.write(JSON.stringify({v:1,id:r.id,ok:false,error:{code:'idempotency_conflict'}})+'\\n');return}if(index<0){index=events.length;events.push({seq:String(index+1),payload_hex:r.payload_hex,idempotency_key:r.idempotency_key});writeFileSync(file,JSON.stringify(state))}Object.assign(x,{first:String(index+1),last:String(index+1),cursor:String(index+2)})}else if(r.op==='head')x.cursor=String(events.length+1);else Object.assign(x,{events:events.slice(Number(r.cursor)-1),next_cursor:String(events.length+1)})}process.stdout.write(JSON.stringify(x)+'\\n')});`)
   const config: ShareServiceConfig = {stateDir:join(dir,'state'),comb:{binary:process.execPath,args:[bridge]},githubPermissionToken:'operator-metadata-only',githubApiUrl:`http://127.0.0.1:${(github.address() as any).port}`}
   let service=await startShareService(config);config.publicUrl=service.url;cleanup.push(() => service.close())
   async function api(path: string, body?: any, token?: string) {
@@ -255,3 +256,66 @@ it('atomically rejects a requested space already bound to another repository', a
   expect(JSON.stringify(result.body)).toContain('space is already bound to another repository')
   expect((await f.api('challenge?space='+f.space.space)).body.repo).toBe(f.space.repo)
 })
+
+it('drains an in-flight append, closes SSE promptly and reconnects after restart', async () => {
+  const f=await fixture({delayAppendMs:250}); await f.keys()
+  const relay=await fetch(f.service.url+'/v1/relay',{headers:{Authorization:`Bearer ${f.token}`}})
+  const reader=relay.body!.getReader(); await reader.read()
+  const append=f.api('rpc',f.append(),f.token)
+  await vi.waitFor(async()=>expect(await readFile(join(f.dir,'append-started'),'utf8')).toBe('started'))
+  const started=performance.now()
+  const close=f.service.close()
+  expect((await append).status).toBe(200)
+  await close
+  console.log(`H2d append drain: ${Math.round(performance.now()-started)} ms, append=200`)
+  expect(performance.now()-started).toBeLessThan(2000)
+  let ending=''; for(;;){const row=await reader.read();if(row.done)break;ending+=new TextDecoder().decode(row.value)}
+  expect(ending).toContain('event: close')
+  f.config.port=Number(new URL(f.service.url).port)
+  await f.restart()
+  const token=(await f.api('token',await f.tokenBody())).body.token
+  expect((await f.api('rpc',{op:'head',log:'a'.repeat(64)},token)).body.cursor).toBe('2')
+  const reconnected=await fetch(f.service.url+'/v1/relay',{headers:{Authorization:`Bearer ${token}`}})
+  const again=reconnected.body!.getReader()
+  expect(new TextDecoder().decode((await again.read()).value)).toContain(': connected')
+  await f.service.close(); await again.cancel()
+},10000)
+
+it('bounds a stuck append drain to five seconds with an open SSE client', async () => {
+  const f=await fixture({delayAppendMs:30000}); await f.keys()
+  const relay=await fetch(f.service.url+'/v1/relay',{headers:{Authorization:`Bearer ${f.token}`}})
+  const reader=relay.body!.getReader();await reader.read()
+  const append=f.api('rpc',f.append(),f.token).catch(()=>null)
+  await vi.waitFor(async()=>expect(await readFile(join(f.dir,'append-started'),'utf8')).toBe('started'))
+  const started=performance.now()
+  const stop=f.service.close();expect(f.service.close()).toBe(stop);await stop
+  console.log(`H2d stuck drain: ${Math.round(performance.now()-started)} ms`)
+  expect(performance.now()-started).toBeGreaterThanOrEqual(4900)
+  expect(performance.now()-started).toBeLessThan(6500)
+  await append;await reader.cancel()
+},10000)
+
+it('CLI SIGTERM exits zero promptly with active SSE and restarts on the same port', async () => {
+  const f=await fixture();f.config.port=Number(new URL(f.service.url).port)
+  await f.service.close()
+  const configFile=join(f.dir,'config.json');await writeFile(configFile,JSON.stringify(f.config))
+  async function launch(){
+    const child=spawn(process.execPath,['--import','tsx','packages/cli/src/main.ts','share','serve','--config',configFile],{stdio:['ignore','pipe','pipe']})
+    cleanup.push(async()=>{if(child.exitCode===null){child.kill('SIGKILL');await once(child,'exit')}})
+    let diagnostic='';child.stderr.on('data',chunk=>{diagnostic+=chunk.toString()})
+    await vi.waitFor(()=>expect(diagnostic).toContain('Share service listening:'),{timeout:5000})
+    const token=(await f.api('token',await f.tokenBody())).body.token
+    const relay=await fetch(f.service.url+'/v1/relay',{headers:{Authorization:`Bearer ${token}`}})
+    const reader=relay.body!.getReader();expect(new TextDecoder().decode((await reader.read()).value)).toContain(': connected')
+    return {child,reader}
+  }
+  for(let i=0;i<2;i++){
+    const {child,reader}=await launch();const exited=once(child,'exit');const started=performance.now()
+    child.kill('SIGTERM')
+    expect(await exited).toEqual([0,null])
+    console.log(`H2d CLI SIGTERM cycle ${i+1}: ${Math.round(performance.now()-started)} ms, exit=0, SSE reconnected`)
+    expect(performance.now()-started).toBeLessThan(2000)
+    let ending='';for(;;){const row=await reader.read();if(row.done)break;ending+=new TextDecoder().decode(row.value)}
+    expect(ending).toContain('event: close')
+  }
+},15000)

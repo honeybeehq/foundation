@@ -111,3 +111,15 @@ with HTTP 412 and a commit instruction. Positive checks cache for 30 seconds;
 quiet relay connections are rechecked every 30 seconds and disconnected on failure
 (within 60 seconds of a file change). Removing the descriptor stops live serving.
 A working-tree file or non-default branch cannot authorize the service.
+
+## Shutdown
+
+SIGTERM/SIGINT stops accepting connections and sends open relays an SSE
+`event: close` with `{"reason":"service shutdown"}`, followed by EOF. Existing
+clients reconnect through their ordinary retry loop after restart; the event is
+advisory and never a durable acknowledgement. Requests already admitted,
+including queued appends, may finish for up to five seconds. Remaining sockets
+and Comb subprocesses are then closed, and the CLI exits zero. An append whose
+connection closes without a receipt remains uncertain: retry with the same
+keyed identity, using the existing durable deduplication. Configure systemd's
+stop timeout above this five-second drain (the current deployment uses 45 s).
