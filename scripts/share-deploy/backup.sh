@@ -11,6 +11,11 @@ if systemctl --user is-active --quiet foundation-share.service; then was_active=
 restart() { if "$was_active"; then systemctl --user start foundation-share.service; fi; }
 trap restart EXIT
 systemctl --user stop foundation-share.service
+stop_result=$(systemctl --user show -p Result --value foundation-share.service)
+if [ "$stop_result" != success ]; then
+  echo "Refusing backup: service did not stop cleanly (result=$stop_result)" >&2
+  exit 1
+fi
 stamp=$(date -u +%Y%m%dT%H%M%SZ)
 destination="$SHARE_BACKUPS/$stamp"
 "$SHARE_FOUNDATION" share backup "$destination" --config "$SHARE_CONFIG"

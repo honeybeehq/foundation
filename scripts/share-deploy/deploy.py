@@ -68,4 +68,4 @@ unit('foundation-share-backup.service', '[Unit]\nDescription=Stopped Foundation 
 unit('foundation-share-backup.timer', '[Unit]\nDescription=Nightly Foundation share backup\n\n[Timer]\nOnCalendar=*-*-* 03:15:00\nRandomizedDelaySec=10min\nPersistent=true\n\n[Install]\nWantedBy=timers.target\n')
 unit('foundation-share-health.service', '[Unit]\nDescription=Foundation share HTTP health check\n\n[Service]\nType=oneshot\n' + common + 'Environment="SHARE_BACKUPS='+str(base/'backups')+'"\nExecStart='+str(base/'bin/health.sh')+'\n')
 unit('foundation-share-health.timer', '[Unit]\nDescription=Foundation share minute health check\n\n[Timer]\nOnBootSec=2min\nOnUnitActiveSec=1min\n\n[Install]\nWantedBy=timers.target\n')
-print('Rendered private local-backend configuration and user service/backup/health units; App auth remains unconfigured until provisioned')
+print('Rendered private local-backend configuration and user service/backup/health units; existing App configuration preserved')
