@@ -55,10 +55,12 @@ Known operational limitation: stopping the service with open clients reached its
 45-second systemd timeout and required SIGKILL. Restart succeeded without lock
 cleanup, and backup/restore after client-daemon shutdown stopped promptly. H2d
 `3ab85e5` addresses shutdown separately; none of the evidence above is relabelled
-as that later build. Its targeted deployment acceptance follows the H3 proof. The backup script now
+as that later build. Its targeted deployment acceptance followed the H3 proof and passed; see the
+operational update below. The backup script now
 refuses any non-successful systemd stop, restarts via its EXIT trap, and creates no
-snapshot in that failure path. Until H2d is deployed, a connected client can
-therefore cause the nightly backup to fail rather than snapshot after SIGKILL.
+snapshot in that failure path. Before the H2d deployment, a connected client could therefore cause the nightly
+backup to fail rather than snapshot after SIGKILL. The separate acceptance now
+proves a clean stop and successful backup with a client connected.
 The deployment-render receipt predates a corrected status message: its old
 “App auth remains unconfigured” line was fixed wording, not the actual config state.
 
@@ -99,7 +101,12 @@ verification. No installed Apiary bundle or Design panel code changed.
 
 ## Source and placement
 
-Current deployed Foundation source:
+Operational update: the current server is pinned to `8036e2955961fb93a78f4328487720bd42e17a9e`,
+with the independently installed H3 backup guard retained. The separately tested
+H2d shutdown/connected-backup acceptance and exact build boundaries are recorded
+in [H3-H2d-acceptance.md](H3-H2d-acceptance.md). The core results above remain fc743e7.
+
+Core proof Foundation source:
 `fc743e72f65eb70e78c6088d681567857b2b2319`, upgraded from
 `a68d273d35a65e2c08ef5f827fae1ba2255a323a` after the orchestrator requested
 the current S7f local-read and A1 encrypted-image rollout for the real drill. It includes the descriptor gate,
