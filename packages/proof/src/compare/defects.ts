@@ -1,3 +1,4 @@
+import { changedCollections } from "./collections.ts";
 import { hash, canonical } from "./canonical.ts";
 import type { Capture, CaptureNode, Defect, Drift, Match } from "./types.ts";
 
@@ -30,6 +31,7 @@ export function groupDefects(
   const cn = new Map(code.nodes.map((n) => [identity(n), n]));
   const pairs = new Map(matches.map((m) => [identity(m.design), m]));
   const groups = new Map<string, Defect>();
+  const collections=changedCollections(design.nodes,code.nodes,matches);
   const record = (
     layer: Defect["layer"],
     kind: Defect["kind"],
@@ -157,6 +159,45 @@ export function groupDefects(
       classification = "environment";
       cause = "declared-linux-font-substitution";
     }
+    // Keep authored evidence, but identical normalized rendering with the same
+    // primary face does not establish a separate product defect.
+    if (d.property === "font-family" && d.rendered &&
+        d.rendered.design === d.rendered.code &&
+        String(d.design).split(",")[0] === String(d.code).split(",")[0]) {
+      classification = "environment";
+      cause = "equivalent-rendered-font-stack";
+    }
+    if (d.property === "box-sizing" && a && b &&
+        [a,b].every(n => ["top","right","bottom","left"].every(side =>
+          !parseFloat(n.style[`border-${side}-width`] || "0") &&
+          (!parseFloat(n.style[`padding-${side}`] || "0") ||
+            a!.style[`padding-${side}`] === b!.style[`padding-${side}`] && Math.abs(a!.box[2]-b!.box[2])<=1)))) {
+      classification = "uncertain";
+      cause = "equivalent-borderless-box-model";
+    }
+    if (d.property === "position" && ["static","relative"].includes(String(d.design)) && ["static","relative"].includes(String(d.code))) {
+      classification="uncertain"; cause="positioning-technique";
+    }
+    if (a && b && a.box.every((v,i)=>Math.abs(v-b!.box[i]!)<=1) &&
+        /^(display|position|flex-|align-|justify-|overflow-)/.test(d.property)) {
+      classification="uncertain"; cause="unproven-layout-configuration";
+    }
+    if (d.kind === "missing" || d.kind === "extra") {
+      const n=a ?? b, tree=a ? design : code;
+      const clear=(v="")=>!v || ["none","transparent","rgba(0, 0, 0, 0)"].includes(v);
+      const leaves=n && tree.nodes.filter(c=>inside(c,n) && c.text?.trim());
+      if (n && !n.text?.trim() && !n.role && !["svg","img","input","button","canvas"].includes(n.tag) &&
+          clear(n.style["background-color"]) && clear(n.style["background-image"]) && clear(n.style["box-shadow"]) &&
+          ["top","right","bottom","left"].every(side=>!parseFloat(n.style[`border-${side}-width`] || "0")) &&
+          leaves?.length && leaves.every(c=>matches.some(m=>!m.uncertain && (a ? m.design : m.code)===c))) {
+        classification="uncertain"; cause="unmatched-transparent-wrapper";
+      }
+    }
+    const collection=collections.find(m=>(!a || within(a,m.design)) && (!b || within(b,m.code)) && !!(a||b));
+    if(collection && ["missing","extra","text"].includes(d.kind)) {
+      record({design:identity(collection.design),code:identity(collection.code)},"text","text:collection-data","uncertain",d.id);
+      continue;
+    }
     const region =
       classification !== "environment" &&
       regions.find(
@@ -165,7 +206,7 @@ export function groupDefects(
           (b ? within(b, m.code) : true) &&
           !!(a || b),
       );
-    if (region) {
+    if (region && (d.kind === "missing" || d.kind === "extra")) {
       const anchors = new Set(
         matches
           .filter(
@@ -328,10 +369,23 @@ export function groupDefects(
     // This does not assert a particular CSS declaration caused the discrepancy.
     if (
       classification === "product" &&
-      (d.kind === "layout" || layoutProperty.test(d.property))
+      ((d.kind === "layout" && d.property !== "transform") || layoutProperty.test(d.property))
     ) {
       cause = "layout:configuration";
     }
+    if (classification === "product" && cause === "layout:configuration" && a && b && ["y","height","line-height"].includes(d.property)) {
+      const leading=(n: CaptureNode) => n.style["line-height"] === "normal" ? "normal" :
+        String(Math.round(parseFloat(n.style["line-height"]!)/parseFloat(n.style["font-size"]!)*100)/100);
+      if (leading(a)!==leading(b) && leading(a)!=="NaN" && leading(b)!=="NaN") {
+        const ancestor=matches.filter(m => !m.uncertain && inside(a!,m.design) && inside(b!,m.code) &&
+          leading(m.design)===leading(a!) && leading(m.code)===leading(b!))
+          .sort((x,y)=>x.design.path.length-y.design.path.length)[0];
+        if (ancestor) layer={design:identity(ancestor.design),code:identity(ancestor.code)};
+      }
+    }
+    // Ink is part of an icon replacement; its transform is an independent cause.
+    if (a?.tag === "svg" && b?.tag === "svg" && ["icon","color"].includes(d.property) &&
+        drifts.some(x=>x.property==="icon" && x.designNode===d.designNode && x.codeNode===d.codeNode)) cause="style:icon";
     const kind =
       cause === "style:surface"
         ? "style"

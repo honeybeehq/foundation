@@ -1,0 +1,5 @@
+ts	phase	decision	why	evidence	result
+2026-10-26T08:50:58Z	analysis	Reproduced baseline and enumerated strict false positives and misses	Need an error inventory before changing checker rules	research/round4-error-analysis.md	baseline reproduced
+2026-10-26T09:19:01Z	tuning	Kept collection data uncertainty separate from product geometry and styles	Capture data cannot prove registry sample changes are production defects	packages/proof/src/compare/collections.test.ts	recall loss reported
+2026-10-26T09:19:01Z	verification	Fixed new icon and below-fold control regressions before freezing	No-regression gate exposed inert SVG authoring groups and capture-root geometry	.audit/a1-controls-final	rerun pending
+2026-10-26T09:23:57Z	verification	Original fourteen controls are exact after corrections; replay and tests pass	Freeze only after the no-regression gate passes	research/round4/checks/controls.json	14 exact; seven deterministic replays

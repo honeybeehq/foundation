@@ -1,0 +1,51 @@
+[
+  {
+    "case": "keycap-default",
+    "reportEqual": true,
+    "diffEqual": true,
+    "reportHash": "48b12c59eae6750a916cbb5e43442288882fe6de1f6c60802e111f119fb62f8f",
+    "diffHash": "a3de118b66a3e5b30cbd575c4f382925f69dec2a120e7a33390bf550ad491539"
+  },
+  {
+    "case": "inbox-row-selected",
+    "reportEqual": true,
+    "diffEqual": true,
+    "reportHash": "d9893884f26154991b7f5f94f54044a31cf20fb9a2e4c8bc2f044e35202b6f87",
+    "diffHash": "36ae32d820166616cc79dc0a45863aaa728a08b8b05b5634eb346993937637c8"
+  },
+  {
+    "case": "inbox-row-failed",
+    "reportEqual": true,
+    "diffEqual": true,
+    "reportHash": "4f7651899b7282f082628a7b3c1f95e1c4d0592359bfc0b7350035deb47c645d",
+    "diffHash": "bacd36264e4b0f19da4b15b1f6f0b92e895401f9e8d364d039e962cb0806fc87"
+  },
+  {
+    "case": "help-center-agent-run",
+    "reportEqual": true,
+    "diffEqual": true,
+    "reportHash": "4919ee4cf01fabaa90c866b86a0248450648c24adb8c56b62ec809eb19a581f2",
+    "diffHash": "5db69a516eb8613c97145090399d046efad70a44c5e942974f3ebbb8f0742696"
+  },
+  {
+    "case": "tracks-track-selected",
+    "reportEqual": true,
+    "diffEqual": true,
+    "reportHash": "528735c1943ed6ca3173bff2298e1673f219d232c6b89337535ac2a8746be75b",
+    "diffHash": "25e0a79fff133cc17cdf2d624348e610f3c07452025cac44366270f6bf896113"
+  },
+  {
+    "case": "tracks-proposal-pending",
+    "reportEqual": true,
+    "diffEqual": true,
+    "reportHash": "284231f6321e58c0fb50b7a0d3e1ff709110267b224163afd62bd6411d631e7a",
+    "diffHash": "7f33b74926cf33569d1ccc79723ce75c2b3f090acdabb21f83f2bf88e995edcb"
+  },
+  {
+    "case": "tracks-empty",
+    "reportEqual": true,
+    "diffEqual": true,
+    "reportHash": "3b899dc8348e3a39efc1394d507c45d98bf879bdfb13f4efb09a78bc5af5f026",
+    "diffHash": "fa774bb0ccf61513cdb51b1cddc735d338f24bd07282822ecde7f2bd284f258b"
+  }
+]

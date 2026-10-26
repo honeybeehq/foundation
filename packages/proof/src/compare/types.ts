@@ -1,5 +1,6 @@
 export type Box = [number, number, number, number];
 export interface CaptureNode {
+  paint?: {transform?: string; fill?: string; stroke?: string; strokeWidth?: string; attributes?: Record<string,string>; [key:string]: unknown};
   visibility?: {
     eligible: boolean;
     interactive?: boolean;

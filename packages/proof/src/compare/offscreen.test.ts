@@ -40,15 +40,15 @@ it('does not flag equivalent design scroll overflow',async () => {
   const a=await capture(html),b=await capture(html);
   expect(offscreenDefects(a,b,[])).toHaveLength(0);
 });
-it('does not exempt code scroll overflow when design content fits',async () => {
+it('treats content moved within a functioning scroller as reachable layout drift',async () => {
   const a=await capture('<div data-fdn-id="list" style="height:80px;overflow:auto"><button>Last item</button></div>');
   const b=await capture('<div data-fdn-id="list" style="height:80px;overflow:auto"><div style="height:120px"></div><button>Last item</button></div>');
-  expect(offscreenDefects(a,b,[])).toHaveLength(1);
+  expect(offscreenDefects(a,b,[])).toHaveLength(0);
 });
-it('does not exempt a new offscreen control in an otherwise intentional scroller',async () => {
+it('does not count new reachable scroll content as an independent visibility defect',async () => {
   const a=await capture('<div data-fdn-id="list" style="height:80px;overflow:auto"><div style="height:120px"></div><button>Last item</button></div>');
   const b=await capture('<div data-fdn-id="list" style="height:80px;overflow:auto"><div style="height:120px"></div><button>Last item</button><button>New action</button></div>');
-  expect(offscreenDefects(a,b,[]).map(d=>d.summary)).toEqual(['rendered outside the visible pane: New action']);
+  expect(offscreenDefects(a,b,[])).toHaveLength(0);
 });
 it('preserves equivalent clipped pan content but catches controls moved outside it',async () => {
   const content='<div data-fdn-id="canvas" style="height:80px;overflow:hidden;touch-action:none"><div style="transform:translateY(100px)"><span>Graph card</span></div></div>';
@@ -135,3 +135,18 @@ it('does not excuse a clipped action using non-interactive design text',async ()
   const b=await capture('<button style="position:absolute;top:350px">Accept</button>');
   expect(offscreenDefects(a,b,[])).toHaveLength(1);
 });
+it('uses unique nearby card text to disambiguate repeated clipped labels',async()=>{
+ const rows='<div style="position:absolute;top:350px"><span>Unique first</span><span>ACTION</span></div><div style="position:absolute;top:450px"><span>Unique second</span><span>ACTION</span></div>';
+ const a=await capture(rows),b=await capture(rows.replaceAll('<span>ACTION</span>','<div><span>ACTION</span></div>'));
+ expect(offscreenDefects(a,b,[])).toHaveLength(0);
+});
+it('keeps the real Flow View proposal bar and removes repeated-label alarms',async()=>{
+ const {readCapture}=await import('./index.ts');
+ const base='packages/proof/fixtures/sample-captures/tracks-pane-flowview';
+ for(const [state,expected] of [['track-selected',0],['proposal-pending',1],['empty',0]] as const) {
+  const a=await readCapture(`${base}/${state}/1416x720@1/design`),b=await readCapture(`${base}/${state}/1416x720@1/code`);
+  const ds=offscreenDefects(a,b,[]);
+  expect(ds).toHaveLength(expected);
+  if(expected) expect(ds[0]!.summary).toContain('Accept');
+ }
+},20000);
