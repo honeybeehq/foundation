@@ -1,0 +1,10 @@
+design_path,design_fdn_id,design_desc,code_path,code_desc,confidence,note
+0/0,n249#2::n249::n17,row (transparent; 6px radius),0/0,row <button>,sure,
+0/0/0,n249#2::n249::n18,line 1 (glyph · title · age),0/0/0,line 1 span,sure,
+0/0/0/0/0,n249#2::n249::n19::n1,agent glyph icon (hexagon),0/0/0/0/0/0,model mark icon,sure,same slot; different glyph
+0/0/0/1,n249#2::n249::n20,"text ""checkout-a11y"" (600)",0/0/0/1,"text ""checkout-a11y"" (500)",sure,
+0/0/0/2,n249#2::n249::n21,"text ""34m"" (age)",0/0/0/2,"text ""34m""",sure,
+0/0/1,n249#2::n249::n22,line 2 (status · note),0/0/1,line 2 span,sure,
+0/0/1/0/0,n249#2::n249::n23::n15,waiting status ring dot,0/0/1/0,waiting status ring dot,sure,
+0/0/1/1,n249#2::n249::n24,"text ""waiting""",none,,sure,code draws no status word for waiting rows
+0/0/1/2,n249#2::n249::n25,"text ""focus trap: dialog or inert?""",0/0/1/1,"text ""focus trap: dialog or inert?""",sure,
