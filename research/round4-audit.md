@@ -27,3 +27,5 @@ Reviewer: Claude Opus 5.5, session 9a31f0fe-f8b6-41f2-8c15-7b37e87683c2. It read
 The overall target is not met. Reclassification and post-label scorer changes must not be mistaken for a calibrated bug count. Saved evidence and the frozen commit permit independent checks; no held-out result caused a rule change. The report is an honest failed-target result with some useful component improvements.
 
 Retrospective trail evidence uses source filenames as shorthand beneath `packages/proof/src/compare/`. `author-transcript:L…` refers to the projected transcript of ff2c73ed-45e6-484e-a18c-21f64fcad0ab inspected by the reviewer; these are review pointers, not local files. Retrospective entries explicitly distinguish checkpoints from isolated effect estimates. Unmeasured changes are not assigned invented metric deltas.
+
+Final confirmation: the reviewer read Project round4-accuracy.md v2 and round4-audit.md v1 and reported no remaining factual errors; it confirmed those documents represent its flags accurately. Audit complete. The independent review covers the trail and reporting, not independent code execution or a claim that the accuracy target passed.
