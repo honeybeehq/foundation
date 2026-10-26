@@ -5,26 +5,89 @@ pinned Foundation install, native Comb bridge, user systemd supervision, nightly
 complete local-store backups and seven-day retention. It is reachable only on
 the tailnet. No public/Funnel endpoint was created.
 
-**Live App activation is pending one human action:** enable Single file: read
-for exactly `.foundation/share.json`, then accept the installation permission
-update. The real private App config is already present outside the repository at
-0600. Its current Metadata-only grant fails the new `--single-file` preflight.
-Production has not enabled that credential or served a live space. Foundation
-Champion has the exact permission/acceptance instructions.
+**Real App activated on 2026-10-26.** Both App and installation grant exactly
+Metadata read plus Single file read for `.foundation/share.json`. Netcup's fresh
+preflight read the private default-branch descriptor (200), refused root Contents
+(403), and the reviewed activation script restarted successfully. A real descriptor
+probe refused an uncommitted space binding (412). The service and both drill clients
+are now pinned to `fc743e72f65eb70e78c6088d681567857b2b2319` for the real two-host
+phase, which passed on 2026-10-26. Additional-account denial/removal remains a labelled
+stub because no second account is available. Earlier two-host evidence below remains
+explicitly historical STUB authorization on build 8848c86.
 
-## What passed, and what remains
+## Real App drill (2026-10-26)
+
+All three runtimes were pinned to `fc743e72f65eb70e78c6088d681567857b2b2319`.
+Studio and metal-3 used real `trmdy` GitHub identity and SSH proofs, and the service
+used the accepted App installation, not stub repository permissions.
+
+- Default branch without the descriptor returned404; first init prepared only local
+  discovery/recovery, and second init was refused412 with zero server spaces.
+  Committing the descriptor enabled init and automatic epoch1 handover to metal-3.
+- Three initial changes +6 warmups +40 measured edits produced49 matching changes.
+  Both15/19-chunk PNGs arrived, matched full SHA-256, and decoded at1024×768 in
+  actual receiver Chromium screenshots/videos; two image edits brought the total51.
+- Single Studio-clock request-to-remote-session upper bounds (20/direction):
+  Studio→metal p50 334.374ms/p95 412.896ms/max475.598ms; reverse p50 349.989ms/
+  p95 703.818ms/max1414.158ms. Shared host load and SSH/control polling are included.
+  One measured reverse sample exceeded one second; no all-edits-subsecond claim.
+- With the service down/HTTPS502, one local edit per host survived and converged to
+  identical53-change HTML/chain bytes after restart, pending0, with both images intact.
+  Studio's controller performed the metal offline edit after its helper stalled;
+  independent metal readback confirmed it. This coordination delay is not latency.
+- Both daemons stopped at pending0. The production backup at
+  `data/backups/20261026T095119Z` restored to a fresh scratch directory and then to
+  configured production paths. All1979 object hashes and metadata matched, the live
+  Comb config hash was unchanged, and original trees were retained for rollback.
+  Both daemons restarted without manual lock removal. Two new serial edits produced
+  matching55-change bytes and unchanged image hashes. This uses retained clients;
+  it is not a fresh-device or old-snapshot rollback drill.
+- Removing only the committed default-branch descriptor made an existing token
+  return412 and a quiet authenticated relay reach EOF with zero data events.
+  Restoring the exact descriptor restored shared/pending0; final55 bytes/images match.
+- Current-build local CLI/crypto/Comb refusal/removal/rotation passed with explicitly
+  labelled loopback identities and membership. **Real second-account acceptance
+  remains untested because no second GitHub account was supplied.**
+- All62 share tests (11 files) and standalone root typecheck passed. Nightly backup
+  and health timers are active. Both client test process trees/listeners were stopped.
+
+Known operational limitation: stopping the service with open clients reached its
+45-second systemd timeout and required SIGKILL. Restart succeeded without lock
+cleanup, and backup/restore after client-daemon shutdown stopped promptly. H2d
+`3ab85e5` addresses shutdown separately; none of the evidence above is relabelled
+as that later build. Its targeted deployment acceptance follows the H3 proof. The backup script now
+refuses any non-successful systemd stop, restarts via its EXIT trap, and creates no
+snapshot in that failure path. Until H2d is deployed, a connected client can
+therefore cause the nightly backup to fail rather than snapshot after SIGKILL.
+The deployment-render receipt predates a corrected status message: its old
+“App auth remains unconfigured” line was fixed wording, not the actual config state.
+
+Primary evidence includes original receiver screenshots and Chromium videos plus
+actual terminal/session recordings. Studio's optional Nectar preview was refused
+with E_QUOTA (12 serving environments); primary recordings remain available.
+All real and stub client namespaces (including live task tokens/Keychains), scratch
+restore and preserved original trees must be
+reviewed/deleted by2026-11-01 08:00UTC or receive a dated extension. Production and
+its nightly backups remain operational. Backups share the server disk; no off-host
+copy or continuous App/durable-write monitoring is claimed. The observed session
+registration race required one explicit sync open, without deleting a lock; H2 owns
+that follow-up. The native keychain lock is0644 and contains owner metadata only.
+Root review:72dcce37 (Opus5.5); Studio review:80f221f3 (Opus5.5); metal summary-only
+review:d64e60e3 (Opus5.5). These are separate reviewers with separate scopes.
+
+## Historical pre-gate drill (2026-10-25)
 
 | Check | Evidence and scope |
 | --- | --- |
 | Deployment and HTTPS | Healthy user service; canonical origin and `honeybeehq` owner restriction configured. A live wrong-owner challenge returns403. |
-| Real App initial setup | Studio verified private metadata/admin and Contents403, public Contents-grant422; config transferred directly over SSH, never in messages or Project files. New single-file acceptance remains pending. |
+| Real App initial setup | Studio verified private metadata/admin and Contents403, public Contents-grant422; config transferred directly over SSH, never in messages or Project files. Single-file acceptance and netcup activation passed on 2026-10-26; the real drill passed; see the current results above. |
 | Same-account enrollment | Studio and metal-3 used real `trmdy` GitHub identity and SSH keys; automatic epoch1 grant passed without a manual grant. **Server repo permissions were labelled STUB.** |
 | Two-host edits | 6 warmups +40 measured actual-session marker/envelope matches, then identical48-change HTML/chain bytes. Measured build8848c86, endpoint19488 with STUB server permissions. |
 | Outage | Both actual sessions saved local edits with service502 (20.6ms/31.1ms local control upper bounds). Both converged to identical50-change bytes and shared/pending0. |
 | Populated restore | Stopped-store backup; metadata +1551 files restored exactly into a new directory; same endpoint resumed; one edit each way produced identical52-change bytes, shared/pending0. Retained clients, not fresh-device recovery. |
 | Raw store |1615 object files: no plaintext/hex marker, node-id or doc-id matches. A real retained ciphertext record rejected an independent random key at AEAD authentication. |
 | Refusal/removal/rotation | Actual CLI/crypto/Comb local drill passes, with **labelled loopback identities/membership**. Real additional-account denial/removal still needs accounts. |
-| New committed-file gate | Integrated70 tests and root tsc pass. Actual-Comb local drill verifies no space/token before commit, uncommitted412, committed activation, removal412 and quiet relay closure. Its GitHub is a labelled stub reading actual Git HEAD. Real App version awaits the permission update. |
+| New committed-file gate | Integrated70 tests and root tsc pass. Actual-Comb local drill verifies no space/token before commit, uncommitted412, committed activation, removal412 and quiet relay closure. Its GitHub is a labelled stub reading actual Git HEAD. Real App grant and activation passed on 2026-10-26; see current phase above. |
 
 The temporary19488 proxy and both temporary service units are stopped/removed.
 Both client helpers stopped their owned sessions, control listeners and daemons.
@@ -37,8 +100,9 @@ verification. No installed Apiary bundle or Design panel code changed.
 ## Source and placement
 
 Current deployed Foundation source:
-`a68d273d35a65e2c08ef5f827fae1ba2255a323a`, based on reviewed rollout
-`d5949a478916a553c90caec7eebd25f3aaa26fe0`. It includes the descriptor gate,
+`fc743e72f65eb70e78c6088d681567857b2b2319`, upgraded from
+`a68d273d35a65e2c08ef5f827fae1ba2255a323a` after the orchestrator requested
+the current S7f local-read and A1 encrypted-image rollout for the real drill. It includes the descriptor gate,
 space/repo uniqueness fix, Single-file helper and H3 renewable App/vault seams.
 The rebase preserved `request(path, false, repo)` for descriptor fetches; static
 fixture credentials never replace the production token provider.
@@ -158,9 +222,9 @@ admit collaborators/organization members with repo access; public repo-read is
 refused. Private repo-read remains a compatibility alias.
 
 Peers run `share login` and `sync serve`, using their own local GitHub credentials
-and SSH key. Keep recovery codes outside the repo. For the real drill, Studio has
-a fresh `h3-real-app` branch/design prepared but has not changed the default
-branch or initialized it yet. The actual scratch repo is private
+and SSH key. Keep recovery codes outside the repo. For the real drill, `h3-real-app` is now the default branch; descriptor commit
+`a4fa47b` enabled space `sp_e2e34ea3e539d3b9932cbe647425d5fd` after a recorded
+uncommitted-file refusal. The actual scratch repo is private
 `honeybeehq/foundation-share-test`. An earlier empty
 `trmdy/foundation-share-h3-test` remains untouched.
 
@@ -174,7 +238,11 @@ or tokens in arguments, repo files or messages.
 Backup runs at03:15 server local time plus up to10min jitter, Persistent=true.
 It waits for the shared lock, stops the service, runs `foundation share backup`,
 copies matching private Comb config and restarts via EXIT trap if previously
-active. Only successful complete snapshots older than7days are pruned.
+active. Only successful complete snapshots older than7days are pruned. After investigating
+a sticky failed service Result on an intentionally stopped service, use
+`systemctl --user reset-failed foundation-share.service` before retrying.
+Check `systemctl --user is-failed foundation-share-backup.service` and the newest
+snapshot age; failures currently have no external alert.
 
 ```sh
 systemctl --user start foundation-share-backup.service
