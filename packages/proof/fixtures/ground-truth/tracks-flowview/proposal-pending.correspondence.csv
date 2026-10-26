@@ -1,0 +1,119 @@
+design_path,design_fdn_id,design_desc,code_path,code_desc,confidence,note
+0/0/0/0,n212::n143,paint bg+bd,0/0/0/0,aside bg+bd,sure,
+0/0/0/0/0,n212::n574,paint bd,0/0/0/0/0,div bd,sure,
+0/0/0/0/0/0,n212::n575,"text ""TRACKS""",0/0/0/0/0/0,"text ""TRACKS""",sure,
+0/0/0/0/0/1,n212::n576,"text ""7""",0/0/0/0/0/1,"text ""7""",sure,
+0/0/0/0/0/2,n212::n577,button block,0/0/0/0/0/2,button ,sure,
+0/0/0/0/0/2/0/0,n212::n578::n412,icon,0/0/0/0/0/2/0,svg ,sure,
+0/0/0/0/1/0/0,n212::n579#0::n579::n528,paint bg,0/0/0/0/1/0,button bg,sure,
+0/0/0/0/1/0/0/0/0/0,n212::n579#0::n579::n530::n412,icon,0/0/0/0/1/0/0/0,svg ,sure,
+0/0/0/0/1/0/0/1/0,n212::n579#0::n579::n532,"text ""review-and-ship""",0/0/0/0/1/0/1/0,"text ""review-and-ship""",sure,
+0/0/0/0/1/0/0/1/1,n212::n579#0::n579::n533,"text ""7 steps · action ×3 · orchestrate · review · deploy · ask""",0/0/0/0/1/0/1/1,"text ""7 steps · action ×3 · orchestrate · review · deploy · ask""",sure,
+0/0/0/0/1/0/0/2/0,n212::n579#0::n579::n534::n25,paint bg,0/0/0/0/1/0/2,span bg,sure,
+0/0/0/0/1/1/0,n212::n579#1::n579::n528,button block,0/0/0/0/1/1,button ,sure,
+0/0/0/0/1/1/0/0/0/0,n212::n579#1::n579::n530::n412,icon,0/0/0/0/1/1/0/0,svg ,sure,
+0/0/0/0/1/1/0/1/0,n212::n579#1::n579::n532,"text ""pr-triage""",0/0/0/0/1/1/1/0,"text ""pr-triage""",sure,
+0/0/0/0/1/1/0/1/1,n212::n579#1::n579::n533,"text ""5 steps · action ×3 · orchestrate · review""",0/0/0/0/1/1/1/1,"text ""5 steps · action ×3 · orchestrate · review""",sure,
+0/0/0/0/1/2/0,n212::n579#2::n579::n528,button block,0/0/0/0/1/2,button ,sure,
+0/0/0/0/1/2/0/0/0/0,n212::n579#2::n579::n530::n412,icon,0/0/0/0/1/2/0/0,svg ,sure,
+0/0/0/0/1/2/0/1/0,n212::n579#2::n579::n532,"text ""spec-round""",0/0/0/0/1/2/1/0,"text ""spec-round""",sure,
+0/0/0/0/1/2/0/1/1,n212::n579#2::n579::n533,"text ""5 steps · action ×3 · orchestrate · review""",0/0/0/0/1/2/1/1,"text ""5 steps · action ×3 · orchestrate · review""",sure,
+0/0/0/0/1/3/0,n212::n579#3::n579::n528,button block,0/0/0/0/1/3,button ,sure,
+0/0/0/0/1/3/0/0/0/0,n212::n579#3::n579::n530::n412,icon,0/0/0/0/1/3/0/0,svg ,sure,
+0/0/0/0/1/3/0/1/0,n212::n579#3::n579::n532,"text ""board-draw""",0/0/0/0/1/3/1/0,"text ""board-draw""",sure,
+0/0/0/0/1/3/0/1/1,n212::n579#3::n579::n533,"text ""5 steps · action ×3 · orchestrate · review""",0/0/0/0/1/3/1/1,"text ""5 steps · action ×3 · orchestrate · review""",sure,
+0/0/0/0/1/4/0,n212::n579#4::n579::n528,button block,0/0/0/0/1/4,button ,sure,
+0/0/0/0/1/4/0/0/0/0,n212::n579#4::n579::n530::n412,icon,0/0/0/0/1/4/0/0,svg ,sure,
+0/0/0/0/1/4/0/1/0,n212::n579#4::n579::n532,"text ""flaky-hunt""",0/0/0/0/1/4/1/0,"text ""flaky-hunt""",sure,
+0/0/0/0/1/4/0/1/1,n212::n579#4::n579::n533,"text ""5 steps · action ×3 · orchestrate · review""",0/0/0/0/1/4/1/1,"text ""5 steps · action ×3 · orchestrate · review""",sure,
+0/0/0/0/1/5/0,n212::n579#5::n579::n528,button block,0/0/0/0/1/5,button ,sure,
+0/0/0/0/1/5/0/0/0/0,n212::n579#5::n579::n530::n412,icon,0/0/0/0/1/5/0/0,svg ,sure,
+0/0/0/0/1/5/0/1/0,n212::n579#5::n579::n532,"text ""dep-bump""",0/0/0/0/1/5/1/0,"text ""dep-bump""",sure,
+0/0/0/0/1/5/0/1/1,n212::n579#5::n579::n533,"text ""4 steps · action ×3 · orchestrate""",0/0/0/0/1/5/1/1,"text ""4 steps · action ×3 · orchestrate""",sure,
+0/0/0/0/1/6/0,n212::n579#6::n579::n528,button block,0/0/0/0/1/6,button ,sure,
+0/0/0/0/1/6/0/0/0/0,n212::n579#6::n579::n530::n412,icon,0/0/0/0/1/6/0/0,svg ,sure,
+0/0/0/0/1/6/0/1/0,n212::n579#6::n579::n532,"text ""nectar-preview""",0/0/0/0/1/6/1/0,"text ""nectar-preview""",sure,
+0/0/0/0/1/6/0/1/1,n212::n579#6::n579::n533,"text ""5 steps · action ×3 · orchestrate · review""",0/0/0/0/1/6/1/1,"text ""5 steps · action ×3 · orchestrate · review""",sure,
+0/0/0/1,n212::n150,main block,0/0/0/1,main ,sure,
+0/0/0/1/0,n212::n151,paint bd,0/0/0/1/0,div bd,sure,
+0/0/0/1/0/0,n212::n153,"text ""review-and-ship""",0/0/0/1/0/0,"text ""review-and-ship""",sure,
+0/0/0/1/0/1/0/0,n212::n584::n25,paint bg,0/0/0/1/0/1/0,span bg,sure,
+0/0/0/1/0/1/1,n212::n585,"text ""proposal · 2 changes""",0/0/0/1/0/1,"text ""proposal · 2 change s""",unsure,box differs by 12px
+0/0/0/1/0/3/0,n212::n587::n535,paint bg,0/0/0/1/0/3,span bg,sure,
+0/0/0/1/0/3/0/0,n212::n587::n536,"text ""Flow""",0/0/0/1/0/3/0,"text ""Flow""",sure,
+0/0/0/1/0/3/0/1,n212::n587::n537,"text ""Code""",0/0/0/1/0/3/1,"text ""Code""",sure,
+0/0/0/1/0/4/0,n212::n589::n37,paint bd,0/0/0/1/0/4,"text ""Attach to agent""",sure,
+0/0/0/1/0/4/0/0,n212::n589::n38,"text ""Attach to agent""",0/0/0/1/0/4,"text ""Attach to agent""",unsure,box differs by 30px
+0/0/0/1/1/0,n212::n591::n481,paint img,0/0/0/1/1/0,div img,sure,
+0/0/0/1/1/0/0/0/0/0,n212::n591::n484::n405,paint bg+bd+sh,0/0/0/1/1/0/0/0/1,div bg+bd+sh,sure,
+0/0/0/1/1/0/0/0/0/0/0/0,n212::n591::n484::n409::n412,icon,0/0/0/1/1/0/0/0/1/0/0,svg ,sure,
+0/0/0/1/1/0/0/0/0/0/1,n212::n591::n484::n410,"text ""Read the diff""",0/0/0/1/1/0/0/0/1/1,"text ""Read the diff""",unsure,box differs by 9px
+0/0/0/1/1/0/0/0/1,n212::n591::n485,paint bg,0/0/0/1/1/0/0/0/0/0/7,path ,sure,connector drawn as an svg path/circle in code
+0/0/0/1/1/0/0/0/2/0,n212::n591::n486::n405,paint bg+bd+sh,0/0/0/1/1/0/0/0/3,div bg+bd+sh,sure,
+0/0/0/1/1/0/0/0/2/0/0/0,n212::n591::n486::n409::n412,icon,0/0/0/1/1/0/0/0/3/0/0,svg ,sure,
+0/0/0/1/1/0/0/0/2/0/1,n212::n591::n486::n410,"text ""Fan out reviewers""",0/0/0/1/1/0/0/0/3/1,"text ""Fan out reviewers""",sure,
+0/0/0/1/1/0/0/0/2/0/2,n212::n591::n486::n411,"text ""orchestrate""",0/0/0/1/1/0/0/0/3/2,"text ""orchestrate""",sure,
+0/0/0/1/1/0/0/0/3,n212::n591::n487,paint bg,0/0/0/1/1/0/0/0/0/0/8,path ,sure,connector drawn as an svg path/circle in code
+0/0/0/1/1/0/0/0/4/0,n212::n591::n489,paint bd,0/0/0/1/1/0/0/0/0/0,svg ,unsure,code draws the branch frame as elbow paths in one svg
+0/0/0/1/1/0/0/0/4/0/0,n212::n591::n490,paint bg+bd,0/0/0/1/1/0/0/0/0/0/14,circle ,sure,connector drawn as an svg path/circle in code
+0/0/0/1/1/0/0/0/4/1/0/0/0/0,n212::n591::n494::n405,paint bg+bd+sh,0/0/0/1/1/0/0/0/5/0/0/0,div bg+bd+sh,sure,
+0/0/0/1/1/0/0/0/4/1/0/0/0/0/0/0,n212::n591::n494::n409::n412,icon,0/0/0/1/1/0/0/0/5/0/0/0/0/0,svg ,sure,
+0/0/0/1/1/0/0/0/4/1/0/0/0/0/1,n212::n591::n494::n410,"text ""Typecheck & lint""",0/0/0/1/1/0/0/0/5/0/0/0/1,"text ""Typecheck & lint""",unsure,box differs by 8px
+0/0/0/1/1/0/0/0/4/1/1/0/0/0,n212::n591::n497::n405,paint bg+bd+sh,0/0/0/1/1/0/0/0/5/0/1/0,div bg+bd+sh,sure,
+0/0/0/1/1/0/0/0/4/1/1/0/0/0/0/0,n212::n591::n497::n409::n412,icon,0/0/0/1/1/0/0/0/5/0/1/0/0/0,svg ,sure,
+0/0/0/1/1/0/0/0/4/1/1/0/0/0/1,n212::n591::n497::n410,"text ""Run the suite""",0/0/0/1/1/0/0/0/5/0/1/0/1,"text ""Run the suite""",unsure,box differs by 8px
+0/0/0/1/1/0/0/0/5,n212::n591::n498,paint bg,0/0/0/1/1/0/0/0/0/0/9,path ,sure,connector drawn as an svg path/circle in code
+0/0/0/1/1/0/0/0/6/0,n212::n591::n499::n405,paint bg+bd+sh,0/0/0/1/1/0/0/0/7,div bg+bd+sh,sure,
+0/0/0/1/1/0/0/0/6/0/0/0,n212::n591::n499::n409::n412,icon,0/0/0/1/1/0/0/0/7/0/0,svg ,sure,
+0/0/0/1/1/0/0/0/6/0/1,n212::n591::n499::n410,"text ""Verdict gate""",0/0/0/1/1/0/0/0/7/1,"text ""Verdict gate""",sure,
+0/0/0/1/1/0/0/0/6/0/2,n212::n591::n499::n411,"text ""gate""",0/0/0/1/1/0/0/0/7/2,"text ""gate""",sure,
+0/0/0/1/1/0/0/0/7/0/0/0,n212::n591::n501::n402,"text ""approved ↓ continues""",0/0/0/1/1/0/0/0/8/0/0,"text ""approved ↓ continues""",unsure,box differs by 173px
+0/0/0/1/1/0/0/0/7/0/0/1,n212::n591::n501::n403,"text ""DENIED ↺""",0/0/0/1/1/0/0/0/0/1/0,"text ""DENIED ↺""",sure,
+0/0/0/1/1/0/0/0/7/0/0/2,n212::n591::n501::n404,paint bg,0/0/0/1/1/0/0/0/0/0/5,path ,sure,connector drawn as an svg path/circle in code
+0/0/0/1/1/0/0/0/7/1/0/0/0,n212::n591::n504::n405,paint bg+bd+sh,0/0/0/1/1/0/0/0/8/1/1/0,div bg+bd+sh,sure,
+0/0/0/1/1/0/0/0/7/1/0/0/0/0/0,n212::n591::n504::n409::n412,icon,0/0/0/1/1/0/0/0/8/1/1/0/0/0,svg ,sure,
+0/0/0/1/1/0/0/0/7/1/0/0/0/1,n212::n591::n504::n410,"text ""Fix findings""",0/0/0/1/1/0/0/0/8/1/1/0/1,"text ""Fix findings""",unsure,box differs by 8px
+0/0/0/1/1/0/0/0/7/2,n212::n591::n505,paint bd,0/0/0/1/1/0/0/0/0/0/6,path ,sure,connector drawn as an svg path/circle in code
+0/0/0/1/1/0/0/0/7/2/0,n212::n591::n506,paint bg+bd,0/0/0/1/1/0/0/0/0/0/15,circle ,sure,connector drawn as an svg path/circle in code
+0/0/0/1/1/0/0/0/8/0,n212::n591::n507::n405,paint bg+bd+sh,0/0/0/1/1/0/0/0/10,div bg+bd+sh,unsure,box differs by 42px
+0/0/0/1/1/0/0/0/8/0/0/0,n212::n591::n507::n409::n412,icon,0/0/0/1/1/0/0/0/10/0/0,svg ,unsure,box differs by 42px
+0/0/0/1/1/0/0/0/8/0/1,n212::n591::n507::n410,"text ""Publish preview""",0/0/0/1/1/0/0/0/10/1,"text ""Publish preview""",unsure,box differs by 42px
+0/0/0/1/1/0/0/0/8/0/2,n212::n591::n507::n411,"text ""nectar""",0/0/0/1/1/0/0/0/10/2,"text ""nectar""",unsure,box differs by 42px
+0/0/0/1/1/0/0/0/9,n212::n591::n508,paint bg,0/0/0/1/1/0/0/0/0/0/10,path ,unsure,connector drawn as an svg path/circle in code
+0/0/0/1/1/0/0/0/10/0,n212::n591::n509::n519,paint bg+bd,0/0/0/1/1/0/0/0/12,div bg+bd,unsure,box differs by 42px
+0/0/0/1/1/0/0/0/10/0/0/0/0,n212::n591::n509::n521::n412,icon,0/0/0/1/1/0/0/0/12/0/0/0,svg ,unsure,box differs by 42px
+0/0/0/1/1/0/0/0/10/0/0/1,n212::n591::n509::n522,"text ""ACTION""",0/0/0/1/1/0/0/0/12/0/1,"text ""ACTION""",unsure,box differs by 42px
+0/0/0/1/1/0/0/0/10/0/0/2,n212::n591::n509::n523,"text ""n5a · proposed""",0/0/0/1/1/0/0/0/12/0/2,"text ""n5a · proposed""",unsure,box differs by 42px
+0/0/0/1/1/0/0/0/10/0/1,n212::n591::n509::n524,"text ""Smoke-test the preview""",0/0/0/1/1/0/0/0/12/1,"text ""Smoke-test the preview""",unsure,box differs by 42px
+0/0/0/1/1/0/0/0/10/0/2/0,n212::n591::n509::n526,"text ""INSTRUCTION""",0/0/0/1/1/0/0/0/12/2/0,"text ""INSTRUCTION""",unsure,box differs by 42px
+0/0/0/1/1/0/0/0/10/0/2/1,n212::n591::n509::n527,"text ""open the preview and click through the changed screens""",0/0/0/1/1/0/0/0/12/2/1,"text ""open the preview and click through the changed screens""",unsure,box differs by 42px
+0/0/0/1/1/0/0/0/11,n212::n591::n510,paint bg,0/0/0/1/1/0/0/0/0/0/12,path ,unsure,connector drawn as an svg path/circle in code
+0/0/0/1/1/0/0/0/12/0,n212::n591::n511::n519,paint bg+bd,0/0/0/1/1/0/0/0/14,div bg+bd,unsure,box differs by 43px
+0/0/0/1/1/0/0/0/12/0/0/0/0,n212::n591::n511::n521::n412,icon,0/0/0/1/1/0/0/0/14/0/0/0,svg ,unsure,box differs by 43px
+0/0/0/1/1/0/0/0/12/0/0/1,n212::n591::n511::n522,"text ""ACTION""",0/0/0/1/1/0/0/0/14/0/1,"text ""ACTION""",unsure,box differs by 43px
+0/0/0/1/1/0/0/0/12/0/0/2,n212::n591::n511::n523,"text ""n5b · proposed""",0/0/0/1/1/0/0/0/14/0/2,"text ""n5b · proposed""",unsure,box differs by 43px
+0/0/0/1/1/0/0/0/12/0/1,n212::n591::n511::n524,"text ""Write release notes""",0/0/0/1/1/0/0/0/14/1,"text ""Write release notes""",unsure,box differs by 43px
+0/0/0/1/1/0/0/0/12/0/2/0,n212::n591::n511::n526,"text ""INSTRUCTION""",0/0/0/1/1/0/0/0/14/2/0,"text ""INSTRUCTION""",unsure,box differs by 43px
+0/0/0/1/1/0/0/0/12/0/2/1,n212::n591::n511::n527,"text ""summarise what changed for the reviewer""",0/0/0/1/1/0/0/0/14/2/1,"text ""summarise what changed for the reviewer""",unsure,box differs by 43px
+0/0/0/1/1/0/0/0/13,n212::n591::n512,paint bg,0/0/0/1/1/0/0/0/0/0/13,path ,unsure,connector drawn as an svg path/circle in code
+0/0/0/1/1/0/0/0/14/0,n212::n591::n513::n405,paint bg+bd+sh,0/0/0/1/1/0/0/0/16,div bg+bd+sh,unsure,box differs by 43px
+0/0/0/1/1/0/0/0/14/0/0/0,n212::n591::n513::n409::n412,icon,0/0/0/1/1/0/0/0/16/0/0,svg ,unsure,box differs by 43px
+0/0/0/1/1/0/0/0/14/0/1,n212::n591::n513::n410,"text ""Ship it?""",0/0/0/1/1/0/0/0/16/1,"text ""Ship it?""",unsure,box differs by 43px
+0/0/0/1/1/0/0/0/14/0/2,n212::n591::n513::n411,"text ""blocking""",0/0/0/1/1/0/0/0/16/2,"text ""blocking""",unsure,box differs by 43px
+0/0/0/1/1/0/0/0/15/0,n212::n591::n515,paint bg,0/0/0/1/1/0/0/0/0/0/12,path ,unsure,connector drawn as an svg path/circle in code
+0/0/0/1/1/0/0/0/15/1,n212::n591::n516,"text ""Smoke-test the preview before the ask; add release notes for""",0/0/0/1/1/0/0/0/18,"text ""Smoke-test the preview before the ask; add release notes for""",unsure,box differs by 98px
+0/0/0/1/1/0/1/0/0,n212::n591::n518::n471,paint bg+bd+sh,0/0/0/1/1/0/0/0/17,div bg+bd+sh,unsure,"accept bar sits after the last step in code (~580px lower), off screen"
+0/0/0/1/1/0/1/0/0/0,n212::n591::n518::n472,"text ""2 changes""",0/0/0/1/1/0/0/0/17/0,"text ""2 change s""",unsure,"box differs by 587px; accept bar sits after the last step in code (~580px lower), off screen"
+0/0/0/1/1/0/1/0/0/1,n212::n591::n518::n473,"text ""+n5a · +n5b""",0/0/0/1/1/0/0/0/17/1,"text ""+n5a · +n5b""",unsure,"box differs by 587px; accept bar sits after the last step in code (~580px lower), off screen"
+0/0/0/1/1/0/1/0/0/2,n212::n591::n518::n474,paint bg,0/0/0/1/1/0/0/0/17/2,"text ""Accept""",unsure,"accept bar sits after the last step in code (~580px lower), off screen"
+0/0/0/1/1/0/1/0/0/2/0,n212::n591::n518::n475,"text ""Accept""",0/0/0/1/1/0/0/0/17/2,"text ""Accept""",unsure,"box differs by 583px; accept bar sits after the last step in code (~580px lower), off screen"
+0/0/0/1/1/0/1/0/0/2/1,n212::n591::n518::n476,"text ""⌘↵""",0/0/0/1/1/0/0/0/17/2/0,"text ""⌘↵""",unsure,"box differs by 587px; accept bar sits after the last step in code (~580px lower), off screen"
+0/0/0/1/1/0/1/0/0/3,n212::n591::n518::n477,"text ""Refine""",0/0/0/1/1/0/0/0/17/3,"text ""Refine""",unsure,"box differs by 587px; accept bar sits after the last step in code (~580px lower), off screen"
+0/0/0/1/1/0/1/0/0/4/0,n212::n591::n518::n479,"text ""Discard""",0/0/0/1/1/0/0/0/17/4,"text ""Discard""",unsure,"box differs by 583px; accept bar sits after the last step in code (~580px lower), off screen"
+0/0/0/1/1/0/1/0/0/4/1,n212::n591::n518::n480,"text ""⌘⌫""",0/0/0/1/1/0/0/0/17/4/0,"text ""⌘⌫""",unsure,"box differs by 587px; accept bar sits after the last step in code (~580px lower), off screen"
+0/0/0/1/2,n212::n592,paint bd,0/0/0/1/2,div bd,sure,
+0/0/0/1/2/0,n212::n597,"text ""a proposed diff from the sidecar — nothing is real until you""",0/0/0/1/2/0,"text ""a proposed diff from the sidecar — nothing is real until you""",sure,
+0/0/0/2/0,n212::n598::n538,paint bd,0/0/0/2,button bd,sure,
+0/0/0/2/0/0/0/0,n212::n598::n540::n412,icon,0/0/0/2/0/0,svg ,sure,
+0/0/0/2/0/0/1,n212::n598::n541,paint bg+bd,0/0/0/2/0/1,span bg+bd,sure,
+0/0/0/2/0/1,n212::n598::n542,"text ""⌘⌃B""",0/0/0/2/1,"text ""⌘⌃B""",sure,
