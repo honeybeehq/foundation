@@ -1,0 +1,1727 @@
+[
+  {
+    "case": "keycap-command-enter",
+    "optimistic": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "predicted": 3,
+      "labelled": 3,
+      "agreement": [
+        {
+          "defect": "def-2c196671d396367dc353",
+          "label": "KC-01",
+          "description": "Key cap is 18px tall in code but 21px in design (both author 18px; design adds the 1px top and 2px bottom border outside it, code includes them), so the cap looks squatter and \"⌘↵\" sits about 1.5px higher"
+        },
+        {
+          "defect": "def-c0137bd736dd83ea507e",
+          "label": "KC-02",
+          "description": "Key label ink is lighter in code: #6B6862 (inkSoft) vs #5A564E"
+        },
+        {
+          "defect": "def-d9f16c4902f4db928df1",
+          "label": "KC-03",
+          "description": "Key border is #E2E0DB (ghostBorder) in code vs --color-border #E7E5E0 in design"
+        }
+      ],
+      "falsePositives": [],
+      "falseNegatives": []
+    },
+    "strict": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "predicted": 3,
+      "labelled": 3,
+      "agreement": [
+        {
+          "defect": "def-2c196671d396367dc353",
+          "label": "KC-01",
+          "description": "Key cap is 18px tall in code but 21px in design (both author 18px; design adds the 1px top and 2px bottom border outside it, code includes them), so the cap looks squatter and \"⌘↵\" sits about 1.5px higher"
+        },
+        {
+          "defect": "def-c0137bd736dd83ea507e",
+          "label": "KC-02",
+          "description": "Key label ink is lighter in code: #6B6862 (inkSoft) vs #5A564E"
+        },
+        {
+          "defect": "def-d9f16c4902f4db928df1",
+          "label": "KC-03",
+          "description": "Key border is #E2E0DB (ghostBorder) in code vs --color-border #E7E5E0 in design"
+        }
+      ],
+      "falsePositives": [],
+      "falseNegatives": []
+    }
+  },
+  {
+    "case": "inbox-login",
+    "optimistic": {
+      "tp": 7,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.875,
+      "recall": 1,
+      "predicted": 8,
+      "labelled": 7,
+      "agreement": [
+        {
+          "defect": "def-21b665c904ae8d61e9df",
+          "label": "IL-07",
+          "description": "Rows are taller in code (line 1 19px vs 16, line 2 17px vs 15), so the row is 54px instead of 49px, line 2 sits 3–4px lower and the row overruns the 49px frame by 5px"
+        },
+        {
+          "defect": "def-5874fbf20ad17980d53a",
+          "label": "IL-02",
+          "description": "Title ink is pure black in design (var(--color-text-primary) undefined on the board) vs #2E2B27 in code"
+        },
+        {
+          "defect": "def-1c309f1a375645091228",
+          "label": "IL-01",
+          "description": "Title and note render in a serif face in the design but in Hanken Grotesk in code: the inbox board uses var(--font-sans) but never defines it"
+        },
+        {
+          "defect": "def-460958bdcc396372e9f3",
+          "label": "IL-05",
+          "description": "Title is semibold (600) in design but medium (500) in code"
+        },
+        {
+          "defect": "def-6d1831c583cac990ff71",
+          "label": "IL-03",
+          "description": "Leading glyph is the agent hexagon in muted #8A877F in design; code shows the agent's model logo (Grok mark) in lighter #A29D93"
+        },
+        {
+          "defect": "def-a75561d09d5cf836d79e",
+          "label": "IL-04",
+          "description": "Leading glyph sits 3px lower relative to the title (y 11 vs 8): code nudges marks 2px down on top of the taller line"
+        },
+        {
+          "defect": "def-b093afb7b9794addf0ed",
+          "label": "IL-06",
+          "description": "Note reads \"credentials expired — sign in again\" in code vs \"credentials expired — open seat\" in design"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-668649494886fd235cf6",
+          "layer": {
+            "design": "n249#4::n249::n19::n1",
+            "code": "0/0/0/0/0/0"
+          },
+          "kind": "token",
+          "cause": "style:icon",
+          "classification": "product",
+          "findings": [
+            "d22"
+          ],
+          "summary": "style icon differs at n249#4::n249::n19::n1"
+        }
+      ],
+      "falseNegatives": []
+    },
+    "strict": {
+      "tp": 7,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.875,
+      "recall": 1,
+      "predicted": 8,
+      "labelled": 7,
+      "agreement": [
+        {
+          "defect": "def-21b665c904ae8d61e9df",
+          "label": "IL-07",
+          "description": "Rows are taller in code (line 1 19px vs 16, line 2 17px vs 15), so the row is 54px instead of 49px, line 2 sits 3–4px lower and the row overruns the 49px frame by 5px"
+        },
+        {
+          "defect": "def-5874fbf20ad17980d53a",
+          "label": "IL-02",
+          "description": "Title ink is pure black in design (var(--color-text-primary) undefined on the board) vs #2E2B27 in code"
+        },
+        {
+          "defect": "def-1c309f1a375645091228",
+          "label": "IL-01",
+          "description": "Title and note render in a serif face in the design but in Hanken Grotesk in code: the inbox board uses var(--font-sans) but never defines it"
+        },
+        {
+          "defect": "def-460958bdcc396372e9f3",
+          "label": "IL-05",
+          "description": "Title is semibold (600) in design but medium (500) in code"
+        },
+        {
+          "defect": "def-6d1831c583cac990ff71",
+          "label": "IL-03",
+          "description": "Leading glyph is the agent hexagon in muted #8A877F in design; code shows the agent's model logo (Grok mark) in lighter #A29D93"
+        },
+        {
+          "defect": "def-a75561d09d5cf836d79e",
+          "label": "IL-04",
+          "description": "Leading glyph sits 3px lower relative to the title (y 11 vs 8): code nudges marks 2px down on top of the taller line"
+        },
+        {
+          "defect": "def-b093afb7b9794addf0ed",
+          "label": "IL-06",
+          "description": "Note reads \"credentials expired — sign in again\" in code vs \"credentials expired — open seat\" in design"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-668649494886fd235cf6",
+          "layer": {
+            "design": "n249#4::n249::n19::n1",
+            "code": "0/0/0/0/0/0"
+          },
+          "kind": "token",
+          "cause": "style:icon",
+          "classification": "product",
+          "findings": [
+            "d22"
+          ],
+          "summary": "style icon differs at n249#4::n249::n19::n1"
+        }
+      ],
+      "falseNegatives": []
+    }
+  },
+  {
+    "case": "inbox-waiting",
+    "optimistic": {
+      "tp": 8,
+      "fp": 2,
+      "fn": 0,
+      "precision": 0.8,
+      "recall": 1,
+      "predicted": 10,
+      "labelled": 8,
+      "agreement": [
+        {
+          "defect": "def-9e51fa6c3db84c344dd9",
+          "label": "IW-08",
+          "description": "Rows are taller in code (line 1 19px vs 16, line 2 17px vs 15), so the row is 54px instead of 49px, line 2 sits 3–4px lower and the row overruns the 49px frame by 5px"
+        },
+        {
+          "defect": "def-de737323d3f1d738199e",
+          "label": "IW-02",
+          "description": "Title ink is pure black in design (var(--color-text-primary) undefined on the board) vs #2E2B27 in code"
+        },
+        {
+          "defect": "def-d66b4d602eb2f042b0e4",
+          "label": "IW-01",
+          "description": "Title and note render in a serif face in the design but in Hanken Grotesk in code: the inbox board uses var(--font-sans) but never defines it"
+        },
+        {
+          "defect": "def-2091b1d0804b51c2815a",
+          "label": "IW-05",
+          "description": "Title is semibold (600) in design but medium (500) in code"
+        },
+        {
+          "defect": "def-7d4f261130dde32b55ac",
+          "label": "IW-07",
+          "description": "Age \"34m\" is bright blue #3565D4 in code vs faint grey #A8A59E in design"
+        },
+        {
+          "defect": "def-0629f579e4216bf906a2",
+          "label": "IW-03",
+          "description": "Leading glyph is the agent hexagon in muted #8A877F in design; code shows the agent's model logo (Claude mark) in lighter #A29D93"
+        },
+        {
+          "defect": "def-fc9baa59a62ae0c94731",
+          "label": "IW-04",
+          "description": "Leading glyph sits about 3px lower relative to the title: code nudges marks 2px down on top of the taller line"
+        },
+        {
+          "defect": "def-f3e4c6ba4d79fb2a71b6",
+          "label": "IW-06",
+          "description": "The grey \"waiting\" word after the ring dot is missing; code shows only the dot, so the question starts right after it"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-975985cf9825fbbfcb13",
+          "layer": {
+            "design": "n249#2::n249::n19::n1",
+            "code": "0/0/0/0/0/0"
+          },
+          "kind": "token",
+          "cause": "style:icon",
+          "classification": "product",
+          "findings": [
+            "d23"
+          ],
+          "summary": "style icon differs at n249#2::n249::n19::n1"
+        },
+        {
+          "id": "def-cff1aeede19b622bad54",
+          "layer": {
+            "design": "n249#2::n249::n25",
+            "code": "0/0/1/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d30",
+            "d32"
+          ],
+          "summary": "layout configuration differs at n249#2::n249::n25"
+        }
+      ],
+      "falseNegatives": []
+    },
+    "strict": {
+      "tp": 8,
+      "fp": 2,
+      "fn": 0,
+      "precision": 0.8,
+      "recall": 1,
+      "predicted": 10,
+      "labelled": 8,
+      "agreement": [
+        {
+          "defect": "def-9e51fa6c3db84c344dd9",
+          "label": "IW-08",
+          "description": "Rows are taller in code (line 1 19px vs 16, line 2 17px vs 15), so the row is 54px instead of 49px, line 2 sits 3–4px lower and the row overruns the 49px frame by 5px"
+        },
+        {
+          "defect": "def-de737323d3f1d738199e",
+          "label": "IW-02",
+          "description": "Title ink is pure black in design (var(--color-text-primary) undefined on the board) vs #2E2B27 in code"
+        },
+        {
+          "defect": "def-d66b4d602eb2f042b0e4",
+          "label": "IW-01",
+          "description": "Title and note render in a serif face in the design but in Hanken Grotesk in code: the inbox board uses var(--font-sans) but never defines it"
+        },
+        {
+          "defect": "def-2091b1d0804b51c2815a",
+          "label": "IW-05",
+          "description": "Title is semibold (600) in design but medium (500) in code"
+        },
+        {
+          "defect": "def-7d4f261130dde32b55ac",
+          "label": "IW-07",
+          "description": "Age \"34m\" is bright blue #3565D4 in code vs faint grey #A8A59E in design"
+        },
+        {
+          "defect": "def-0629f579e4216bf906a2",
+          "label": "IW-03",
+          "description": "Leading glyph is the agent hexagon in muted #8A877F in design; code shows the agent's model logo (Claude mark) in lighter #A29D93"
+        },
+        {
+          "defect": "def-fc9baa59a62ae0c94731",
+          "label": "IW-04",
+          "description": "Leading glyph sits about 3px lower relative to the title: code nudges marks 2px down on top of the taller line"
+        },
+        {
+          "defect": "def-f3e4c6ba4d79fb2a71b6",
+          "label": "IW-06",
+          "description": "The grey \"waiting\" word after the ring dot is missing; code shows only the dot, so the question starts right after it"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-975985cf9825fbbfcb13",
+          "layer": {
+            "design": "n249#2::n249::n19::n1",
+            "code": "0/0/0/0/0/0"
+          },
+          "kind": "token",
+          "cause": "style:icon",
+          "classification": "product",
+          "findings": [
+            "d23"
+          ],
+          "summary": "style icon differs at n249#2::n249::n19::n1"
+        },
+        {
+          "id": "def-cff1aeede19b622bad54",
+          "layer": {
+            "design": "n249#2::n249::n25",
+            "code": "0/0/1/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d30",
+            "d32"
+          ],
+          "summary": "layout configuration differs at n249#2::n249::n25"
+        }
+      ],
+      "falseNegatives": []
+    }
+  },
+  {
+    "case": "help-search-split",
+    "optimistic": {
+      "tp": 7,
+      "fp": 34,
+      "fn": 6,
+      "precision": 0.17073170731707318,
+      "recall": 0.5384615384615384,
+      "predicted": 41,
+      "labelled": 13,
+      "agreement": [
+        {
+          "defect": "def-c8615a7085020b960f1a",
+          "label": "HSP-12",
+          "description": "Key-cap label ink is lighter in code: #6B6862 vs #5A564E"
+        },
+        {
+          "defect": "def-3b23906d9a52a44d1a88",
+          "label": "HSP-13",
+          "description": "Key-cap border is #E2E0DB (ghostBorder) instead of --color-border #E7E5E0"
+        },
+        {
+          "defect": "def-f8fac14648d3cfd3024f",
+          "label": "HSP-11",
+          "description": "Bordered boxes are smaller in code because the design adds borders outside the authored size: key caps 18px vs 21px tall, search field 34px vs 36px, footer 34px vs 35px"
+        },
+        {
+          "defect": "def-1b7139a18260764f4c9b",
+          "label": "HSP-05",
+          "description": "Clear (✕) button inside the search field is missing"
+        },
+        {
+          "defect": "def-6a903a4fcda7a02aa6b4",
+          "label": "HSP-01",
+          "description": "While searching, code keeps the Guide/Reference topic sidebar on the left; the design's search state has no sidebar, so in code the search field and results are about 215px narrower"
+        },
+        {
+          "defect": "def-f16b0e868fd6d26f2ea7",
+          "label": "HSP-02",
+          "description": "Search matches loosely: code lists 20 results, many without \"split\" in them (Close preview, Focus pane in direction, Switch account, Model effort and speed …), ranked above real matches such as Preview beside (6th vs 3rd); the list overflows under the footer"
+        },
+        {
+          "defect": "def-726637e30ca96fe43c72",
+          "label": "HSP-10",
+          "description": "When a command has several key groups, code puts a faint \"·\" between the caps; design spaces them 3px apart"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-087d25c3bdcc09f265fe",
+          "layer": {
+            "design": "n145",
+            "code": "n145"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d1"
+          ],
+          "summary": "style surface differs at n145"
+        },
+        {
+          "id": "def-0fc7e1223c07481e796e",
+          "layer": {
+            "design": "n145",
+            "code": "n145"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d3",
+            "d5",
+            "d11",
+            "d12",
+            "d14",
+            "d34",
+            "d35",
+            "d38",
+            "d43",
+            "d46",
+            "d53",
+            "d58",
+            "d61",
+            "d68",
+            "d120",
+            "d121",
+            "d128",
+            "d137",
+            "d138",
+            "d145",
+            "d149",
+            "d155",
+            "d156",
+            "d158",
+            "d171",
+            "d172",
+            "d175",
+            "d184",
+            "d185",
+            "d192",
+            "d196",
+            "d198",
+            "d206",
+            "d268",
+            "d270",
+            "d273"
+          ],
+          "summary": "layout configuration differs at n145"
+        },
+        {
+          "id": "def-6ea0951538a05a334e5e",
+          "layer": {
+            "design": "n154::n2",
+            "code": "0/0/1/1/0/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d4",
+            "d6",
+            "d7",
+            "d8",
+            "d9",
+            "d10",
+            "d267"
+          ],
+          "summary": "layout configuration differs at n154::n2"
+        },
+        {
+          "id": "def-8c423f1dd908c6393669",
+          "layer": {
+            "design": "n154::n3",
+            "code": "0/0/1/1/0/0/0/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d17",
+            "d18"
+          ],
+          "summary": "layout configuration differs at n154::n3"
+        },
+        {
+          "id": "def-9aea4069b2fa608fc1b4",
+          "layer": {
+            "design": "n154::n3",
+            "code": "0/0/1/1/0/0/0/0/0"
+          },
+          "kind": "style",
+          "cause": "style:white-space",
+          "classification": "product",
+          "findings": [
+            "d19"
+          ],
+          "summary": "style white-space differs at n154::n3"
+        },
+        {
+          "id": "def-547c879c6f4eb86e2fad",
+          "layer": {
+            "design": "n154::n7#0::n7",
+            "code": "0/0/1/1/0/0/0/1/0"
+          },
+          "kind": "style",
+          "cause": "style:text-align",
+          "classification": "product",
+          "findings": [
+            "d54"
+          ],
+          "summary": "style text-align differs at n154::n7#0::n7"
+        },
+        {
+          "id": "def-6d27732988602c7a96f6",
+          "layer": {
+            "design": "n154::n7#1::n7",
+            "code": "0/0/1/1/0/0/0/1/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d56",
+            "d57"
+          ],
+          "summary": "layout configuration differs at n154::n7#1::n7"
+        },
+        {
+          "id": "def-a431452953309f13cd55",
+          "layer": {
+            "design": "n154::n7#1::n8::n1",
+            "code": "0/0/1/1/0/0/0/1/1/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d60",
+            "d70"
+          ],
+          "summary": "layout configuration differs at n154::n7#1::n8::n1"
+        },
+        {
+          "id": "def-809effcbf8d0f9454c1a",
+          "layer": {
+            "design": "n154::n7#1::n8::n1",
+            "code": "0/0/1/1/0/0/0/1/1/1"
+          },
+          "kind": "style",
+          "cause": "style:color",
+          "classification": "product",
+          "findings": [
+            "d62"
+          ],
+          "summary": "style color differs at n154::n7#1::n8::n1"
+        },
+        {
+          "id": "def-0b505a346ce367318b74",
+          "layer": {
+            "design": "n154::n7#1::n8::n1",
+            "code": "0/0/1/1/0/0/0/1/1/1"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d63",
+            "d64",
+            "d65",
+            "d66"
+          ],
+          "summary": "style surface differs at n154::n7#1::n8::n1"
+        },
+        {
+          "id": "def-9d1cdce313e7e87722c3",
+          "layer": {
+            "design": "n154::n7#1::n7",
+            "code": "0/0/1/1/0/0/0/1/1"
+          },
+          "kind": "style",
+          "cause": "style:text-align",
+          "classification": "product",
+          "findings": [
+            "d69"
+          ],
+          "summary": "style text-align differs at n154::n7#1::n7"
+        },
+        {
+          "id": "def-0ed555524a011bc0885e",
+          "layer": {
+            "design": "n155::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/0/1/1/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d119",
+            "d130"
+          ],
+          "summary": "layout configuration differs at n155::n7#0::n8::n1"
+        },
+        {
+          "id": "def-992e933695f20e641025",
+          "layer": {
+            "design": "n155::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/0/1/1/1"
+          },
+          "kind": "style",
+          "cause": "style:color",
+          "classification": "product",
+          "findings": [
+            "d122"
+          ],
+          "summary": "style color differs at n155::n7#0::n8::n1"
+        },
+        {
+          "id": "def-ebf1b816aa3ffa6198b2",
+          "layer": {
+            "design": "n155::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/0/1/1/1"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d123",
+            "d124",
+            "d125",
+            "d126"
+          ],
+          "summary": "style surface differs at n155::n7#0::n8::n1"
+        },
+        {
+          "id": "def-686db363b1124d57fbf1",
+          "layer": {
+            "design": "n155::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/0/1/1/1"
+          },
+          "kind": "style",
+          "cause": "style:text-align",
+          "classification": "product",
+          "findings": [
+            "d129"
+          ],
+          "summary": "style text-align differs at n155::n7#0::n8::n1"
+        },
+        {
+          "id": "def-6b0afe72d7f23844dd7e",
+          "layer": {
+            "design": "n155::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/0/1/2/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d136",
+            "d147"
+          ],
+          "summary": "layout configuration differs at n155::n7#1::n8::n1"
+        },
+        {
+          "id": "def-3080acff8490ed094414",
+          "layer": {
+            "design": "n155::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/0/1/2/1"
+          },
+          "kind": "style",
+          "cause": "style:color",
+          "classification": "product",
+          "findings": [
+            "d139"
+          ],
+          "summary": "style color differs at n155::n7#1::n8::n1"
+        },
+        {
+          "id": "def-5f6e6795acf714f30b35",
+          "layer": {
+            "design": "n155::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/0/1/2/1"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d140",
+            "d141",
+            "d142",
+            "d143"
+          ],
+          "summary": "style surface differs at n155::n7#1::n8::n1"
+        },
+        {
+          "id": "def-357e2fe8761ae0c4f6d8",
+          "layer": {
+            "design": "n155::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/0/1/2/1"
+          },
+          "kind": "style",
+          "cause": "style:text-align",
+          "classification": "product",
+          "findings": [
+            "d146"
+          ],
+          "summary": "style text-align differs at n155::n7#1::n8::n1"
+        },
+        {
+          "id": "def-a23786c3f444f956244f",
+          "layer": {
+            "design": "n156::n2",
+            "code": "0/0/1/1/0/5/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d148",
+            "d150",
+            "d151",
+            "d152",
+            "d153",
+            "d154"
+          ],
+          "summary": "layout configuration differs at n156::n2"
+        },
+        {
+          "id": "def-fedda021290d78c3e8ae",
+          "layer": {
+            "design": "n156::n3",
+            "code": "0/0/1/1/0/5/0/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d161",
+            "d162"
+          ],
+          "summary": "layout configuration differs at n156::n3"
+        },
+        {
+          "id": "def-22ef07bab450f7a0c50f",
+          "layer": {
+            "design": "n156::n3",
+            "code": "0/0/1/1/0/5/0/0/0"
+          },
+          "kind": "style",
+          "cause": "style:white-space",
+          "classification": "product",
+          "findings": [
+            "d163"
+          ],
+          "summary": "style white-space differs at n156::n3"
+        },
+        {
+          "id": "def-232ec2388467cd869943",
+          "layer": {
+            "design": "n156::n6",
+            "code": "0/0/1/1/0/2/0/0/2"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d170",
+            "d173",
+            "d178"
+          ],
+          "summary": "layout configuration differs at n156::n6"
+        },
+        {
+          "id": "def-9015505b75bda6f6a00a",
+          "layer": {
+            "design": "n156::n7#0::n7",
+            "code": "0/0/1/1/0/5/0/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d183"
+          ],
+          "summary": "layout configuration differs at n156::n7#0::n7"
+        },
+        {
+          "id": "def-4b65de0b63baec06eede",
+          "layer": {
+            "design": "n156::n7#0::n8::n1",
+            "code": "0/0/1/1/0/5/0/1/0/0"
+          },
+          "kind": "style",
+          "cause": "style:color",
+          "classification": "product",
+          "findings": [
+            "d186"
+          ],
+          "summary": "style color differs at n156::n7#0::n8::n1"
+        },
+        {
+          "id": "def-333fd54839529061dcc7",
+          "layer": {
+            "design": "n156::n7#0::n8::n1",
+            "code": "0/0/1/1/0/5/0/1/0/0"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d187",
+            "d188",
+            "d189",
+            "d190"
+          ],
+          "summary": "style surface differs at n156::n7#0::n8::n1"
+        },
+        {
+          "id": "def-2f0a4bb1304bf1e95280",
+          "layer": {
+            "design": "n156::n7#0::n8::n1",
+            "code": "0/0/1/1/0/5/0/1/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d194"
+          ],
+          "summary": "layout configuration differs at n156::n7#0::n8::n1"
+        },
+        {
+          "id": "def-1dba73a220b7a91514c7",
+          "layer": {
+            "design": "n157::n6",
+            "code": "0/0/1/1/0/3/0/1/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d195",
+            "d197",
+            "d201",
+            "d202",
+            "d203",
+            "d208",
+            "d209",
+            "d211"
+          ],
+          "summary": "layout configuration differs at n157::n6"
+        },
+        {
+          "id": "def-609d25e648cfbec251ed",
+          "layer": {
+            "design": "n157::n6",
+            "code": "0/0/1/1/0/3/0/1/1"
+          },
+          "kind": "token",
+          "cause": "token:color",
+          "classification": "product",
+          "findings": [
+            "d200"
+          ],
+          "summary": "token color differs at n157::n6"
+        },
+        {
+          "id": "def-da6ce63f06c20057b925",
+          "layer": {
+            "design": "n157::n6",
+            "code": "0/0/1/1/0/3/0/1/1"
+          },
+          "kind": "style",
+          "cause": "style:font-family",
+          "classification": "product",
+          "findings": [
+            "d204"
+          ],
+          "summary": "style font-family differs at n157::n6"
+        },
+        {
+          "id": "def-fe01c591413ac631cdcf",
+          "layer": {
+            "design": "n157::n6",
+            "code": "0/0/1/1/0/3/0/1/1"
+          },
+          "kind": "style",
+          "cause": "style:font-size",
+          "classification": "product",
+          "findings": [
+            "d205"
+          ],
+          "summary": "style font-size differs at n157::n6"
+        },
+        {
+          "id": "def-382070b073221e154a2a",
+          "layer": {
+            "design": "n154::n4",
+            "code": "0/0/1/1/0/0/0/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d269",
+            "d276",
+            "d277",
+            "d279"
+          ],
+          "summary": "layout configuration differs at n154::n4"
+        },
+        {
+          "id": "def-dbbc17d716079c8f83ba",
+          "layer": {
+            "design": "n154::n4",
+            "code": "0/0/1/1/0/0/0/0/1"
+          },
+          "kind": "style",
+          "cause": "style:white-space",
+          "classification": "product",
+          "findings": [
+            "d278"
+          ],
+          "summary": "style white-space differs at n154::n4"
+        },
+        {
+          "id": "def-6fc6f1175cc701f1f0f9",
+          "layer": {
+            "design": "n163"
+          },
+          "kind": "missing",
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d308",
+            "d309",
+            "d310",
+            "d311"
+          ],
+          "summary": "missing subtree differs at n163"
+        }
+      ],
+      "falseNegatives": [
+        {
+          "id": "HSP-03",
+          "design_layer": "0/0/1/1/0;0/0/1/3/0;0/0/1/4/0;0/0/1/5/0",
+          "code_layer": "none",
+          "kind": "missing",
+          "description": "Design results Open files in a split, Inline ⇄ split diff, Move pane in direction — splits off at an edge and the dimmed Add pane to group — unsplit a tab are not in the code results",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[missing-results] not in the extracted command list (or labelled without \"split\"); may be partly a fixture gap (the capture fixture misses plugin-contributed commands)",
+          "properties": "subtree"
+        },
+        {
+          "id": "HSP-04",
+          "design_layer": "0/0/0/0/1",
+          "code_layer": "0/0/1/0/1",
+          "kind": "layout",
+          "description": "Match count sits outside the search field, to its right, instead of right-aligned inside the field",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[count-placement]",
+          "properties": "layout"
+        },
+        {
+          "id": "HSP-06",
+          "design_layer": "0/0/1/6",
+          "code_layer": "none",
+          "kind": "missing",
+          "description": "The \"no match in GUIDE topics · search \"split\" in Search everything /\" hint under the results is missing",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[no-match-hint]",
+          "properties": "subtree"
+        },
+        {
+          "id": "HSP-07",
+          "design_layer": "0/0/2/*",
+          "code_layer": "0/0/1/2/*",
+          "kind": "text",
+          "description": "Footer shows the generic \"click keys to rebind · live from the command registry\" instead of the search hints \"↑↓ move · ↵ run Split pane · esc clear, then close\"",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[footer-hints]",
+          "properties": "text"
+        },
+        {
+          "id": "HSP-08",
+          "design_layer": "none",
+          "code_layer": "0/0/1/1/0/8/0/0/0;0/0/1/1/0/9/0/0/0;0/0/1/1/0/12/0/0/0;0/0/1/1/0/13/0/0/0;0/0/1/1/0/14/0/0/0",
+          "kind": "layout",
+          "description": "Command names are cut off with an ellipsis when the note is long (\"Sidecar · Trace — turn and tool …\", \"Switch search tab by visual or…\", \"Scroll transcript down / up ha…\"); the design always shows the name in full",
+          "severity": "high",
+          "likely_intentional": "no",
+          "note": "[label-truncation] same failure as round-3 HelpCenter H-03",
+          "properties": "flex-shrink;text-overflow"
+        },
+        {
+          "id": "HSP-09",
+          "design_layer": "0/0/1/0/0/1",
+          "code_layer": "0/0/1/1/0/0/0/0/1",
+          "kind": "text",
+          "description": "Split pane note reads \"row · column — ⇧ flips\" instead of \"row · column\"",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[split-note]",
+          "properties": "text"
+        }
+      ]
+    },
+    "strict": {
+      "tp": 4,
+      "fp": 37,
+      "fn": 9,
+      "precision": 0.0975609756097561,
+      "recall": 0.3076923076923077,
+      "predicted": 41,
+      "labelled": 13,
+      "agreement": [
+        {
+          "defect": "def-6ea0951538a05a334e5e",
+          "label": "HSP-02",
+          "description": "Search matches loosely: code lists 20 results, many without \"split\" in them (Close preview, Focus pane in direction, Switch account, Model effort and speed …), ranked above real matches such as Preview beside (6th vs 3rd); the list overflows under the footer"
+        },
+        {
+          "defect": "def-1b7139a18260764f4c9b",
+          "label": "HSP-05",
+          "description": "Clear (✕) button inside the search field is missing"
+        },
+        {
+          "defect": "def-6a903a4fcda7a02aa6b4",
+          "label": "HSP-01",
+          "description": "While searching, code keeps the Guide/Reference topic sidebar on the left; the design's search state has no sidebar, so in code the search field and results are about 215px narrower"
+        },
+        {
+          "defect": "def-0fc7e1223c07481e796e",
+          "label": "HSP-10",
+          "description": "When a command has several key groups, code puts a faint \"·\" between the caps; design spaces them 3px apart"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-087d25c3bdcc09f265fe",
+          "layer": {
+            "design": "n145",
+            "code": "n145"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d1"
+          ],
+          "summary": "style surface differs at n145"
+        },
+        {
+          "id": "def-8c423f1dd908c6393669",
+          "layer": {
+            "design": "n154::n3",
+            "code": "0/0/1/1/0/0/0/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d17",
+            "d18"
+          ],
+          "summary": "layout configuration differs at n154::n3"
+        },
+        {
+          "id": "def-9aea4069b2fa608fc1b4",
+          "layer": {
+            "design": "n154::n3",
+            "code": "0/0/1/1/0/0/0/0/0"
+          },
+          "kind": "style",
+          "cause": "style:white-space",
+          "classification": "product",
+          "findings": [
+            "d19"
+          ],
+          "summary": "style white-space differs at n154::n3"
+        },
+        {
+          "id": "def-726637e30ca96fe43c72",
+          "layer": {
+            "design": "n154::n6",
+            "code": "0/0/1/1/0/3/0/0/3"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d33",
+            "d36",
+            "d41"
+          ],
+          "summary": "layout configuration differs at n154::n6"
+        },
+        {
+          "id": "def-f16b0e868fd6d26f2ea7",
+          "layer": {
+            "design": "n154::n7#0::n7",
+            "code": "0/0/1/1/0/0/0/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d42",
+            "d45"
+          ],
+          "summary": "layout configuration differs at n154::n7#0::n7"
+        },
+        {
+          "id": "def-c8615a7085020b960f1a",
+          "layer": {
+            "design": "n154::n7#0::n8::n1",
+            "code": "0/0/1/1/0/0/0/1/0/0"
+          },
+          "kind": "style",
+          "cause": "style:color",
+          "classification": "product",
+          "findings": [
+            "d47"
+          ],
+          "summary": "style color differs at n154::n7#0::n8::n1"
+        },
+        {
+          "id": "def-3b23906d9a52a44d1a88",
+          "layer": {
+            "design": "n154::n7#0::n8::n1",
+            "code": "0/0/1/1/0/0/0/1/0/0"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d48",
+            "d49",
+            "d50",
+            "d51"
+          ],
+          "summary": "style surface differs at n154::n7#0::n8::n1"
+        },
+        {
+          "id": "def-547c879c6f4eb86e2fad",
+          "layer": {
+            "design": "n154::n7#0::n7",
+            "code": "0/0/1/1/0/0/0/1/0"
+          },
+          "kind": "style",
+          "cause": "style:text-align",
+          "classification": "product",
+          "findings": [
+            "d54"
+          ],
+          "summary": "style text-align differs at n154::n7#0::n7"
+        },
+        {
+          "id": "def-f8fac14648d3cfd3024f",
+          "layer": {
+            "design": "n154::n7#0::n8::n1",
+            "code": "0/0/1/1/0/0/0/1/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d55"
+          ],
+          "summary": "layout configuration differs at n154::n7#0::n8::n1"
+        },
+        {
+          "id": "def-6d27732988602c7a96f6",
+          "layer": {
+            "design": "n154::n7#1::n7",
+            "code": "0/0/1/1/0/0/0/1/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d56",
+            "d57"
+          ],
+          "summary": "layout configuration differs at n154::n7#1::n7"
+        },
+        {
+          "id": "def-a431452953309f13cd55",
+          "layer": {
+            "design": "n154::n7#1::n8::n1",
+            "code": "0/0/1/1/0/0/0/1/1/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d60",
+            "d70"
+          ],
+          "summary": "layout configuration differs at n154::n7#1::n8::n1"
+        },
+        {
+          "id": "def-809effcbf8d0f9454c1a",
+          "layer": {
+            "design": "n154::n7#1::n8::n1",
+            "code": "0/0/1/1/0/0/0/1/1/1"
+          },
+          "kind": "style",
+          "cause": "style:color",
+          "classification": "product",
+          "findings": [
+            "d62"
+          ],
+          "summary": "style color differs at n154::n7#1::n8::n1"
+        },
+        {
+          "id": "def-0b505a346ce367318b74",
+          "layer": {
+            "design": "n154::n7#1::n8::n1",
+            "code": "0/0/1/1/0/0/0/1/1/1"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d63",
+            "d64",
+            "d65",
+            "d66"
+          ],
+          "summary": "style surface differs at n154::n7#1::n8::n1"
+        },
+        {
+          "id": "def-9d1cdce313e7e87722c3",
+          "layer": {
+            "design": "n154::n7#1::n7",
+            "code": "0/0/1/1/0/0/0/1/1"
+          },
+          "kind": "style",
+          "cause": "style:text-align",
+          "classification": "product",
+          "findings": [
+            "d69"
+          ],
+          "summary": "style text-align differs at n154::n7#1::n7"
+        },
+        {
+          "id": "def-0ed555524a011bc0885e",
+          "layer": {
+            "design": "n155::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/0/1/1/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d119",
+            "d130"
+          ],
+          "summary": "layout configuration differs at n155::n7#0::n8::n1"
+        },
+        {
+          "id": "def-992e933695f20e641025",
+          "layer": {
+            "design": "n155::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/0/1/1/1"
+          },
+          "kind": "style",
+          "cause": "style:color",
+          "classification": "product",
+          "findings": [
+            "d122"
+          ],
+          "summary": "style color differs at n155::n7#0::n8::n1"
+        },
+        {
+          "id": "def-ebf1b816aa3ffa6198b2",
+          "layer": {
+            "design": "n155::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/0/1/1/1"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d123",
+            "d124",
+            "d125",
+            "d126"
+          ],
+          "summary": "style surface differs at n155::n7#0::n8::n1"
+        },
+        {
+          "id": "def-686db363b1124d57fbf1",
+          "layer": {
+            "design": "n155::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/0/1/1/1"
+          },
+          "kind": "style",
+          "cause": "style:text-align",
+          "classification": "product",
+          "findings": [
+            "d129"
+          ],
+          "summary": "style text-align differs at n155::n7#0::n8::n1"
+        },
+        {
+          "id": "def-6b0afe72d7f23844dd7e",
+          "layer": {
+            "design": "n155::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/0/1/2/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d136",
+            "d147"
+          ],
+          "summary": "layout configuration differs at n155::n7#1::n8::n1"
+        },
+        {
+          "id": "def-3080acff8490ed094414",
+          "layer": {
+            "design": "n155::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/0/1/2/1"
+          },
+          "kind": "style",
+          "cause": "style:color",
+          "classification": "product",
+          "findings": [
+            "d139"
+          ],
+          "summary": "style color differs at n155::n7#1::n8::n1"
+        },
+        {
+          "id": "def-5f6e6795acf714f30b35",
+          "layer": {
+            "design": "n155::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/0/1/2/1"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d140",
+            "d141",
+            "d142",
+            "d143"
+          ],
+          "summary": "style surface differs at n155::n7#1::n8::n1"
+        },
+        {
+          "id": "def-357e2fe8761ae0c4f6d8",
+          "layer": {
+            "design": "n155::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/0/1/2/1"
+          },
+          "kind": "style",
+          "cause": "style:text-align",
+          "classification": "product",
+          "findings": [
+            "d146"
+          ],
+          "summary": "style text-align differs at n155::n7#1::n8::n1"
+        },
+        {
+          "id": "def-a23786c3f444f956244f",
+          "layer": {
+            "design": "n156::n2",
+            "code": "0/0/1/1/0/5/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d148",
+            "d150",
+            "d151",
+            "d152",
+            "d153",
+            "d154"
+          ],
+          "summary": "layout configuration differs at n156::n2"
+        },
+        {
+          "id": "def-fedda021290d78c3e8ae",
+          "layer": {
+            "design": "n156::n3",
+            "code": "0/0/1/1/0/5/0/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d161",
+            "d162"
+          ],
+          "summary": "layout configuration differs at n156::n3"
+        },
+        {
+          "id": "def-22ef07bab450f7a0c50f",
+          "layer": {
+            "design": "n156::n3",
+            "code": "0/0/1/1/0/5/0/0/0"
+          },
+          "kind": "style",
+          "cause": "style:white-space",
+          "classification": "product",
+          "findings": [
+            "d163"
+          ],
+          "summary": "style white-space differs at n156::n3"
+        },
+        {
+          "id": "def-232ec2388467cd869943",
+          "layer": {
+            "design": "n156::n6",
+            "code": "0/0/1/1/0/2/0/0/2"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d170",
+            "d173",
+            "d178"
+          ],
+          "summary": "layout configuration differs at n156::n6"
+        },
+        {
+          "id": "def-9015505b75bda6f6a00a",
+          "layer": {
+            "design": "n156::n7#0::n7",
+            "code": "0/0/1/1/0/5/0/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d183"
+          ],
+          "summary": "layout configuration differs at n156::n7#0::n7"
+        },
+        {
+          "id": "def-4b65de0b63baec06eede",
+          "layer": {
+            "design": "n156::n7#0::n8::n1",
+            "code": "0/0/1/1/0/5/0/1/0/0"
+          },
+          "kind": "style",
+          "cause": "style:color",
+          "classification": "product",
+          "findings": [
+            "d186"
+          ],
+          "summary": "style color differs at n156::n7#0::n8::n1"
+        },
+        {
+          "id": "def-333fd54839529061dcc7",
+          "layer": {
+            "design": "n156::n7#0::n8::n1",
+            "code": "0/0/1/1/0/5/0/1/0/0"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d187",
+            "d188",
+            "d189",
+            "d190"
+          ],
+          "summary": "style surface differs at n156::n7#0::n8::n1"
+        },
+        {
+          "id": "def-2f0a4bb1304bf1e95280",
+          "layer": {
+            "design": "n156::n7#0::n8::n1",
+            "code": "0/0/1/1/0/5/0/1/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d194"
+          ],
+          "summary": "layout configuration differs at n156::n7#0::n8::n1"
+        },
+        {
+          "id": "def-1dba73a220b7a91514c7",
+          "layer": {
+            "design": "n157::n6",
+            "code": "0/0/1/1/0/3/0/1/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d195",
+            "d197",
+            "d201",
+            "d202",
+            "d203",
+            "d208",
+            "d209",
+            "d211"
+          ],
+          "summary": "layout configuration differs at n157::n6"
+        },
+        {
+          "id": "def-609d25e648cfbec251ed",
+          "layer": {
+            "design": "n157::n6",
+            "code": "0/0/1/1/0/3/0/1/1"
+          },
+          "kind": "token",
+          "cause": "token:color",
+          "classification": "product",
+          "findings": [
+            "d200"
+          ],
+          "summary": "token color differs at n157::n6"
+        },
+        {
+          "id": "def-da6ce63f06c20057b925",
+          "layer": {
+            "design": "n157::n6",
+            "code": "0/0/1/1/0/3/0/1/1"
+          },
+          "kind": "style",
+          "cause": "style:font-family",
+          "classification": "product",
+          "findings": [
+            "d204"
+          ],
+          "summary": "style font-family differs at n157::n6"
+        },
+        {
+          "id": "def-fe01c591413ac631cdcf",
+          "layer": {
+            "design": "n157::n6",
+            "code": "0/0/1/1/0/3/0/1/1"
+          },
+          "kind": "style",
+          "cause": "style:font-size",
+          "classification": "product",
+          "findings": [
+            "d205"
+          ],
+          "summary": "style font-size differs at n157::n6"
+        },
+        {
+          "id": "def-382070b073221e154a2a",
+          "layer": {
+            "design": "n154::n4",
+            "code": "0/0/1/1/0/0/0/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d269",
+            "d276",
+            "d277",
+            "d279"
+          ],
+          "summary": "layout configuration differs at n154::n4"
+        },
+        {
+          "id": "def-dbbc17d716079c8f83ba",
+          "layer": {
+            "design": "n154::n4",
+            "code": "0/0/1/1/0/0/0/0/1"
+          },
+          "kind": "style",
+          "cause": "style:white-space",
+          "classification": "product",
+          "findings": [
+            "d278"
+          ],
+          "summary": "style white-space differs at n154::n4"
+        },
+        {
+          "id": "def-6fc6f1175cc701f1f0f9",
+          "layer": {
+            "design": "n163"
+          },
+          "kind": "missing",
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d308",
+            "d309",
+            "d310",
+            "d311"
+          ],
+          "summary": "missing subtree differs at n163"
+        }
+      ],
+      "falseNegatives": [
+        {
+          "id": "HSP-03",
+          "design_layer": "0/0/1/1/0;0/0/1/3/0;0/0/1/4/0;0/0/1/5/0",
+          "code_layer": "none",
+          "kind": "missing",
+          "description": "Design results Open files in a split, Inline ⇄ split diff, Move pane in direction — splits off at an edge and the dimmed Add pane to group — unsplit a tab are not in the code results",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[missing-results] not in the extracted command list (or labelled without \"split\"); may be partly a fixture gap (the capture fixture misses plugin-contributed commands)",
+          "properties": "subtree"
+        },
+        {
+          "id": "HSP-04",
+          "design_layer": "0/0/0/0/1",
+          "code_layer": "0/0/1/0/1",
+          "kind": "layout",
+          "description": "Match count sits outside the search field, to its right, instead of right-aligned inside the field",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[count-placement]",
+          "properties": "layout"
+        },
+        {
+          "id": "HSP-06",
+          "design_layer": "0/0/1/6",
+          "code_layer": "none",
+          "kind": "missing",
+          "description": "The \"no match in GUIDE topics · search \"split\" in Search everything /\" hint under the results is missing",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[no-match-hint]",
+          "properties": "subtree"
+        },
+        {
+          "id": "HSP-07",
+          "design_layer": "0/0/2/*",
+          "code_layer": "0/0/1/2/*",
+          "kind": "text",
+          "description": "Footer shows the generic \"click keys to rebind · live from the command registry\" instead of the search hints \"↑↓ move · ↵ run Split pane · esc clear, then close\"",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[footer-hints]",
+          "properties": "text"
+        },
+        {
+          "id": "HSP-08",
+          "design_layer": "none",
+          "code_layer": "0/0/1/1/0/8/0/0/0;0/0/1/1/0/9/0/0/0;0/0/1/1/0/12/0/0/0;0/0/1/1/0/13/0/0/0;0/0/1/1/0/14/0/0/0",
+          "kind": "layout",
+          "description": "Command names are cut off with an ellipsis when the note is long (\"Sidecar · Trace — turn and tool …\", \"Switch search tab by visual or…\", \"Scroll transcript down / up ha…\"); the design always shows the name in full",
+          "severity": "high",
+          "likely_intentional": "no",
+          "note": "[label-truncation] same failure as round-3 HelpCenter H-03",
+          "properties": "flex-shrink;text-overflow"
+        },
+        {
+          "id": "HSP-09",
+          "design_layer": "0/0/1/0/0/1",
+          "code_layer": "0/0/1/1/0/0/0/0/1",
+          "kind": "text",
+          "description": "Split pane note reads \"row · column — ⇧ flips\" instead of \"row · column\"",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[split-note]",
+          "properties": "text"
+        },
+        {
+          "id": "HSP-11",
+          "design_layer": "0/0/0/0;0/0/2;*",
+          "code_layer": "0/0/1/0/0;0/0/1/2;*",
+          "kind": "layout",
+          "description": "Bordered boxes are smaller in code because the design adds borders outside the authored size: key caps 18px vs 21px tall, search field 34px vs 36px, footer 34px vs 35px",
+          "severity": "medium",
+          "likely_intentional": "no",
+          "note": "[box-sizing] same cause as Keycap [cap-height]",
+          "properties": "height;box-sizing"
+        },
+        {
+          "id": "HSP-12",
+          "design_layer": "*",
+          "code_layer": "*",
+          "kind": "style",
+          "description": "Key-cap label ink is lighter in code: #6B6862 vs #5A564E",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[cap-ink]",
+          "properties": "color"
+        },
+        {
+          "id": "HSP-13",
+          "design_layer": "*",
+          "code_layer": "*",
+          "kind": "token",
+          "description": "Key-cap border is #E2E0DB (ghostBorder) instead of --color-border #E7E5E0",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[cap-border]",
+          "properties": "border-color"
+        }
+      ]
+    }
+  }
+]
