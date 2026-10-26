@@ -1,0 +1,36 @@
+{
+  "captureOnly": true,
+  "comparisonRun": false,
+  "freshContextReplay": [
+    {
+      "file": "inbox-waiting/waiting/340x100@1/design/screenshot.png",
+      "equal": true,
+      "sha256": "826f7f7f2d21f358f4af6824920a23e7e9f19064af3e4cb43fc77a949ae46cf8"
+    },
+    {
+      "file": "inbox-waiting/waiting/340x100@1/design/dom.json",
+      "equal": true,
+      "sha256": "33e7712e8c769f4568437f3fcce0dc1812942f9e9632641b31f1b517981186b8"
+    },
+    {
+      "file": "inbox-waiting/waiting/340x100@1/design/full-extent.png",
+      "equal": true,
+      "sha256": "ecc94d2c66f8914e62d11578ad2969e7bc5e1862d10262ac43534c8e9edd1fae"
+    },
+    {
+      "file": "inbox-waiting/waiting/340x100@1/code/screenshot.png",
+      "equal": true,
+      "sha256": "af674e927dc12ac544258bf6ed384685276f1fab19436d69196f62e88daf9be9"
+    },
+    {
+      "file": "inbox-waiting/waiting/340x100@1/code/dom.json",
+      "equal": true,
+      "sha256": "a617a70fc8145d8fc57a599ea0b84b3b60d41aade46479143d4769d8a27f8642"
+    },
+    {
+      "file": "inbox-waiting/waiting/340x100@1/code/full-extent.png",
+      "equal": true,
+      "sha256": "79e1f4750bafd7d55800eed84db950893971bbad1186656ac6de3d8cd8a17cb5"
+    }
+  ]
+}
