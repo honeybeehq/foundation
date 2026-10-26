@@ -154,7 +154,8 @@ function cli(index: number, ...args: string[]): Promise<{ code: number; out: str
         FOUNDATION_SHARE_STATE_DIR: join(homes[index]!,".foundation/share"),
         FOUNDATION_SHARE_TEST_GITHUB: github,
         FOUNDATION_REPLICA_STORE: join(homes[index]!, 'replicas'),
-        FOUNDATION_NODE_ID: ids[index]
+        FOUNDATION_NODE_ID: ids[index],
+        FOUNDATION_ORIGIN_NODE: ids[index]
       },
       stdio: 'pipe'
     })
@@ -180,7 +181,8 @@ function daemon(index: number) {
       FOUNDATION_SHARE_STATE_DIR: join(homes[index]!,".foundation/share"),
       FOUNDATION_SHARE_TEST_GITHUB: github,
       FOUNDATION_REPLICA_STORE: join(homes[index]!, 'replicas'),
-      FOUNDATION_NODE_ID: ids[index]
+      FOUNDATION_NODE_ID: ids[index],
+        FOUNDATION_ORIGIN_NODE: ids[index]
     },
     stdio: ['ignore', 'pipe', 'pipe']
   })
@@ -190,7 +192,7 @@ function daemon(index: number) {
 }
 function activityFollow(index:number,workspace:string,cursor?:string) {
   const records:any[]=[]
-  const child=spawn(process.execPath,['--import','tsx',main,'sync','activity','--workspace',workspace,'--follow','--json',...(cursor?['--cursor',cursor]:[])],{env:{...process.env,HOME:homes[index],FOUNDATION_SHARE_STATE_DIR:join(homes[index]!,".foundation/share"),FOUNDATION_SHARE_TEST_GITHUB:github,FOUNDATION_REPLICA_STORE:join(homes[index]!,'replicas'),FOUNDATION_NODE_ID:ids[index]},stdio:['ignore','pipe','pipe']})
+  const child=spawn(process.execPath,['--import','tsx',main,'sync','activity','--workspace',workspace,'--follow','--json',...(cursor?['--cursor',cursor]:[])],{env:{...process.env,HOME:homes[index],FOUNDATION_SHARE_STATE_DIR:join(homes[index]!,".foundation/share"),FOUNDATION_SHARE_TEST_GITHUB:github,FOUNDATION_REPLICA_STORE:join(homes[index]!,'replicas'),FOUNDATION_NODE_ID:ids[index],FOUNDATION_ORIGIN_NODE:ids[index]},stdio:['ignore','pipe','pipe']})
   children.push(child);let buffer=''
   child.stdout!.on('data',chunk=>{buffer+=String(chunk);let end:number;while((end=buffer.indexOf('\n'))>=0){const line=buffer.slice(0,end);buffer=buffer.slice(end+1);if(line)records.push(JSON.parse(line))}})
   child.stderr!.on('data',chunk=>log(`activity ${ids[index]}: ${String(chunk).trim()}`))
@@ -665,6 +667,15 @@ try {
     const replay=activity!.records.filter(r=>r.entry?.hash===outageHash)
     assert.equal(replay.length,1);assert.equal(replay[0].delivery,'baseline');assert.equal(replay[0].source,'import')
     log('REPLAY: delayed outage edit is exactly one imported baseline fact, never a live lease')
+    const history=JSON.parse(await ok(1,'chain',files[1]!,'log','--json'))
+    const entry=history.entries.find((e:any)=>e.hash===outageHash)
+    assert(entry,'outage change in durable history')
+    assert.equal(entry.originNode,chain(0).log().find(e=>e.hash===outageHash)!.originNode)
+    assert.equal(entry.originAssurance,'writer-stated')
+    const own=JSON.parse(await ok(0,'chain',files[0]!,'log','--json')).entries.find((e:any)=>e.hash===outageHash)
+    assert.equal(own.originAssurance,'local')
+    log(`HISTORY: outage edit ${entry.hash.slice(0,12)} originNode=${entry.originNode} originAssurance=${entry.originAssurance}; author's own history assurance=${own.originAssurance}`)
+
     const prior=JSON.parse(readFileSync(join(homes[1]!,'replicas/read-model/activity-index.json'),'utf8'))
     b.kill('SIGTERM');await until(()=>b.exitCode!==null,'daemon stops before journal restart')
     b=daemon(1);await wait(1200)

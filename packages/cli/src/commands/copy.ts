@@ -1,3 +1,4 @@
+import { rememberAuthored } from '../history-origin.js'
 import { selectedChainFormat } from '../chain-format.js'
 import { loadChain } from '../chain-cache.js'
 import { randomUUID } from 'node:crypto'
@@ -75,6 +76,7 @@ export async function runCopy(args: string[], io: CliIO): Promise<number> {
     const message = `copied from ${source.docId ?? 'unidentified'}@${source.head ?? 'untracked'}${source.dirty ? '+working' : ''} (${sourcePath})`
     const chain = createChain(doc, withWallTime({ author: defaultAuthor(), message }), { docId })
     writeCopy(path, documentText(doc, docId), chain.save({ format: selectedChainFormat(path) }))
+    rememberAuthored(chain)
     const result = { path, docId, chainPath, head: chain.head().hash, source }
     io.stdout(flags.json ? JSON.stringify(result) : `copied ${sourcePath} to ${path} (docId ${docId})`)
     return 0

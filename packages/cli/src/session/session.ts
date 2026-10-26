@@ -1,3 +1,4 @@
+import { historyOrigins } from '../history-origin.js'
 import { mintNodeId } from 'foundation-engine'
 import { syncTrace } from '../sync-trace.js'
 import { selectedChainFormat } from '../chain-format.js'
@@ -295,7 +296,8 @@ class DesignSession implements Session {
           }
           const baseline = this.emptyActivityFrontier
           const since = baseline && message.since === baseline.token && (baseline.docId === null || baseline.docId === this.chain.docId()) ? emptyActivityPage(this.chain.docId()).frontier : message.since
-          return this.emit({ t: 'activity', id: message.id, ...this.chain.activityPage({ ...message, since }) })
+          const page=this.chain.activityPage({ ...message, since })
+          return this.emit({ t: 'activity', id: message.id, ...page, entries:historyOrigins(this.docId,page.entries) })
         } catch (err) {
           return this.reject(message.id, { code: 'invalid-op', message: err instanceof Error ? err.message : String(err) })
         }
@@ -303,7 +305,7 @@ class DesignSession implements Session {
         this.syncAndAnnounce()
         try {
           const page = this.chain?.logPage(message) ?? { entries: [], nextCursor: null, latestCursor: null, hasMore: false }
-          return this.emit({ t: 'log', id: message.id, ...page })
+          return this.emit({ t: 'log', id: message.id, ...page, entries:historyOrigins(this.docId,page.entries) })
         } catch (err) {
           return this.reject(message.id, { code: 'invalid-op', message: err instanceof Error ? err.message : String(err) })
         }

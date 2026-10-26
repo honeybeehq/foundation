@@ -279,6 +279,7 @@ export interface ChainLogEntry extends EnvelopeRecord {
   time: { kind: 'logical'; value: number }
   wallTime: string | null
   originNode: string | null
+  originAssurance: 'writer-stated' | 'local' | null
   nodeIds: NodeId[]
   artboardIds?: NodeId[]
   pageIds?: NodeId[]

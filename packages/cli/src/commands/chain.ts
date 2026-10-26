@@ -1,3 +1,4 @@
+import { historyOrigins } from '../history-origin.js'
 import { chainFormatUpgradeWarning } from '../chain-format.js'
 import { loadChain } from '../chain-cache.js'
 /**
@@ -221,10 +222,11 @@ async function runChainLogVerify(file: string, subcommand: string, io: CliIO, fl
           if (flags[flag] === true) throw new Error(`--${flag} requires a value`)
         }
         const limit = flagString(flags, 'limit')
-        io.stdout(JSON.stringify(chain.logPage({
+        const page=chain.logPage({
           ...(limit !== undefined ? { limit: Number(limit) } : {}),
           before: flagString(flags, 'before'),
-        })))
+        })
+        io.stdout(JSON.stringify({...page,entries:historyOrigins(chain.docId(),page.entries)}))
         return 0
       } catch (err) {
         io.stderr(err instanceof Error ? err.message : String(err))

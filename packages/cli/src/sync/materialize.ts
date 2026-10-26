@@ -1,3 +1,4 @@
+import { rememberOrigin } from '../history-origin.js'
 import { AssetSharing, copyCachedAssets } from '../share/assets.js'
 import { mkdirSync, realpathSync, statSync, existsSync, lstatSync, readFileSync } from 'node:fs'
 import { loadChain } from 'foundation-engine'
@@ -6,7 +7,7 @@ import type { CatalogueRecord } from './catalogue.js'
 import { catalogueLog } from './catalogue.js'
 import { createBridge, type Bridge } from '../share/transport.js'
 import { combLog, copyKey, type CombConfig } from './daemon.js'
-import { restoreChangeBlobs } from '../../../engine/src/chain/blob.js'
+import { decodeBlob, restoreChangeBlobs } from '../../../engine/src/chain/blob.js'
 import { materializeDocument } from '../disk.js'
 import { registerDesign, liveDesigns, statePath, writeSyncState } from '../sync-store.js'
 import { findShareRoot } from '../share/config.js'
@@ -41,7 +42,7 @@ export function materializePath(root: string, path: string): string {
   if (isAbsolute(confined) || confined.split('/').includes('..')) throw new MaterializeError('invalid-path', 'target symlink escapes the Product checkout')
   return resolve(real, relative(ancestor, target))
 }
-async function replay(bridge: Bridge, log: string, consume: (bytes: Uint8Array) => void): Promise<string> {
+async function replay(bridge: Bridge, log: string, consume: (bytes: Uint8Array, signatureVerified: boolean) => void): Promise<string> {
   const head = await bridge.request('head', { log })
   if (head.log !== log || typeof head.cursor !== 'string' || !/^[1-9][0-9]*$/.test(head.cursor)) throw new MaterializeError('invalid-history', 'invalid feed head')
   const limit = BigInt(head.cursor)
@@ -51,9 +52,9 @@ async function replay(bridge: Bridge, log: string, consume: (bytes: Uint8Array) 
     const page = await bridge.request('read', { log, cursor: String(cursor), max_events: count, max_bytes: 491520 })
     if (page.log !== log || !Array.isArray(page.events) || page.events.length === 0 || page.events.length > count) throw new MaterializeError('history-unavailable', `missing feed history at ${cursor}`)
     for (const raw of page.events) {
-      const event = raw as { seq?: unknown; payload_hex?: unknown }
+      const event = raw as { seq?: unknown; payload_hex?: unknown; writerSignatureVerified?: unknown }
       if (!event || event.seq !== String(cursor) || typeof event.payload_hex !== 'string' || !/^(?:[0-9a-fA-F]{2})+$/.test(event.payload_hex)) throw new MaterializeError('invalid-history', `invalid event at ${cursor}`)
-      consume(Buffer.from(event.payload_hex, 'hex')); cursor++
+      consume(Buffer.from(event.payload_hex, 'hex'),event.writerSignatureVerified===true); cursor++
     }
     if (page.next_cursor !== String(cursor)) throw new MaterializeError('invalid-history', 'invalid feed cursor')
   }
@@ -134,8 +135,8 @@ export async function materialize(request: MaterializeRequest, config: CombConfi
       bridge = createBridge({ ...config, shareLog: JSON.stringify(['foundation-share-document-v1', request.docId]) })
       await bridge.hello()
     }
-    const blobs: Uint8Array[] = []
-    const replayedCursor = await replay(bridge, combLog({ workspace: request.workspaceId, product: request.productId, docId: request.docId, file }), bytes => blobs.push(bytes))
+    const blobs: Uint8Array[] = [], verifiedHashes:string[]=[]
+    const replayedCursor = await replay(bridge, combLog({ workspace: request.workspaceId, product: request.productId, docId: request.docId, file }), (bytes,verified)=>{blobs.push(bytes);if(config.share&&verified)verifiedHashes.push(decodeBlob(bytes).envelope.hash)})
     if (!blobs.length) throw new MaterializeError('history-unavailable', 'design feed is empty or unavailable')
     let chain
     try { chain = restoreChangeBlobs(blobs, request.docId) }
@@ -151,6 +152,7 @@ export async function materialize(request: MaterializeRequest, config: CombConfi
       if (String(err).includes('path-conflict:')) throw new MaterializeError('path-conflict', String(err))
       throw err
     }
+    rememberOrigin(chain.docId(),verifiedHashes,'writer-stated')
     savedPath = file; stage = 'registration'
     const design = { file, workspace: request.workspaceId, product: request.productId, docId: request.docId }
     // Seed before live registration; a running daemon must not replay or republish the bootstrap history.

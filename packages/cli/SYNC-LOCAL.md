@@ -184,3 +184,27 @@ Before that worker has a checkpoint, `sync status --json` reports
 `status: "sharing pending"`. Startup errors remain visible in `lastError`.
 Explicit `sync open` still performs its synchronous format upgrade and can
 report genuine contention. Closing a registration and later editing reopens it.
+
+History entries from `foundation chain FILE log --json`, session `log`, and
+incremental session `activity` expose `originNode: string | null` and
+`originAssurance: 'writer-stated' | 'local' | null`. The node is the existing
+hashed envelope claim, including for old or unsigned history. It is a display
+label, never authorization or machine attestation; legacy values may be hostnames
+rather than node inventory IDs. Assurance is `writer-stated` only after this
+machine verified a member-device signature on that exact change. It is `local`
+when the actual local writer committed it; matching origin/author text cannot
+create local assurance. Unknown assurance is null. Local assurance takes
+precedence for this machine's own changes.
+
+Private append-only hash receipts under the replica store survive activity
+journal payload eviction and process restart. They are observer metadata, not
+chain/envelope fields, and are not sent to the share service or committed to git.
+A plain git copy on another machine therefore keeps the raw node but has unknown
+assurance until locally observed verification. Missing/unreadable observer state
+fails closed to null and never fails an edit. S7 live facts retain their existing
+outer NodeRef and verified-only origin rules; their entry has the same explicit
+writer-stated/null assurance. Baseline/outage replay remains baseline and does
+not renew presence leases merely because History can display its machine.
+
+Receipts describe verification at observation time. Later membership loss does
+not erase that historical display assurance or authorize any new write.

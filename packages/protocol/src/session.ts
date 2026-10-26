@@ -332,6 +332,7 @@ const isLogEntry: Check = (value) => isEnvelope(value) && shape({
   time: optional(shape({ kind: oneOf(['logical']), value: isNumber })),
   wallTime: optional(nullable(isString)),
   originNode: optional(nullable(isString)),
+  originAssurance: optional(nullable(oneOf(['writer-stated', 'local']))),
   nodeIds: optional(arrayOf(isString)),
   artboardIds: optional(arrayOf(isString)),
   pageIds: optional(arrayOf(isString)),

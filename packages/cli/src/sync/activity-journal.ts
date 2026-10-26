@@ -1,3 +1,4 @@
+import { rememberOrigin } from '../history-origin.js'
 import { createHash, randomUUID } from 'node:crypto'
 import { closeSync, existsSync, fsyncSync, ftruncateSync, mkdirSync, openSync, readFileSync, readSync, statSync, unlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -128,7 +129,12 @@ export function initializeActivityJournal(onError:(message:string)=>void=()=>{})
   try{index=readIndex(root)}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;index=migrate(root)}
   const state:Writer={root,index,seen:new Map(),pending:new Map(),onError}
   if(index.dedupThrough<index.next-1)repairDedup(state)
-  for(const row of allRows(root,index))remember(state,factKey(row))
+  const verifiedHistory=new Map<string,string[]>()
+  for(const row of allRows(root,index)){
+    remember(state,factKey(row))
+    if(row.signatureVerified===true){const hashes=verifiedHistory.get(row.document.docId)??[];hashes.push(row.entry.hash);verifiedHistory.set(row.document.docId,hashes)}
+  }
+  for(const [docId,hashes]of verifiedHistory)rememberOrigin(docId,hashes,'writer-stated')
   writer=state
 }
 function schedule(state:Writer,delay=20):void {
@@ -163,8 +169,9 @@ export function flushActivityJournal(maxBatches=Number.POSITIVE_INFINITY):void {
     for(const [chain,hashes] of wanted){let before:string|undefined;do{const page=chain.logPage({limit:200,...(before?{before}:{})});for(const entry of page.entries)if(hashes.delete(entry.hash))entries.set(entry.hash,entry);before=page.nextCursor??undefined}while(before&&hashes.size)}
     const rows:ImportedFact[]=[],keys:string[]=[]
     for(const task of tasks){if(!state.pending.has(task.key))continue;const raw=entries.get(task.hash);if(!raw){state.pending.delete(task.key);state.onError('validated activity hash absent from chain');continue}
+      if(task.verified)rememberOrigin(task.chain.docId(),[task.hash],'writer-stated')
       const origin=task.verified?raw.originNode:null
-      rows.push({version:1,cursor:cursor(state.index,state.index.next+rows.length),document:{workspaceId:task.design.workspace,productId:task.design.product,docId:task.design.docId,ownerNodeId:task.options.ownerNodeId},repo:task.options.repo,originNode:origin?{id:origin,name:origin}:null,originAssurance:origin?'writer-stated':null,signatureVerified:task.verified,source:task.source,entry:{...raw,originNode:origin,boardKeys:(raw as ChainLogEntry&{boardKeys?:string[]}).boardKeys??[]},delivery:task.options.delivery==='live'&&Date.now()-task.observedAt<5000?'live':'baseline',observedAt:task.observedAt});keys.push(task.key)
+      rows.push({version:1,cursor:cursor(state.index,state.index.next+rows.length),document:{workspaceId:task.design.workspace,productId:task.design.product,docId:task.design.docId,ownerNodeId:task.options.ownerNodeId},repo:task.options.repo,originNode:origin?{id:origin,name:origin}:null,originAssurance:origin?'writer-stated':null,signatureVerified:task.verified,source:task.source,entry:{...raw,originNode:origin,originAssurance:origin?'writer-stated':null,boardKeys:(raw as ChainLogEntry&{boardKeys?:string[]}).boardKeys??[]},delivery:task.options.delivery==='live'&&Date.now()-task.observedAt<5000?'live':'baseline',observedAt:task.observedAt});keys.push(task.key)
     }
     if(!rows.length)continue
     appendRows(state,rows);state.index.next+=rows.length;const removed=trimIndex(state.index)

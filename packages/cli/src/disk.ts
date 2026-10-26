@@ -1,3 +1,4 @@
+import { rememberAuthored } from './history-origin.js'
 import { syncTrace, syncTraceSpan } from './sync-trace.js'
 import { selectedChainFormat } from './chain-format.js'
 import { loadChain, rememberSavedChain } from './chain-cache.js'
@@ -124,6 +125,7 @@ export function persistDocument(file: string, chain: FdnChain, text = projectedT
     const receipt = JSON.stringify({ version: projectionVersion(text), protected: protectedProjection })
     if (sameBytes(readBytesIfPresent(`${file}.chain`), bytes) && readTextIfPresent(file) === text) {
       writeAtomic(`${file}.chain.projection`, receipt)
+      rememberAuthored(chain)
       ok = true; return bytes
     }
     const pendingPath = `${file}.chain.pending`
@@ -134,6 +136,7 @@ export function persistDocument(file: string, chain: FdnChain, text = projectedT
     writeAtomic(`${file}.chain.projection`, receipt)
     unlinkSync(pendingPath)
     rememberSavedChain(bytes)
+    rememberAuthored(chain)
     ok = true; return bytes
   } finally { finish({ ok }) }
 }

@@ -142,6 +142,8 @@ export interface FdnChain {
   undo(meta: ChangeMeta): EnvelopeRecord
   head(): EnvelopeRecord
   log(): EnvelopeRecord[]
+  /** Unsaved observer metadata: commits authored by this instance, never imported history. */
+  takeAuthoredChanges(): EnvelopeRecord[]
   logPage(opts?: ChainLogOptions): ChainLogPage
   activityPage(opts?: ChainActivityOptions): ChainActivityPage
   fork(actor: string): FdnChain
@@ -235,6 +237,7 @@ class LoroChain implements FdnChain {
   private peerIdStr: PeerID
   private anchors = new Map<string, Frontier>()
   private lastLocalChange: PatchOp[] | undefined
+  private authoredChanges: EnvelopeRecord[] = []
 
   constructor(actor: string, loro?: LoroDoc) {
     this.peerId = derivePeerId(actor)
@@ -471,6 +474,10 @@ class LoroChain implements FdnChain {
     return h
   }
 
+  takeAuthoredChanges(): EnvelopeRecord[] {
+    return this.authoredChanges.splice(0)
+  }
+
   log(): EnvelopeRecord[] {
     return this.changes().map((c) => c.envelope)
   }
@@ -652,7 +659,9 @@ class LoroChain implements FdnChain {
     const committed = this.loro.getChangeAt({ peer: this.peerIdStr, counter: endCounter - 1 })
     const bytes = this.bytesForSpan(committed.peer, committed.counter, committed.length)
     const hash = computeEnvelopeHash(prevHash, meta.author, meta.message, specVersion, bytes)
-    return { hash, prevHash, author: meta.author, message: meta.message, specVersion, wallTime: meta.wallTime ?? null, originNode: meta.originNode ?? null }
+    const envelope = { hash, prevHash, author: meta.author, message: meta.message, specVersion, wallTime: meta.wallTime ?? null, originNode: meta.originNode ?? null }
+    this.authoredChanges.push(envelope)
+    return envelope
   }
 
   private bytesForSpan(peer: PeerID, counter: number, len: number): Uint8Array {
