@@ -1,0 +1,2 @@
+design_path,design_fdn_id,design_desc,code_path,code_desc,confidence,note
+0/0,n231::n1,"key cap ""⌘↵"" (off-white face, 1px border, 2px bottom lip, 4px radius)",0/0,"<kbd> key cap ""⌘↵""",sure,the only visual layer; root 0 is the capture wrapper
