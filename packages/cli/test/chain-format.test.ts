@@ -1,9 +1,11 @@
 import { execFileSync } from 'node:child_process'
-import { copyFileSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { loadChain } from 'foundation-engine'
+import { loadChain as cachedLoadChain } from '../src/chain-cache.js'
+import { OriginalUpdates } from '../../engine/src/chain/originals.js'
 import type { WireServiceMessage } from 'foundation-protocol'
 import { runNew } from '../src/commands/new.js'
 import { runEdit } from '../src/commands/edit.js'
@@ -78,7 +80,7 @@ describe('opt-in chain storage', () => {
       expect(await runSync(['open', file], captureIo())).toBe(0)
       messages.length = 0
       session.receive(JSON.stringify({ t: 'commit', id: 'blocked', base: 1, label: 'no', ops: [{ op: 'set-token', name: 'blocked', value: 'no' }] }))
-      expect(messages.find(m => m.t === 'doc')).toMatchObject({ chainFormat: 2, chainReadOnly: true })
+      expect(messages.find(m => m.t === 'doc')).toMatchObject({ chainFormat: 2, chainReadOnly: true, readOnly: expect.stringContaining('cannot write chain format 2') })
       expect(messages.find(m => m.t === 'result')).toMatchObject({ ok: false, message: expect.stringContaining('cannot write chain format 2') })
       expect(loadChain(readFileSync(`${file}.chain`)).doc().tokens.blocked).toBeUndefined()
     } finally { session.close() }
@@ -88,6 +90,50 @@ describe('opt-in chain storage', () => {
       legacy.receive(JSON.stringify({ t: 'hello', protocol: '0.2', client: 'unchanged', author: 'a' }))
       expect(messages.find(m => m.t === 'welcome')).toMatchObject({ chainFormat: 2, writeChainFormat: 2, chainReadOnly: false })
     } finally { legacy.close() }
+  })
+
+  it('keeps a read-only session read-only without auto-registering or upgrading', () => {
+    vi.stubEnv('FOUNDATION_SYNC_AUTO_OPEN', '1')
+    const before = readFileSync(`${file}.chain`), messages: WireServiceMessage[] = []
+    const session = createSession({ path: file, watch: false, send: message => messages.push(message) })
+    try {
+      session.receive(JSON.stringify({ t: 'hello', protocol: '0.2', client: 'reader', author: 'a', mode: 'read' }))
+      expect(messages.find(m => m.t === 'welcome')).toMatchObject({ chainFormat: 1, readOnly: expect.stringContaining('read-only session') })
+      session.receive(JSON.stringify({ t: 'commit', id: 'no', base: 1, label: 'no', ops: [{ op: 'set-token', name: 'no', value: 'no' }] }))
+      expect(messages.find(m => m.t === 'result')).toMatchObject({ ok: false })
+      expect(readFileSync(`${file}.chain`)).toEqual(before)
+      expect(existsSync(join(dir, 'replicas', 'live'))).toBe(false)
+    } finally { session.close() }
+  })
+
+  it('reports the format restriction on a writable v2 welcome', async () => {
+    expect(await runSync(['open', file], captureIo())).toBe(0)
+    const messages: WireServiceMessage[] = []
+    const session = createSession({ path: file, watch: false, send: message => messages.push(message) })
+    try {
+      session.receive(JSON.stringify({ t: 'hello', protocol: '0.2', client: 'v1-client', author: 'a', chainFormats: [1] }))
+      expect(messages.find(m => m.t === 'welcome')).toMatchObject({ chainFormat: 2, chainReadOnly: true, readOnly: expect.stringContaining('cannot write chain format 2') })
+    } finally { session.close() }
+  })
+
+  it('keeps original v2 bytes and the verified load cache through a durable receipt write', async () => {
+    vi.stubEnv('FOUNDATION_CACHE_DIR', join(dir, 'cache'))
+    expect(await runSync(['open', file], captureIo())).toBe(0)
+    const before = loadChain(readFileSync(`${file}.chain`)).changes()
+    const messages: WireServiceMessage[] = []
+    const session = createSession({ path: file, watch: false, send: message => messages.push(message) })
+    try {
+      session.receive(JSON.stringify({ t: 'hello', protocol: '0.2', client: 'writer', author: 'a' }))
+      session.receive(JSON.stringify({ t: 'commit', id: 'durable', base: 1, durable: true, label: 'durable', ops: [{ op: 'set-token', name: 'durable', value: 'yes' }] }))
+      expect(messages.find(m => m.t === 'result')).toMatchObject({ ok: true, head: { hash: expect.any(String) }, nodeIds: [] })
+      expect(format(file)).toBe(2)
+      const saved = readFileSync(`${file}.chain`), chain = loadChain(saved)
+      const header = JSON.parse(saved.subarray(4, 4 + saved.readUInt32LE(0)).toString())
+      expect(existsSync(join(dir, 'cache', 'verified-chains-v2', header.seal))).toBe(true)
+      for (const original of before) expect(chain.changes().find(c => c.envelope.hash === original.envelope.hash)?.bytes).toEqual(original.bytes)
+      const validate = vi.spyOn(OriginalUpdates.prototype, 'validate')
+      try { expect(cachedLoadChain(saved).storageFormat()).toBe(2); expect(validate).not.toHaveBeenCalled() } finally { validate.mockRestore() }
+    } finally { session.close() }
   })
 
   it('exposes writer capabilities and default policy through version and doctor', async () => {

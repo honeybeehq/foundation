@@ -324,7 +324,7 @@ class DesignSession implements Session {
       this.preparedChain = { text: this.docText, actor: this.actor, docId: this.docId, finish: prepareChain(this.doc, { actor: this.actor, docId: this.docId }) }
     }
     this.phase = 'open'
-    if (this.chain) {
+    if (this.chain && !this.readMode) {
       autoOpenDesign(this.path, message => this.log(message))
       const bytes = readBytesIfPresent(this.chainPath)
       if (bytes && !sameBytes(bytes, this.diskChain)) {
@@ -823,6 +823,7 @@ class DesignSession implements Session {
   private documentView(head: EnvelopeRecord | null = this.head()): DocumentView {
     const top = (stack: UndoStep[]): string | null => stack.at(-1)?.label ?? null
     const formatError = this.chainFormatError()
+    const readOnly = this.readOnlyReason() ?? formatError
     return {
       chainFormat: this.chain?.storageFormat() ?? null,
       writeChainFormat: selectedChainFormat(this.path, this.chain?.storageFormat()),
@@ -830,10 +831,12 @@ class DesignSession implements Session {
       rev: this.rev,
       doc: this.doc,
       head,
-      history: (this.readOnlyReason() || formatError) ? { canUndo: false, canRedo: false, undoLabel: null, redoLabel: null } : { canUndo: this.undoStack.length > 0, canRedo: this.redoStack.length > 0, undoLabel: top(this.undoStack), redoLabel: top(this.redoStack) },
-      ...((this.readOnlyReason() || formatError) ? { readOnly: this.readOnlyReason()! } : {}),
-      issues: this.sourcePending ? [...this.issues, { code: 'read-only-source-pending', severity: 'info', message: 'The source is missing or differs from saved history. This read-only session shows the saved chain without ingesting source edits.' }] : this.issues,
-      ...(formatError ? { issues: [...this.issues, { code: 'chain-format-read-only', severity: 'warning', message: formatError }] } : {}),
+      history: readOnly ? { canUndo: false, canRedo: false, undoLabel: null, redoLabel: null } : { canUndo: this.undoStack.length > 0, canRedo: this.redoStack.length > 0, undoLabel: top(this.undoStack), redoLabel: top(this.redoStack) },
+      ...(readOnly ? { readOnly } : {}),
+      issues: [...this.issues,
+        ...(this.sourcePending ? [{ code: 'read-only-source-pending', severity: 'info' as const, message: 'The source is missing or differs from saved history. This read-only session shows the saved chain without ingesting source edits.' }] : []),
+        ...(formatError ? [{ code: 'chain-format-read-only', severity: 'warning' as const, message: formatError }] : []),
+      ],
       pages: artboardPages(this.doc),
       boards: boardViews(this.doc),
       unavailableBoards: this.unavailableBoards(),
