@@ -1,0 +1,9 @@
+id,design_layer,code_layer,kind,description,severity,likely_intentional,note,properties
+IL-01,0/0/0/1;0/0/1/2,0/0/0/1;0/0/1/2,token,"Title and note render in a serif face in the design but in Hanken Grotesk in code: the inbox board uses var(--font-sans) but never defines it",high,no,[sans-font-undefined] design-file bug,font-family
+IL-02,0/0/0/1,0/0/0/1,token,"Title ink is pure black in design (var(--color-text-primary) undefined on the board) vs #2E2B27 in code",low,no,[primary-ink-undefined] design-file bug,color
+IL-03,0/0/0/0/0,0/0/0/0/0/0,style,"Leading glyph is the agent hexagon in muted #8A877F in design; code shows the agent's model logo (Grok mark) in lighter #A29D93",medium,unsure,[glyph-model-mark] code renders ModelMark for every row,icon;color
+IL-04,0/0/0/0/0,0/0/0/0/0/0,layout,"Leading glyph sits 3px lower relative to the title (y 11 vs 8): code nudges marks 2px down on top of the taller line",low,yes,[glyph-offset] rowGlyphDown translateY(2px),transform
+IL-05,0/0/0/1,0/0/0/1,style,"Title is semibold (600) in design but medium (500) in code",low,unsure,"[title-weight] design makes agent rows 600; code reserves 600 for failed rows",font-weight
+IL-06,0/0/1/2,0/0/1/2,text,"Note reads ""credentials expired — sign in again"" in code vs ""credentials expired — open seat"" in design",low,unsure,[login-note-copy] code derives the line from the session state,text
+IL-07,0/0;0/0/0;0/0/1,0/0;0/0/0;0/0/1,layout,"Rows are taller in code (line 1 19px vs 16, line 2 17px vs 15), so the row is 54px instead of 49px, line 2 sits 3–4px lower and the row overruns the 49px frame by 5px",medium,unsure,[line-height] code inherits line-height 1.45,line-height;height
+IL-08,0,0,environment,"Area around the component is white in the design artboard and the warm window background #F5F4F1 in the code harness. Not a product defect",low,no,[harness-bg] capture environment only,background-color(page)
