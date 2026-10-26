@@ -10,12 +10,23 @@ import { updateDocument, writeAtomic } from './disk.js'
 export interface LiveDesign { docId: string; file: string; workspace: string; product: string; repoRoot?: string }
 export interface SyncState { cursor: string; published: string[]; lastError: string | null; lastErrorAt?: string; receiveError?: string | null; publishError?: string | null; connectionError?: string | null; catalogueError?: string | null; updatedAt: string; pending: number }
 export function replicaRoot(): string { return process.env.FOUNDATION_REPLICA_STORE ?? join(homedir(), '.foundation', 'replicas') }
-export function registerDesign(file: string, workspace = process.env.FOUNDATION_WORKSPACE ?? 'default', product = process.env.FOUNDATION_PRODUCT ?? 'default', repoRoot?: string, onUpgrade?: (message: string) => void): LiveDesign {
+function describeDesign(file: string, workspace = process.env.FOUNDATION_WORKSPACE ?? 'default', product = process.env.FOUNDATION_PRODUCT ?? 'default', repoRoot?: string): LiveDesign {
   file = realpathSync(file)
   const docId = loadChain(readFileSync(`${file}.chain`)).docId()
   if (!docId) throw new Error('sync requires a tracked design with a document id')
   for (const part of [workspace, product, docId]) if (!/^[A-Za-z0-9._-]+$/.test(part)) throw new Error('invalid sync address component')
-  const design = { docId, file, workspace, product, ...(repoRoot ? { repoRoot: realpathSync(repoRoot) } : {}) }
+  return { docId, file, workspace, product, ...(repoRoot ? { repoRoot: realpathSync(repoRoot) } : {}) }
+}
+function saveRegistration(design: LiveDesign): void {
+  const {docId,file,workspace,product}=design
+  const dir = join(replicaRoot(), 'live'); mkdirSync(dir, { recursive: true })
+  const key = createHash('sha256').update(JSON.stringify({ docId, file, workspace, product })).digest('hex')
+  writeAtomic(join(dir, `${key}.json`), JSON.stringify(design))
+}
+export function registerDesign(file: string, workspace?: string, product?: string, repoRoot?: string, onUpgrade?: (message: string) => void): LiveDesign {
+  const design=describeDesign(file,workspace,product,repoRoot)
+  file=design.file
+  const docId=design.docId
   let upgraded = false
   // Upgrade under the ordinary document lock before a daemon can publish it.
   updateDocument(file, chain => {
@@ -23,10 +34,7 @@ export function registerDesign(file: string, workspace = process.env.FOUNDATION_
     upgraded = chain.storageFormat() === 1
     chain.upgradeStorage()
   })
-  const dir = join(replicaRoot(), 'live'); mkdirSync(dir, { recursive: true })
-  // Each registration owns a path record; opening another copy never overwrites it.
-  const key = createHash('sha256').update(JSON.stringify({ docId, file, workspace, product })).digest('hex')
-  writeAtomic(join(dir, `${key}.json`), JSON.stringify(design))
+  saveRegistration(design)
   if (upgraded) onUpgrade?.(chainFormatUpgradeWarning(file))
   return design
 }
@@ -71,6 +79,9 @@ export function autoOpenDesign(file: string, log: (message: string) => void): vo
     }
     const canonical = realpathSync(file)
     if (liveDesigns().some(design => design.file === canonical)) return
-    registerDesign(canonical, undefined, undefined, undefined, log)
+    // Registration is a local queue record, not a document mutation. Session
+    // hello may already hold this lock; the daemon upgrades under its own lock
+    // before publishing and retries contention without blocking the editor.
+    saveRegistration(describeDesign(canonical))
   } catch (err) { log(`sync registration: ${String(err)}`) }
 }

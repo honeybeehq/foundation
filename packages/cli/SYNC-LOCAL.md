@@ -174,3 +174,13 @@ newest-first with at most eight authenticated alternatives per chunk; malicious
 member-written content can still deny an asset, but never blocks document sync.
 Each chunk uses a lightweight share bridge object; authorization/key checks still
 run for each request. No asset-throughput or cross-host latency SLO is claimed.
+
+Automatic registration during session startup or a completed CLI edit writes a
+local registration record without taking the document lock or modifying the
+chain. This record is the daemon's queue: before publishing, its worker takes
+the normal lock, checks the document identity and upgrades storage if needed.
+The worker retries a busy document; the session/edit does not wait for sharing.
+Before that worker has a checkpoint, `sync status --json` reports
+`status: "sharing pending"`. Startup errors remain visible in `lastError`.
+Explicit `sync open` still performs its synchronous format upgrade and can
+report genuine contention. Closing a registration and later editing reopens it.
