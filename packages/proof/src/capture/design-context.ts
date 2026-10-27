@@ -10,21 +10,28 @@ export async function preserveDesignContext(page: Page, selector: string, proper
     if (original.width <= 0 || original.height <= 0) throw Error('Selected design root has no painted size in its original context')
     const boxes = elements.map(el => {const r=el.getBoundingClientRect();return [r.x-original.x,r.y-original.y,r.width,r.height]})
     const styles = elements.map(el => properties.map(p => getComputedStyle(el).getPropertyValue(p)))
+    if (document.getElementById('foundation-root')) throw Error('Capture root already exists')
+    if (getComputedStyle(document.documentElement).transform !== 'none') throw Error('Authored html transforms need a dedicated capture adapter')
     const originalId = selected.id
-    selected.id = 'foundation-root'
+    const wrapper=document.createElement('div')
+    wrapper.id='foundation-root'
+    wrapper.style.display='contents'
+    selected.before(wrapper)
+    wrapper.append(selected)
     const isolation = document.createElement('style')
-    isolation.textContent = `html{translate:${-original.x}px ${-original.y}px!important}body *:not(#foundation-root):not(#foundation-root *){visibility:hidden!important}#foundation-root{visibility:visible!important}`
+    isolation.textContent = `html{transform:translate(${-original.x}px,${-original.y}px)!important;transform-origin:0 0!important}body *:not(#foundation-root):not(#foundation-root *){visibility:hidden!important}#foundation-root{visibility:visible!important}`
     document.head.append(isolation)
     const after = selected.getBoundingClientRect()
     const geometryChanges = elements.flatMap((el,i) => {
       const r=el.getBoundingClientRect(), actual=[r.x-after.x,r.y-after.y,r.width,r.height]
-      return actual.some((v,j)=>Math.abs(v-boxes[i]![j]!)>0.05)?[{node:i,before:boxes[i],after:actual}]:[]
+      const empty = boxes[i]![2] === 0 && boxes[i]![3] === 0 && actual[2] === 0 && actual[3] === 0
+      return actual.some((v,j)=>(j>=2 || !empty) && Math.abs(v-boxes[i]![j]!)>0.05)?[{node:i,before:boxes[i],after:actual}]:[]
     })
     const styleChanges = elements.flatMap((el,i) => properties.flatMap((property,j) => {
       const actual=getComputedStyle(el).getPropertyValue(property)
       return actual===styles[i]![j]?[]:[{node:i,property,before:styles[i]![j],after:actual}]
     }))
     if (geometryChanges.length || styleChanges.length || Math.abs(after.x)>0.05 || Math.abs(after.y)>0.05) throw Error('Design context changed during isolation: '+JSON.stringify({geometryChanges,styleChanges,origin:[after.x,after.y]}))
-    return {mode:'in-place' as const, originalId, originalBox:[original.x,original.y,original.width,original.height], isolatedBox:[after.x,after.y,after.width,after.height], properties:properties.length, nodes:elements.length,geometryChanges,styleChanges}
+    return {mode:'in-place' as const, originalId, originalBox:[original.x,original.y,original.width,original.height], isolatedBox:[after.x,after.y,after.width,after.height], properties:properties.length, nodes:elements.length,geometryChanges,styleChanges,wrapper:'display:contents',ancestorContextPreserved:true,outsidePaint:'visibility:hidden',backgrounds:'authored html/body retained',ancestorClips:'retained'}
   },{selector,properties:[...properties]})
 }
