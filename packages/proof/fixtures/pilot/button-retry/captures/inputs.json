@@ -153,12 +153,17 @@
     "platform": "linux",
     "designHtmlSha256": "5fd37f92bb3d214b73a36786dce7ae89d9552db29efd262cc88699de01694431"
   },
-  "captureMode": "--preserve-design-context",
-  "captureSourceCommit": "37ba01ba61771ffeed2faca58a2598324b94db78",
+  "captureMode": "--preserve-design-context --design-viewport 1600x1200",
+  "captureSourceCommit": "8f60686c34a968008846814a433690438df252fb",
   "codeCommit": "d336dbb8880dd817d55476a408d1ee0b996c57e1",
   "fixtureSource": ".foundation/pilot-fixtures.ts",
   "fixtureSha256": "82edee7b289d0619a84920b59d6b12a565a4498493371dba64a7a90ad6531c7b",
   "scope": "Shared Button DS primitive mapped to ActionButton default visual specimen; no Inbox action wiring or service behavior claimed",
   "mocks": "Props only; no live I/O/providers/services. Button click is no-op. Status color comes from the real STATUS_COLOR.running token.",
-  "frameContract": "meta.frame is design reference for overflow detection; code host is non-constraining viewport. Design stays in original formatting context via transparent capture wrapper."
+  "frameContract": "meta.frame is design reference for overflow detection; code host is non-constraining viewport. Design stays in original formatting context via transparent capture wrapper.",
+  "designViewport": {
+    "width": 1600,
+    "height": 1200
+  },
+  "supersedes": "04a13c1 small-design-viewport capture; SectionLabel wrapping was a capture artifact detected before labels"
 }

@@ -1,6 +1,6 @@
 {
   "schema": "fdn-capture/0",
-  "rendererSourceHash": "d178f4301cfa59130630d0ad3bf7b7e4fe4288e909cfea5faa5909baccdcb4b2",
+  "rendererSourceHash": "c2cfd8a7ef2f2b026c898cd244093f3dfec52e44d08670808d1778ad29767e29",
   "rendererSources": [
     {
       "file": "package.json",
@@ -168,7 +168,7 @@
     },
     {
       "file": "packages/proof/src/capture/cli.ts",
-      "sha256": "b8d5257e2885470f8f57004a5014f2ddc314321a44ee6c25e4c2ba3970e19cdb"
+      "sha256": "99499a7d98059bd1b61be7b7e37468cca122f334ab36d7d92049104eded3bb5c"
     },
     {
       "file": "packages/proof/src/capture/code-cli.ts",
@@ -231,7 +231,7 @@
       "sha256": "65b137b164da0eabf320bd8ad051d2e75dc1b210019746c3be72a78d3db92f37"
     }
   ],
-  "rendererCommit": "37ba01ba61771ffeed2faca58a2598324b94db78",
+  "rendererCommit": "8f60686c34a968008846814a433690438df252fb",
   "rendererDirty": false,
   "provable": true,
   "source": "design",
@@ -256,8 +256,8 @@
     "viewport": [
       0,
       0,
-      240,
-      80
+      1600,
+      1200
     ]
   },
   "fullExtent": {
@@ -274,7 +274,7 @@
     "originalId": "",
     "originalBox": [
       1314.953125,
-      736.40625,
+      529.40625,
       75.640625,
       30
     ],
@@ -293,6 +293,10 @@
     "outsidePaint": "visibility:hidden",
     "backgrounds": "authored html/body retained",
     "ancestorClips": "retained"
+  },
+  "designViewport": {
+    "width": 1600,
+    "height": 1200
   },
   "url": "foundation:baked",
   "fonts": [
@@ -567,6 +571,6 @@
   "blocked": [],
   "errors": [],
   "timingsMs": {
-    "capture": 1236
+    "capture": 1436
   }
 }

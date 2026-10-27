@@ -5,17 +5,17 @@
     {
       "file": "section-label/default/240x60@1/design/screenshot.png",
       "equal": true,
-      "sha256": "f492b7423a871c96fd604f151d269eb9b3a1124068969548f7df8b1b7405f527"
+      "sha256": "878350d0d403afe3856b7e1cd004b951e6761f5b5b7d57a6e3dc5c621cd86720"
     },
     {
       "file": "section-label/default/240x60@1/design/dom.json",
       "equal": true,
-      "sha256": "375d261bc6233c45b368d091fecec7c1f87b0d9c7299d61b91afffc419696440"
+      "sha256": "a8a3a6d83bbccbad0f53f8986ef309e756fa9bd69f8a40894ffe2815d95a9fd3"
     },
     {
       "file": "section-label/default/240x60@1/design/full-extent.png",
       "equal": true,
-      "sha256": "cb1810ebd39a7a97f9a57feb28a09d9b6a9ca90ded51ccdbf36b7c73c191898c"
+      "sha256": "dcf9987e6171579e5b3df8a166e37d539e9954ba0e8cf3abe5ced5c11c48bbf8"
     },
     {
       "file": "section-label/default/240x60@1/code/screenshot.png",
