@@ -1,0 +1,204 @@
+{
+  "state": "empty",
+  "mode": "ids",
+  "product": 20,
+  "uncertain": 0,
+  "oneToOneSupport": 10,
+  "productPrecision": 0.5,
+  "productRecall": 0.7142857142857143,
+  "inclusivePrecision": 0.5,
+  "productLabelCoverage": 10,
+  "allLabelCoverage": 10,
+  "onlyUncertainLabels": [],
+  "compositeProductCandidates": 4,
+  "broadLabelsExcluded": [
+    "E-01",
+    "E-11",
+    "E-14"
+  ],
+  "narrowScopeSupport": 8,
+  "narrowScopePrecision": 0.4,
+  "narrowScopeRecall": 0.7272727272727273,
+  "coverage": [
+    {
+      "id": "def-0a3695ce3a8dfd31c48c",
+      "classification": "product",
+      "cause": "style:surface",
+      "findings": 6,
+      "labels": [
+        "E-11"
+      ]
+    },
+    {
+      "id": "def-19009fc3468668bf1bc6",
+      "classification": "product",
+      "cause": "layout:configuration",
+      "findings": 5,
+      "labels": []
+    },
+    {
+      "id": "def-e5055ad300715d2ed2f7",
+      "classification": "product",
+      "cause": "layout:configuration",
+      "findings": 9,
+      "labels": [
+        "E-01"
+      ]
+    },
+    {
+      "id": "def-e1a777144bcb56b2712f",
+      "classification": "product",
+      "cause": "layout:configuration",
+      "findings": 7,
+      "labels": [
+        "E-01"
+      ]
+    },
+    {
+      "id": "def-73f96564eb6295ad4e29",
+      "classification": "product",
+      "cause": "text:text",
+      "findings": 1,
+      "labels": [
+        "E-04"
+      ]
+    },
+    {
+      "id": "def-55c140ffc1f49e3fdf1a",
+      "classification": "product",
+      "cause": "layout:configuration",
+      "findings": 7,
+      "labels": [
+        "E-01",
+        "E-05"
+      ]
+    },
+    {
+      "id": "def-70fa105a918ce9890316",
+      "classification": "product",
+      "cause": "text:text",
+      "findings": 1,
+      "labels": [
+        "E-05"
+      ]
+    },
+    {
+      "id": "def-2d516e9b50d589b2b876",
+      "classification": "product",
+      "cause": "token:color",
+      "findings": 1,
+      "labels": [
+        "E-06"
+      ]
+    },
+    {
+      "id": "def-20a00fc76f833d7c3c13",
+      "classification": "product",
+      "cause": "layout:configuration",
+      "findings": 9,
+      "labels": [
+        "E-01"
+      ]
+    },
+    {
+      "id": "def-aea252968eb4f8660e79",
+      "classification": "product",
+      "cause": "text:text",
+      "findings": 1,
+      "labels": [
+        "E-07"
+      ]
+    },
+    {
+      "id": "def-e636a40e31b7dcead176",
+      "classification": "product",
+      "cause": "token:color",
+      "findings": 1,
+      "labels": [
+        "E-08"
+      ]
+    },
+    {
+      "id": "def-cb56b813059b1af509b3",
+      "classification": "product",
+      "cause": "token:font-weight",
+      "findings": 1,
+      "labels": [
+        "E-08"
+      ]
+    },
+    {
+      "id": "def-c57024cd4804fce204d8",
+      "classification": "product",
+      "cause": "style:text-align",
+      "findings": 1,
+      "labels": []
+    },
+    {
+      "id": "def-2df5460f62e257dd1302",
+      "classification": "product",
+      "cause": "missing:subtree",
+      "findings": 4,
+      "labels": [
+        "E-01"
+      ]
+    },
+    {
+      "id": "def-fd556e1f9bf9fdc709da",
+      "classification": "product",
+      "cause": "missing:subtree",
+      "findings": 37,
+      "labels": [
+        "E-01"
+      ]
+    },
+    {
+      "id": "def-7f8b7f1a0d74dac3b82f",
+      "classification": "product",
+      "cause": "missing:subtree",
+      "findings": 1,
+      "labels": [
+        "E-01"
+      ]
+    },
+    {
+      "id": "def-144943ebaa071be572ce",
+      "classification": "product",
+      "cause": "missing:subtree",
+      "findings": 1,
+      "labels": [
+        "E-01"
+      ]
+    },
+    {
+      "id": "def-86b344b6cf920e9b1e0b",
+      "classification": "product",
+      "cause": "missing:subtree",
+      "findings": 1,
+      "labels": [
+        "E-01",
+        "E-09"
+      ]
+    },
+    {
+      "id": "def-82d4525fe6fe80b1fbeb",
+      "classification": "product",
+      "cause": "missing:subtree",
+      "findings": 3,
+      "labels": [
+        "E-01",
+        "E-10"
+      ]
+    },
+    {
+      "id": "def-be2f5a39bd50d8db8e1f",
+      "classification": "product",
+      "cause": "extra:subtree",
+      "findings": 12,
+      "labels": [
+        "E-01",
+        "E-12"
+      ]
+    }
+  ]
+}

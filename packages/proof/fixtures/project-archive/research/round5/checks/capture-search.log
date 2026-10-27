@@ -1,0 +1,8 @@
+8:54:08 AM [vite] warning: `esbuild` option was specified by "vite:react-babel" plugin. This option is deprecated, please use `oxc` instead.
+8:54:08 AM [vite] warning: `optimizeDeps.esbuildOptions` option was specified by "vite:react-babel" plugin. This option is deprecated, please use `optimizeDeps.rolldownOptions` instead.
+You or a plugin you are using have set `optimizeDeps.esbuildOptions` but this option is now deprecated. Vite now uses Rolldown to optimize the dependencies. Please use `optimizeDeps.rolldownOptions` instead.
+Port 5173 is in use, trying another one...
+help-search-split/split design: 77 nodes, 4013 ms
+help-search-split/split code: 92 nodes, 6475 ms
+PAIR /home/trmd/.hive/v2/cells/dtc-a1-accuracy-4f559e4794c8/github-com-honeybeehq-foundation-ddad6d63099e-space-4f559e4794c8/packages/proof/fixtures/round5-big-panels/captures/search/help-search-split/split/980x638@1 10770 ms
+Captured 1 pairs in 13228 ms

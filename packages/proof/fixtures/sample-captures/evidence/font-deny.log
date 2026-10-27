@@ -1,0 +1,2 @@
+Error: Unbundled fonts rendered glyphs: LiberationSans
+PASS: actual rendered system font is rejected even when its PostScript name is allowlisted

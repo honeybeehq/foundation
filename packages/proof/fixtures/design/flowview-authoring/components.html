@@ -1,0 +1,282 @@
+  <fdn-component name="ActionButton" hidden>
+    <fdn-props>
+      <fdn-prop name="label" type="string" required="true"></fdn-prop>
+      <fdn-prop name="hint" type="string"></fdn-prop>
+      <fdn-prop name="variant" type="enum" default="default" values="default,accent"></fdn-prop>
+      <fdn-prop name="disabled" type="enum" default="no" values="yes,no"></fdn-prop>
+    </fdn-props>
+    <button data-fdn-id="n37" when="prop.variant == 'default'" data-fdn-style="pill-btn" style="opacity:{{ prop.disabled == 'yes' ? '0.45' : '1' }}">
+      <span data-fdn-id="n38">{{ prop.label }}</span>
+      <span data-fdn-id="n39" when="prop.hint" style="color:var(--color-text-muted);font-family:var(--font-mono);font-size:var(--font-size-2xs);opacity:0.8">{{ prop.hint }}</span>
+    </button>
+    <button data-fdn-id="n40" when="prop.variant == 'accent'" data-fdn-style="pill-btn-accent">
+      <span data-fdn-id="n41">{{ prop.label }}</span>
+      <span data-fdn-id="n42" when="prop.hint" style="font-family:var(--font-mono);font-size:var(--font-size-meta);opacity:0.8">{{ prop.hint }}</span>
+    </button>
+  </fdn-component>
+  <fdn-component name="ArmLabels" hidden>
+    <div style="align-items:flex-start;display:flex;flex:none;height:64px;width:480px">
+      <span style="box-sizing:border-box;color:var(--color-meta-faint);flex:none;font-family:var(--font-mono);font-size:var(--font-size-2xs);letter-spacing:0.08em;padding-left:51px;padding-top:5px;white-space:nowrap;width:302px">approved ↓ continues</span>
+      <span style="color:var(--color-status-review);flex:none;font-family:var(--font-mono);font-size:var(--font-size-2xs);font-weight:var(--font-weight-semibold);letter-spacing:0.13em;padding-top:5px;white-space:nowrap;width:56px">DENIED ↺</span>
+      <span style="background-color:var(--color-border-input);flex:none;height:64px;margin-left:6px;width:1px"></span>
+    </div>
+  </fdn-component>
+  <fdn-component name="FlowCard" hidden>
+    <fdn-props>
+      <fdn-prop name="title" type="string" required="true"></fdn-prop>
+      <fdn-prop name="meta" type="string"></fdn-prop>
+      <fdn-prop name="state" type="enum" required="true" values="done,current,upcoming,definition,removed"></fdn-prop>
+      <fdn-prop name="glyph" type="enum" default="lines" values="lines,orchestrate,gate,ask,deploy"></fdn-prop>
+      <fdn-prop name="fit" type="enum" default="spine" values="spine,lane,wide"></fdn-prop>
+    </fdn-props>
+    <div data-fdn-style="flow-card" style="box-shadow:{{ cardshadow[prop.state] }};gap:{{ prop.state == 'current' ? '8px' : cardgap[prop.fit] }};opacity:{{ cardopacity[prop.state] }};padding-bottom:{{ cardpady[prop.state] }};padding-left:{{ prop.state == 'current' ? '14px' : cardpadx[prop.fit] }};padding-right:{{ prop.state == 'current' ? '14px' : cardpadx[prop.fit] }};padding-top:{{ cardpady[prop.state] }};width:{{ cardwidth[prop.fit] }}">
+      <fdn-use when="prop.state == 'done'" component="FlowGlyph" data-fdn-prop-name="done" data-fdn-prop-color="var(--color-status-running)"></fdn-use>
+      <span when="prop.state == 'current'" style="background-color:var(--color-status-running);border-radius:50%;flex:none;height:8px;width:8px"></span>
+      <span when="prop.state == 'upcoming'" style="border:1px solid var(--color-border-input);border-radius:50%;box-sizing:border-box;flex:none;height:12px;width:12px"></span>
+      <fdn-use when="prop.state == 'definition' || prop.state == 'removed'" component="FlowGlyph" data-fdn-prop-name="{{ prop.glyph }}" data-fdn-prop-color="{{ glyphcolor[prop.glyph] }}" data-fdn-prop-size="{{ glyphsize[prop.glyph] }}"></fdn-use>
+      <span data-fdn-style="card-title" style="white-space:{{ titlewrap[prop.state] }};color:{{ titlecolor[prop.state] }};font-weight:{{ titleweight[prop.state] }};text-decoration-line:{{ prop.state == 'removed' ? 'line-through' : 'none' }}">{{ prop.title }}</span>
+      <span when="prop.meta" data-fdn-style="card-meta" style="color:{{ prop.state == 'current' ? 'var(--color-status-running)' : 'var(--color-text-faint)' }};font-size:{{ metasize[prop.state] }}">{{ prop.meta }}</span>
+    </div>
+  </fdn-component>
+  <fdn-component name="FlowGlyph" hidden>
+    <fdn-props>
+      <fdn-prop name="name" type="enum" required="true" values="done,lines,orchestrate,gate,ask,deploy,plus,track,sidecar"></fdn-prop>
+      <fdn-prop name="size" type="number" default="14"></fdn-prop>
+      <fdn-prop name="color" type="token" default="var(--color-text-muted)"></fdn-prop>
+    </fdn-props>
+    <svg fill="none" height="{{ prop.size }}" viewBox="0 0 16 16" width="{{ prop.size }}" style="color:{{ prop.color }}">
+      <g when="prop.name == 'done'">
+        <circle cx="8" cy="8" r="6.3" stroke="currentColor" stroke-width="1.3"></circle>
+        <path d="M5.5 8.2l1.8 1.8 3.2-3.6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
+      </g>
+      <path when="prop.name == 'lines'" d="M2.5 4.2h11M2.5 8h11M2.5 11.8h6.5" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+      <g when="prop.name == 'orchestrate'">
+        <circle cx="8" cy="3.4" r="1.7" stroke="currentColor" stroke-width="1.3"></circle>
+        <circle cx="3.6" cy="12.6" r="1.7" stroke="currentColor" stroke-width="1.3"></circle>
+        <circle cx="12.4" cy="12.6" r="1.7" stroke="currentColor" stroke-width="1.3"></circle>
+        <path d="M8 5.1v1.6M8 6.7H3.6v4.2M8 6.7h4.4v4.2" stroke="currentColor" stroke-linejoin="round" stroke-width="1.3"></path>
+      </g>
+      <g when="prop.name == 'gate'">
+        <circle cx="8" cy="8" r="6.3" stroke="currentColor" stroke-width="1.3"></circle>
+        <path d="M5.5 8.2l1.8 1.8 3.2-3.6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
+      </g>
+      <path when="prop.name == 'ask'" d="M2.5 3.2h11v7.2H8l-3 2.8v-2.8H2.5z" stroke="currentColor" stroke-linejoin="round" stroke-width="1.3"></path>
+      <g when="prop.name == 'deploy'">
+        <path d="M8 10.2V2.8M5.2 5.4 8 2.6l2.8 2.8" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
+        <path d="M3 10.8V13h10v-2.2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
+      </g>
+      <path when="prop.name == 'plus'" d="M8 3.4v9.2M3.4 8h9.2" stroke="currentColor" stroke-linecap="round" stroke-width="1.4"></path>
+      <g when="prop.name == 'track'">
+        <circle cx="8" cy="3.1" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+        <circle cx="8" cy="8" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+        <circle cx="8" cy="12.9" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+        <path d="M8 4.7v1.7M8 9.6v1.7" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+      </g>
+      <path when="prop.name == 'sidecar'" d="M8 1.6l5.2 3v6L8 13.6l-5.2-3v-6z" stroke="currentColor" stroke-linejoin="round" stroke-width="1.3"></path>
+    </svg>
+  </fdn-component>
+  <fdn-component name="LiveFlow" hidden>
+    <div data-fdn-style="flow-canvas">
+      <div data-fdn-style="flow-viewport">
+      <div data-fdn-style="flow-graph">
+        <div style="align-items:center;gap:6px;color:var(--color-meta-faint);display:flex;font-family:var(--font-mono);font-size:var(--font-size-xs);margin-bottom:14px;width:480px">
+          <span style="border:1px solid var(--color-meta-faint);border-radius:50%;box-sizing:border-box;flex:none;height:6px;width:6px"></span>
+          <span>read-only while attached — edits fork the definition for the next run</span>
+        </div>
+        <fdn-use component="FlowCard" data-fdn-prop-title="Read the diff" data-fdn-prop-meta="done · 11:48" data-fdn-prop-state="done"></fdn-use>
+        <span data-fdn-style="spine-link"></span>
+        <fdn-use component="FlowCard" data-fdn-prop-title="Fan out reviewers" data-fdn-prop-meta="done · 11:48" data-fdn-prop-state="done"></fdn-use>
+        <span data-fdn-style="spine-link"></span>
+        <div data-fdn-style="branch">
+          <div data-fdn-style="branch-frame" style="height:129.5px">
+            <span data-fdn-style="junction"></span>
+          </div>
+          <div data-fdn-style="lanes" style="margin-bottom:42.5px;margin-top:-87.5px">
+            <div data-fdn-style="lane">
+              <div style="display:flex;flex-direction:column">
+                <fdn-use component="FlowCard" data-fdn-prop-title="Typecheck &amp; lint" data-fdn-prop-meta="done · 11:48" data-fdn-prop-state="done" data-fdn-prop-fit="lane"></fdn-use>
+              </div>
+            </div>
+            <div data-fdn-style="lane">
+              <div style="display:flex;flex-direction:column">
+                <fdn-use component="FlowCard" data-fdn-prop-title="Run the suite" data-fdn-prop-meta="current" data-fdn-prop-state="current" data-fdn-prop-fit="lane"></fdn-use>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span data-fdn-style="spine-link"></span>
+        <fdn-use component="FlowCard" data-fdn-prop-title="Verdict gate" data-fdn-prop-meta="upcoming · gate" data-fdn-prop-state="upcoming"></fdn-use>
+        <div style="display:flex;flex:none;flex-direction:column;width:480px">
+          <fdn-use component="ArmLabels"></fdn-use>
+          <div style="display:flex;justify-content:flex-end">
+            <div style="width:232px">
+              <fdn-use component="FlowCard" data-fdn-prop-title="Fix findings" data-fdn-prop-meta="upcoming" data-fdn-prop-state="upcoming" data-fdn-prop-fit="lane"></fdn-use>
+            </div>
+          </div>
+          <div data-fdn-style="arm-join">
+            <span data-fdn-style="junction" style="margin-left:-3px"></span>
+          </div>
+        </div>
+        <fdn-use component="FlowCard" data-fdn-prop-title="Publish preview" data-fdn-prop-meta="upcoming · nectar" data-fdn-prop-state="upcoming"></fdn-use>
+        <span data-fdn-style="spine-link"></span>
+        <fdn-use component="FlowCard" data-fdn-prop-title="Ship it?" data-fdn-prop-meta="upcoming · blocking ask" data-fdn-prop-state="upcoming"></fdn-use>
+        <div style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-xs);margin-top:18px;width:480px">up next · pr-triage · queued by bumble-7 · 11:58 — spec-round · queued by mite-3 · 11:58</div>
+      </div>
+      </div>
+    </div>
+  </fdn-component>
+  <fdn-component name="PixelBee" hidden>
+    <div style="flex:none;height:56px;width:44px">
+      <span style="box-shadow:var(--art-ink-deep) 12px 0 0 0, var(--art-ink-deep) 28px 0 0 0, var(--art-ink-deep) 16px 4px 0 0, var(--art-ink-deep) 24px 4px 0 0, var(--art-ink-deep) 12px 8px 0 0, var(--art-ink-deep) 16px 8px 0 0, var(--art-ink-deep) 20px 8px 0 0, var(--art-ink-deep) 24px 8px 0 0, var(--art-ink-deep) 28px 8px 0 0, var(--art-ink-deep) 8px 12px 0 0, var(--art-ink-deep) 12px 12px 0 0, var(--art-ink-deep) 16px 12px 0 0, var(--art-ink-deep) 20px 12px 0 0, var(--art-ink-deep) 24px 12px 0 0, var(--art-ink-deep) 28px 12px 0 0, var(--art-ink-deep) 32px 12px 0 0, var(--art-ink-deep) 8px 16px 0 0, var(--art-pale) 12px 16px 0 0, var(--art-ink-deep) 16px 16px 0 0, var(--art-ink-deep) 20px 16px 0 0, var(--art-ink-deep) 24px 16px 0 0, var(--art-pale) 28px 16px 0 0, var(--art-ink-deep) 32px 16px 0 0, var(--art-ink-deep) 8px 20px 0 0, var(--art-ink-deep) 12px 20px 0 0, var(--art-ink-deep) 16px 20px 0 0, var(--art-ink-deep) 20px 20px 0 0, var(--art-ink-deep) 24px 20px 0 0, var(--art-ink-deep) 28px 20px 0 0, var(--art-ink-deep) 32px 20px 0 0, var(--art-pale) 0 24px 0 0, var(--art-pale) 4px 24px 0 0, var(--art-honey) 12px 24px 0 0, var(--art-honey) 16px 24px 0 0, var(--art-honey) 20px 24px 0 0, var(--art-honey) 24px 24px 0 0, var(--art-honey) 28px 24px 0 0, var(--art-pale) 36px 24px 0 0, var(--art-pale) 40px 24px 0 0, var(--art-pale) 0 28px 0 0, var(--art-pale) 4px 28px 0 0, var(--art-pale) 8px 28px 0 0, var(--art-ink-deep) 12px 28px 0 0, var(--art-ink-deep) 16px 28px 0 0, var(--art-ink-deep) 20px 28px 0 0, var(--art-ink-deep) 24px 28px 0 0, var(--art-ink-deep) 28px 28px 0 0, var(--art-pale) 32px 28px 0 0, var(--art-pale) 36px 28px 0 0, var(--art-pale) 40px 28px 0 0, var(--art-pale) 0 32px 0 0, var(--art-pale) 4px 32px 0 0, var(--art-honey) 12px 32px 0 0, var(--art-honey) 16px 32px 0 0, var(--art-honey) 20px 32px 0 0, var(--art-honey) 24px 32px 0 0, var(--art-honey) 28px 32px 0 0, var(--art-pale) 36px 32px 0 0, var(--art-pale) 40px 32px 0 0, var(--art-ink-deep) 8px 36px 0 0, var(--art-ink-deep) 12px 36px 0 0, var(--art-ink-deep) 16px 36px 0 0, var(--art-ink-deep) 20px 36px 0 0, var(--art-ink-deep) 24px 36px 0 0, var(--art-ink-deep) 28px 36px 0 0, var(--art-ink-deep) 32px 36px 0 0, var(--art-honey) 12px 40px 0 0, var(--art-honey) 16px 40px 0 0, var(--art-honey) 20px 40px 0 0, var(--art-honey) 24px 40px 0 0, var(--art-honey) 28px 40px 0 0, var(--art-ink-deep) 12px 44px 0 0, var(--art-ink-deep) 16px 44px 0 0, var(--art-ink-deep) 20px 44px 0 0, var(--art-ink-deep) 24px 44px 0 0, var(--art-ink-deep) 28px 44px 0 0, var(--art-honey) 16px 48px 0 0, var(--art-honey) 20px 48px 0 0, var(--art-honey) 24px 48px 0 0, var(--art-ink-deep) 20px 52px 0 0;display:block;height:4px;width:4px"></span>
+    </div>
+  </fdn-component>
+  <fdn-component name="ProposalBar" hidden>
+    <div style="align-items:center;background-color:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-dock);box-sizing:border-box;gap:8px;display:flex;flex:none;padding:8px 10px;width:480px">
+      <span style="color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-sm);white-space:nowrap">2 changes</span>
+      <span style="color:var(--color-meta-faint);font-family:var(--font-mono);font-size:var(--font-size-sm);overflow:hidden;white-space:nowrap">+n5a · +n5b</span>
+      <span data-fdn-style="pill-btn-accent" style="gap:5px;font-size:var(--font-size-base);height:26px;margin-left:auto;padding-left:12px;padding-right:12px">
+        <span>Accept</span>
+        <span style="font-family:var(--font-mono);font-size:var(--font-size-2xs);opacity:0.8">⌘↵</span>
+      </span>
+      <span data-fdn-style="pill-btn" style="font-size:var(--font-size-base);height:26px;padding-left:12px;padding-right:12px">Refine</span>
+      <span style="align-items:center;border-radius:var(--radius-md);color:var(--color-text-muted);gap:5px;display:flex;flex:none;font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);height:26px;padding-left:12px;padding-right:12px">
+        <span>Discard</span>
+        <span style="font-family:var(--font-mono);font-size:var(--font-size-2xs);opacity:0.8">⌘⌫</span>
+      </span>
+    </div>
+  </fdn-component>
+  <fdn-component name="ProposedCard" hidden>
+    <fdn-props>
+      <fdn-prop name="type" type="string" required="true"></fdn-prop>
+      <fdn-prop name="glyph" type="enum" default="lines" values="lines,orchestrate,gate,ask,deploy"></fdn-prop>
+      <fdn-prop name="ref" type="string" required="true"></fdn-prop>
+      <fdn-prop name="title" type="string" required="true"></fdn-prop>
+      <fdn-prop name="field" type="string" required="true"></fdn-prop>
+      <fdn-prop name="value" type="string" required="true"></fdn-prop>
+      <fdn-prop name="fit" type="enum" default="wide" values="lane,wide"></fdn-prop>
+    </fdn-props>
+    <div style="background-color:var(--color-proposal-wash);border:1px dashed var(--color-status-merged);border-radius:var(--radius-lg);box-sizing:border-box;display:flex;flex-direction:column;padding-bottom:10px;padding-left:{{ prop.fit == 'lane' ? '13px' : '14px' }};padding-right:{{ prop.fit == 'lane' ? '13px' : '14px' }};padding-top:10px;row-gap:8px;width:{{ cardwidth[prop.fit] }}">
+      <div style="align-items:center;gap:8px;display:flex">
+        <fdn-use component="FlowGlyph" data-fdn-prop-name="{{ prop.glyph }}" data-fdn-prop-color="{{ glyphcolor[prop.glyph] }}" data-fdn-prop-size="{{ prop.glyph == 'deploy' ? '13' : '14' }}"></fdn-use>
+        <span style="color:{{ glyphcolor[prop.glyph] }};font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium)">{{ prop.type }}</span>
+        <span style="color:var(--color-status-merged);font-family:var(--font-mono);font-size:var(--font-size-meta);margin-left:auto;white-space:nowrap">{{ prop.ref }} · proposed</span>
+      </div>
+      <div style="color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-md);font-weight:var(--font-weight-semibold)">{{ prop.title }}</div>
+      <div style="display:flex;flex-direction:column">
+        <div style="color:var(--color-text-muted);font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);margin-bottom:4px">{{ prop.field }}</div>
+        <div style="background-color:var(--color-surface-alt);border-radius:var(--radius-md);color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-base);padding:7px 11px">{{ prop.value }}</div>
+      </div>
+    </div>
+  </fdn-component>
+  <fdn-component name="ProposalFlow" hidden>
+    <div data-fdn-style="flow-canvas">
+      <div data-fdn-style="flow-viewport">
+      <div data-fdn-style="flow-graph">
+        <fdn-use component="FlowCard" data-fdn-prop-title="Read the diff" data-fdn-prop-state="definition" data-fdn-prop-fit="wide"></fdn-use>
+        <span data-fdn-style="spine-link"></span>
+        <fdn-use component="FlowCard" data-fdn-prop-title="Fan out reviewers" data-fdn-prop-meta="orchestrate" data-fdn-prop-state="definition" data-fdn-prop-glyph="orchestrate" data-fdn-prop-fit="wide"></fdn-use>
+        <span data-fdn-style="spine-link"></span>
+        <div data-fdn-style="branch">
+          <div data-fdn-style="branch-frame" style="height:125px">
+            <span data-fdn-style="junction"></span>
+          </div>
+          <div data-fdn-style="lanes" style="margin-bottom:42px;margin-top:-83px">
+            <div data-fdn-style="lane">
+              <div style="display:flex;flex-direction:column">
+                <fdn-use component="FlowCard" data-fdn-prop-title="Typecheck &amp; lint" data-fdn-prop-state="definition" data-fdn-prop-fit="lane"></fdn-use>
+              </div>
+            </div>
+            <div data-fdn-style="lane">
+              <div style="display:flex;flex-direction:column">
+                <fdn-use component="FlowCard" data-fdn-prop-title="Run the suite" data-fdn-prop-state="definition" data-fdn-prop-fit="lane"></fdn-use>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span data-fdn-style="spine-link"></span>
+        <fdn-use component="FlowCard" data-fdn-prop-title="Verdict gate" data-fdn-prop-meta="gate" data-fdn-prop-state="definition" data-fdn-prop-glyph="gate" data-fdn-prop-fit="wide"></fdn-use>
+        <div style="display:flex;flex:none;flex-direction:column;width:480px">
+          <fdn-use component="ArmLabels"></fdn-use>
+          <div style="display:flex;justify-content:flex-end">
+            <div style="width:232px">
+              <fdn-use component="FlowCard" data-fdn-prop-title="Fix findings" data-fdn-prop-state="definition" data-fdn-prop-fit="lane"></fdn-use>
+            </div>
+          </div>
+          <div data-fdn-style="arm-join">
+            <span data-fdn-style="junction" style="margin-left:-3px"></span>
+          </div>
+        </div>
+        <fdn-use component="FlowCard" data-fdn-prop-title="Publish preview" data-fdn-prop-meta="nectar" data-fdn-prop-state="definition" data-fdn-prop-glyph="deploy" data-fdn-prop-fit="wide"></fdn-use>
+        <span data-fdn-style="spine-link"></span>
+        <fdn-use component="ProposedCard" data-fdn-prop-type="ACTION" data-fdn-prop-ref="n5a" data-fdn-prop-title="Smoke-test the preview" data-fdn-prop-field="INSTRUCTION" data-fdn-prop-value="open the preview and click through the changed screens"></fdn-use>
+        <span data-fdn-style="spine-link"></span>
+        <fdn-use component="ProposedCard" data-fdn-prop-type="ACTION" data-fdn-prop-ref="n5b" data-fdn-prop-title="Write release notes" data-fdn-prop-field="INSTRUCTION" data-fdn-prop-value="summarise what changed for the reviewer"></fdn-use>
+        <span data-fdn-style="spine-link"></span>
+        <fdn-use component="FlowCard" data-fdn-prop-title="Ship it?" data-fdn-prop-meta="blocking" data-fdn-prop-state="definition" data-fdn-prop-glyph="ask" data-fdn-prop-fit="wide"></fdn-use>
+        <div style="align-items:center;color:var(--color-mono-meta);gap:8px;display:flex;font-family:var(--font-mono);font-size:var(--font-size-xs);margin-top:19px;width:480px">
+          <span style="background-color:var(--color-status-merged);border-radius:50%;flex:none;height:6px;width:6px"></span>
+          <span>Smoke-test the preview before the ask; add release notes for the reviewer</span>
+        </div>
+      </div>
+      </div>
+      <div style="display:flex;flex:none;justify-content:center;padding-bottom:16px;padding-top:12px">
+        <fdn-use component="ProposalBar"></fdn-use>
+      </div>
+    </div>
+  </fdn-component>
+  <fdn-component name="RailRow" hidden>
+    <fdn-props>
+      <fdn-prop name="name" type="string" required="true"></fdn-prop>
+      <fdn-prop name="meta" type="string" required="true"></fdn-prop>
+      <fdn-prop name="selected" type="enum" default="no" values="yes,no"></fdn-prop>
+      <fdn-prop name="attached" type="enum" default="no" values="yes,no"></fdn-prop>
+    </fdn-props>
+    <button data-fdn-style="rail-row" style="background-color:{{ prop.selected == 'yes' ? 'var(--color-rail-selection)' : 'transparent' }}">
+      <span style="display:block;flex-shrink:0;height:14px;width:14px">
+        <fdn-use component="FlowGlyph" data-fdn-prop-name="track" data-fdn-prop-color="var(--color-chip-ink)"></fdn-use>
+      </span>
+      <span style="display:block;flex-grow:1;min-width:0">
+        <span style="color:var(--color-text-primary);display:block;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ prop.name }}</span>
+        <span data-fdn-style="meta-10" style="display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ prop.meta }}</span>
+      </span>
+      <fdn-use when="prop.attached == 'yes'" component="StatusDot" data-fdn-prop-state="running"></fdn-use>
+    </button>
+  </fdn-component>
+  <fdn-component name="SectionLabel" hidden>
+    <fdn-props>
+      <fdn-prop name="text" type="string" required="true"></fdn-prop>
+      <fdn-prop name="trailing" type="string"></fdn-prop>
+    </fdn-props>
+    <div data-fdn-id="n34" style="align-items:baseline;column-gap:8px;display:flex;margin-bottom:7px">
+      <span data-fdn-id="n35" data-fdn-style="section-label">{{ prop.text }}</span>
+      <span data-fdn-id="n36" when="prop.trailing" data-fdn-style="meta-mono" style="color:var(--color-text-disabled);margin-left:auto">{{ prop.trailing }}</span>
+    </div>
+  </fdn-component>
+  <fdn-component name="SegmentedView" hidden>
+    <fdn-props>
+      <fdn-prop name="code" type="enum" default="enabled" values="enabled,disabled"></fdn-prop>
+    </fdn-props>
+    <span style="align-items:center;background-color:var(--color-chip-bg);border-radius:var(--radius-md);gap:2px;display:flex;flex:none;padding:2px">
+      <button data-fdn-style="segment" style="background-color:var(--color-segment-on);box-shadow:var(--shadow-segment);color:var(--color-text-primary)">Flow</button>
+      <button data-fdn-style="segment" style="color:var(--color-text-muted);opacity:{{ prop.code == 'disabled' ? '0.45' : '1' }}">Code</button>
+    </span>
+  </fdn-component>
+  <fdn-component name="SidecarRail" hidden>
+    <fdn-props>
+      <fdn-prop name="pending" type="enum" default="none" values="pending,none"></fdn-prop>
+    </fdn-props>
+    <button style="align-items:center;border-bottom-width:0;border-left:1px solid var(--color-divider);border-right-width:0;border-top-width:0;box-sizing:border-box;color:var(--color-text-muted);display:flex;flex:none;flex-direction:column;padding-bottom:12px;padding-left:0;padding-right:0;padding-top:12px;width:36px">
+      <span style="display:flex;flex-direction:column;align-items:flex-end;height:15px;width:15px">
+        <fdn-use component="FlowGlyph" data-fdn-prop-name="sidecar" data-fdn-prop-size="15" data-fdn-prop-color="currentColor"></fdn-use>
+        <span when="prop.pending == 'pending'" style="background-color:var(--color-status-merged);border:1.5px solid var(--color-surface);border-radius:50%;box-sizing:border-box;flex:none;height:7px;margin-right:-4px;margin-top:-18px;width:7px"></span>
+      </span>
+      <span style="color:var(--color-meta-faint);font-family:var(--font-mono);font-size:var(--font-size-2xs);margin-top:10px;writing-mode:vertical-rl">⌘⌃B</span>
+    </button>
+  </fdn-component>
+  <fdn-component name="StatusDot" hidden>
+    <fdn-props>
+      <fdn-prop name="state" type="enum" required="true" values="blocked,done,merged,review,running,waiting"></fdn-prop>
+      <fdn-prop name="size" type="string" default="7px"></fdn-prop>
+    </fdn-props>
+    <span data-fdn-id="n25" style="background:{{ statuscolor[prop.state] }};border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex-shrink:0;height:{{ prop.size }};width:{{ prop.size }}"></span>
+  </fdn-component>

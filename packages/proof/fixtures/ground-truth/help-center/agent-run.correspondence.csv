@@ -1,0 +1,155 @@
+design_path,design_fdn_id,design_desc,code_path,code_desc,confidence,note
+0/0,n45,div n45,0/0,div,sure,card
+0/0/0/0,n46::n16,div n16,0/0/0,div,sure,guide sidebar
+0/0/0/0/0,n46::n17,div n17,0/0/0/0,div,sure,
+0/0/0/0/0/0,n46::n18,"text ""Help""",0/0/0/0/0,"text ""Help""",sure,
+0/0/0/0/0/1/0/0,n46::n20::n1,"text ""esc""",0/0/0/0/1,"text ""esc""",sure,
+0/0/0/0/1/0,n46::n21::n9,div n9,0/0/0/1,"text ""GUIDE""",sure,
+0/0/0/0/1/0/0,n46::n21::n10,"text ""GUIDE""",0/0/0/1,"text ""GUIDE""",sure,label text sits in the block itself in code
+0/0/0/0/2/0,n46::n22#0::n22::n12,span n12,0/0/0/2,"text ""Getting started""",sure,
+0/0/0/0/2/0/0,n46::n22#0::n22::n13,"text ""Getting started""",0/0/0/2,"text ""Getting started""",sure,
+0/0/0/0/3/0,n46::n22#1::n22::n12,span n12,0/0/0/3,"text ""Bees & the fleet""",sure,
+0/0/0/0/3/0/0,n46::n22#1::n22::n13,"text ""Bees & the fleet""",0/0/0/3,"text ""Bees & the fleet""",sure,
+0/0/0/0/4/0,n46::n22#2::n22::n12,span n12,0/0/0/4,"text ""Yards & products""",sure,
+0/0/0/0/4/0/0,n46::n22#2::n22::n13,"text ""Yards & quests""",0/0/0/4,"text ""Yards & products""",sure,
+0/0/0/0/5/0,n46::n22#3::n22::n12,span n12,0/0/0/5,"text ""Reviewing changes""",sure,
+0/0/0/0/5/0/0,n46::n22#3::n22::n13,"text ""Reviewing changes""",0/0/0/5,"text ""Reviewing changes""",sure,
+0/0/0/0/6/0,n46::n22#4::n22::n12,span n12,none,,sure,"""Loops"" topic absent in code"
+0/0/0/0/6/0/0,n46::n22#4::n22::n13,"text ""Loops""",none,,sure,"""Loops"" topic absent in code"
+0/0/0/0/7/0,n46::n23::n9,div n9,0/0/0/6,"text ""REFERENCE""",sure,
+0/0/0/0/7/0/0,n46::n23::n10,"text ""REFERENCE""",0/0/0/6,"text ""REFERENCE""",sure,label text sits in the block itself in code
+0/0/0/0/8/0,n46::n24#0::n24::n12,span n12,0/0/0/7,"text ""Keyboard shortcuts""",sure,
+0/0/0/0/8/0/0,n46::n24#0::n24::n13,"text ""Keyboard shortcuts""",0/0/0/7,"text ""Keyboard shortcuts""",sure,
+0/0/0/0/9/0,n46::n24#1::n24::n12,span n12,0/0/0/8,"text ""Command palette""",sure,
+0/0/0/0/9/0/0,n46::n24#1::n24::n13,"text ""Command palette""",0/0/0/8,"text ""Command palette""",sure,
+0/0/0/0/10/0,n46::n24#2::n24::n12,span n12,0/0/0/9,"text ""Message delivery""",sure,
+0/0/0/0/10/0/0,n46::n24#2::n24::n13,"text ""Message delivery""",0/0/0/9,"text ""Message delivery""",sure,
+0/0/0/0/12/0,n46::n26::n12,span n12,none,,sure,"""What's new"" topic absent in code"
+0/0/0/0/12/0/0,n46::n26::n13,"text ""What's new""",none,,sure,"""What's new"" topic absent in code"
+0/0/0/0/12/0/1,n46::n26::n14,"text ""0.4.2""",none,,sure,What's new row absent in code
+0/0/0/0/13/0,n46::n27::n12,span n12,none,,sure,"""About Apiary"" topic absent in code"
+0/0/0/0/13/0/0,n46::n27::n13,"text ""About Apiary""",none,,sure,"""About Apiary"" topic absent in code"
+0/0/1,n47,div n47,0/0/1,div,sure,
+0/0/1/0,n48,div n48,0/0/1/0,div,sure,
+0/0/1/0/0,n49,div n49,0/0/1/0/0,div,sure,
+0/0/1/0/0/0,n50,"text ""Search shortcuts — command, key, or surface…""",0/0/1/0/0/0,input,sure,input placeholder
+0/0/1/0/0/1,n51,span n51,0/0/1/0/0/0,input,unsure,painted caret vs the native input caret (not visible in the code capture)
+0/0/1/0/1,n52,"text ""86 bindings · 10 surfaces""",0/0/1/0/1,"text ""183 shortcuts · 14 surfaces""",sure,
+0/0/1/1,n53,div n53,0/0/1/1,div,sure,
+0/0/1/1/0,n54,div n54,0/0/1/1/0,div,sure,catalog column
+0/0/1/1/0/0,n55,div n55,0/0/1/1/0/7,div,sure,agent-run section
+0/0/1/1/0/0/0/0,n56::n9,div n9,0/0/1/1/0/7/0,div,sure,
+0/0/1/1/0/0/0/0/0,n56::n10,"text ""THIS PANE · AGENT RUN""",0/0/1/1/0/7/0/0,"text ""Agent run""",sure,"""THIS PANE · AGENT RUN"" vs ""AGENT RUN"" + ""THIS PANE"" tag"
+0/0/1/1/0/0/0/0/1,n56::n11,"text ""· opened from drone-07""",none,,sure,"""· opened from drone-07"" absent"
+0/0/1/1/0/0/1,n57,div n57,none,,sure,code draws no bordered card around the section
+0/0/1/1/0/0/1/0/0,n58#0::n58::n2,div n2,0/0/1/1/0/7/3/0,div,sure,
+0/0/1/1/0/0/1/0/0/0,n58#0::n58::n3,"text ""Reply""",0/0/1/1/0/7/3/0/0/0,"text ""Reply""",sure,
+0/0/1/1/0/0/1/0/0/1,n58#0::n58::n4,"text ""queued · delivered when the turn ends""",0/0/1/1/0/7/3/0/0/1,"text ""running bee: queued, delivered at turn end""",sure,
+0/0/1/1/0/0/1/0/0/2,n58#0::n58::n5,span n5,0/0/1/1/0/7/3/0/1,span,sure,
+0/0/1/1/0/0/1/0/0/2/0/0/0,n58#0::n58::n7#0::n8::n1,"text ""↵""",0/0/1/1/0/7/3/0/1/0/0,"text ""↵""",sure,
+0/0/1/1/0/0/1/1/0,n58#1::n58::n2,div n2,0/0/1/1/0/7/6/0,div,sure,
+0/0/1/1/0/0/1/1/0/0,n58#1::n58::n3,"text ""Interrupt & send now""",0/0/1/1/0/7/6/0/0/0,"text ""Interrupt & send now""",sure,
+0/0/1/1/0/0/1/1/0/1,n58#1::n58::n5,span n5,0/0/1/1/0/7/6/0/1,span,sure,
+0/0/1/1/0/0/1/1/0/1/0/0/0,n58#1::n58::n7#0::n8::n1,"text ""⌘↵""",0/0/1/1/0/7/6/0/1/0/0,"text ""⌘↵""",sure,
+0/0/1/1/0/0/1/2/0,n58#2::n58::n2,div n2,none,,unsure,"code splits it into separate ""Sidecar · …"" commands further down the section"
+0/0/1/1/0/0/1/2/0/0,n58#2::n58::n3,"text ""Surface a card""",none,,unsure,"code splits it into separate ""Sidecar · …"" commands further down the section"
+0/0/1/1/0/0/1/2/0/1,n58#2::n58::n4,"text ""changes · browser · terminal · swarm""",none,,unsure,"code splits it into separate ""Sidecar · …"" commands further down the section"
+0/0/1/1/0/0/1/2/0/2,n58#2::n58::n5,span n5,none,,unsure,"code splits it into separate ""Sidecar · …"" commands further down the section"
+0/0/1/1/0/0/1/2/0/2/0/0/0,n58#2::n58::n7#0::n8::n1,"text ""⌥D""",none,,unsure,"code splits it into separate ""Sidecar · …"" commands further down the section"
+0/0/1/1/0/0/1/2/0/2/1/0/0,n58#2::n58::n7#1::n8::n1,"text ""⌥B""",none,,unsure,"code splits it into separate ""Sidecar · …"" commands further down the section"
+0/0/1/1/0/0/1/2/0/2/2/0/0,n58#2::n58::n7#2::n8::n1,"text ""⌥T""",none,,unsure,"code splits it into separate ""Sidecar · …"" commands further down the section"
+0/0/1/1/0/0/1/2/0/2/3/0/0,n58#2::n58::n7#3::n8::n1,"text ""⌥S""",none,,unsure,"code splits it into separate ""Sidecar · …"" commands further down the section"
+0/0/1/1/0/0/1/3/0,n58#3::n58::n2,div n2,none,,sure,no Archive agent row in the code catalog
+0/0/1/1/0/0/1/3/0/0,n58#3::n58::n3,"text ""Archive agent""",none,,sure,no Archive agent row in the code catalog
+0/0/1/1/0/0/1/3/0/1,n58#3::n58::n5,span n5,none,,sure,no Archive agent row in the code catalog
+0/0/1/1/0/0/1/3/0/1/0/0/0,n58#3::n58::n7#0::n8::n1,"text ""e""",none,,sure,no Archive agent row in the code catalog
+0/0/1/1/0/0/1/3/0/1/1/0/0,n58#3::n58::n7#1::n8::n1,"text ""⌘⇧E""",none,,sure,no Archive agent row in the code catalog
+0/0/1/1/0/0/1/4/0,n58#4::n58::n2,div n2,0/0/1/1/0/7/26/0,div,unsure,agent-run row below the visible area in code
+0/0/1/1/0/0/1/4/0/0,n58#4::n58::n3,"text ""Toggle important""",0/0/1/1/0/7/26/0/0/0,"text ""Toggle important""",unsure,agent-run row below the visible area in code
+0/0/1/1/0/0/1/4/0/1,n58#4::n58::n4,"text ""feeds needs-me + jump""",0/0/1/1/0/7/26/0/0/1,"text ""feeds needs-me + jumps""",unsure,agent-run row below the visible area in code; 
+0/0/1/1/0/0/1/4/0/2,n58#4::n58::n5,span n5,0/0/1/1/0/7/26/0/1,button,unsure,agent-run row below the visible area in code
+0/0/1/1/0/0/1/4/0/2/0/0/0,n58#4::n58::n7#0::n8::n1,"text ""⌘⌥J""",0/0/1/1/0/7/26/0/1/0/0,"text ""⌘⌥J""",unsure,agent-run row below the visible area in code
+0/0/1/1/0/0/1/5/0,n58#5::n58::n2,div n2,0/0/1/1/0/7/27/0,div,unsure,agent-run row below the visible area in code
+0/0/1/1/0/0/1/5/0/0,n58#5::n58::n3,"text ""Copy bee id""",0/0/1/1/0/7/27/0/0/0,"text ""Copy bee id""",unsure,agent-run row below the visible area in code
+0/0/1/1/0/0/1/5/0/1,n58#5::n58::n5,span n5,0/0/1/1/0/7/27/0/1,button,unsure,agent-run row below the visible area in code
+0/0/1/1/0/0/1/5/0/1/0/0/0,n58#5::n58::n7#0::n8::n1,"text ""⌘⇧C""",0/0/1/1/0/7/27/0/1/0/0,"text ""⌘⇧C""",unsure,agent-run row below the visible area in code
+0/0/1/1/0/0/1/6/0,n58#6::n58::n2,div n2,0/0/1/1/0/7/28/0,div,unsure,below the visible area; reworded
+0/0/1/1/0/0/1/6/0/0,n58#6::n58::n3,"text ""Ask agent to self-seal""",0/0/1/1/0/7/28/0/0/0,"text ""Ask the bee to self-seal""",unsure,below the visible area; reworded
+0/0/1/1/0/0/1/6/0/1,n58#6::n58::n5,span n5,0/0/1/1/0/7/28/0/1,button,unsure,below the visible area; reworded
+0/0/1/1/0/0/1/6/0/1/0/0/0,n58#6::n58::n7#0::n8::n1,"text ""⌘⌥⇧L""",0/0/1/1/0/7/28/0/1/0/0,"text ""⌘⌥⇧E""",unsure,below the visible area; reworded
+0/0/1/1/0/0/1/7/0,n58#7::n58::n2,div n2,0/0/1/1/0/1/10/0,div,unsure,"lives in another section, scrolled above the visible area"
+0/0/1/1/0/0/1/7/0/0,n58#7::n58::n3,"text ""Back to previous view""",0/0/1/1/0/1/10/0/0/0,"text ""Back to previous view""",unsure,"lives in another section, scrolled above the visible area"
+0/0/1/1/0/0/1/7/0/1,n58#7::n58::n5,span n5,0/0/1/1/0/1/10/0/1,button,unsure,"lives in another section, scrolled above the visible area"
+0/0/1/1/0/0/1/7/0/1/0/0/0,n58#7::n58::n7#0::n8::n1,"text ""⌘←""",0/0/1/1/0/1/10/0/1/0/0,"text ""⌘←""",unsure,"lives in another section, scrolled above the visible area"
+0/0/1/1/0/1/0,n59::n9,div n9,0/0/1/1/0/0/0,div,unsure,"Global section header, scrolled above the visible area"
+0/0/1/1/0/1/0/0,n59::n10,"text ""GLOBAL""",0/0/1/1/0/0/0,div,unsure,"Global section header, scrolled above the visible area"
+0/0/1/1/0/2/0,n60#0::n60::n2,div n2,0/0/1/1/0/0/1/0,div,unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/2/0/0,n60#0::n60::n3,"text ""Command palette""",0/0/1/1/0/0/1/0/0/0,"text ""Command palette""",unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/2/0/1,n60#0::n60::n5,span n5,0/0/1/1/0/0/1/0/1,button,unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/2/0/1/0/0/0,n60#0::n60::n7#0::n8::n1,"text ""⌘K""",0/0/1/1/0/0/1/0/1/0/0,"text ""⌘K""",unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/3/0,n60#1::n60::n2,div n2,0/0/1/1/0/0/2/0,div,unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/3/0/0,n60#1::n60::n3,"text ""New agent — quick compose""",0/0/1/1/0/0/2/0/0/0,"text ""New agent — quick compose""",unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/3/0/1,n60#1::n60::n4,"text ""from any view · layout untouched""",0/0/1/1/0/0/2/0/0/1,"text ""from any view · layout untouched""",unsure,Global section is scrolled above the visible area in code; 
+0/0/1/1/0/3/0/2,n60#1::n60::n5,span n5,0/0/1/1/0/0/2/0/1,button,unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/3/0/2/0/0/0,n60#1::n60::n7#0::n8::n1,"text ""⌘⇧N""",0/0/1/1/0/0/2/0/1/0/0,"text ""⌘⇧N""",unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/4/0,n60#2::n60::n2,div n2,none,,unsure,no row with this label in the code catalog
+0/0/1/1/0/4/0/0,n60#2::n60::n3,"text ""Jump to pane — picker""",none,,unsure,no row with this label in the code catalog
+0/0/1/1/0/4/0/1,n60#2::n60::n5,span n5,none,,unsure,no row with this label in the code catalog
+0/0/1/1/0/4/0/1/0/0/0,n60#2::n60::n7#0::n8::n1,"text ""⌘S""",none,,unsure,no row with this label in the code catalog
+0/0/1/1/0/5/0,n60#3::n60::n2,div n2,none,,unsure,no row with this label in the code catalog
+0/0/1/1/0/5/0/0,n60#3::n60::n3,"text ""Jump to most important""",none,,unsure,no row with this label in the code catalog
+0/0/1/1/0/5/0/1,n60#3::n60::n5,span n5,none,,unsure,no row with this label in the code catalog
+0/0/1/1/0/5/0/1/0/0/0,n60#3::n60::n7#0::n8::n1,"text ""⌘⇧S""",none,,unsure,no row with this label in the code catalog
+0/0/1/1/0/5/0/1/1/0/0,n60#3::n60::n7#1::n8::n1,"text ""⌘J""",none,,unsure,no row with this label in the code catalog
+0/0/1/1/0/6/0,n60#4::n60::n2,div n2,none,,unsure,no row with this label in the code catalog
+0/0/1/1/0/6/0/0,n60#4::n60::n3,"text ""Needs me — triage""",none,,unsure,no row with this label in the code catalog
+0/0/1/1/0/6/0/1,n60#4::n60::n5,span n5,none,,unsure,no row with this label in the code catalog
+0/0/1/1/0/6/0/1/0/0/0,n60#4::n60::n7#0::n8::n1,"text ""g j""",none,,unsure,no row with this label in the code catalog
+0/0/1/1/0/7/0,n60#5::n60::n2,div n2,0/0/1/1/0/0/22/0,div,unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/7/0/0,n60#5::n60::n3,"text ""Search everything""",0/0/1/1/0/0/22/0/0/0,"text ""Search everything""",unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/7/0/1,n60#5::n60::n5,span n5,0/0/1/1/0/0/22/0/1,button,unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/7/0/1/0/0/0,n60#5::n60::n7#0::n8::n1,"text ""/""",0/0/1/1/0/0/22/0/1/0/0,"text ""/""",unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/8/0,n60#6::n60::n2,div n2,0/0/1/1/0/0/23/0,div,unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/8/0/0,n60#6::n60::n3,"text ""Toggle sidebar""",0/0/1/1/0/0/23/0/0/0,"text ""Toggle sidebar""",unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/8/0/1,n60#6::n60::n5,span n5,0/0/1/1/0/0/23/0/1,button,unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/8/0/1/0/0/0,n60#6::n60::n7#0::n8::n1,"text ""⌘B""",0/0/1/1/0/0/23/0/1/0/0,"text ""⌘B""",unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/9/0,n60#7::n60::n2,div n2,0/0/1/1/0/0/25/0,div,unsure,"code has separate Switch workspace / Switch yard rows, scrolled above"
+0/0/1/1/0/9/0/0,n60#7::n60::n3,"text ""Switch workspace · switch yard""",0/0/1/1/0/0/25/0/0/0,"text ""Switch workspace""",unsure,"code has separate Switch workspace / Switch yard rows, scrolled above"
+0/0/1/1/0/9/0/1,n60#7::n60::n5,span n5,0/0/1/1/0/0/25/0/1,button,unsure,"code has separate Switch workspace / Switch yard rows, scrolled above"
+0/0/1/1/0/9/0/1/0/0/0,n60#7::n60::n7#0::n8::n1,"text ""o w""",0/0/1/1/0/0/25/0/1/0/0,"text ""o""",unsure,"code has separate Switch workspace / Switch yard rows, scrolled above"
+0/0/1/1/0/9/0/1/1/0/0,n60#7::n60::n7#1::n8::n1,"text ""o y""",0/0/1/1/0/0/25/0/1/0/1,"text ""w""",unsure,"code has separate Switch workspace / Switch yard rows, scrolled above"
+0/0/1/1/0/10/0,n60#8::n60::n2,div n2,0/0/1/1/0/0/31/0,div,unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/10/0/0,n60#8::n60::n3,"text ""New window tab""",0/0/1/1/0/0/31/0/0/0,"text ""New window tab""",unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/10/0/1,n60#8::n60::n5,span n5,0/0/1/1/0/0/31/0/1,button,unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/10/0/1/0/0/0,n60#8::n60::n7#0::n8::n1,"text ""⌘T""",0/0/1/1/0/0/31/0/1/0/0,"text ""⌘⌃T""",unsure,Global section is scrolled above the visible area in code
+0/0/1/1/0/11/0,n60#9::n60::n2,div n2,none,,unsure,no combined row in the code catalog
+0/0/1/1/0/11/0/0,n60#9::n60::n3,"text ""Next · previous window tab""",none,,unsure,no combined row in the code catalog
+0/0/1/1/0/11/0/1,n60#9::n60::n5,span n5,none,,unsure,no combined row in the code catalog
+0/0/1/1/0/11/0/1/0/0/0,n60#9::n60::n7#0::n8::n1,"text ""⌃⇥""",none,,unsure,no combined row in the code catalog
+0/0/1/1/0/11/0/1/1/0/0,n60#9::n60::n7#1::n8::n1,"text ""⌃⇧⇥""",none,,unsure,no combined row in the code catalog
+0/0/1/1/0/12/0,n60#10::n60::n2,div n2,none,,unsure,no row with this label in the code catalog
+0/0/1/1/0/12/0/0,n60#10::n60::n3,"text ""Keyboard shortcuts — this panel""",none,,unsure,no row with this label in the code catalog
+0/0/1/1/0/12/0/1,n60#10::n60::n5,span n5,none,,unsure,no row with this label in the code catalog
+0/0/1/1/0/12/0/1/0/0/0,n60#10::n60::n7#0::n8::n1,"text ""?""",none,,unsure,no row with this label in the code catalog
+0/0/1/1/1,n65,div n65,0/0/1/1/1,div,sure,anchor rail
+0/0/1/1/1/0/0,n66::n15,"text ""This pane""",none,,sure,"code has no ""This pane"" anchor; Agent run is highlighted in its catalog slot"
+0/0/1/1/1/1/0,n67::n15,"text ""Global""",0/0/1/1/1/0,"text ""Global""",sure,
+0/0/1/1/1/2/0,n68::n15,"text ""Panes & tabs""",0/0/1/1/1/1,"text ""Panes & tabs""",sure,
+0/0/1/1/1/3/0,n69::n15,"text ""Lists""",0/0/1/1/1/6,"text ""Lists""",sure,
+0/0/1/1/1/4/0,n70::n15,"text ""Composer""",0/0/1/1/1/10,"text ""Composer""",sure,
+0/0/1/1/1/5/0,n71::n15,"text ""Fleet""",0/0/1/1/1/8,"text ""Fleet""",sure,
+0/0/1/1/1/6/0,n72::n15,"text ""Changes""",none,,sure,no Changes anchor in code
+0/0/1/1/1/7/0,n73::n15,"text ""Editor""",0/0/1/1/1/12,"text ""Files & editor""",unsure,"""Files & editor"" in code"
+0/0/1/1/1/8/0,n74::n15,"text ""Search""",0/0/1/1/1/13,"text ""Search""",sure,
+0/0/1/1/1/9/0,n75::n15,"text ""Sidebar & pickers""",none,,sure,no such anchor in code
+0/0/1/2,n76,div n76,0/0/1/2,div,sure,footer
+0/0/1/2/0,n77,"text ""type to search""",none,,sure,"footer hint absent in code (only ""click keys to rebind"" remains)"
+0/0/1/2/1,n78,"text ""·""",none,,sure,"footer hint absent in code (only ""click keys to rebind"" remains)"
+0/0/1/2/2,n79,"text ""↑↓ move""",none,,sure,"footer hint absent in code (only ""click keys to rebind"" remains)"
+0/0/1/2/3,n80,"text ""·""",none,,sure,"footer hint absent in code (only ""click keys to rebind"" remains)"
+0/0/1/2/4,n81,"text ""↵ run command""",none,,sure,"footer hint absent in code (only ""click keys to rebind"" remains)"
+0/0/1/2/5,n82,"text ""·""",none,,sure,"footer hint absent in code (only ""click keys to rebind"" remains)"
+0/0/1/2/6,n83,"text ""click keys to rebind""",0/0/1/2/0,"text ""click keys to rebind""",sure,
+0/0/1/2/7,n84,"text ""·""",none,,sure,"footer hint absent in code (only ""click keys to rebind"" remains)"
+0/0/1/2/8,n85,"text ""esc close""",none,,sure,"footer hint absent in code (only ""click keys to rebind"" remains)"
+0/0/1/2/9,n86,"text ""live from the command registry""",0/0/1/2/1,"text ""live from the command registry""",sure,

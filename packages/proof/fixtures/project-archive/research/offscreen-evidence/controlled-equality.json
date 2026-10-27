@@ -1,0 +1,20 @@
+{
+  "byteEqual": true,
+  "rows": 14,
+  "fields": [
+    "scenario",
+    "expected",
+    "found",
+    "tp",
+    "fp",
+    "fn",
+    "precision",
+    "recall",
+    "pixelRatio"
+  ],
+  "excluded": [
+    "ms",
+    "new offscreen detector fields"
+  ],
+  "sha256": "81ead169695e97fe21ca45622b03ea0e2878f55a407a2e2e55f3780742930854"
+}

@@ -1,0 +1,16 @@
+id,design_layer,code_layer,kind,description,severity,likely_intentional,note,properties
+E-01,0/0,0/0/0,layout,"Empty state is a single full-width pane (title bar, centred message, footer) in design; code keeps the 232px track rail and the 36px sidecar rail, so the message is centred in the middle column only",high,yes,code always mounts TracksRail and TracksSidecarRail,layout;subtree
+E-02,0/0/0,0/0/0/0/0,layout,"Title bar ""Tracks"" (15px semibold) + ""none defined"" + more menu is replaced by the rail header ""TRACKS"" (10px spaced caps) + ""0"" + a + button",medium,yes,,text;font-size;letter-spacing;color;layout
+E-03,0/0/1/0/0,0/0/0/1/0/0,style,"Illustration is a 60×40 sideways flying bee (5px pixels, honey/brown with pale wings) in design; code draws a 44×56 upright bee with antennae (4px pixels, dark body with honey stripes)",medium,unsure,both are called PixelBee; the sprite grid differs,icon;size
+E-04,0/0/1/1,0/0/0/1/0/1,text,"Heading reads ""No tracks yet"" in design, ""Write down how you’d want it done."" in code",medium,yes,,text
+E-05,0/0/1/2,0/0/0/1/0/2,text,"Explanation copy differs: design ""A track is an expected sequence of steps you clip onto one agent. Attaching it injects a standing prompt…"" (4 lines, 420px); code ""A track is a short list of steps an agent follows and checks off as it works."" (2 lines, 380px)",medium,yes,,text;width
+E-06,0/0/1/2,0/0/0/1/0/2,token,"Explanation copy colour is text-muted #8A877F in design, darker #6F6B63 (chipInk) in code",low,unsure,,color
+E-07,0/0/1/3/0/0,0/0/0/1/0/3,text,"Primary button reads ""Define a track"" with shortcut ""n"" in design, ""New track"" with shortcut ""c"" in code",medium,unsure,shortcut letter differs too,text
+E-08,0/0/1/3/0/0,0/0/0/1/0/3,style,"Primary button label is 12px medium white in design, 12.5px semibold cream #FFFDF8 in code; shortcut hint 9.5px at 62% white vs 10px at 80%",low,unsure,,font-size;font-weight;color;opacity
+E-09,0/0/1/4,none,missing,"Secondary hint ""or ask a sidecar agent to draft one — it arrives as a proposal you accept, refine, or discard"" is missing",medium,unsure,,subtree
+E-10,0/0/2,none,missing,"Footer (""n define"" · ""hive track define · schema v2"") is missing",low,unsure,,subtree
+E-11,0/0,0/0/0/1,style,"Pane is a white card (8px radius, shadow) in design; code main column has no surface and shows the warm app background #F5F4F1 (rail stays white)",medium,yes,,background-color;border-radius;box-shadow
+E-12,none,0/0/0/2,extra,Code adds the 36px AI sidecar rail (hex icon + ⌘⌃B) on the right,medium,yes,,subtree
+E-13,0/0/1/1;0/0/1/2;0/0/1/3,0/0/0/1/0/1;0/0/0/1/0/2;0/0/0/1/0/3,layout,Vertical rhythm differs: heading-to-copy gap 16px in design vs 5px in code; illustration-to-heading 20px vs 18px; block sits 39px lower in code,low,unsure,,margin
+E-14,*,*,token,"UI text is authored in the system font stack (-apple-system / Helvetica Neue, SF Mono) in design and in Hanken Grotesk / IBM Plex Mono in code",medium,yes,"authored stacks differ, independent of the Linux substitution",font-family
+E-15,*,none,environment,Design text renders in Linux substitutes (Liberation/DejaVu) for the Mac system fonts; 500/600 weights snap to 400/700. Not a product defect,low,no,capture environment only,font-family;font-weight(rendered)

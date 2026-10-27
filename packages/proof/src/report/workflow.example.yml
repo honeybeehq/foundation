@@ -1,0 +1,110 @@
+name: Foundation design proof (prototype)
+on:
+  push:
+    branches: [proto/design-to-code-tracks]
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Advisory warns; required fails on drift or incomplete coverage
+        type: choice
+        options: [advisory, required]
+        default: advisory
+permissions:
+  contents: read
+jobs:
+  proof:
+    if: github.ref == 'refs/heads/proto/design-to-code-tracks'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      # Reviewed base revision. Protect workflow edits before adopting a required PR check.
+      POLICY_REF: 5cb1e7e5aeb4e92af7c0595b5408558e82bb774b
+      MODE: ${{ inputs.mode || 'advisory' }}
+      ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
+    steps:
+      - name: Record start
+        run: echo "STARTED=$(date +%s)" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+        with:
+          # Exact candidate commit; never the moving branch tip.
+          ref: ${{ github.sha }}
+          path: app
+          fetch-depth: 0
+      - name: Load trusted base policy and tool
+        working-directory: app
+        run: |
+          mkdir -p "$RUNNER_TEMP/fdn-trusted" "$RUNNER_TEMP/fdn-tool"
+          git show "$POLICY_REF:.foundation/proof-policy.json" > "$RUNNER_TEMP/fdn-trusted/policy.json"
+          TOOL_FILE=$(node -p "require(process.env.RUNNER_TEMP + '/fdn-trusted/policy.json').tool.file")
+          TOOL_SHA=$(node -p "require(process.env.RUNNER_TEMP + '/fdn-trusted/policy.json').tool.sha256")
+          git show "$POLICY_REF:$TOOL_FILE" > "$RUNNER_TEMP/fdn-trusted/tool.tgz"
+          echo "$TOOL_SHA  $RUNNER_TEMP/fdn-trusted/tool.tgz" | sha256sum -c -
+          echo "TOOL_SHA=$TOOL_SHA" >> "$GITHUB_ENV"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Restore dependencies and pinned browser
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            app/node_modules
+            app/apps/*/node_modules
+            app/packages/*/node_modules
+            app/packages/plugins/*/node_modules
+            app/services/*/node_modules
+            .cache/ms-playwright
+          key: fdn-linux-24-${{ hashFiles('app/pnpm-lock.yaml') }}-${{ env.TOOL_SHA }}
+      - name: Install frozen app and versioned proof CLI
+        run: |
+          INSTALL_START=$(date +%s)
+          pnpm --dir app install --frozen-lockfile --ignore-scripts
+          npm install --prefix "$RUNNER_TEMP/fdn-tool" "$RUNNER_TEMP/fdn-trusted/tool.tgz" --ignore-scripts --no-audit --no-fund
+          CLI_SHA=$(node -p "require(process.env.RUNNER_TEMP + '/fdn-trusted/policy.json').tool.cliSha256")
+          echo "$CLI_SHA  $RUNNER_TEMP/fdn-tool/node_modules/foundation-proof/cli.mjs" | sha256sum -c -
+          "$RUNNER_TEMP/fdn-tool/node_modules/.bin/playwright" install --with-deps chromium
+          echo "INSTALL_SECONDS=$(( $(date +%s) - INSTALL_START ))" >> "$GITHUB_ENV"
+      - name: Capture real Classic Tracks with pinned browser and fonts
+        run: |
+          CAPTURE_START=$(date +%s)
+          node "$RUNNER_TEMP/fdn-tool/node_modules/foundation-proof/cli.mjs" capture-code --code app --baseline app/.foundation/baseline --out "$RUNNER_TEMP/captures" --tool-hash "$TOOL_SHA"
+          echo "CAPTURE_SECONDS=$(( $(date +%s) - CAPTURE_START ))" >> "$GITHUB_ENV"
+      - name: Compare and verify using base policy
+        id: check
+        continue-on-error: true
+        env:
+          GITHUB_STEP_SUMMARY: /dev/null
+        run: |
+          node "$RUNNER_TEMP/fdn-tool/node_modules/foundation-proof/cli.mjs" check --code app --baseline app/.foundation/baseline --captures "$RUNNER_TEMP/captures" --out "$RUNNER_TEMP/proof" --policy "$RUNNER_TEMP/fdn-trusted/policy.json" --mode "$MODE" --artifact-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID#artifacts"
+      - name: Upload captures, reports and diff images
+        id: artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: foundation-proof-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/captures
+            ${{ runner.temp }}/proof
+          if-no-files-found: error
+      - name: Readable job summary and timings
+        if: always()
+        env:
+          ARTIFACT_URL: ${{ steps.artifact.outputs.artifact-url }}
+          CACHE_HIT: ${{ steps.cache.outputs.cache-hit }}
+        run: |
+          if [ -f "$RUNNER_TEMP/proof/summary.md" ]; then
+            sed "s|ARTIFACT_URL|$ARTIFACT_URL|g" "$RUNNER_TEMP/proof/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo '## Not provable: setup or capture failed; see failed step logs.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "Cache hit: ${CACHE_HIT:-false}. Install: ${INSTALL_SECONDS:-unavailable}s. Capture: ${CAPTURE_SECONDS:-unavailable}s. Total before cache save: $(( $(date +%s) - STARTED ))s." >> "$GITHUB_STEP_SUMMARY"
+          echo "Pinned candidate: $GITHUB_SHA. Trusted base policy: $POLICY_REF. Tool SHA256: $TOOL_SHA." >> "$GITHUB_STEP_SUMMARY"
+      - name: Enforce required mode
+        if: always() && steps.check.outcome == 'failure'
+        run: |
+          echo 'Required design proof failed: remaining drift, stale acceptance, or incomplete coverage. See the summary and verification.json.'
+          exit 1

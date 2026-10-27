@@ -1,0 +1,14 @@
+id	category	rule	design	code	properties	rawFindings	summary
+def-8ab0502364aa3c58d851	geometry or layout consequence	layout:configuration	n212::n136	n212::n136	position;box-sizing;overflow-x;overflow-y;flex-grow	d7;d8;d9;d10;d11	layout configuration differs at n212::n136
+def-02bc2841d90590bf8783	geometry or layout consequence	layout:configuration	n212::n142	n212::n142	y;height;box-sizing	d12;d13;d14;d15;d17;d21;d23;d26	layout configuration differs at n212::n142
+def-b0cf38940b96243d850e	paint or box styling	style:surface	n212::n143	n212::n143	background-color	d18	style surface differs at n212::n143
+def-7a4c896fedec867d7851	geometry or layout consequence	layout:configuration	n212::n150	n212::n150	width;box-sizing	d22;d24;d27	layout configuration differs at n212::n150
+def-0256a2567505b63b5d15	geometry or layout consequence	layout:configuration	n212::n153	n212::n153	x;y;width;height;line-height;box-sizing;overflow-x;overflow-y	d33;d34;d35;d36;d38;d39;d40;d41	layout configuration differs at n212::n153
+def-01f8533ecb45dc78ec31	inherited or text styling	style:white-space	n212::n153	n212::n153	white-space	d42	style white-space differs at n212::n153
+def-1602eaa13058a9926a44	missing structure not folded	missing:subtree	n212::n137		node	d452;d453;d454;d455	missing subtree differs at n212::n137
+def-f6f50ac87909dac93604	missing structure not folded	missing:subtree	n212::n154		node	d536	missing subtree differs at n212::n154
+def-cbdf44ab3f5f8279e4cc	missing structure not folded	missing:subtree	n212::n155		node	d537	missing subtree differs at n212::n155
+def-4203e4fd0a7bc48db425	missing structure not folded	missing:subtree	n212::n184		node	d697;d698;d699;d700;d701;d702	missing subtree differs at n212::n184
+def-4aaa87ac3013a95ad50d	extra structure not folded	extra:subtree		0/0/0/0/0	node	d703;d704;d705;d706;d707	extra subtree differs at 0/0/0/0/0
+def-a0d240154f3ce3b7be3f	extra structure not folded	extra:subtree		0/0/0/1/0/4	node	d728	extra subtree differs at 0/0/0/1/0/4
+def-476294cf78aac0664130	extra structure not folded	extra:subtree		0/0/0/1/2	node	d756;d757	extra subtree differs at 0/0/0/1/2

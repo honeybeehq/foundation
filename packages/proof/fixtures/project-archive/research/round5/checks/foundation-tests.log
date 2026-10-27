@@ -1,0 +1,9 @@
+
+ RUN  v4.1.10 /home/trmd/.hive/v2/cells/dtc-a1-accuracy-4f559e4794c8/github-com-honeybeehq-foundation-ddad6d63099e-space-4f559e4794c8
+
+
+ Test Files  85 passed | 2 skipped (87)
+      Tests  865 passed | 7 skipped (872)
+   Start at  08:54:08
+   Duration  29.99s (transform 81.64s, setup 0ms, import 138.07s, tests 81.69s, environment 23ms)
+

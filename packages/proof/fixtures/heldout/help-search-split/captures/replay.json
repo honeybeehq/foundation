@@ -1,0 +1,36 @@
+{
+  "captureOnly": true,
+  "comparisonRun": false,
+  "freshContextReplay": [
+    {
+      "file": "help-search-split/split/980x638@1/design/screenshot.png",
+      "equal": true,
+      "sha256": "75f38f33f399c6dbb5de400638d4197108f220d803f2fa13fded21304a66167e"
+    },
+    {
+      "file": "help-search-split/split/980x638@1/design/dom.json",
+      "equal": true,
+      "sha256": "b36464d1eb398bd58c37880f01d491c549a92ad335dcd0023ada3173c95f5942"
+    },
+    {
+      "file": "help-search-split/split/980x638@1/design/full-extent.png",
+      "equal": true,
+      "sha256": "d207deb3941a4445edaaea1c7e9cfd2b6440fdd0b3af2282f88fd22191ab3cf3"
+    },
+    {
+      "file": "help-search-split/split/980x638@1/code/screenshot.png",
+      "equal": true,
+      "sha256": "04e8932bc5d702f97cb261a6f301f4e7b00bde9b58dcb7729e22a0b867afb031"
+    },
+    {
+      "file": "help-search-split/split/980x638@1/code/dom.json",
+      "equal": true,
+      "sha256": "50ff0c67b477e7ebc932ab9a7d18ec0f9bb0ff01d0457de5780252d7981d628d"
+    },
+    {
+      "file": "help-search-split/split/980x638@1/code/full-extent.png",
+      "equal": true,
+      "sha256": "eee7b5154e3b117e095b57cff0044317da036cde8963e4e4cb15d74ee9b25c6f"
+    }
+  ]
+}

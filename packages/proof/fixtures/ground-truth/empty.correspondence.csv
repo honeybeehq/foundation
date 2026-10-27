@@ -1,0 +1,17 @@
+design_path,design_fdn_id,design_desc,code_path,code_desc,confidence,note
+0/0,n284::n265,"pane (white card, 8px radius, shadow)",0/0/0,pane root (no background),sure,whole pane; code pane root has no card background
+0/0/0,n284::n266,pane title bar,0/0/0/0/0,rail header,unsure,title bar vs rail header (only header in code)
+0/0/0/0,n284::n267,"text ""Tracks""",0/0/0/0/0/0,"text ""TRACKS""",sure,"pane name ""Tracks"" vs ""TRACKS"""
+0/0/0/1,n284::n268,"text ""none defined""",0/0/0/0/0/1,"text ""0""",sure,"""none defined"" vs count ""0"""
+0/0/0/2/0/0,n284::n270::n1,icon,none,,sure,more menu absent; code has + button
+0/0/1,n284::n271,empty-state body,0/0/0/1/0,empty-state column,sure,empty-state body
+0/0/1/0/0,n284::n272::n303,pixel bee sprite (12x8 grid of 5px pixels),0/0/0/1/0/0,pixel bee sprite (box-shadow pixels),sure,pixel bee illustration (different sprite)
+0/0/1/1,n284::n273,"text ""No tracks yet""",0/0/0/1/0/1,"text ""Write down how you’d want it done.""",sure,empty heading
+0/0/1/2,n284::n274,"text ""A track is an expected sequence of steps you clip onto one a""",0/0/0/1/0/2,"text ""A track is a short list of steps an agent follows and checks""",sure,explanation copy
+0/0/1/3/0/0,n284::n276::n40,"CTA button ""Define a track""",0/0/0/1/0/3,"text ""New track""",sure,primary CTA
+0/0/1/3/0/0/0,n284::n276::n41,"text ""Define a track""",0/0/0/1/0/3,"text ""New track""",sure,CTA label (text sits directly in code button)
+0/0/1/3/0/0/1,n284::n276::n42,"text ""n""",0/0/0/1/0/3/0,"text ""c""",sure,CTA shortcut hint
+0/0/1/4,n284::n277,"text ""or ask a sidecar agent to draft one — it arrives as a propos""",none,,sure,sidecar hint line absent
+0/0/2,n284::n278,footer bar,none,,sure,footer absent in code
+0/0/2/0,n284::n279,"text ""n define""",none,,sure,footer absent in code
+0/0/2/1,n284::n280,"text ""hive track define · schema v2""",none,,sure,footer absent in code

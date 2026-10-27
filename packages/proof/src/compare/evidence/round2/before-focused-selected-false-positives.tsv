@@ -1,0 +1,93 @@
+id	category	rule	design	code	properties	rawFindings	summary
+def-3ce337836aec35e2ee4c	paint or box styling	token:border-radius	n212::n136	n212::n136	border-top-left-radius;border-top-right-radius;border-bottom-left-radius;border-bottom-right-radius	d2;d3;d4;d5	token border-radius differs at n212::n136
+def-e69984eb3296d2e9449f	paint or box styling	style:box-shadow	n212::n136	n212::n136	box-shadow	d6	style box-shadow differs at n212::n136
+def-8ab0502364aa3c58d851	geometry or layout consequence	layout:configuration	n212::n136	n212::n136	position;box-sizing;overflow-x;overflow-y;flex-grow	d7;d8;d9;d10;d11	layout configuration differs at n212::n136
+def-02bc2841d90590bf8783	geometry or layout consequence	layout:configuration	n212::n142	n212::n142	y;height;box-sizing	d12;d13;d14;d15;d17;d21;d23;d26	layout configuration differs at n212::n142
+def-480569ba8300503d4eba	paint or box styling	style:background-color	n212::n143	n212::n143	background-color	d18	style background-color differs at n212::n143
+def-7a4c896fedec867d7851	geometry or layout consequence	layout:configuration	n212::n150	n212::n150	x;width;box-sizing	d20;d22;d24;d25;d27	layout configuration differs at n212::n150
+def-0256a2567505b63b5d15	geometry or layout consequence	layout:configuration	n212::n153	n212::n153	x;y;width;height;box-sizing;overflow-x;overflow-y	d33;d34;d35;d36;d39;d40;d41	layout configuration differs at n212::n153
+def-a23de17cb08b6fd0c1be	inherited or text styling	style:line-height	n212::n153	n212::n153	line-height	d38	style line-height differs at n212::n153
+def-01f8533ecb45dc78ec31	inherited or text styling	style:white-space	n212::n153	n212::n153	white-space	d42	style white-space differs at n212::n153
+def-a47dad76f160a2159858	geometry or layout consequence	layout:configuration	n212::n149#0::n149::n49	0/0/0/0/1/0/1/0	y;width;height;box-sizing;flex-shrink	d43;d44;d45;d50;d51	layout configuration differs at n212::n149#0::n149::n49
+def-fb17efe905f5e9f2c572	inherited or text styling	style:line-height	n212::n149#0::n149::n49	0/0/0/0/1/0/1/0	line-height	d48	style line-height differs at n212::n149#0::n149::n49
+def-56a5534de0572ab96ebc	inherited or text styling	style:text-align	n212::n149#0::n149::n49	0/0/0/0/1/0/1/0	text-align	d49	style text-align differs at n212::n149#0::n149::n49
+def-4cc1ca49e826590b0043	geometry or layout consequence	layout:configuration	n212::n149#1::n149::n49	0/0/0/0/1/1/1/0	y;width;height;box-sizing;flex-shrink	d52;d53;d54;d58;d59	layout configuration differs at n212::n149#1::n149::n49
+def-1e12c358bcf570c1e801	inherited or text styling	style:line-height	n212::n149#1::n149::n49	0/0/0/0/1/1/1/0	line-height	d56	style line-height differs at n212::n149#1::n149::n49
+def-ba8ad0ec9146901d0710	inherited or text styling	style:text-align	n212::n149#1::n149::n49	0/0/0/0/1/1/1/0	text-align	d57	style text-align differs at n212::n149#1::n149::n49
+def-8ba661cfb573b3330e99	geometry or layout consequence	layout:configuration	n212::n149#2::n149::n49	0/0/0/0/1/2/1/0	y;width;height;box-sizing;flex-shrink	d60;d61;d62;d66;d67	layout configuration differs at n212::n149#2::n149::n49
+def-fea92758a5cb94b15d84	inherited or text styling	style:line-height	n212::n149#2::n149::n49	0/0/0/0/1/2/1/0	line-height	d64	style line-height differs at n212::n149#2::n149::n49
+def-f28403c1b9c79b905500	inherited or text styling	style:text-align	n212::n149#2::n149::n49	0/0/0/0/1/2/1/0	text-align	d65	style text-align differs at n212::n149#2::n149::n49
+def-e94a5c02e226cc23b59c	geometry or layout consequence	layout:configuration	n212::n149#3::n149::n49	0/0/0/0/1/3/1/0	y;width;height;box-sizing;flex-shrink	d68;d69;d70;d74;d75	layout configuration differs at n212::n149#3::n149::n49
+def-6e65bd1c2f04847db1a0	inherited or text styling	style:line-height	n212::n149#3::n149::n49	0/0/0/0/1/3/1/0	line-height	d72	style line-height differs at n212::n149#3::n149::n49
+def-9f6f6d83cbf22d0dec56	inherited or text styling	style:text-align	n212::n149#3::n149::n49	0/0/0/0/1/3/1/0	text-align	d73	style text-align differs at n212::n149#3::n149::n49
+def-d004bb880bf8ec31ac10	geometry or layout consequence	layout:configuration	n212::n149#4::n149::n49	0/0/0/0/1/4/1/0	y;width;height;box-sizing;flex-shrink	d76;d77;d78;d82;d83	layout configuration differs at n212::n149#4::n149::n49
+def-8f0aae2795e243fcbeef	inherited or text styling	style:line-height	n212::n149#4::n149::n49	0/0/0/0/1/4/1/0	line-height	d80	style line-height differs at n212::n149#4::n149::n49
+def-b741ff4fd4bbb9c1de40	inherited or text styling	style:text-align	n212::n149#4::n149::n49	0/0/0/0/1/4/1/0	text-align	d81	style text-align differs at n212::n149#4::n149::n49
+def-1abafa9e53c64339f3c8	geometry or layout consequence	layout:configuration	n212::n149#5::n149::n46	0/0/0/0/1/5	y	d99	layout configuration differs at n212::n149#5::n149::n46
+def-0284aa05cdc0cc07d58a	geometry or layout consequence	layout:configuration	n212::n149#5::n149::n49	0/0/0/0/1/5/1/0	width;height;box-sizing;flex-shrink	d100;d101;d106;d107	layout configuration differs at n212::n149#5::n149::n49
+def-b7de13198e79d296bb7d	inherited or text styling	style:line-height	n212::n149#5::n149::n49	0/0/0/0/1/5/1/0	line-height	d104	style line-height differs at n212::n149#5::n149::n49
+def-6e3584ac7b0a5ab1fe66	inherited or text styling	style:text-align	n212::n149#5::n149::n49	0/0/0/0/1/5/1/0	text-align	d105	style text-align differs at n212::n149#5::n149::n49
+def-b373b2eff8e19de1bc76	geometry or layout consequence	layout:configuration	n212::n149#6::n149::n46	0/0/0/0/1/6	y	d123	layout configuration differs at n212::n149#6::n149::n46
+def-15d5bee0fd0b8289252f	geometry or layout consequence	layout:configuration	n212::n149#6::n149::n49	0/0/0/0/1/6/1/0	width;height;box-sizing;flex-shrink	d124;d125;d130;d131	layout configuration differs at n212::n149#6::n149::n49
+def-240429963b8e1956cb42	inherited or text styling	token:color	n212::n149#6::n149::n49	0/0/0/0/1/6/1/0	color	d126	token color differs at n212::n149#6::n149::n49
+def-b2da8c31c62e484f936d	inherited or text styling	style:line-height	n212::n149#6::n149::n49	0/0/0/0/1/6/1/0	line-height	d128	style line-height differs at n212::n149#6::n149::n49
+def-b3c7755ba8048932dbfa	inherited or text styling	style:text-align	n212::n149#6::n149::n49	0/0/0/0/1/6/1/0	text-align	d129	style text-align differs at n212::n149#6::n149::n49
+def-40f9891252c44a21f274	inherited or text styling	token:color	n212::n163#0::n163::n106	0/0/0/1/1/0/0/0/2/0/1	color	d187	token color differs at n212::n163#0::n163::n106
+def-08529933120cc58d45f7	inherited or text styling	style:line-height	n212::n136	n212::n136	line-height	d189;d202;d215;d228;d241	style line-height differs at n212::n136
+def-ab3745af3a10204476cf	inherited or text styling	style:text-align	n212::n163#0::n163::n106	0/0/0/1/1/0/0/0/2/0/1	text-align	d190	style text-align differs at n212::n163#0::n163::n106
+def-9a3e993f8f977bae7e53	geometry or layout consequence	layout:configuration	n212::n163#1::n163::n106	0/0/0/1/1/0/0/0/4/0/1	x;y;width;height;box-sizing;overflow-x;overflow-y;flex-grow;flex-shrink	d196;d197;d198;d199;d204;d205;d206;d207;d208	layout configuration differs at n212::n163#1::n163::n106
+def-56992273c7533849a202	inherited or text styling	token:color	n212::n163#1::n163::n106	0/0/0/1/1/0/0/0/4/0/1	color	d200	token color differs at n212::n163#1::n163::n106
+def-badc50a0e337c252a73a	inherited or text styling	style:text-align	n212::n163#1::n163::n106	0/0/0/1/1/0/0/0/4/0/1	text-align	d203	style text-align differs at n212::n163#1::n163::n106
+def-44a27490aa59bf9794ee	geometry or layout consequence	layout:configuration	n212::n163#3::n163::n106	0/0/0/1/1/0/0/0/6/0/0/0/0/1	x;y;width;height;box-sizing;overflow-x;overflow-y;flex-grow;flex-shrink	d209;d210;d211;d212;d217;d218;d219;d220;d221	layout configuration differs at n212::n163#3::n163::n106
+def-2ed54c14ea2476d8492b	inherited or text styling	token:color	n212::n163#3::n163::n106	0/0/0/1/1/0/0/0/6/0/0/0/0/1	color	d213	token color differs at n212::n163#3::n163::n106
+def-f02cf9cc30df49a20bd7	inherited or text styling	style:text-align	n212::n163#3::n163::n106	0/0/0/1/1/0/0/0/6/0/0/0/0/1	text-align	d216	style text-align differs at n212::n163#3::n163::n106
+def-4f52dfcd05e42fcdb787	geometry or layout consequence	layout:configuration	n212::n163#4::n163::n106	0/0/0/1/1/0/0/0/6/0/1/0/0/1	x;y;width;height;box-sizing;overflow-x;overflow-y;flex-grow;flex-shrink	d222;d223;d224;d225;d230;d231;d232;d233;d234	layout configuration differs at n212::n163#4::n163::n106
+def-d60abfcf766f077abb27	inherited or text styling	style:text-align	n212::n163#4::n163::n106	0/0/0/1/1/0/0/0/6/0/1/0/0/1	text-align	d229	style text-align differs at n212::n163#4::n163::n106
+def-b7659c0012b89c363095	geometry or layout consequence	layout:configuration	n212::n163#5::n163::n106	0/0/0/1/1/0/0/0/8/0/1	x;y;width;height;box-sizing;overflow-x;overflow-y;flex-grow;flex-shrink	d235;d236;d237;d238;d243;d244;d245;d246;d247	layout configuration differs at n212::n163#5::n163::n106
+def-895f0b56a7d5d167835a	inherited or text styling	style:text-align	n212::n163#5::n163::n106	0/0/0/1/1/0/0/0/8/0/1	text-align	d242	style text-align differs at n212::n163#5::n163::n106
+def-1602eaa13058a9926a44	missing structure not folded	missing:subtree	n212::n137		node	d248;d249;d250;d251	missing subtree differs at n212::n137
+def-a0b8f7abcbacacbfa775	missing structure not folded	missing:subtree	n212::n149#1::n149::n46		node	d280;d281;d282;d283;d284;d285;d286;d287;d288;d289	missing subtree differs at n212::n149#1::n149::n46
+def-b14a114cf51efa0baded	missing structure not folded	missing:subtree	n212::n149#2::n149::n46		node	d290;d291;d292;d293;d294;d295;d296;d297;d298;d299	missing subtree differs at n212::n149#2::n149::n46
+def-07827f04204477c08c1f	missing structure not folded	missing:subtree	n212::n149#3::n149::n46		node	d300;d301;d302;d303;d304;d305;d306;d307;d308;d309	missing subtree differs at n212::n149#3::n149::n46
+def-d961ee4e2d256ce1b1cf	missing structure not folded	missing:subtree	n212::n149#4::n149::n46		node	d310;d311;d312;d313;d314;d315;d316;d317;d318;d319;d320;d321;d322;d323	missing subtree differs at n212::n149#4::n149::n46
+def-1e44bcf098013452c685	missing structure not folded	missing:subtree	n212::n149#5::n149::n47		node	d324;d325;d326;d327	missing subtree differs at n212::n149#5::n149::n47
+def-19dd999094bcf057d68d	missing structure not folded	missing:subtree	n212::n149#5::n149::n53		node	d328;d329	missing subtree differs at n212::n149#5::n149::n53
+def-c4412a6c9e51e04fb37a	missing structure not folded	missing:subtree	n212::n149#6::n149::n47		node	d330;d331;d332;d333	missing subtree differs at n212::n149#6::n149::n47
+def-b54985da221989265a3e	missing structure not folded	missing:subtree	n212::n149#6::n149::n53		node	d334;d335	missing subtree differs at n212::n149#6::n149::n53
+def-f6f50ac87909dac93604	missing structure not folded	missing:subtree	n212::n154		node	d337	missing subtree differs at n212::n154
+def-cbdf44ab3f5f8279e4cc	missing structure not folded	missing:subtree	n212::n155		node	d338	missing subtree differs at n212::n155
+def-9a3469811202ffca0013	missing structure not folded	missing:subtree	n212::n163#0::n163::n99		node	d350;d351	missing subtree differs at n212::n163#0::n163::n99
+def-e27ba7a57401ffedcdbd	missing structure not folded	missing:subtree	n212::n163#0::n163::n105		node	d353	missing subtree differs at n212::n163#0::n163::n105
+def-e64e95c314449c783486	missing structure not folded	missing:subtree	n212::n163#1::n163::n98		node	d355;d356;d357;d358;d359;d360	missing subtree differs at n212::n163#1::n163::n98
+def-d18745fb11c7135b6c10	missing structure not folded	missing:subtree	n212::n163#2::n163::n98		node	d361;d362;d363;d364;d365;d366;d367	missing subtree differs at n212::n163#2::n163::n98
+def-a5faf14ca0881369113d	missing structure not folded	missing:subtree	n212::n163#3::n163::n98		node	d368;d369;d370;d371;d372;d373;d374	missing subtree differs at n212::n163#3::n163::n98
+def-ea794686016c26d22942	missing structure not folded	missing:subtree	n212::n163#4::n163::n98		node	d375;d376;d377;d378;d379;d380;d381	missing subtree differs at n212::n163#4::n163::n98
+def-12ff5dcef16183c685a7	missing structure not folded	missing:subtree	n212::n163#5::n163::n98		node	d382;d383;d384;d385;d386	missing subtree differs at n212::n163#5::n163::n98
+def-54cf0bdbd0d018263bb5	missing structure not folded	missing:subtree	n212::n163#6::n163::n98		node	d387;d388;d389;d390;d391;d392;d393	missing subtree differs at n212::n163#6::n163::n98
+def-6a2836afe3d4aa51d4f2	missing structure not folded	missing:subtree	n212::n163#7::n163::n98		node	d394;d395;d396;d397;d398;d399	missing subtree differs at n212::n163#7::n163::n98
+def-e278a313de59e0596ea6	missing structure not folded	missing:subtree	n212::n163#8::n163::n98		node	d400;d401;d402;d403;d404;d405	missing subtree differs at n212::n163#8::n163::n98
+def-8359a260683be8acc9bd	missing structure not folded	missing:subtree	n212::n372#0::n372::n363		node	d409;d410;d411;d412;d413;d414;d415	missing subtree differs at n212::n372#0::n372::n363
+def-7acce9d8e94173595a44	missing structure not folded	missing:subtree	n212::n164		node	d416;d417	missing subtree differs at n212::n164
+def-4203e4fd0a7bc48db425	missing structure not folded	missing:subtree	n212::n184		node	d480;d481;d482;d483;d484;d485	missing subtree differs at n212::n184
+def-4aaa87ac3013a95ad50d	extra structure not folded	extra:subtree		0/0/0/0/0	node	d486;d487;d488;d489;d490	extra subtree differs at 0/0/0/0/0
+def-e18b0c6deb4645d32789	extra structure not folded	extra:subtree		0/0/0/0/1/0	node	d491;d492;d493;d494	extra subtree differs at 0/0/0/0/1/0
+def-932f2c71f4c7aef333a2	extra structure not folded	extra:subtree		0/0/0/0/1/1	node	d495;d496;d497	extra subtree differs at 0/0/0/0/1/1
+def-d5e376b159337ffe32e3	extra structure not folded	extra:subtree		0/0/0/0/1/2	node	d498;d499;d500	extra subtree differs at 0/0/0/0/1/2
+def-5f6187169399663e7592	extra structure not folded	extra:subtree		0/0/0/0/1/3	node	d501;d502;d503	extra subtree differs at 0/0/0/0/1/3
+def-ca25ba49342a50be9df2	extra structure not folded	extra:subtree		0/0/0/0/1/4	node	d504;d505;d506	extra subtree differs at 0/0/0/0/1/4
+def-108600f2bb514d563e08	extra structure not folded	extra:subtree		0/0/0/0/1/5/0/0	node	d507	extra subtree differs at 0/0/0/0/1/5/0/0
+def-d6e60d5ade3424eecb49	extra structure not folded	extra:subtree		0/0/0/0/1/5/1/1	node	d508	extra subtree differs at 0/0/0/0/1/5/1/1
+def-fe86bea28288ca9fbef7	extra structure not folded	extra:subtree		0/0/0/0/1/6/0/0	node	d509	extra subtree differs at 0/0/0/0/1/6/0/0
+def-cf64d672a8219c2ba56a	extra structure not folded	extra:subtree		0/0/0/0/1/6/1/1	node	d510	extra subtree differs at 0/0/0/0/1/6/1/1
+def-c94b9be861d25e1fbb28	extra structure not folded	extra:subtree		0/0/0/1/0/1	node	d511;d512	extra subtree differs at 0/0/0/1/0/1
+def-a0d240154f3ce3b7be3f	extra structure not folded	extra:subtree		0/0/0/1/0/4	node	d516	extra subtree differs at 0/0/0/1/0/4
+def-fab48bd4925e9d08d849	extra structure not folded	extra:subtree		0/0/0/1/1/0/0/0/0/0	node	d517	extra subtree differs at 0/0/0/1/1/0/0/0/0/0
+def-993a4f03ef0a7cda67cf	extra structure not folded	extra:subtree		0/0/0/1/1/0/0/0/0/1	node	d518;d519	extra subtree differs at 0/0/0/1/1/0/0/0/0/1
+def-aee27d1faacdc491847d	extra structure not folded	extra:subtree		0/0/0/1/1/0/0/0/1	node	d520;d521	extra subtree differs at 0/0/0/1/1/0/0/0/1
+def-0027c54baeeeb207ec4c	extra structure not folded	extra:subtree		0/0/0/1/1/0/0/0/2/0/0	node	d522;d523	extra subtree differs at 0/0/0/1/1/0/0/0/2/0/0
+def-32a6cb7a09bee7901d8f	extra structure not folded	extra:subtree		0/0/0/1/1/0/0/0/2/0/2	node	d524	extra subtree differs at 0/0/0/1/1/0/0/0/2/0/2
+def-cebdb0b20a9f91a79df8	extra structure not folded	extra:subtree		0/0/0/1/1/0/0/0/4/0	node	d525;d526;d527;d528	extra subtree differs at 0/0/0/1/1/0/0/0/4/0
+def-c975bf1b5b61ef311990	extra structure not folded	extra:subtree		0/0/0/1/1/0/0/0/6/0	node	d529;d530;d531;d532;d533;d534;d535;d536;d537;d538	extra subtree differs at 0/0/0/1/1/0/0/0/6/0
+def-d6126f32517408ad17e8	extra structure not folded	extra:subtree		0/0/0/1/1/0/0/0/8/0	node	d539;d540;d541	extra subtree differs at 0/0/0/1/1/0/0/0/8/0
+def-124579373cd205f7dff6	extra structure not folded	extra:subtree		0/0/0/1/1/0/0/0/9/0/0	node	d542	extra subtree differs at 0/0/0/1/1/0/0/0/9/0/0
+def-476294cf78aac0664130	extra structure not folded	extra:subtree		0/0/0/1/2	node	d543;d544;d545;d546	extra subtree differs at 0/0/0/1/2

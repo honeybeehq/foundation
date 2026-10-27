@@ -1,0 +1,12 @@
+Port 5173 is in use, trying another one...
+Port 5174 is in use, trying another one...
+tracks-pane/track-selected design: 215 nodes, 4443 ms
+tracks-pane/track-selected code: 192 nodes, 8100 ms
+PAIR /home/trmd/.hive/v2/cells/dtc-a1-accuracy-4f559e4794c8/github-com-honeybeehq-foundation-ddad6d63099e-space-4f559e4794c8/packages/proof/fixtures/round5-big-panels/captures/tracks/tracks-pane/track-selected/1416x720@1 12868 ms
+tracks-pane/proposal-pending design: 257 nodes, 3516 ms
+tracks-pane/proposal-pending code: 228 nodes, 3825 ms
+PAIR /home/trmd/.hive/v2/cells/dtc-a1-accuracy-4f559e4794c8/github-com-honeybeehq-foundation-ddad6d63099e-space-4f559e4794c8/packages/proof/fixtures/round5-big-panels/captures/tracks/tracks-pane/proposal-pending/1416x720@1 7651 ms
+tracks-pane/empty design: 31 nodes, 2122 ms
+tracks-pane/empty code: 24 nodes, 2463 ms
+PAIR /home/trmd/.hive/v2/cells/dtc-a1-accuracy-4f559e4794c8/github-com-honeybeehq-foundation-ddad6d63099e-space-4f559e4794c8/packages/proof/fixtures/round5-big-panels/captures/tracks/tracks-pane/empty/1416x720@1 4852 ms
+Captured 3 pairs in 29343 ms

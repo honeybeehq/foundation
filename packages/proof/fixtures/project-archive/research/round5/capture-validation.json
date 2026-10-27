@@ -1,0 +1,152 @@
+[
+  {
+    "pair": "packages/proof/fixtures/round5-big-panels/captures/help/help-center/agent-run/1480x830@1",
+    "state": "agent-run",
+    "apiaryCommit": "de190984abad4cdfa2bcd7a92717858801fea8ae",
+    "rendererCommit": "21cccd187f03bbb8c02dba36abbfb4bd6ebe61cc",
+    "referenceFrame": {
+      "width": 1062,
+      "height": 718
+    },
+    "designViewport": {
+      "width": 1600,
+      "height": 1200
+    },
+    "rootRects": {
+      "design": [
+        0,
+        0,
+        1062,
+        718
+      ],
+      "code": [
+        0,
+        0,
+        1060,
+        716
+      ]
+    },
+    "regions": 8,
+    "clean": true
+  },
+  {
+    "pair": "packages/proof/fixtures/round5-big-panels/captures/search/help-search-split/split/980x638@1",
+    "state": "split",
+    "apiaryCommit": "de190984abad4cdfa2bcd7a92717858801fea8ae",
+    "rendererCommit": "21cccd187f03bbb8c02dba36abbfb4bd6ebe61cc",
+    "referenceFrame": {
+      "width": 902,
+      "height": 562
+    },
+    "designViewport": {
+      "width": 1600,
+      "height": 1200
+    },
+    "rootRects": {
+      "design": [
+        0,
+        0,
+        902,
+        562
+      ],
+      "code": [
+        0,
+        0,
+        901.59375,
+        561.4375
+      ]
+    },
+    "regions": 5,
+    "clean": true
+  },
+  {
+    "pair": "packages/proof/fixtures/round5-big-panels/captures/tracks/tracks-pane/empty/1416x720@1",
+    "state": "empty",
+    "apiaryCommit": "de190984abad4cdfa2bcd7a92717858801fea8ae",
+    "rendererCommit": "21cccd187f03bbb8c02dba36abbfb4bd6ebe61cc",
+    "referenceFrame": {
+      "width": 1114,
+      "height": 468
+    },
+    "designViewport": {
+      "width": 1600,
+      "height": 1200
+    },
+    "rootRects": {
+      "design": [
+        0,
+        0,
+        1114,
+        468
+      ],
+      "code": [
+        0,
+        0,
+        1114,
+        468
+      ]
+    },
+    "regions": 6,
+    "clean": true
+  },
+  {
+    "pair": "packages/proof/fixtures/round5-big-panels/captures/tracks/tracks-pane/proposal-pending/1416x720@1",
+    "state": "proposal-pending",
+    "apiaryCommit": "de190984abad4cdfa2bcd7a92717858801fea8ae",
+    "rendererCommit": "21cccd187f03bbb8c02dba36abbfb4bd6ebe61cc",
+    "referenceFrame": {
+      "width": 1416,
+      "height": 611
+    },
+    "designViewport": {
+      "width": 1600,
+      "height": 1200
+    },
+    "rootRects": {
+      "design": [
+        0,
+        0,
+        1416,
+        611
+      ],
+      "code": [
+        0,
+        0,
+        1416,
+        611
+      ]
+    },
+    "regions": 16,
+    "clean": true
+  },
+  {
+    "pair": "packages/proof/fixtures/round5-big-panels/captures/tracks/tracks-pane/track-selected/1416x720@1",
+    "state": "track-selected",
+    "apiaryCommit": "de190984abad4cdfa2bcd7a92717858801fea8ae",
+    "rendererCommit": "21cccd187f03bbb8c02dba36abbfb4bd6ebe61cc",
+    "referenceFrame": {
+      "width": 1416,
+      "height": 525.5
+    },
+    "designViewport": {
+      "width": 1600,
+      "height": 1200
+    },
+    "rootRects": {
+      "design": [
+        0,
+        0,
+        1416,
+        525.5
+      ],
+      "code": [
+        0,
+        0,
+        1416,
+        525.5
+      ]
+    },
+    "regions": 13,
+    "clean": true
+  }
+]

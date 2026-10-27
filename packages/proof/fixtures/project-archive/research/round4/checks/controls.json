@@ -1,0 +1,17 @@
+{
+  "fields": [
+    "scenario",
+    "expected",
+    "found",
+    "tp",
+    "fp",
+    "fn",
+    "precision",
+    "recall",
+    "pixelRatio"
+  ],
+  "cases": 14,
+  "exact": true,
+  "differences": [],
+  "pixelRatioBaselineAlreadyCorrect": true
+}

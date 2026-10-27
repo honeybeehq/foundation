@@ -1,0 +1,26 @@
+[
+  {
+    "state": "track-selected",
+    "designNodes": 408,
+    "codeNodes": 192,
+    "iterations": 30,
+    "medianMs": 0.8415620000000104,
+    "p95Ms": 1.3758770000000027
+  },
+  {
+    "state": "proposal-pending",
+    "designNodes": 438,
+    "codeNodes": 220,
+    "iterations": 30,
+    "medianMs": 2.1157759999999826,
+    "p95Ms": 2.4450050000000374
+  },
+  {
+    "state": "empty",
+    "designNodes": 79,
+    "codeNodes": 24,
+    "iterations": 30,
+    "medianMs": 0.006600000000048567,
+    "p95Ms": 0.015640000000075815
+  }
+]

@@ -1,0 +1,54 @@
+design_path,design_fdn_id,design_desc,code_path,code_desc,confidence,note
+0/0,n145,"dialog card (white, border, 12px radius, shadow)",0/0,HelpCenter card,sure,
+0/0/0,n146,search header row,0/0/1/0,search header row,sure,code header sits right of the topic rail
+0/0/0/0,n147,search field (focused border #DAD5CC),0/0/1/0/0,search field,sure,
+0/0/0/0/0/0,n149,"text ""split"" (query)",0/0/1/0/0/0,"input value ""split""",sure,
+0/0/0/0/0/1,n150,painted caret,0/0/1/0/0/0,"input (native caret, not visible in a still capture)",unsure,
+0/0/0/0/1,n151,"text ""6 matches"" (inside the field)",0/0/1/0/1,"text ""20 matches"" (outside the field)",sure,
+0/0/0/0/2,n152,clear ✕ button,none,,sure,no clear button in code
+0/0/1,n153,results list,0/0/1/1/0,results list,sure,
+0/0/1/0/0,n154::n2,"row ""Split pane"" (highlighted)",0/0/1/1/0/0/0,"row ""Split pane"" (highlighted)",sure,
+0/0/1/0/0/0,n154::n3,"text ""Split pane""",0/0/1/1/0/0/0/0/0,"text ""Split pane""",sure,
+0/0/1/0/0/1,n154::n4,"text ""row · column""",0/0/1/1/0/0/0/0/1,"text ""row · column — ⇧ flips""",sure,
+0/0/1/0/0/2,n154::n5,tag + keys group,0/0/1/1/0/0/0/1,keys button,unsure,code splits the tag (in the label button) from the keys
+0/0/1/0/0/2/0,n154::n6,"text ""Panes & tabs""",0/0/1/1/0/0/0/0/3,"text ""Panes & tabs""",sure,
+0/0/1/0/0/2/1/0/0,n154::n7#0::n8::n1,"key cap ""⌘D""",0/0/1/1/0/0/0/1/0/0,"kbd ""⌘D""",sure,
+0/0/1/0/0/2/2/0/0,n154::n7#1::n8::n1,"key cap ""⌘⇧D""",0/0/1/1/0/0/0/1/1/1,"kbd ""⌘⇧D""",sure,
+0/0/1/1/0,n155::n2,"row ""Open files in a split""",none,,sure,"not among the code results for ""split"""
+0/0/1/1/0/0,n155::n3,"text ""Open files in a split""",none,,sure,"not among the code results for ""split"""
+0/0/1/1/0/1,n155::n4,"text ""vertical · horizontal""",none,,sure,"not among the code results for ""split"""
+0/0/1/1/0/2,n155::n5,tag + keys group,none,,sure,"not among the code results for ""split"""
+0/0/1/1/0/2/0,n155::n6,"text ""Panes & tabs""",none,,sure,"not among the code results for ""split"""
+0/0/1/1/0/2/1/0/0,n155::n7#0::n8::n1,"key cap ""⌘⌥O""",none,,sure,"not among the code results for ""split"""
+0/0/1/1/0/2/2/0/0,n155::n7#1::n8::n1,"key cap ""⌘⌥⇧O""",none,,sure,"not among the code results for ""split"""
+0/0/1/3/0,n157::n2,"row ""Inline ⇄ split diff""",none,,sure,"not among the code results for ""split"""
+0/0/1/3/0/0,n157::n3,"text ""Inline ⇄ split diff""",none,,sure,"not among the code results for ""split"""
+0/0/1/3/0/1,n157::n4,"text ""auto by pane width""",none,,sure,"not among the code results for ""split"""
+0/0/1/3/0/2,n157::n5,tag + keys group,none,,sure,"not among the code results for ""split"""
+0/0/1/3/0/2/0,n157::n6,"text ""Changes""",none,,sure,"not among the code results for ""split"""
+0/0/1/3/0/2/1/0/0,n157::n7#0::n8::n1,"key cap ""i""",none,,sure,"not among the code results for ""split"""
+0/0/1/4/0,n158::n2,"row ""Move pane in direction — splits off at an edge""",none,,sure,"not among the code results for ""split"""
+0/0/1/4/0/0,n158::n3,"text ""Move pane in direction — splits off at an edge""",none,,sure,"not among the code results for ""split"""
+0/0/1/4/0/1,n158::n5,tag + keys group,none,,sure,"not among the code results for ""split"""
+0/0/1/4/0/1/0,n158::n6,"text ""Panes & tabs""",none,,sure,"not among the code results for ""split"""
+0/0/1/4/0/1/1/0/0,n158::n7#0::n8::n1,"key cap ""⌘⌥⇧←↑↓→""",none,,sure,"not among the code results for ""split"""
+0/0/1/5/0,n159::n2,"row ""Add pane to group — unsplit a tab""",none,,sure,"not among the code results for ""split"""
+0/0/1/5/0/0,n159::n3,"text ""Add pane to group — unsplit a tab""",none,,sure,"not among the code results for ""split"""
+0/0/1/5/0/1,n159::n4,"text ""not available in this pane""",none,,sure,"not among the code results for ""split"""
+0/0/1/5/0/2,n159::n5,tag + keys group,none,,sure,"not among the code results for ""split"""
+0/0/1/5/0/2/0,n159::n6,"text ""Panes & tabs""",none,,sure,"not among the code results for ""split"""
+0/0/1/5/0/2/1/0/0,n159::n7#0::n8::n1,"key cap ""⌘⇧T""",none,,sure,"not among the code results for ""split"""
+0/0/1/2/0,n156::n2,"row ""Preview beside — split stays""",0/0/1/1/0/5/0,"row ""Preview beside — split stays"" (6th instead of 3rd)",sure,
+0/0/1/2/0/0,n156::n3,"text ""Preview beside — split stays""",0/0/1/1/0/5/0/0/0,"text ""Preview beside — split stays""",sure,
+0/0/1/2/0/1,n156::n5,tag + keys group,0/0/1/1/0/5/0/1,keys span,unsure,code splits the tag from the keys
+0/0/1/2/0/1/0,n156::n6,"text ""Lists""",0/0/1/1/0/5/0/0/2,"text ""Lists""",sure,
+0/0/1/2/0/1/1/0/0,n156::n7#0::n8::n1,"key cap ""⇥""",0/0/1/1/0/5/0/1/0/0,"kbd ""⇥""",sure,
+0/0/1/6,n160,no-match hint line (hairline top),none,,sure,no cross-topic hint in code
+0/0/1/6/0,n161,"text ""no match in GUIDE topics ·""",none,,sure,
+0/0/1/6/1,n162,"text ""search """"split"""" in Search everything /""",none,,sure,
+0/0/2,n163,footer bar,0/0/1/2,footer bar,sure,
+0/0/2/0,n164,"text ""↑↓ move""",none,,sure,code footer shows generic hints instead
+0/0/2/1,n165,"text ""·""",none,,sure,code footer shows generic hints instead
+0/0/2/2,n166,"text ""↵ run Split pane""",none,,sure,code footer shows generic hints instead
+0/0/2/3,n167,"text ""·""",none,,sure,code footer shows generic hints instead
+0/0/2/4,n168,"text ""esc clear, then close""",none,,sure,code footer shows generic hints instead

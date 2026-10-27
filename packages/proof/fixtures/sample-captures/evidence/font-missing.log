@@ -1,0 +1,22 @@
+$ tsx src/capture/cli.ts --code /var/tmp/dtc-t2-apiary --links /tmp/t2-font-missing.json --out .artifacts/t2/missing-font
+node:internal/fs/promises:640
+  return new FileHandle(await PromisePrototypeThen(
+                        ^
+
+Error: ENOENT: no such file or directory, open '/var/tmp/dtc-t2-apiary/.foundation/fonts/DOES-NOT-EXIST.ttf'
+    at async open (node:internal/fs/promises:640:25)
+    at async readFile (node:internal/fs/promises:1290:14)
+    at async <anonymous> (/home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/packages/proof/src/capture/cli.ts:32:17)
+    at async Promise.all (index 0)
+    at async <anonymous> (/home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/packages/proof/src/capture/cli.ts:31:20) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/var/tmp/dtc-t2-apiary/.foundation/fonts/DOES-NOT-EXIST.ttf'
+}
+
+Node.js v24.18.0
+/home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/packages/proof:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] proof@ capture: `tsx src/capture/cli.ts --code /var/tmp/dtc-t2-apiary --links /tmp/t2-font-missing.json --out .artifacts/t2/missing-font`
+Exit status 1
+[WARN]  Local package.json exists, but node_modules missing, did you mean to install?
