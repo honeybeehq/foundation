@@ -1,3 +1,4 @@
+import {preserveDesignContext} from './design-context.ts'
 import { captureFullExtent } from "./extent.ts";
 import { readFile, writeFile, mkdir } from 'node:fs/promises'
 import { execFileSync } from 'node:child_process'
@@ -21,6 +22,8 @@ const linksPath = resolve(repo, option('--links', '.foundation/links.json')!)
 const out = resolve(option('--out', 'captures')!)
 const designPath = resolve(option('--design', resolve(import.meta.dirname, '../../fixtures/design/tracks-pane.fdn.html'))!)
 const codeBoundary = option('--code-boundary')
+const preserveContext = args.includes('--preserve-design-context')
+if (preserveContext && codeBoundary) throw Error('Choose design-context preservation or legacy card extraction, not both')
 const started = performance.now()
 const links = JSON.parse(await readFile(linksPath, 'utf8')) as Links
 if (links.schema !== 'fdn-links/0' || !links.artboards?.length) throw new Error('Expected fdn-links/0 with artboards')
@@ -91,6 +94,8 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
       page.on('pageerror', error => errors.push(error.message))
       page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()) })
       let url = 'foundation:baked'
+      let designIsolation: Awaited<ReturnType<typeof preserveDesignContext>> | undefined
+      let originalFontSubstitutions: Awaited<ReturnType<typeof pinFontStacks>> | undefined
       try {
         if (side === 'code') {
           url = `${target.url}__foundation/${index}`
@@ -101,7 +106,11 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
         } else {
           const baked = bakeDocument(doc, { state: state.designState, includeNodeIds: true })
           await page.setContent(baked.html)
-          await page.evaluate(({id,properties,audit}) => {
+          if (preserveContext) {
+            await page.addStyleTag({content:fontAssets.map(font=>font.css).join('\n')+'\n*{animation:none!important;transition:none!important;caret-color:transparent!important}'})
+            originalFontSubstitutions = await pinFontStacks(page,links.fontPolicy,'body')
+            designIsolation = await preserveDesignContext(page,`[data-fdn-id="${state.designNode ?? board.designNode}"]`,STYLE_PROPERTIES)
+          } else await page.evaluate(({id,properties,audit}) => {
             const selected = document.querySelector(`[data-fdn-id="${id}"]`)
             if (!selected) throw new Error(`Design node missing: ${id}`)
             const elements = [selected, ...selected.querySelectorAll('*')]
@@ -141,14 +150,17 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
           ;(window as any).__foundationBoundaryAudit = {nodes:elements.length,properties:properties.length,differences,unexpected,scrolls:scrolls.flatMap(({el,x,y},i) => x || y ? [{node:i,x,y}] : []),designExtraction:(window as any).__foundationDesignExtraction}
           if (unexpected.length || (window as any).__foundationDesignExtraction?.differences.length) throw new Error('Computed styles changed during boundary extraction: '+JSON.stringify(unexpected))
         }, {side, selector:codeBoundary,properties:[...STYLE_PROPERTIES]})
-        await page.addStyleTag({ content: fontAssets.map(font => font.css).join('\n') + '\n*{animation:none!important;transition:none!important;caret-color:transparent!important} #foundation-root{width:100vw;height:100vh;overflow:hidden}' })
+        const rootLayout = preserveContext && side === 'design' ? '' : '#foundation-root{width:100vw;height:100vh;overflow:hidden}'
+        await page.addStyleTag({ content: fontAssets.map(font => font.css).join('\n') + '\n*{animation:none!important;transition:none!important;caret-color:transparent!important} ' + rootLayout })
         await page.evaluate(() => document.fonts.ready)
-        const fontSubstitutions = await pinFontStacks(page, links.fontPolicy)
+        const fontSubstitutions = originalFontSubstitutions ?? await pinFontStacks(page, links.fontPolicy)
         if (side === 'design') frame = await page.evaluate(() => {
-          const rect = document.querySelector('#foundation-root')!.firstElementChild!.getBoundingClientRect()
+          const root=document.querySelector('#foundation-root')!
+          const rect = (root.getAttribute('data-fdn-id') ? root : root.firstElementChild!).getBoundingClientRect()
           return {width: rect.width, height: rect.height}
         })
-        await page.addStyleTag({content: `#foundation-root{width:${frame.width}px;height:${frame.height}px}`})
+        if (preserveContext && side === 'code') frame={width:board.viewport.width,height:board.viewport.height}
+        if (!(preserveContext && side === 'design')) await page.addStyleTag({content: `#foundation-root{width:${frame.width}px;height:${frame.height}px}`})
         await page.waitForFunction(() => (window as any).__foundationPendingTimers === 0, undefined, {timeout:5000})
         await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
         await settleRoot(page)
@@ -167,7 +179,7 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
         await page.screenshot({ path: join(destination, 'screenshot.png'), animations: 'disabled' })
         const fullExtent = await captureFullExtent(page, '#foundation-root', join(destination, 'full-extent.png'))
         await writeFile(join(destination, 'dom.json'), JSON.stringify(dom, null, 2) + '\n')
-        const meta = { schema: 'fdn-capture/0', ...provenance, rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, extent: dom.extent, fullExtent, frame, ...(codeBoundary ? {boundary:{codeSelector:codeBoundary, originNormalized:true, bothRootsNormalized:true, sizePreserved:true,audit:boundaryAudit}} : {}), url, fonts, fontPolicy: links.fontPolicy, fontSubstitutions, platformFonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
+        const meta = { schema: 'fdn-capture/0', ...provenance, rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, extent: dom.extent, fullExtent, frame, ...(designIsolation ? {designIsolation} : {}), ...(preserveContext && side === 'code' ? {componentFrame:'viewport'} : {}), ...(codeBoundary ? {boundary:{codeSelector:codeBoundary, originNormalized:true, bothRootsNormalized:true, sizePreserved:true,audit:boundaryAudit}} : {}), url, fonts, fontPolicy: links.fontPolicy, fontSubstitutions, platformFonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
         await writeFile(join(destination, 'meta.json'), JSON.stringify(meta, null, 2) + '\n')
         console.log(`${board.id}/${state.name} ${side}: ${dom.nodes.length} nodes, ${meta.timingsMs.capture} ms`)
       } finally { await context.close() }

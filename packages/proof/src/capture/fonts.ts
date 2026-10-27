@@ -1,13 +1,13 @@
 import type { Page } from 'playwright'
 import type { Links } from './types.js'
 
-export async function pinFontStacks(page: Page, policy: Links['fontPolicy']) {
+export async function pinFontStacks(page: Page, policy: Links['fontPolicy'], root = '#foundation-root') {
   if (!policy) return []
-  const substitutions = await page.evaluate(policy => {
+  const substitutions = await page.evaluate(({policy,root}) => {
     const authored = new WeakMap<Element,string>()
     ;(window as any).__foundationAuthoredFontFamilies = authored
     const replacements = new Map<string, string>()
-    const rows = Array.from(document.querySelectorAll<HTMLElement>('#foundation-root, #foundation-root *')).map(el => ({el, family: getComputedStyle(el).fontFamily}))
+    const rows = Array.from(document.querySelectorAll<HTMLElement>(`${root}, ${root} *`)).map(el => ({el, family: getComputedStyle(el).fontFamily}))
     for (const {el, family} of rows) {
       authored.set(el, family)
       const names = family.split(',').map(value => value.trim().replace(/^['"]|['"]$/g, ''))
@@ -22,7 +22,7 @@ export async function pinFontStacks(page: Page, policy: Links['fontPolicy']) {
     }
     document.body.getBoundingClientRect()
     return [...replacements].sort(([a], [b]) => a.localeCompare(b)).map(([from, to]) => ({from, to}))
-  }, policy)
+  }, {policy,root})
   await page.evaluate(() => document.fonts.ready)
   return substitutions
 }
