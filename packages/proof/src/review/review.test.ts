@@ -260,3 +260,24 @@ test("ended-session timing must be consistent and finite", async () => {
     await rm(dir, { recursive: true, force: true });
   }
 });
+
+test("aborted-session decisions are explicitly untimed", async () => {
+  const { reviewCounts, runReviewMs } = await import("./index.ts");
+  const r = report(),
+    { log } = reviewed(r);
+  log.entries[0]!.sessionId = "aborted";
+  log.sessions = [
+    {
+      id: "aborted",
+      run: "10",
+      reviewer: "Reviewer",
+      startedAt: "2026-01-01T00:00:00Z",
+      lastAt: "2026-01-01T00:00:01Z",
+      endedAt: "2026-01-01T00:00:02Z",
+      durationMs: 2000,
+      aborted: true,
+    },
+  ];
+  expect(reviewCounts(log, "10")).toEqual({ timed: 0, untimed: 1 });
+  expect(runReviewMs(log, "10")).toBe(0);
+});

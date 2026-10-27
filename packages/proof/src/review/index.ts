@@ -281,3 +281,16 @@ export async function persistReview(
     throw e;
   }
 }
+
+export function reviewCounts(log: ReviewLog, run: string) {
+  const timed = new Set(
+    log.sessions
+      .filter((s) => s.run === run && s.endedAt && !s.aborted)
+      .map((s) => s.id),
+  );
+  const entries = log.entries.filter((e) => e.run === run);
+  return {
+    timed: entries.filter((e) => timed.has(e.sessionId)).length,
+    untimed: entries.filter((e) => !timed.has(e.sessionId)).length,
+  };
+}
