@@ -127,6 +127,10 @@ function cost(
     iou(a, b) < 0.75
   )
     return 1;
+  // Direct unique copy identifies content across presentational tag/role
+  // wrappers. Role changes remain captured facts, not an extra text penalty.
+  if (a.text?.trim() && a.text.trim() === b.text?.trim() && da.counts.get(a.text.trim())===1 && ca.counts.get(a.text.trim())===1)
+    return 0.25*(1-iou(a,b)) + 0.05*(a.path===b.path ? 0 : 1);
   let textDistance = text && text === other ? 0 : text && other ? 1 : 0.7;
   if (!text && !other) {
     const left = dc.get(a.path) ?? new Set<string>(),
@@ -169,7 +173,7 @@ function cost(
         ? 0
         : 1) +
     0.15 *
-      ((a.role || "") === (b.role || "") && (a.name || "") === (b.name || "")
+      ((a.role || "") === (b.role || "") && (a.name === a.text && b.name === b.text || (a.name || "") === (b.name || ""))
         ? 0
         : 1) +
     0.25 * (1 - iou(a, b)) +
@@ -359,6 +363,27 @@ export function matchNodes(
         usedC.add(b);
       }
     });
+  }
+  // An established component boundary with exactly one icon per side provides
+  // identity even when the replacement uses different SVG primitives.
+  for (const parent of matches.filter(m=>!m.uncertain)) {
+    if (!matches.some(m=>m.design.text?.trim() && m.design.path.startsWith(parent.design.path+"/") && m.code.path.startsWith(parent.code.path+"/"))) continue;
+    const left=d.filter(n=>!usedD.has(n) && n.tag==="svg" && n.path.startsWith(parent.design.path+"/"));
+    const right=c.filter(n=>!usedC.has(n) && n.tag==="svg" && n.path.startsWith(parent.code.path+"/"));
+    if(left.length===1 && right.length===1) {
+      matches.push({design:left[0]!,code:right[0]!,kind:"heuristic",confidence:0.7});
+      usedD.add(left[0]!);usedC.add(right[0]!);
+    }
+  }
+  // A single remaining text slot on both sides of an established boundary is
+  // a copy replacement, even when differing lengths destroy box overlap.
+  for (const parent of [...matches].filter(m => !m.uncertain).sort((a,b) => b.design.path.length-a.design.path.length)) {
+    const left = d.filter(n => !usedD.has(n) && n.text?.trim() && n.path.startsWith(parent.design.path+"/"));
+    const right = c.filter(n => !usedC.has(n) && n.text?.trim() && n.path.startsWith(parent.code.path+"/"));
+    if (left.length !== 1 || right.length !== 1 || left[0]!.tag !== right[0]!.tag) continue;
+    const a=left[0]!, b=right[0]!;
+    matches.push({design:a,code:b,kind:"heuristic",confidence:0.7});
+    usedD.add(a); usedC.add(b);
   }
   // A moved component may have unrelated wrappers while its already reserved
   // text descendants still identify it. Infer the enclosing pair, but keep the

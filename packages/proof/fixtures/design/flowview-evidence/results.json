@@ -1,0 +1,93 @@
+{
+  "apiary": "proto/design-to-code-tracks ab8ab87d15f90af37caa6f28cb2a0253603e1d1f",
+  "foundationCompare": "f9dfd62 (matcher/grouping frozen e419831; O1 detector ffd2bbc)",
+  "states": {
+    "track-selected": {
+      "oldDesign": {
+        "rawFindings": 716,
+        "productCandidates": 28,
+        "uncertain": 18,
+        "environment": 1,
+        "offscreenCandidates": 4,
+        "pixelDiffPercent": 2.805
+      },
+      "newDesign": {
+        "rawFindings": 135,
+        "productCandidates": 29,
+        "uncertain": 38,
+        "environment": 0,
+        "offscreenCandidates": 0,
+        "pixelDiffPercent": 0.227
+      }
+    },
+    "proposal-pending": {
+      "oldDesign": {
+        "rawFindings": 767,
+        "productCandidates": 30,
+        "uncertain": 18,
+        "environment": 1,
+        "offscreenCandidates": 6,
+        "pixelDiffPercent": 3.232
+      },
+      "newDesign": {
+        "rawFindings": 168,
+        "productCandidates": 32,
+        "uncertain": 53,
+        "environment": 0,
+        "offscreenCandidates": 2,
+        "pixelDiffPercent": 0.479
+      }
+    },
+    "empty": {
+      "oldDesign": {
+        "rawFindings": 112,
+        "productCandidates": 20,
+        "uncertain": 0,
+        "environment": 1,
+        "offscreenCandidates": 0,
+        "pixelDiffPercent": 1.235
+      },
+      "newDesign": {
+        "rawFindings": 8,
+        "productCandidates": 7,
+        "uncertain": 0,
+        "environment": 0,
+        "offscreenCandidates": 0,
+        "pixelDiffPercent": 0
+      }
+    }
+  },
+  "round4": {
+    "apiary": "proto/design-to-code-components 501368d3e8888b11a6745580c3b380d860688b19",
+    "foundationCompare": "d854883 base (frozen matcher/grouping e419831 + O1 off-screen detector)",
+    "states": {
+      "track-selected": {
+        "rawFindings": 135,
+        "productCandidates": 29,
+        "uncertain": 38,
+        "offscreenCandidates": [],
+        "pixelDiffPercent": 0.227
+      },
+      "proposal-pending": {
+        "rawFindings": 168,
+        "productCandidates": 35,
+        "uncertain": 53,
+        "offscreenCandidates": [
+          "rendered outside the visible pane: ACTION",
+          "rendered outside the visible pane: INSTRUCTION",
+          "rendered outside the visible pane: ACTION",
+          "rendered outside the visible pane: INSTRUCTION",
+          "rendered outside the visible pane: 2 change s \u00b7 +n5a \u00b7 +n5b \u00b7 Accept \u00b7 \u2318\u21b5 \u00b7 Refine \u00b7 Discard \u00b7 \u2318\u232b"
+        ],
+        "pixelDiffPercent": 0.413
+      },
+      "empty": {
+        "rawFindings": 8,
+        "productCandidates": 7,
+        "uncertain": 0,
+        "offscreenCandidates": [],
+        "pixelDiffPercent": 0
+      }
+    }
+  }
+}

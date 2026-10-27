@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Tracks proposal example — before and after</title>
+<style>
+  body{margin:0;background:#ECEAE5;font:14px/1.45 -apple-system,"Helvetica Neue",Helvetica,Arial,sans-serif;color:#2E2B27}
+  section{padding:22px 32px 26px;border-top:1px solid #DCD9D2} h1{font-size:20px;margin:0 0 6px} h2{font-size:16px;margin:0 0 4px}
+  header{padding:26px 32px 8px;max-width:1100px} header p, section>p{color:#6B6862;margin:0 0 12px;max-width:1100px}
+  .label{font:600 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.08em;color:#8A877F;margin:0 0 6px}.label b{color:#2E2B27}
+  .frame{overflow:hidden;outline:1px solid #D6D3CD;background:#fff;display:inline-block;margin-bottom:14px}.frame img{display:block}
+  .pair{display:flex;gap:16px;align-items:flex-start}.pair .frame{width:680px}.pair img{width:680px;height:auto}
+</style></head><body>
+<header><h1>Proposal pending — Fix findings and Publish preview are normal steps; the proposal adds new ones</h1>
+<p>Before: the proposal re-added Fix findings and Publish preview and replaced a "Manual smoke test" the track never had. After: both stay normal steps, and the proposal adds two new steps after Publish preview, Smoke-test the preview and Write release notes. Design and app were both updated and captured with the same pinned browser and fonts.</p></header>
+<section id="before"><h2>Before (round 3)</h2><p>Proposed: Fix findings, Publish preview; removed: Manual smoke test.</p>
+<div class="label">DESIGN</div><div class="frame" style="width:1416px;height:611px"><img src="img/before-design.png" width="1416" height="720" alt="before design"></div>
+<div class="label">APP</div><div class="frame" style="width:1416px;height:611px"><img src="img/before-code.png" width="1416" height="720" alt="before app"></div></section>
+<section id="after"><h2>After (round 4)</h2><p>Fix findings sits on the denied arm and Publish preview on the spine as normal steps; "proposal · 2 changes". The two proposed cards are further down the canvas (see the full graph below). The design keeps Accept / Refine / Discard in view; the app still draws it off-screen.</p>
+<div class="label">DESIGN</div><div class="frame" style="width:1416px;height:611px"><img src="img/after-design.png" width="1416" height="720" alt="after design"></div>
+<div class="label">APP</div><div class="frame" style="width:1416px;height:611px"><img src="img/after-code.png" width="1416" height="720" alt="after app"></div></section>
+<section id="full"><h2>After — the whole graph (diagnostic paint, clipping turned off)</h2><p>Overflow made visible so the proposed cards below the fold can be read. In the design the docked bar overlaps the graph here only because clipping is off.</p>
+<div class="pair"><div><div class="label">DESIGN</div><div class="frame"><img src="img/after-design-full.png" alt="design full graph"></div></div><div><div class="label">APP</div><div class="frame"><img src="img/after-code-full.png" alt="app full graph"></div></div></div></section>
+</body></html>

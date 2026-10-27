@@ -1,0 +1,54 @@
+[
+  {
+    "case": "keycap-command-enter",
+    "optimistic": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0
+    },
+    "strict": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0
+    }
+  },
+  {
+    "case": "inbox-login",
+    "optimistic": {
+      "tp": 7,
+      "fp": 1,
+      "fn": 0
+    },
+    "strict": {
+      "tp": 7,
+      "fp": 1,
+      "fn": 0
+    }
+  },
+  {
+    "case": "inbox-waiting",
+    "optimistic": {
+      "tp": 8,
+      "fp": 2,
+      "fn": 0
+    },
+    "strict": {
+      "tp": 8,
+      "fp": 2,
+      "fn": 0
+    }
+  },
+  {
+    "case": "help-search-split",
+    "optimistic": {
+      "tp": 7,
+      "fp": 34,
+      "fn": 6
+    },
+    "strict": {
+      "tp": 4,
+      "fp": 37,
+      "fn": 9
+    }
+  }
+]

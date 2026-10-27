@@ -1,0 +1,9 @@
+
+ RUN  v4.1.10 /home/trmd/.hive/v2/cells/dtc-o1-offscreen-c04e00ce2948/github-com-honeybeehq-foundation-ddad6d63099e-space-c04e00ce2948
+
+
+ Test Files  4 passed (4)
+      Tests  45 passed (45)
+   Start at  20:29:18
+   Duration  3.06s (transform 580ms, setup 0ms, import 1.36s, tests 3.70s, environment 1ms)
+

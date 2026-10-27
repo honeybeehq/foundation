@@ -4,6 +4,7 @@ import { readFile, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { PNG } from "pngjs";
 import pixelmatch from "pixelmatch";
+import { belowFoldMatches } from "./below-fold.ts";
 import { offscreenDefects } from "./offscreen.ts";
 import { groupDefects } from "./defects.ts";
 import { matchNodes } from "./match.ts";
@@ -80,6 +81,8 @@ export function compare(
     drifts: Drift[] = [];
   const add = (d: Omit<Drift, "id">) =>
     drifts.push({ id: `d${drifts.length + 1}`, ...d });
+  const supplemental=belowFoldMatches(design.nodes,code.nodes,matches);
+  matches.push(...supplemental);
   for (const m of matches) {
     const a = m.design,
       b = m.code,
@@ -102,6 +105,7 @@ export function compare(
           code: b.box[i],
         });
     });
+    if (supplemental.includes(m)) continue;
     if ((a.text || "").trim() !== (b.text || "").trim())
       add({
         ...base,
@@ -110,6 +114,20 @@ export function compare(
         design: a.text ?? "",
         code: b.text ?? "",
       });
+    if (a.tag === "svg" && b.tag === "svg" && a.paint && b.paint) {
+      const icon=(n: typeof a,c: Capture) => c.nodes.filter(p=>(p===n || p.path.startsWith(n.path+"/")) && !(p.tag === "g" && (!p.paint?.transform || p.paint.transform === "none") && !Object.keys(p.paint?.attributes ?? {}).filter(key=>!key.startsWith("data-") && !["id","class"].includes(key)).length)).map(p=>({tag:p.tag,attributes:Object.fromEntries(Object.entries(p.paint?.attributes ?? {}).filter(([key])=>!key.startsWith("data-") && !["id","class","width","height"].includes(key)))}));
+      const av=icon(a,design),bv=icon(b,code);
+      if(canonical(av)!==canonical(bv)) add({...base,kind:"style",property:"icon",design:av,code:bv});
+    }
+    if ((a.text?.trim() || a.tag === "svg") && a.paint && b.paint) {
+      const parent=matches.filter(p=>p!==m && a.path.startsWith(p.design.path+"/") && b.path.startsWith(p.code.path+"/"))
+        .sort((x,y)=>y.design.path.length-x.design.path.length)[0];
+      const transforms=(n: typeof a, c: Capture, boundary?: typeof a) => c.nodes.filter(p =>
+        (p===n || n.path.startsWith(p.path+"/")) && (!boundary || p.path.startsWith(boundary.path+"/")) &&
+        p.paint?.transform && p.paint.transform !== "none").map(p=>p.paint!.transform);
+      const av=transforms(a,design,parent?.design),bv=transforms(b,code,parent?.code);
+      if (canonical(av)!==canonical(bv)) add({...base,kind:"layout",property:"transform",design:av,code:bv});
+    }
     for (const p of properties) {
       const textProperty =
         /^(font-|line-height|letter-spacing|text-|white-space|color$)/.test(p);
@@ -117,8 +135,8 @@ export function compare(
         textProperty &&
         !a.text?.trim() &&
         !b.text?.trim() &&
-        !["input", "button", "select", "textarea", "svg"].includes(a.tag) &&
-        !["input", "button", "select", "textarea", "svg"].includes(b.tag)
+        !(["input", "select", "textarea"].includes(a.tag) || a.tag === "svg" && p === "color") &&
+        !(["input", "select", "textarea"].includes(b.tag) || b.tag === "svg" && p === "color")
       )
         continue;
       const border = /^border-(top|right|bottom|left)-(color|style)$/.exec(p);
@@ -165,7 +183,7 @@ export function compare(
       }
     }
   }
-  for (const n of missing)
+  for (const n of missing.filter(n=>!matches.some(m=>m.design===n)))
     add({
       kind: "missing",
       designNode: n.fdnId || n.path,
@@ -173,7 +191,7 @@ export function compare(
       property: "node",
       designBox: n.box,
     });
-  for (const n of extra)
+  for (const n of extra.filter(n=>!matches.some(m=>m.code===n)))
     add({
       kind: "extra",
       codeNode: n.fdnId || n.path,
@@ -210,10 +228,13 @@ export function compare(
   const meta = design.meta;
   const defects = groupDefects(drifts, matches, design, code);
   for (const defect of offscreenDefects(design, code, matches)) {
-    add({kind:'layout', property:'offscreen', codeNode:defect.layer.code, confidence:1,
+    add({kind:'layout', property:'offscreen', ...(defect.layer.design ? {designNode:defect.layer.design}:{}), codeNode:defect.layer.code, confidence:1,
       codeBox:defect.offscreen!.box, code:{...defect.offscreen, summary:defect.summary}});
     defect.findings = [drifts.at(-1)!.id];
-    defects.push(defect);
+    const size = defects.find(d=>d.classification === "product" && d.kind === "layout" && d.layer.code===defect.layer.code &&
+      d.findings.some(id=>drifts.some(r=>r.id===id && ["height","width"].includes(r.property))));
+    if(size) {size.findings.push(...defect.findings); size.offscreen=defect.offscreen;}
+    else defects.push(defect);
   }
   const report = {
     schema: "fdn-drift/0",

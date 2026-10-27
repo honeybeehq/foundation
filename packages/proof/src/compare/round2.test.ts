@@ -124,7 +124,7 @@ describe("causal grouping", () => {
     expect(defects).toHaveLength(1);
     expect(defects[0]?.findings).toEqual(["d1", "d2"]);
   });
-  it("reports a structurally replaced region once and keeps its environment findings separate", () => {
+  it("keeps independent geometry outside a structural replacement group", () => {
     const a = node("0/0"),
       b = node("0/0"),
       at = node("0/0/0", { text: "First" }),
@@ -180,10 +180,11 @@ describe("causal grouping", () => {
       cap([shell, a, at, au, old]),
       cap([shell, b, bt, bu, fresh]),
     );
-    expect(defects).toHaveLength(1);
+    expect(defects).toHaveLength(2);
     expect(defects[0]?.cause).toBe("layout:region-structure");
     expect(defects[0]?.classification).toBe("product");
-    expect(defects[0]?.findings).toEqual(["d1", "d2", "d3"]);
+    expect(defects[0]?.findings).toEqual(["d1", "d2"]);
+    expect(defects[1]?.findings).toEqual(["d3"]);
   });
   it("folds a following sibling shift into the size change that explains it", () => {
     const a = node("0/0", { box: [0, 0, 50, 100] }),

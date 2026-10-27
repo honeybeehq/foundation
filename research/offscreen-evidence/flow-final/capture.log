@@ -1,0 +1,13 @@
+tracks-pane/at-rest design: 215 nodes, 2748 ms
+tracks-pane/at-rest code: 192 nodes, 7572 ms
+PAIR /home/trmd/.hive/v2/cells/dtc-o1-offscreen-c04e00ce2948/github-com-honeybeehq-foundation-ddad6d63099e-space-c04e00ce2948/.audit/o1/flow-final-captures/tracks-pane/at-rest/1416x720@1 10654 ms
+tracks-pane/track-selected design: 215 nodes, 2556 ms
+tracks-pane/track-selected code: 192 nodes, 3735 ms
+PAIR /home/trmd/.hive/v2/cells/dtc-o1-offscreen-c04e00ce2948/github-com-honeybeehq-foundation-ddad6d63099e-space-c04e00ce2948/.audit/o1/flow-final-captures/tracks-pane/track-selected/1416x720@1 6608 ms
+tracks-pane/proposal-pending design: 249 nodes, 2618 ms
+tracks-pane/proposal-pending code: 220 nodes, 3818 ms
+PAIR /home/trmd/.hive/v2/cells/dtc-o1-offscreen-c04e00ce2948/github-com-honeybeehq-foundation-ddad6d63099e-space-c04e00ce2948/.audit/o1/flow-final-captures/tracks-pane/proposal-pending/1416x720@1 6734 ms
+tracks-pane/empty design: 31 nodes, 1512 ms
+tracks-pane/empty code: 24 nodes, 2472 ms
+PAIR /home/trmd/.hive/v2/cells/dtc-o1-offscreen-c04e00ce2948/github-com-honeybeehq-foundation-ddad6d63099e-space-c04e00ce2948/.audit/o1/flow-final-captures/tracks-pane/empty/1416x720@1 4228 ms
+Captured 4 pairs in 30703 ms

@@ -27,10 +27,14 @@ export function csv(text: string): Record<string, string>[] {
     row.push(cell.replace(/\r$/, ""));
     rows.push(row);
   }
+  if (quoted) throw Error("Unterminated quoted CSV field");
   const keys = rows.shift()!;
   return rows
     .filter((r) => r.some(Boolean))
-    .map((r) => Object.fromEntries(keys.map((k, i) => [k, r[i] ?? ""])));
+    .map((r,i) => {
+      if (r.length !== keys.length) throw Error(`CSV row ${i+2} has ${r.length} fields; expected ${keys.length}`);
+      return Object.fromEntries(keys.map((k,j)=>[k,r[j]!]));
+    });
 }
 const rate = (n: number, d: number) => (d ? n / d : null);
 export function correspondenceMetrics(
@@ -154,7 +158,7 @@ export function defectMetrics(
   labels: Record<string, string>[],
   design: CaptureNode[],
   code: CaptureNode[],
-  options: { expandShorthands?: boolean } = {},
+  options: { expandShorthands?: boolean; strictScope?: boolean } = {},
 ) {
   const truth = labels.filter((l) => l.kind !== "environment");
   const predicted = defects.filter((d) => d.classification === "product");
@@ -172,9 +176,19 @@ export function defectMetrics(
           .filter((r) => {
             const prop =
               properties.includes(r.property) ||
+              (options.strictScope === true && ((r.property === "y" && properties.includes("top")) || (r.property === "x" && properties.includes("left")) ||
+                r.property === "offscreen" && properties.some(p => ["top","position","layout"].includes(p)))) ||
               (properties.includes("subtree") &&
                 (r.kind === "missing" || r.kind === "extra")) ||
               (properties.includes("layout") && r.kind === "layout");
+            const strictInScope = (actual: string | undefined, scope: string | undefined) =>
+              inScope(actual, scope?.split(";").filter(p => p !== "*").join(";"));
+            if (options.strictScope) {
+              const ds = dp.get(r.designNode ?? "") ?? r.designNode;
+              const cs = cp.get(r.codeNode ?? "") ?? r.codeNode;
+              return prop && (ds ? strictInScope(ds, l.design_layer) : l.design_layer === "none") &&
+                (cs ? strictInScope(cs, l.code_layer) : l.code_layer === "none");
+            }
             return (
               prop &&
               (inScope(
