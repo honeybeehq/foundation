@@ -1,0 +1,7 @@
+id,design_layer,code_layer,kind,description,severity,likely_intentional,note,properties
+BR-01,0/0/0,0/0,token,"Label renders in a serif face in the design but in Hanken Grotesk in code: the inbox board uses var(--font-sans) but never defines it; this also makes the code button 86px wide vs 76px",high,no,[sans-font-undefined] design-file bug (same as round-3 InboxRow),font-family
+BR-02,0/0/0,0/0,style,"Label is 12.5px in code vs 12px in design",low,unsure,[button-font-size],font-size
+BR-03,0/0/0,0/0,style,"Label ink is lighter in code: #8A877F (inkMuted) vs --color-text-tertiary #6B6862",low,unsure,[button-ink],color
+BR-04,0/0,0/0,token,"Border is #E2E0DB (ghostBorder) in code vs --color-border-subtle #ECEAE5 in design, slightly darker",low,unsure,[button-border],border-color
+BR-05,0/0,0/0,layout,"Button is 28px tall in code vs 30px in design (both author 28px; design adds the 1px borders outside it)",low,no,[box-sizing] content-box in design vs border-box in code,height;box-sizing
+BR-06,0,0,environment,"Area around the component is white in the design artboard and the warm window background #F5F4F1 in the code harness. Not a product defect",low,no,[harness-bg] capture environment only,background-color(page)
