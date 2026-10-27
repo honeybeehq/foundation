@@ -1,8 +1,12 @@
+import { rememberAuthored } from './history-origin.js'
+import { syncTrace, syncTraceSpan } from './sync-trace.js'
+import { selectedChainFormat } from './chain-format.js'
+import { loadChain, rememberSavedChain } from './chain-cache.js'
 import { parseForWrite } from './parse-write.js'
 import { createHash, randomUUID } from 'node:crypto'
 import { closeSync, fsyncSync, openSync, readFileSync, renameSync, rmSync, unlinkSync, writeFileSync } from 'node:fs'
 import { basename, dirname, join } from 'node:path'
-import { diffPatch, loadChain, normalizeDocument, parseDocument, projectDocument } from 'foundation-engine'
+import { diffPatch, normalizeDocument, parseDocument, projectDocument } from 'foundation-engine'
 import type { ChangeMeta, EnvelopeRecord, FdnChain, FdnDocument } from 'foundation-engine'
 import { withWallTime } from './change-meta.js'
 import { injectDocIdAttr, readDocIdAttr } from './docid.js'
@@ -113,19 +117,28 @@ export function recoverDocument(file: string): void {
 }
 
 export function persistDocument(file: string, chain: FdnChain, text = projectedText(chain, chain.docId() ?? readDocIdAttr(readTextIfPresent(file) ?? '')), protectedProjection = true): Uint8Array {
-  const bytes = chain.save()
-  const receipt = JSON.stringify({ version: projectionVersion(text), protected: protectedProjection })
-  if (sameBytes(readBytesIfPresent(`${file}.chain`), bytes) && readTextIfPresent(file) === text) {
+  const finish = syncTraceSpan('save', () => ({ docId: chain.docId(), hash: chain.head().hash }))
+  let ok = false
+  try {
+    if (selectedChainFormat(file, chain.storageFormat()) === 2) chain.upgradeStorage()
+    const bytes = chain.save()
+    const receipt = JSON.stringify({ version: projectionVersion(text), protected: protectedProjection })
+    if (sameBytes(readBytesIfPresent(`${file}.chain`), bytes) && readTextIfPresent(file) === text) {
+      writeAtomic(`${file}.chain.projection`, receipt)
+      rememberAuthored(chain)
+      ok = true; return bytes
+    }
+    const pendingPath = `${file}.chain.pending`
+    writeAtomic(pendingPath, JSON.stringify({ before: readTextIfPresent(file), after: text, chainHash: createHash('sha256').update(bytes).digest('hex'), protected: protectedProjection }))
+    writeAtomic(`${file}.chain`, bytes)
+    syncTrace('save.chain-written', () => ({ docId: chain.docId(), hash: chain.head().hash }))
+    writeAtomic(file, text)
     writeAtomic(`${file}.chain.projection`, receipt)
-    return bytes
-  }
-  const pendingPath = `${file}.chain.pending`
-  writeAtomic(pendingPath, JSON.stringify({ before: readTextIfPresent(file), after: text, chainHash: createHash('sha256').update(bytes).digest('hex'), protected: protectedProjection }))
-  writeAtomic(`${file}.chain`, bytes)
-  writeAtomic(file, text)
-  writeAtomic(`${file}.chain.projection`, receipt)
-  unlinkSync(pendingPath)
-  return bytes
+    unlinkSync(pendingPath)
+    rememberSavedChain(bytes)
+    rememberAuthored(chain)
+    ok = true; return bytes
+  } finally { finish({ ok }) }
 }
 
 function ingestCurrentSource(file: string, chain: FdnChain, source: string): boolean {
@@ -137,7 +150,7 @@ function ingestCurrentSource(file: string, chain: FdnChain, source: string): boo
   return ops.length > 0
 }
 
-export function updateDocument<T>(file: string, mutate: (chain: FdnChain) => T): T {
+export function updateDocument<T>(file: string, mutate: (chain: FdnChain) => T, onlyIfChanged = false): T {
   file = documentPath(file)
   return withDocumentLock(file, () => {
     recoverDocument(file)
@@ -146,8 +159,10 @@ export function updateDocument<T>(file: string, mutate: (chain: FdnChain) => T):
     if (source !== null) {
       ingestCurrentSource(file, chain, source)
     }
+    const before = chain.versionRef()
+    const beforeFormat = chain.storageFormat()
     const result = mutate(chain)
-    persistDocument(file, chain)
+    if (!onlyIfChanged || chain.storageFormat() !== beforeFormat || chain.versionRef() !== before || (source !== null && projectedText(chain) !== source)) persistDocument(file, chain)
     return result
   })
 }
@@ -173,5 +188,29 @@ export function commitDocument(chainPath: string, meta: ChangeMeta, target: FdnD
     const envelope = chain.apply(withWallTime(meta), ops)
     persistDocument(file, chain)
     return { status: 'committed', chain, envelope }
+  })
+}
+
+/** Materialization uses the same G16 lock and pending-save receipt as local writers. */
+export function materializeDocument(file: string, incoming: FdnChain): FdnChain {
+  file = documentPath(file)
+  return withDocumentLock(file, () => {
+    const bytes = readBytesIfPresent(`${file}.chain`), source = readTextIfPresent(file)
+    const sourceId = source === null ? null : readDocIdAttr(source)
+    if (sourceId !== null && sourceId !== incoming.docId()) throw new Error('path-conflict: target contains another design')
+    if (source !== null && bytes === null) throw new Error('path-conflict: target contains an untracked document')
+    let chain = bytes === null ? incoming : loadChain(bytes, { actor: `materialize:${randomUUID()}` })
+    if (chain.docId() !== incoming.docId()) throw new Error('path-conflict: target chain belongs to another design')
+    if (bytes !== null && chain.changes().find(change => change.envelope.prevHash === null)?.envelope.hash !== incoming.changes().find(change => change.envelope.prevHash === null)?.envelope.hash) throw new Error('path-conflict: target has unrelated history')
+    recoverDocument(file)
+    if (bytes !== null) {
+      chain = loadChain(readFileSync(`${file}.chain`), { actor: `materialize:${randomUUID()}` })
+      const current = readTextIfPresent(file)
+      if (current !== null) ingestCurrentSource(file, chain, current)
+      chain.merge(incoming)
+    }
+    if (!chain.verify().ok) throw new Error('materialized chain failed history verification')
+    persistDocument(file, chain)
+    return chain
   })
 }

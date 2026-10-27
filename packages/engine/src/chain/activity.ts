@@ -32,7 +32,7 @@ export class ChainActivity {
   private entries = new Map<string, ChainLogEntry>()
   private hashes = new Map<string, string>()
 
-  constructor(private readonly doc: LoroDoc, private readonly docId: () => string | null) {}
+  constructor(private readonly doc: LoroDoc, private readonly docId: () => string | null, private readonly originalBytes: (change: Change) => Uint8Array) {}
 
   read(opts: ChainActivityOptions = {}, anchors: ReadonlyMap<string, readonly { peer: string; counter: number }[]> = new Map()): ChainActivityPage {
     const requested = opts.limit ?? 200
@@ -114,6 +114,7 @@ export class ChainActivity {
       return { peer: point.peer, counter: point.counter }
     })
   }
+
 
   page(opts: ChainLogOptions = {}, anchors: ReadonlyMap<string, readonly { peer: string; counter: number }[]> = new Map()): ChainLogPage {
     const requested = opts.limit ?? 50
@@ -275,6 +276,7 @@ export class ChainActivity {
       time: { kind: 'logical', value: change.timestamp },
       wallTime: decoded.wallTime ?? null,
       originNode: decoded.originNode ?? null,
+      originAssurance: null,
       nodeIds: [...new Set([...inserted, ...removed, ...changed])].sort(),
       nodes: { inserted: [...inserted].sort(), removed: [...removed].sort(), changed: [...changed].sort() },
       sections: [...sections].sort(([a], [b]) => a.localeCompare(b)).map(([name, names]) => ({ section: name, names: [...names].sort() })),
@@ -293,7 +295,7 @@ export class ChainActivity {
     const cached = this.hashes.get(key)
     if (cached) return cached
     const decoded = decodeEnvelope(change.message)
-    const bytes = this.doc.export({ mode: 'updates-in-range', spans: [{ id: { peer: change.peer, counter: change.counter }, len: change.length }] })
+    const bytes = this.originalBytes(change)
     const hash = computeEnvelopeHash(decoded.prevHash, decoded.author, decoded.message, decoded.specVersion, bytes)
     if (this.hashes.size >= 256) this.hashes.delete(this.hashes.keys().next().value!)
     this.hashes.set(key, hash)

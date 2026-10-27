@@ -1,3 +1,4 @@
+import { encodeOriginalUpdates, OriginalUpdates } from './originals.js'
 import { artboardActivity, explicitArtboards, assertFormatVersion } from '../artboards/index.js'
 /**
  * FdnChain over loro-crdt (LoroDoc + LoroTree movable tree) — the Foundation
@@ -77,8 +78,8 @@ import { artboardActivity, explicitArtboards, assertFormatVersion } from '../art
  *     exchange"): `changes()` exposes the same per-Loro-Change envelope +
  *     raw update-bytes pairing that `log()`/`save()` already compute
  *     internally (log() now just maps over it), and `importUpdate()` is
- *     `merge()`'s existing `loro.import(...); rebuildIndex()` pattern
- *     generalized to accept a single change's bytes (as produced by
+ *     retains a single change's exact received bytes before native re-encoding
+ *     and applies it through `loro.import(...); rebuildIndex()` (as produced by
  *     `changes()` on the sending side) instead of a whole other chain's
  *     full update export.
  */
@@ -141,11 +142,15 @@ export interface FdnChain {
   undo(meta: ChangeMeta): EnvelopeRecord
   head(): EnvelopeRecord
   log(): EnvelopeRecord[]
+  /** Unsaved observer metadata: commits authored by this instance, never imported history. */
+  takeAuthoredChanges(): EnvelopeRecord[]
   logPage(opts?: ChainLogOptions): ChainLogPage
   activityPage(opts?: ChainActivityOptions): ChainActivityPage
   fork(actor: string): FdnChain
   merge(other: FdnChain): void
-  save(): Uint8Array
+  storageFormat(): 1 | 2
+  upgradeStorage(): void
+  save(opts?: { format?: 1 | 2 }): Uint8Array
   verify(): { ok: boolean; brokenAt?: string }
   /** Wave 3 (SPEC 13a-i): the document id, or null if this chain predates/
    *  never received one. Immutable once set — see createChain's `docId` opt. */
@@ -170,6 +175,13 @@ export interface FdnChain {
   docFromUpdates(updates: Uint8Array[]): FdnDocument
 }
 
+export interface VerifiedStorageCache { has(seal: string): boolean; add(seal: string): void }
+const verifiedStorage = new Set<string>()
+function rememberVerifiedStorage(seal: string): void {
+  verifiedStorage.add(seal)
+  if (verifiedStorage.size > 1024) verifiedStorage.delete(verifiedStorage.values().next().value!)
+}
+
 export function createChain(doc: FdnDocument, meta: ChangeMeta, opts?: { actor?: string; docId?: string }): FdnChain {
   return LoroChain.create(doc, meta, opts?.actor ?? randomUUID(), opts?.docId)
 }
@@ -178,8 +190,13 @@ export function prepareChain(doc: FdnDocument, opts: { actor: string; docId: str
   return LoroChain.prepare(doc, opts.actor, opts.docId)
 }
 
-export function loadChain(bytes: Uint8Array, opts?: { actor?: string }): FdnChain {
-  return LoroChain.load(bytes, opts?.actor)
+export function loadChain(bytes: Uint8Array, opts?: { actor?: string; storageCache?: VerifiedStorageCache }): FdnChain {
+  return LoroChain.load(bytes, opts?.actor, opts?.storageCache)
+}
+
+/** Bootstrap retained history without inventing a local genesis or re-exporting its bytes. */
+export function chainFromUpdates(updates: Uint8Array[]): FdnChain {
+  return LoroChain.fromUpdates(updates)
 }
 
 class LoroChain implements FdnChain {
@@ -207,6 +224,8 @@ class LoroChain implements FdnChain {
   private annotations: LoroMap
   private order: LoroMap
 
+  private format: 1 | 2 = 1
+  private originals = new OriginalUpdates()
   private activity: ChainActivity | undefined
   private rootFrontiers: Frontier = []
   private rootChange: Change | undefined
@@ -218,6 +237,7 @@ class LoroChain implements FdnChain {
   private peerIdStr: PeerID
   private anchors = new Map<string, Frontier>()
   private lastLocalChange: PatchOp[] | undefined
+  private authoredChanges: EnvelopeRecord[] = []
 
   constructor(actor: string, loro?: LoroDoc) {
     this.peerId = derivePeerId(actor)
@@ -273,12 +293,27 @@ class LoroChain implements FdnChain {
     }
   }
 
-  static load(bytes: Uint8Array, actor?: string): LoroChain {
+  static fromUpdates(updates: Uint8Array[]): LoroChain {
+    const chain = new LoroChain(randomUUID())
+    for (const update of updates) chain.importUpdate(update)
+    assertFormatVersion({ specVersion: String(chain.meta.get('specVersion') ?? '') })
+    return chain
+  }
+
+  static load(bytes: Uint8Array, actor?: string, cache?: VerifiedStorageCache): LoroChain {
     const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
     const anchorsLen = view.getUint32(0, true)
     const anchorsBytes = bytes.subarray(4, 4 + anchorsLen)
     const snapshotBytes = bytes.subarray(4 + anchorsLen)
-    const entries = JSON.parse(new TextDecoder().decode(anchorsBytes)) as [string, Frontier][]
+    const header = JSON.parse(new TextDecoder().decode(anchorsBytes)) as unknown
+    const legacy = Array.isArray(header)
+    if (!legacy && (header === null || typeof header !== 'object' || !('version' in header) || header.version !== 2 || !('anchors' in header) || !Array.isArray(header.anchors) || !('updates' in header))) throw new Error('unsupported chain storage version')
+    const stored = header as unknown as { anchors: [string, Frontier][]; updates: unknown; seal: string }
+    if (!legacy) {
+      const seal = createHash('sha256').update(JSON.stringify({ version: 2, anchors: stored.anchors, updates: stored.updates })).update(snapshotBytes).digest('hex')
+      if (stored.seal !== seal) throw new Error('chain storage integrity check failed')
+    }
+    const entries = (legacy ? header : stored.anchors) as [string, Frontier][]
     const loro = LoroDoc.fromSnapshot(snapshotBytes)
     // Loading a snapshot opens an independent writer, never reuses its peer identity.
     const resolvedActor = actor ?? randomUUID()
@@ -286,6 +321,16 @@ class LoroChain implements FdnChain {
     chain.rebuildIndex()
     assertFormatVersion({ specVersion: String(chain.meta.get('specVersion') ?? '') })
     for (const [name, frontier] of entries) chain.anchors.set(name, frontier)
+    if (legacy) chain.captureOriginals()
+    else {
+      chain.format = 2
+      chain.originals.load(stored.updates, chain.sortedChanges())
+      if (!verifiedStorage.has(stored.seal) && !cache?.has(stored.seal)) {
+        if (!chain.verify().ok) throw new Error('chain history verification failed: original update archive does not match snapshot history')
+        cache?.add(stored.seal)
+      }
+      rememberVerifiedStorage(stored.seal)
+    }
     return chain
   }
 
@@ -378,7 +423,7 @@ class LoroChain implements FdnChain {
     for (const op of patch.applied) this.applyOp(op)
     if (explicitArtboards(beforeDoc) || explicitArtboards(patch.doc)) this.meta.set('artboardActivity', stableStringify({ ...artboardActivity(beforeDoc, patch.doc, patch.applied), changeKey: `${this.peerIdStr}:${startCounter}` }))
     this.lastLocalChange = patch.inverse
-    return meta => this.commitEnvelope(meta, startCounter, prevHash)
+    return meta => this.commitEnvelope(meta, prevHash)
   }
 
   undo(meta: ChangeMeta): EnvelopeRecord {
@@ -393,9 +438,8 @@ class LoroChain implements FdnChain {
       const wallTime = parseWallTime(meta.wallTime)
       if (meta.wallTime !== undefined && wallTime === undefined) throw new Error('wallTime must be an ISO UTC timestamp')
       const prevHash = this.tryHead()?.hash ?? null
-      const start = this.loro.version().get(this.peerIdStr) ?? 0
       this.meta.set('namedVersion', stableStringify({ name, targetHash: prevHash }))
-      this.commitEnvelope({ ...meta, wallTime }, start, prevHash)
+      this.commitEnvelope({ ...meta, wallTime }, prevHash)
     }
     this.anchors.set(name, this.loro.frontiers())
     return name
@@ -430,17 +474,21 @@ class LoroChain implements FdnChain {
     return h
   }
 
+  takeAuthoredChanges(): EnvelopeRecord[] {
+    return this.authoredChanges.splice(0)
+  }
+
   log(): EnvelopeRecord[] {
     return this.changes().map((c) => c.envelope)
   }
 
   logPage(opts?: ChainLogOptions): ChainLogPage {
-    this.activity ??= new ChainActivity(this.loro, () => this.docId())
+    this.activity ??= new ChainActivity(this.loro, () => this.docId(), change => this.bytesForSpan(change.peer, change.counter, change.length))
     return this.activity.page(opts, this.anchors)
   }
 
   activityPage(opts?: ChainActivityOptions): ChainActivityPage {
-    this.activity ??= new ChainActivity(this.loro, () => this.docId())
+    this.activity ??= new ChainActivity(this.loro, () => this.docId(), change => this.bytesForSpan(change.peer, change.counter, change.length))
     return this.activity.read(opts, this.anchors)
   }
 
@@ -456,14 +504,14 @@ class LoroChain implements FdnChain {
       const hash = computeEnvelopeHash(decoded.prevHash, decoded.author, decoded.message, decoded.specVersion, bytes)
       out.push({
         envelope: { hash, prevHash: decoded.prevHash, author: decoded.author, message: decoded.message, specVersion: decoded.specVersion, wallTime: decoded.wallTime ?? null, originNode: decoded.originNode ?? null },
-        bytes,
+        bytes: bytes.slice(),
       })
     }
     return out
   }
 
   importUpdate(bytes: Uint8Array): void {
-    this.loro.import(bytes)
+    this.originals.record(bytes, () => this.loro.import(bytes))
     this.rebuildIndex()
   }
 
@@ -477,13 +525,20 @@ class LoroChain implements FdnChain {
 
   fork(actor: string): FdnChain {
     const forked = new LoroChain(actor, this.loro.fork())
+    this.captureOriginals()
+    forked.originals.copyFrom(this.originals)
+    forked.format = this.format
     forked.rebuildIndex()
     return forked
   }
 
   merge(other: FdnChain): void {
     if (!(other instanceof LoroChain)) throw new Error('merge: other chain is not a LoroChain instance')
+    this.captureOriginals()
+    other.captureOriginals()
+    this.originals.copyFrom(other.originals)
     this.loro.import(other.loro.export({ mode: 'update', from: this.loro.oplogVersion() }))
+    if (other.format === 2) this.upgradeStorage()
     this.rebuildIndex()
     for (const [name, frontier] of other.anchors) {
       const current = this.anchors.get(name)
@@ -519,18 +574,41 @@ class LoroChain implements FdnChain {
     return left.length - right.length
   }
 
-  save(): Uint8Array {
+  storageFormat(): 1 | 2 { return this.format }
+  upgradeStorage(): void { this.format = 2 }
+
+  save(opts?: { format?: 1 | 2 }): Uint8Array {
+    if (opts?.format === 1 && this.format === 2) throw new Error('chain storage v2 cannot be downgraded')
+    if (opts?.format === 2) this.upgradeStorage()
     assertFormatVersion({ specVersion: String(this.meta.get('specVersion') ?? '') })
     // Rebuild in canonical history order, without materializing intermediate
     // states. Snapshot encoding of a long-lived document can vary after loads
     // or reads; this fresh document always takes the same export path.
+    this.captureOriginals()
+    this.originals.assertCoverage(this.sortedChanges())
     const canonical = new LoroDoc()
     canonical.importBatch(this.changes().map(change => change.bytes))
     if (canonical.oplogVersion().compare(this.loro.oplogVersion()) !== 0) {
       throw new Error('canonical snapshot rebuild did not preserve the complete history')
     }
     const snapshot = canonical.export({ mode: 'snapshot' })
-    const anchorsBytes = new TextEncoder().encode(JSON.stringify(Array.from(this.anchors.entries()).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([name, frontier]) => [name, [...frontier].sort((a, b) => comparePeerIds(a.peer, b.peer) || a.counter - b.counter)])))
+    const anchors = Array.from(this.anchors.entries()).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([name, frontier]) => [name, [...frontier].sort((a, b) => comparePeerIds(a.peer, b.peer) || a.counter - b.counter)])
+    let anchorsBytes: Uint8Array
+    if (this.format === 1) {
+      // A v1 reader has no archive. Refuse rather than write a snapshot whose
+      // re-exports would change already-recorded envelope identities.
+      const legacy = LoroDoc.fromSnapshot(snapshot)
+      for (const change of this.sortedChanges()) {
+        const bytes = legacy.export({ mode: 'updates-in-range', spans: [{ id: { peer: change.peer, counter: change.counter }, len: change.length }] })
+        if (!Buffer.from(bytes).equals(this.bytesForSpan(change.peer, change.counter, change.length))) throw new Error(`v1 snapshot cannot preserve change identities for ${change.peer}:${change.counter}:${change.length}; opt in with FOUNDATION_CHAIN_FORMAT=2 or foundation sync open`)
+      }
+      anchorsBytes = new TextEncoder().encode(JSON.stringify(anchors))
+    } else {
+      const storage = { version: 2, anchors, updates: encodeOriginalUpdates(this.originals.save(this.sortedChanges())) }
+      const seal = createHash('sha256').update(JSON.stringify(storage)).update(snapshot).digest('hex')
+      anchorsBytes = new TextEncoder().encode(JSON.stringify({ ...storage, seal }))
+      rememberVerifiedStorage(seal)
+    }
     const header = new Uint8Array(4)
     new DataView(header.buffer).setUint32(0, anchorsBytes.length, true)
     const out = new Uint8Array(4 + anchorsBytes.length + snapshot.length)
@@ -541,6 +619,8 @@ class LoroChain implements FdnChain {
   }
 
   verify(): { ok: boolean; brokenAt?: string } {
+    this.captureOriginals()
+    try { this.originals.validate(this.loro, this.sortedChanges()) } catch { return { ok: false, brokenAt: 'original-update-archive' } }
     const seen = new Set<string>()
     for (const c of this.sortedChanges()) {
       const decoded = decodeEnvelope(c.message)
@@ -574,20 +654,26 @@ class LoroChain implements FdnChain {
     return { hash, prevHash: decoded.prevHash, author: decoded.author, message: decoded.message, specVersion: decoded.specVersion, wallTime: decoded.wallTime ?? null, originNode: decoded.originNode ?? null }
   }
 
-  private commitEnvelope(meta: ChangeMeta, startCounter: number, prevHash: string | null): EnvelopeRecord {
+  private commitEnvelope(meta: ChangeMeta, prevHash: string | null): EnvelopeRecord {
     const specVersion = (this.meta.get('specVersion') as string | undefined) ?? ''
     const packed: PackedEnvelope = { author: meta.author, message: meta.message, specVersion, prevHash, ...(meta.wallTime !== undefined ? { wallTime: meta.wallTime } : {}), ...(meta.originNode !== undefined ? { originNode: meta.originNode } : {}) }
     this.loro.commit({ message: encodeEnvelope(packed), timestamp: this.clock.next() })
     const endCounter = this.loro.version().get(this.peerIdStr) ?? 0
-    const len = endCounter - startCounter
-    const bytes = this.bytesForSpan(this.peerIdStr, startCounter, len)
+    const committed = this.loro.getChangeAt({ peer: this.peerIdStr, counter: endCounter - 1 })
+    const bytes = this.bytesForSpan(committed.peer, committed.counter, committed.length)
     const hash = computeEnvelopeHash(prevHash, meta.author, meta.message, specVersion, bytes)
-    return { hash, prevHash, author: meta.author, message: meta.message, specVersion, wallTime: meta.wallTime ?? null, originNode: meta.originNode ?? null }
+    const envelope = { hash, prevHash, author: meta.author, message: meta.message, specVersion, wallTime: meta.wallTime ?? null, originNode: meta.originNode ?? null }
+    this.authoredChanges.push(envelope)
+    return envelope
   }
 
   private bytesForSpan(peer: PeerID, counter: number, len: number): Uint8Array {
     if (len <= 0) return new Uint8Array(0)
-    return this.loro.export({ mode: 'updates-in-range', spans: [{ id: { peer, counter }, len }] })
+    return this.originals.bytes(this.loro, { peer, counter, length: len })
+  }
+
+  private captureOriginals(): void {
+    for (const change of this.sortedChanges()) this.originals.bytes(this.loro, change)
   }
 
   private sortedChanges(): Change[] {

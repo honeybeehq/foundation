@@ -202,6 +202,62 @@ preserves existing identities. Reading/parsing existing files stays deterministi
 Explicit operation ids and duplicate id maps remain client-owned; clients mint
 UUIDs for new objects. Token/style/component names are semantic keys, not minted ids.
 
+**Local writer locks:** document writers and the sync daemon singleton record a
+stable hashed OS machine identity (or explicit `FOUNDATION_NODE_ID`), boot identity
+where available, Linux PID namespace, and display hostname. Only the same machine
+and namespace may reclaim a dead PID or a previous-boot owner. Without an OS
+identity, an atomically persisted `~/.foundation/machine-id` fallback additionally
+requires the same hostname and boot; a rename then needs manual recovery. Explicit
+node ids must be unique per machine: sharing an override defeats this distinction.
+Legacy owners without a machine id are reclaimed only for the same hostname and a
+dead PID; a foreign hostname remains blocked even on a local filesystem. Busy
+errors show the lock path, recorded owner and manual removal command; stop and
+confirm the owner before removing it. A live reused PID conservatively remains
+busy until manual recovery; no process-start-time inference is made.
+
+**Chain-format cutover (2026-10-24):** new and local-only writers keep the v1
+array header. Existing v2 files never downgrade. Sync registration (including
+`foundation sync open`), explicit exchange, automatic sync, or
+`FOUNDATION_CHAIN_FORMAT=2` opt in to the v2 archive; registration upgrades under
+the document lock in one save before publication, without a history change.
+Canonical v1 saves verify that reloaded native exports retain every original change
+identity; an unrepresentable v1 history refuses the save and requires explicit v2,
+rather than rewriting hashes or silently upgrading. Both formats retain canonical
+snapshot/anchor ordering. Version and doctor report `chainFormats` and
+`defaultChainFormat`; session welcome/doc report actual `chainFormat`, selected
+`writeChainFormat` and `chainReadOnly`. An optional hello `chainFormats` list makes
+an explicitly incompatible connection read-only. Omission preserves existing
+protocol behaviour; these JSON clients do not read the binary chain themselves.
+Explicit sync upgrades the tracked file permanently and prints a warning: once
+shared or committed, it requires upgraded readers. No automatic backup is made.
+Rollback requires the user's own pre-upgrade backup and loses subsequent edits.
+A crash after the locked upgrade but before registration leaves an unregistered
+v2 file; repeating registration is safe and completes publication.
+
+**Immutable change bytes (2026-10-24):** a change's existing SHA-256 formula
+uses its original single-change Loro update bytes, retained at authoring/import
+and forwarded verbatim. Native re-exports can reorder dependency peers and change
+checksums, so they never replace identity bytes. The `.chain` v2 header stores
+sorted original spans beside sorted anchors; the snapshot is rebuilt in canonical
+history order, preserving equal-frontier byte equality. The original archive is one canonically ordered, length-framed stream compressed
+with Brotli quality 5, generic mode, window 22 and explicit size hint (`brotli-v1`).
+A SHA-256 storage seal covers the header and snapshot. Every unseen seal receives
+full native checksum/span and operation/dependency replay before load returns.
+Verified seals are cached outside the file (process memory; CLI receipts under
+`~/.foundation/verified-chains-v2`), so foreign git checkouts, copies and restores
+cannot vouch for themselves. `verify()` always repeats full checks; receive
+boundaries call it before accepting a candidate. Encoder
+upgrades require cross-replica byte-stability checks.
+Legacy array headers remain readable and capture their current exports before
+mutation; recorded hashes and parent pointers are unchanged. Already drifted legacy
+snapshots cannot recover discarded original bytes: back up unsynced work and restore
+from a healthy archived replica, rather than accepting conflicting encodings.
+Old Foundation (49d3161) continues opening default v1 writes. It refuses the v2
+object header (`entries is not iterable`) before writing, so sync opt-in requires
+v2-capable writers for that design. The wire blob/hash
+format and strict receive checks are unchanged; `importUpdate` accepts one change
+per blob, rejects overlapping spans, and cannot save incomplete causal history.
+
 Why: this gives multiplayer (changes merge), local-first (chains sync lazily and
 offline), audit (every change carries authorship — `agent:<bee>` or `user:<id>`), and
 time-travel diffing ("render anchor 12 vs anchor 9") from one primitive. It is also the
@@ -1087,14 +1143,63 @@ Malformed JSON is retained as a literal attribute and reported during ingestion;
 sessions preserve the source and block commits until repaired. Extra attributes
 on a JSON item merge underneath its JSON fields and produce a warning.
 
-## 9. Sync & multiplayer — *skeleton*
+## 9. Sync & multiplayer
 
-Intent: chains sync as append-only logs; local-first; any transport (filesystem, peer
-replication, a relay server) — the spec defines the log exchange, not the pipe.
-Annotations and review state are in-chain (they are changes like any other, so they
-sync, merge, and carry authorship for free). To fill: exchange protocol, awareness
-(presence/cursors) as an explicitly *non-truth* side channel, auth boundary for
-cloud relays.
+Local chains are authoritative and save before network work. One `foundation sync
+serve` daemon per node publishes immutable exchange envelopes through Comb's
+supported JSONL bridge and imports them through the existing locked save boundary.
+Only explicitly registered live paths are touched (`sync open` / `sync close`).
+The logical feed is `foundation/<workspace>/<product>/<docId>`; because Comb log
+names exclude slashes, its wire name is `foundation-<SHA256(logical feed)>`.
+Envelope SHA-256 is the stable append key. Comb sequence numbers are delivery
+cursors; Loro supplies document causality and merge semantics. Frames, hashes,
+document identity and causal completeness are checked before imports become visible.
+
+The chain is the durable outbox. Acknowledged hashes and receive cursors live in the
+node-local replica store; receive cursors advance only after locked import. Outages
+leave local editing available; retries back off and duplicate delivery is inert.
+Caught-up imports do not rewrite files. Status distinguishes saved locally, waiting
+to upload and shared (acknowledged by Comb, not by every peer). Full feed history
+must be retained for replay. Backend location is configured by file and does not
+change this contract. Setup, hooks and real-process verification: `packages/cli/SYNC.md`.
+
+Configured workspace peers may receive authenticated direct envelope pushes in parallel
+with Comb publication. They use the same strict validation and locked import; direct
+delivery never advances a Comb cursor or marks a change shared. The durable feed remains
+required and converges with every direct request lost. During a daemon run, direct-received changes are not
+forwarded; fallback publication waits a bounded grace period and preserves a causally
+closed prefix so descendants never enter the feed ahead of their parents. Shared
+workspace authentication establishes membership, not author provenance.
+
+A separate workspace catalogue (`foundation/<workspace>/catalogue`, same log mapping)
+advertises versioned per-replica metadata after referenced envelopes are shared.
+Each local path owns a durable replica ID and increasing generation; stable append
+keys hash the record bytes. Records carry confined repo-relative paths, never remote
+absolute paths. Closing a registration is not deletion. Catalogue delivery is advisory
+and runs separately from document uploads; its failure must not delay local editing
+or document publication. Claimed node/authorship fields are not authenticated by a
+content hash or shared backend access; trusted presence requires a separate binding.
+
+Repository sharing is selected by committed `.foundation/share.json`; absent or
+`git-only` means no network. `foundation share` initializes a space, signs devices
+in, reports status, grants keys and revokes devices. The default daemon discovers
+each registered design's repo descriptor; explicit Comb process configuration is
+retained for development. Space/document identity determines shared feeds across
+machines independently of local workspace addresses.
+
+The share service checks GitHub repo rights on every one-hour token issuance using
+a service-owned Metadata-only App credential. User GitHub tokens stay on clients.
+Devices prove possession of an SSH-attested key through a single-use challenge.
+Read can fetch/current-epoch handover; write can append/rotate. End-to-end encryption
+is mandatory for shared mode: libsodium XChaCha20-Poly1305 content, sealed design
+keys, signed devices and writer-certified epochs. Recovery public keys are pinned
+in git; epoch/recipient history is retained locally. Unknown keys, rollback, forks,
+revocation and unavailable authorization are visible status states, preserving
+local edits. A 120-second membership check, one-hour authorization grace and daily
+writer rotation bound stale access and hidden grants; no global transparency or
+instantaneous revocation is claimed. See `packages/cli/SYNC.md` for setup, exact
+trust limits, recovery, real-run evidence and the complete local backup command.
+Original change identities and saved chain/blob formats remain unchanged.
 
 ## 10. Conformance — *skeleton*
 

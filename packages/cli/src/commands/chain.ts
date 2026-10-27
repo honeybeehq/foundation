@@ -1,3 +1,6 @@
+import { historyOrigins } from '../history-origin.js'
+import { chainFormatUpgradeWarning } from '../chain-format.js'
+import { loadChain } from '../chain-cache.js'
 /**
  * `foundation chain ...` — CLI surface over `<file>.chain` (Loro-backed
  * FdnChain, engine/src/chain). Two argument shapes coexist by design:
@@ -14,7 +17,7 @@
  */
 import { existsSync, readFileSync } from 'node:fs'
 import { randomUUID } from 'node:crypto'
-import { createChain, exportBlobs, importBlobs, loadChain, mergeChains, parseDocument, projectDocument } from 'foundation-engine'
+import { createChain, exportBlobs, importBlobs, mergeChains, parseDocument, projectDocument } from 'foundation-engine'
 import type { ChangeMeta, EnvelopeRecord, FdnChain, FdnDocument, OverlapReport, SemanticOp } from 'foundation-engine'
 import type { CliIO } from '../io.js'
 import { flagString, parseArgs } from '../argv.js'
@@ -219,10 +222,11 @@ async function runChainLogVerify(file: string, subcommand: string, io: CliIO, fl
           if (flags[flag] === true) throw new Error(`--${flag} requires a value`)
         }
         const limit = flagString(flags, 'limit')
-        io.stdout(JSON.stringify(chain.logPage({
+        const page=chain.logPage({
           ...(limit !== undefined ? { limit: Number(limit) } : {}),
           before: flagString(flags, 'before'),
-        })))
+        })
+        io.stdout(JSON.stringify({...page,entries:historyOrigins(chain.docId(),page.entries)}))
         return 0
       } catch (err) {
         io.stderr(err instanceof Error ? err.message : String(err))
@@ -295,7 +299,10 @@ async function runChainPush(positionals: string[], io: CliIO): Promise<number> {
   const chain = requireChain(file, io)
   if (!chain) return 0
   try {
-    const { written } = await exportBlobs(chain, dir)
+    let upgraded = false
+    const enabled = updateDocument(file, latest => { upgraded = latest.storageFormat() === 1; latest.upgradeStorage(); return latest }, true)
+    if (upgraded) io.stderr(chainFormatUpgradeWarning(file))
+    const { written } = await exportBlobs(enabled, dir)
     io.stdout(`${chainPathFor(file)}: pushed ${written} blob(s) to ${dir}/${chain.docId()}`)
     return 0
   } catch (err) {
@@ -314,7 +321,9 @@ async function runChainPull(positionals: string[], io: CliIO): Promise<number> {
   if (!chain) return 0
   try {
     const { imported, overlaps } = await importBlobs(chain, dir)
-    if (imported > 0) updateDocument(file, latest => { latest.merge(chain) })
+    let upgraded = false
+    updateDocument(file, latest => { upgraded = latest.storageFormat() === 1; latest.upgradeStorage(); if (imported > 0) latest.merge(chain) }, true)
+    if (upgraded) io.stderr(chainFormatUpgradeWarning(file))
     io.stdout(`${chainPathFor(file)}: pulled ${imported} blob(s) from ${dir}/${chain.docId()}`)
     printOverlaps(overlaps, io)
     if (imported > 0) io.stdout(`updated ${file} from merged chain`)
@@ -336,7 +345,9 @@ async function runChainSync(positionals: string[], io: CliIO): Promise<number> {
   try {
     const { imported, overlaps } = await importBlobs(chain, dir)
     const importedChain = chain
-    chain = updateDocument(file, latest => { latest.merge(importedChain); return latest })
+    let upgraded = false
+    chain = updateDocument(file, latest => { upgraded = latest.storageFormat() === 1; latest.upgradeStorage(); latest.merge(importedChain); return latest })
+    if (upgraded) io.stderr(chainFormatUpgradeWarning(file))
     const { written } = await exportBlobs(chain, dir)
     io.stdout(`${chainPathFor(file)}: synced with ${dir}/${chain.docId()} — pulled ${imported}, pushed ${written}`)
     printOverlaps(overlaps, io)
@@ -380,7 +391,9 @@ async function runChainMerge(positionals: string[], io: CliIO): Promise<number> 
 
   const { overlaps } = mergeChains(ours, theirs)
   const mergedChain = loadChain(theirs)
-  updateDocument(file, chain => { chain.merge(mergedChain) })
+  let upgraded = false
+  updateDocument(file, chain => { upgraded = chain.storageFormat() === 1; chain.upgradeStorage(); chain.merge(mergedChain) })
+  if (upgraded) io.stderr(chainFormatUpgradeWarning(file))
   io.stdout(`${chainPath}: merged with ${theirsPath} — rewrote ${file}`)
   printOverlaps(overlaps, io)
   return 0
