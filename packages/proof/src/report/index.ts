@@ -72,9 +72,11 @@ export interface VerifyPolicy {
   designBinding: "chain-head" | "chain-sha256";
   requireHtmlSha256: true;
   captureEnvironment?: CaptureEnvironmentPolicy;
+  captureEnvironments?: Record<string, CaptureEnvironmentPolicy>;
   baseline?: {
-    htmlSha256: string;
-    head: string;
+    htmlSha256?: string;
+    head?: string;
+    bindings?: Record<string, { htmlSha256: string; head: string }>;
     captures: Record<string, string>;
   };
   tool?: { file: string; sha256: string };
@@ -202,9 +204,11 @@ export async function verify(
       if (!r.design?.file || !r.design?.head)
         errors.push(`${entry.path}: missing design binding`);
       else if (policy.baseline) {
+        const binding =
+          policy.baseline.bindings?.[identity(r)] ?? policy.baseline;
         if (
-          r.design.htmlSha256 !== policy.baseline.htmlSha256 ||
-          r.design.head !== policy.baseline.head
+          r.design.htmlSha256 !== binding.htmlSha256 ||
+          r.design.head !== binding.head
         )
           errors.push(
             `${entry.path}: baseline design binding differs from trusted policy`,
@@ -258,10 +262,13 @@ export async function verify(
             captureHash(c) !== r.inputs.codeHash
           )
             errors.push(`${entry.path}: capture hash mismatch`);
+          const expectedEnvironment =
+            policy.captureEnvironments?.[identity(r)] ??
+            policy.captureEnvironment;
           if (
-            policy.captureEnvironment &&
-            (!environmentMatches(d.meta, policy.captureEnvironment) ||
-              !environmentMatches(c.meta, policy.captureEnvironment))
+            expectedEnvironment &&
+            (!environmentMatches(d.meta, expectedEnvironment) ||
+              !environmentMatches(c.meta, expectedEnvironment))
           )
             errors.push(
               `${entry.path}: capture environment differs from reviewed policy`,
