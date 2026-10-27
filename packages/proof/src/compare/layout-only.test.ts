@@ -59,3 +59,13 @@ it('compares all common template items when stable ids overlap only partially',(
  const a=cap([root,one,two],['0/0','0/1']),b=cap([root,one,{...two,box:[0,0,130,20]}],['0/0','0/1']);
  expect(run(a,b).drifts.map(d=>d.property)).toEqual(['width']);
 });
+it('groups equal repeated-item geometry vectors without swallowing independent item changes',()=>{
+ const root=n('0','',[0,0,100,100]);
+ const a=cap([root,n('0/0','A',[0,0,100,20]),n('0/1','B',[0,30,100,20]),n('0/2','C',[0,60,100,20])],['0/0','0/1','0/2']);
+ const b=cap([root,n('0/0','Other',[5,0,100,20]),n('0/1','Data',[5,30,100,20]),n('0/2','Values',[0,60,130,20])],['0/0','0/1','0/2']);
+ const r=run(a,b);
+ expect(r.defects.filter(d=>d.cause==='layout:repeated-template')).toHaveLength(1);
+ expect(r.defects.filter(d=>d.cause==='layout:geometry')).toHaveLength(1);
+ expect(r.drifts).toHaveLength(3);
+ expect(r.defects.flatMap(d=>d.findings).sort()).toEqual(r.drifts.map(d=>d.id).sort());
+});

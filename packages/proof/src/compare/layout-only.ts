@@ -4,6 +4,7 @@ import {hash} from './canonical.ts';
 
 export function layoutOnlyEvidence(design:Capture,code:Capture,t:Tolerances) {
  const drifts:Drift[]=[],defects:Defect[]=[],matches:Match[]=[];
+ const templates:{region:string;root:{design:string;code:string};unit:{design:string;code:string};findings:string[];signature:string}[]=[];
  const coverage:{id:string;design:string|null;code:string|null;comparedItems:number;ignoredDesignItems:number;ignoredCodeItems:number}[]=[];
  const dm=design.meta.layoutOnlyRegions as CapturedLayoutRegion[]|undefined,cm=code.meta.layoutOnlyRegions as CapturedLayoutRegion[]|undefined;
  const fail=(reason:string)=>({drifts,defects,matches,coverage,reason:`layout-only not-provable: ${reason}`});
@@ -51,7 +52,21 @@ export function layoutOnlyEvidence(design:Capture,code:Capture,t:Tolerances) {
   const pairs=keyed.map(n=>({a:n,b:right.find(x=>x?.fdnId===n.fdnId)!}));
   const restA=left.filter(n=>!pairs.some(p=>p.a===n)),restB=right.filter(n=>!pairs.some(p=>p.b===n));
   for(let i=0;i<Math.min(restA.length,restB.length);i++) pairs.push({a:restA[i]!,b:restB[i]!});
-  for(const pair of pairs) boxes(a.id,pair.a,pair.b,ar,br);
+  for(const pair of pairs) {
+   const start=drifts.length;boxes(a.id,pair.a,pair.b,ar,br);
+   const changes=drifts.slice(start);
+   if(changes.length) templates.push({region:a.id,root:{design:id(ar),code:id(br)},unit:{design:id(pair.a),code:id(pair.b)},findings:changes.map(d=>d.id),signature:changes.map(d=>`${d.property}:${Math.round((Number(d.code)-Number(d.design))/.05)}`).join('|')});
+  }
+ }
+ // Equal displacement/size vectors across multiple repeated items are one
+ // template-geometry hypothesis. Distinct vectors remain independent causes;
+ // every raw item measurement is retained and styles never enter this group.
+ const buckets=new Map<string,typeof templates>();
+ for(const item of templates) {const key=item.region+":"+item.signature;buckets.set(key,[...(buckets.get(key)??[]),item]);}
+ for(const [key,items] of buckets) if(items.length>=2) {
+  const findings=items.flatMap(i=>i.findings),set=new Set(findings);
+  for(let i=defects.length-1;i>=0;i--) if(defects[i]!.cause==='layout:geometry' && defects[i]!.findings.every(f=>set.has(f))) defects.splice(i,1);
+  defects.push({id:'def-'+hash({template:key,layer:items[0]!.root}).slice(0,20),kind:'layout',cause:'layout:repeated-template',classification:'product',layer:items[0]!.root,findings,summary:`Repeated template geometry differs in ${items[0]!.region}`});
  }
  return {drifts,defects,matches,coverage,reason:null};
 }

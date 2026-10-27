@@ -25,3 +25,12 @@ it('preserves a focused input and scroll position while adding the isolation wra
   expect(await page.locator('#card').evaluate(el=>el.scrollTop)).toBe(10);
  } finally {await browser.close();}
 });
+it('does not turn fixture-root overflow into a zero-area clip on the synthetic wrapper',async()=>{
+ const browser=await chromium.launch();const page=await browser.newPage({viewport:{width:400,height:300}});
+ try {
+  await page.evaluate('globalThis.__name=f=>f');
+  await page.setContent('<style>#foundation-root{width:400px;height:300px;overflow:hidden}</style><div id="foundation-root"><section id="card" style="width:200px;height:100px"><button>Keep visible</button></section></div>');
+  await preserveCodeContext(page,'#card',STYLE_PROPERTIES);
+  expect(await page.locator('#foundation-root').evaluate(el=>getComputedStyle(el).overflow)).toBe('visible');
+ } finally {await browser.close();}
+});

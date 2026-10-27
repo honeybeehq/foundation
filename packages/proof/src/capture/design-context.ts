@@ -18,6 +18,7 @@ export async function preserveDesignContext(page: Page, selector: string, proper
     const wrapper=document.createElement('div')
     wrapper.id='foundation-root'
     wrapper.style.display='contents'
+    wrapper.style.overflow='visible'
     selected.before(wrapper)
     wrapper.append(selected)
     focused?.focus({preventScroll:true})
