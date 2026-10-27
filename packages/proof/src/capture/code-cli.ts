@@ -101,7 +101,7 @@ try {
       throw Error(
         "Baseline design binding differs from links; regenerate baseline",
       );
-    const frame = design.meta.frame;
+    const frame = design.meta.designIsolation?.mode === 'in-place' ? {width:board.viewport.width,height:board.viewport.height} : design.meta.frame;
     const folder = join(
       out,
       board.id,
