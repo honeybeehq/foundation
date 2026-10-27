@@ -62,3 +62,17 @@ it('keeps the reference frame for overflow detection inside a larger rendering h
  const code={nodes:[node(40)],meta:{frame,viewport},screenshot:Buffer.alloc(0)}
  expect(offscreenDefects(design,code,[]).some(d=>d.cause==='offscreen')).toBe(true)
 })
+it('keeps a wide board layout while clipping a small specimen screenshot',async()=>{
+ const {mkdtemp,readFile,rm}=await import('node:fs/promises')
+ const {tmpdir}=await import('node:os');const {join}=await import('node:path');const {PNG}=await import('pngjs')
+ const directory=await mkdtemp(join(tmpdir(),'foundation-viewport-'))
+ try {
+  await page.setViewportSize({width:1600,height:1200})
+  await page.setContent('<style>body{margin:0}.board{display:flex;width:80vw}.spacer{width:1100px;flex:none}#selected{font:11px monospace}</style><div class="board"><div class="spacer"></div><span id="selected">WHAT A ROW SAYS</span></div>')
+  const result=await preserveDesignContext(page,'#selected',STYLE_PROPERTIES)
+  const file=join(directory,'normal.png');await page.screenshot({path:file,clip:{x:0,y:0,width:240,height:60}})
+  const png=PNG.sync.read(await readFile(file))
+  expect([png.width,png.height]).toEqual([240,60]);expect(result.originalBox[3]).toBeLessThan(20)
+  expect(await page.viewportSize()).toEqual({width:1600,height:1200})
+ } finally {await page.setViewportSize({width:240,height:100});await rm(directory,{recursive:true,force:true})}
+})

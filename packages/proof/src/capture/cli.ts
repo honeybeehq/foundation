@@ -29,6 +29,10 @@ const codeBoundary = option('--code-boundary')
 const codeContextBoundary = option('--code-context-boundary')
 const preserveContext = args.includes('--preserve-design-context')
 if(codeContextBoundary && (!preserveContext || codeBoundary)) throw Error('Code context boundary requires --preserve-design-context and cannot use legacy extraction')
+const layoutSize = option('--design-viewport')?.match(/^(\d+)x(\d+)$/)
+if (option('--design-viewport') && (!preserveContext || !layoutSize)) throw Error('--design-viewport requires in-place mode and WIDTHxHEIGHT')
+const designViewport = layoutSize ? {width:Number(layoutSize[1]),height:Number(layoutSize[2])} : undefined
+
 if (preserveContext && codeBoundary) throw Error('Choose design-context preservation or legacy card extraction, not both')
 const started = performance.now()
 const links = JSON.parse(await readFile(linksPath, 'utf8')) as Links
@@ -67,7 +71,7 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
       const captureStart = performance.now()
       const blocked: string[] = []
       const errors: string[] = []
-      const context = await browser.newContext({ viewport: { width: board.viewport.width, height: board.viewport.height }, deviceScaleFactor: board.viewport.dpr, colorScheme: 'light', reducedMotion: 'reduce', forcedColors: 'none', timezoneId: 'UTC', locale: 'en-US', serviceWorkers: 'block' })
+      const context = await browser.newContext({ viewport: side === 'design' && designViewport ? designViewport : { width: board.viewport.width, height: board.viewport.height }, deviceScaleFactor: board.viewport.dpr, colorScheme: 'light', reducedMotion: 'reduce', forcedColors: 'none', timezoneId: 'UTC', locale: 'en-US', serviceWorkers: 'block' })
       await context.addInitScript(() => {
         ;(window as any).__name = (fn: unknown) => fn
         const pending = new Set<number>()
@@ -188,10 +192,11 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
         const tokens = await page.evaluate(() => { const css = getComputedStyle(document.documentElement); return Object.fromEntries(Array.from(css).filter(k => k.startsWith('--')).sort().map(k => [k, css.getPropertyValue(k).trim()])) })
         const destination = join(folder, side)
         await mkdir(destination, { recursive: true })
-        await page.screenshot({ path: join(destination, 'screenshot.png'), animations: 'disabled' })
+        await page.screenshot({ path: join(destination, 'screenshot.png'), animations: 'disabled', ...(side === 'design' && designViewport ? {clip:{x:0,y:0,width:board.viewport.width,height:board.viewport.height}} : {}) })
         const fullExtent = await captureFullExtent(page, '#foundation-root', join(destination, 'full-extent.png'))
         await writeFile(join(destination, 'dom.json'), JSON.stringify(dom, null, 2) + '\n')
-        const meta = { schema: 'fdn-capture/0', ...(layoutOnlyRegions?{layoutOnlyRegions}:{}), ...provenance, rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, extent: dom.extent, fullExtent, frame, ...(designIsolation ? {designIsolation} : {}), ...(codeIsolation?{codeIsolation}:{}), ...(preserveContext && side === 'code' ? {componentFrame:codeIsolation?'in-place-boundary':'unconstrained-host'} : {}), ...(codeBoundary ? {boundary:{codeSelector:codeBoundary, originNormalized:true, bothRootsNormalized:true, sizePreserved:true,audit:boundaryAudit}} : {}), url, fonts, fontPolicy: links.fontPolicy, fontSubstitutions, platformFonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
+        const meta = { schema: 'fdn-capture/0', ...(layoutOnlyRegions?{layoutOnlyRegions}:{}), ...provenance, rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, extent: dom.extent, fullExtent, frame, ...(designIsolation ? {designIsolation,designViewport:designViewport ?? {width:board.viewport.width,height:board.viewport.height}} : {}), ...(codeIsolation?{codeIsolation}:{}), ...(preserveContext && side === 'code' ? {componentFrame:codeIsolation?'in-place-boundary':'unconstrained-host'} : {}), ...(codeBoundary ? {boundary:{codeSelector:codeBoundary, originNormalized:true, bothRootsNormalized:true, sizePreserved:true,audit:boundaryAudit}} : {}), url, fonts, fontPolicy: links.fontPolicy, fontSubstitutions, platformFonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
+
 
         await writeFile(join(destination, 'meta.json'), JSON.stringify(meta, null, 2) + '\n')
         console.log(`${board.id}/${state.name} ${side}: ${dom.nodes.length} nodes, ${meta.timingsMs.capture} ms`)
