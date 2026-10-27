@@ -1,0 +1,564 @@
+{
+  "component": "inbox-row",
+  "state": "selected",
+  "mode": "no-ids",
+  "correspondence": {
+    "tp": 5,
+    "fp": 1,
+    "fn": 2,
+    "precision": 0.8333333333333334,
+    "recall": 0.7142857142857143,
+    "abstained": 0,
+    "excludedUnsure": 0,
+    "errors": [
+      {
+        "design": "n249#1::n249::n17",
+        "expected": "0/0",
+        "actual": "0"
+      }
+    ]
+  },
+  "defects": {
+    "tp": 5,
+    "fp": 11,
+    "fn": 2,
+    "precision": 0.3125,
+    "recall": 0.7142857142857143,
+    "predicted": 16,
+    "labelled": 7,
+    "agreement": [
+      {
+        "defect": "def-dfee3242fbdef2698bac",
+        "label": "IS-06",
+        "description": "Rows are taller in code: line 1 is 19px and line 2 17px (line-height 1.45) vs 16px and 15px in design, so the row is 54px instead of 49px, line 2 sits 3px lower and the row overruns the 49px design frame by 5px"
+      },
+      {
+        "defect": "def-3cff89f226ce6d81db34",
+        "label": "IS-02",
+        "description": "Title ink is pure black in the design (var(--color-text-primary) is undefined on the board) vs warm near-black #2E2B27 in code"
+      },
+      {
+        "defect": "def-6c2394a8a581112bc258",
+        "label": "IS-01",
+        "description": "Title and note render in a serif face in the design but in Hanken Grotesk (sans) in code: the inbox board uses var(--font-sans) but never defines it, so the design falls back to the default serif"
+      },
+      {
+        "defect": "def-a59915f3979e93f0e2b8",
+        "label": "IS-05",
+        "description": "Age \"56m\" is bright blue #3565D4 in code vs faint grey #A8A59E in design"
+      },
+      {
+        "defect": "def-c1103dc24e98c0161c13",
+        "label": "IS-04",
+        "description": "Orange status dot and \"review\" word are missing on line 2; the code renders this row as a plain completed row (no dot, no word), so the note starts at the indent instead of after the status"
+      }
+    ],
+    "falsePositives": [
+      {
+        "cause": "style:surface",
+        "classification": "product",
+        "findings": [
+          "d1",
+          "d2",
+          "d3",
+          "d4",
+          "d5"
+        ],
+        "id": "def-dc28712de6769430e333",
+        "kind": "style",
+        "layer": {
+          "code": "0",
+          "design": "0/0"
+        },
+        "summary": "style surface differs at 0/0"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d18",
+          "d19",
+          "d20",
+          "d21"
+        ],
+        "id": "def-812e849691fc745e2e3a",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/0",
+          "design": "0/0/0"
+        },
+        "summary": "layout configuration differs at 0/0/0"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d26"
+        ],
+        "id": "def-544f734d41f787c9294d",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/0/1",
+          "design": "0/0/0/1"
+        },
+        "summary": "layout configuration differs at 0/0/0/1"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d27",
+          "d30",
+          "d32"
+        ],
+        "id": "def-0b4305be81671d2b0f66",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/0/2",
+          "design": "0/0/0/2"
+        },
+        "summary": "layout configuration differs at 0/0/0/2"
+      },
+      {
+        "cause": "style:font-family",
+        "classification": "product",
+        "findings": [
+          "d29"
+        ],
+        "id": "def-0206bcb5c2ffeeae9746",
+        "kind": "style",
+        "layer": {
+          "code": "0/0/0/2",
+          "design": "0/0/0/2"
+        },
+        "summary": "style font-family differs at 0/0/0/2"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d33",
+          "d34",
+          "d35",
+          "d36",
+          "d38",
+          "d40"
+        ],
+        "id": "def-287bdca24795f8c0b47e",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/1",
+          "design": "0/0/1"
+        },
+        "summary": "layout configuration differs at 0/0/1"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d37",
+          "d39",
+          "d42",
+          "d44"
+        ],
+        "id": "def-0cea9a191bac3bcc3e4e",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/1/0",
+          "design": "0/0/1/2"
+        },
+        "summary": "layout configuration differs at 0/0/1/2"
+      },
+      {
+        "cause": "missing:subtree",
+        "classification": "product",
+        "findings": [
+          "d45"
+        ],
+        "id": "def-adf406f742652ea7cab7",
+        "kind": "missing",
+        "layer": {
+          "design": "0/0/0/0/0"
+        },
+        "summary": "missing subtree differs at 0/0/0/0/0"
+      },
+      {
+        "cause": "missing:subtree",
+        "classification": "product",
+        "findings": [
+          "d47"
+        ],
+        "id": "def-4027513e40bf1059f77e",
+        "kind": "missing",
+        "layer": {
+          "design": "0/0/1/1"
+        },
+        "summary": "missing subtree differs at 0/0/1/1"
+      },
+      {
+        "cause": "extra:subtree",
+        "classification": "product",
+        "findings": [
+          "d48",
+          "d49",
+          "d50",
+          "d51"
+        ],
+        "id": "def-a4167e02a8097fa11e3b",
+        "kind": "extra",
+        "layer": {
+          "code": "0/0"
+        },
+        "summary": "extra subtree differs at 0/0"
+      },
+      {
+        "cause": "offscreen",
+        "classification": "product",
+        "findings": [
+          "d52"
+        ],
+        "id": "def-8c318c403d72e465682f",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0"
+        },
+        "offscreen": {
+          "box": [
+            0,
+            0,
+            340,
+            54.234375
+          ],
+          "clips": [
+            {
+              "box": [
+                0,
+                0,
+                340,
+                49
+              ],
+              "pan": false,
+              "path": "0",
+              "scrollX": false,
+              "scrollY": false,
+              "x": true,
+              "y": true
+            }
+          ],
+          "elements": [
+            "0/0"
+          ],
+          "frame": [
+            0,
+            0,
+            340,
+            49
+          ],
+          "viewport": [
+            0,
+            0,
+            340,
+            100
+          ]
+        },
+        "summary": "rendered outside the visible pane: button · Checkout — guest cart merge · 56m · drone-12 · +412 −96 · preview live"
+      }
+    ],
+    "falseNegatives": [
+      {
+        "id": "IS-03",
+        "design_layer": "0/0/0/0/0",
+        "code_layer": "0/0/0/0/0/0",
+        "kind": "style",
+        "description": "Leading glyph is the row-kind icon (window/card) in muted #8A877F in design; code always shows the agent's model logo (OpenAI mark) in lighter #A29D93",
+        "severity": "medium",
+        "likely_intentional": "unsure",
+        "note": "[glyph-model-mark] code renders ModelMark for every row",
+        "properties": "icon;color"
+      },
+      {
+        "id": "IS-07",
+        "design_layer": "0/0/0/0/0",
+        "code_layer": "0/0/0/0/0/0",
+        "kind": "layout",
+        "description": "Leading glyph sits 3px lower relative to the title (y 11 vs 8): code nudges marks down 2px to the title baseline on top of the taller line",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[glyph-offset] rowGlyphDown translateY(2px) is a deliberate optical-baseline tweak",
+        "properties": "transform"
+      }
+    ]
+  },
+  "strictDefects": {
+    "tp": 5,
+    "fp": 11,
+    "fn": 2,
+    "precision": 0.3125,
+    "recall": 0.7142857142857143,
+    "predicted": 16,
+    "labelled": 7,
+    "agreement": [
+      {
+        "defect": "def-dfee3242fbdef2698bac",
+        "label": "IS-06",
+        "description": "Rows are taller in code: line 1 is 19px and line 2 17px (line-height 1.45) vs 16px and 15px in design, so the row is 54px instead of 49px, line 2 sits 3px lower and the row overruns the 49px design frame by 5px"
+      },
+      {
+        "defect": "def-3cff89f226ce6d81db34",
+        "label": "IS-02",
+        "description": "Title ink is pure black in the design (var(--color-text-primary) is undefined on the board) vs warm near-black #2E2B27 in code"
+      },
+      {
+        "defect": "def-6c2394a8a581112bc258",
+        "label": "IS-01",
+        "description": "Title and note render in a serif face in the design but in Hanken Grotesk (sans) in code: the inbox board uses var(--font-sans) but never defines it, so the design falls back to the default serif"
+      },
+      {
+        "defect": "def-a59915f3979e93f0e2b8",
+        "label": "IS-05",
+        "description": "Age \"56m\" is bright blue #3565D4 in code vs faint grey #A8A59E in design"
+      },
+      {
+        "defect": "def-c1103dc24e98c0161c13",
+        "label": "IS-04",
+        "description": "Orange status dot and \"review\" word are missing on line 2; the code renders this row as a plain completed row (no dot, no word), so the note starts at the indent instead of after the status"
+      }
+    ],
+    "falsePositives": [
+      {
+        "cause": "style:surface",
+        "classification": "product",
+        "findings": [
+          "d1",
+          "d2",
+          "d3",
+          "d4",
+          "d5"
+        ],
+        "id": "def-dc28712de6769430e333",
+        "kind": "style",
+        "layer": {
+          "code": "0",
+          "design": "0/0"
+        },
+        "summary": "style surface differs at 0/0"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d18",
+          "d19",
+          "d20",
+          "d21"
+        ],
+        "id": "def-812e849691fc745e2e3a",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/0",
+          "design": "0/0/0"
+        },
+        "summary": "layout configuration differs at 0/0/0"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d26"
+        ],
+        "id": "def-544f734d41f787c9294d",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/0/1",
+          "design": "0/0/0/1"
+        },
+        "summary": "layout configuration differs at 0/0/0/1"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d27",
+          "d30",
+          "d32"
+        ],
+        "id": "def-0b4305be81671d2b0f66",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/0/2",
+          "design": "0/0/0/2"
+        },
+        "summary": "layout configuration differs at 0/0/0/2"
+      },
+      {
+        "cause": "style:font-family",
+        "classification": "product",
+        "findings": [
+          "d29"
+        ],
+        "id": "def-0206bcb5c2ffeeae9746",
+        "kind": "style",
+        "layer": {
+          "code": "0/0/0/2",
+          "design": "0/0/0/2"
+        },
+        "summary": "style font-family differs at 0/0/0/2"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d33",
+          "d34",
+          "d35",
+          "d36",
+          "d38",
+          "d40"
+        ],
+        "id": "def-287bdca24795f8c0b47e",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/1",
+          "design": "0/0/1"
+        },
+        "summary": "layout configuration differs at 0/0/1"
+      },
+      {
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d37",
+          "d39",
+          "d42",
+          "d44"
+        ],
+        "id": "def-0cea9a191bac3bcc3e4e",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0/1/0",
+          "design": "0/0/1/2"
+        },
+        "summary": "layout configuration differs at 0/0/1/2"
+      },
+      {
+        "cause": "missing:subtree",
+        "classification": "product",
+        "findings": [
+          "d45"
+        ],
+        "id": "def-adf406f742652ea7cab7",
+        "kind": "missing",
+        "layer": {
+          "design": "0/0/0/0/0"
+        },
+        "summary": "missing subtree differs at 0/0/0/0/0"
+      },
+      {
+        "cause": "missing:subtree",
+        "classification": "product",
+        "findings": [
+          "d47"
+        ],
+        "id": "def-4027513e40bf1059f77e",
+        "kind": "missing",
+        "layer": {
+          "design": "0/0/1/1"
+        },
+        "summary": "missing subtree differs at 0/0/1/1"
+      },
+      {
+        "cause": "extra:subtree",
+        "classification": "product",
+        "findings": [
+          "d48",
+          "d49",
+          "d50",
+          "d51"
+        ],
+        "id": "def-a4167e02a8097fa11e3b",
+        "kind": "extra",
+        "layer": {
+          "code": "0/0"
+        },
+        "summary": "extra subtree differs at 0/0"
+      },
+      {
+        "cause": "offscreen",
+        "classification": "product",
+        "findings": [
+          "d52"
+        ],
+        "id": "def-8c318c403d72e465682f",
+        "kind": "layout",
+        "layer": {
+          "code": "0/0"
+        },
+        "offscreen": {
+          "box": [
+            0,
+            0,
+            340,
+            54.234375
+          ],
+          "clips": [
+            {
+              "box": [
+                0,
+                0,
+                340,
+                49
+              ],
+              "pan": false,
+              "path": "0",
+              "scrollX": false,
+              "scrollY": false,
+              "x": true,
+              "y": true
+            }
+          ],
+          "elements": [
+            "0/0"
+          ],
+          "frame": [
+            0,
+            0,
+            340,
+            49
+          ],
+          "viewport": [
+            0,
+            0,
+            340,
+            100
+          ]
+        },
+        "summary": "rendered outside the visible pane: button · Checkout — guest cart merge · 56m · drone-12 · +412 −96 · preview live"
+      }
+    ],
+    "falseNegatives": [
+      {
+        "id": "IS-03",
+        "design_layer": "0/0/0/0/0",
+        "code_layer": "0/0/0/0/0/0",
+        "kind": "style",
+        "description": "Leading glyph is the row-kind icon (window/card) in muted #8A877F in design; code always shows the agent's model logo (OpenAI mark) in lighter #A29D93",
+        "severity": "medium",
+        "likely_intentional": "unsure",
+        "note": "[glyph-model-mark] code renders ModelMark for every row",
+        "properties": "icon;color"
+      },
+      {
+        "id": "IS-07",
+        "design_layer": "0/0/0/0/0",
+        "code_layer": "0/0/0/0/0/0",
+        "kind": "layout",
+        "description": "Leading glyph sits 3px lower relative to the title (y 11 vs 8): code nudges marks down 2px to the title baseline on top of the taller line",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[glyph-offset] rowGlyphDown translateY(2px) is a deliberate optical-baseline tweak",
+        "properties": "transform"
+      }
+    ]
+  },
+  "compareMs": 15.959833000000003
+}

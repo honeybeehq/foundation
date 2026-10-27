@@ -1,0 +1,160 @@
+{
+  "task": "H1",
+  "case": "inbox-login",
+  "captureOnly": true,
+  "comparisonRun": false,
+  "labelsRead": false,
+  "apiaryBranch": "proto/design-to-code-components",
+  "apiaryCommit": "a6340a9366c823d6032838b6aee1b0f9e3002692",
+  "links": {
+    "schema": "fdn-links/0",
+    "designFile": "boards/inbox-unified.fdn.html",
+    "designHead": "1c290036c2a26ad4884d480ddf5aa15cc9258bb736a8fc8c5b873ebfd9abe29a",
+    "viteConfig": "apps/next-desktop-beta/foundation.vite.config.ts",
+    "harness": "foundation.harness.tsx",
+    "artboards": [
+      {
+        "id": "inbox-login",
+        "component": "apps/desktop/src/renderer/src/panes/inbox/InboxRow.tsx#InboxRow",
+        "designNode": "n249#4::n249::n17",
+        "viewport": {
+          "width": 340,
+          "height": 100,
+          "dpr": 1
+        },
+        "states": [
+          {
+            "name": "login",
+            "fixture": ".foundation/heldout-fixtures.ts#inboxLogin",
+            "designState": "narrow-queue"
+          }
+        ],
+        "components": []
+      }
+    ],
+    "fonts": [
+      {
+        "family": "Hanken Grotesk",
+        "weight": "400",
+        "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-400-normal.woff2",
+        "sha256": "787b3fdd0b7e6d59ae7ce14ce7a41d1a44616584b4c919b527da951972d5d87d",
+        "postScriptName": "HankenGrotesk-Regular"
+      },
+      {
+        "family": "Hanken Grotesk",
+        "weight": "500",
+        "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-500-normal.woff2",
+        "sha256": "31f666af7bff625900c46aa34a05d8620482ba2db37db7b63749b693ab0c72ec",
+        "postScriptName": "HankenGrotesk-Medium"
+      },
+      {
+        "family": "Hanken Grotesk",
+        "weight": "600",
+        "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-600-normal.woff2",
+        "sha256": "58f23b7ae3e13b21a4dca4c05360be87b3531d60fc1cbff89732cac8fb3019ae",
+        "postScriptName": "HankenGrotesk-SemiBold"
+      },
+      {
+        "family": "IBM Plex Mono",
+        "weight": "400",
+        "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2",
+        "sha256": "08949f728dc52d528e69b1667d15c89a5686a4ee9a296ff90983985f99c380f7",
+        "postScriptName": "IBMPlexMono-Regular"
+      },
+      {
+        "family": "Foundation Design Sans",
+        "weight": "400",
+        "path": ".foundation/fonts/LiberationSans-Regular.ttf",
+        "format": "truetype",
+        "sha256": "4659bc0c58c5028dd488ec928d41d9265db43d9b669fc14ca8b0832daca7b144",
+        "postScriptName": "LiberationSans"
+      },
+      {
+        "family": "Foundation Design Sans",
+        "weight": "700",
+        "path": ".foundation/fonts/LiberationSans-Bold.ttf",
+        "format": "truetype",
+        "sha256": "3973aa5054fb467dd5627245d3dc82e37bf16fe075756156a570455871351582",
+        "postScriptName": "LiberationSans-Bold"
+      },
+      {
+        "family": "Foundation Design Mono",
+        "weight": "400",
+        "path": ".foundation/fonts/DejaVuSansMono.ttf",
+        "format": "truetype",
+        "sha256": "c805f9436dbc268644c1d9584f01a601a653e028e08fd74b9b949f6cf8304d88",
+        "postScriptName": "DejaVuSansMono"
+      },
+      {
+        "family": "Foundation Design Mono",
+        "weight": "700",
+        "path": ".foundation/fonts/DejaVuSansMono-Bold.ttf",
+        "format": "truetype",
+        "sha256": "3a3c502eeff669a231549e80df9f7c49de109bafe303170409e905d0b31a38fe",
+        "postScriptName": "DejaVuSansMono-Bold"
+      },
+      {
+        "family": "Foundation Design Serif",
+        "weight": "400",
+        "path": ".foundation/fonts/LiberationSerif-Regular.ttf",
+        "format": "truetype",
+        "sha256": "705903ae1382f0150f115d6f10a30f5b2f3d6ade649c474afe6366c39174fb65",
+        "postScriptName": "LiberationSerif"
+      },
+      {
+        "family": "Foundation Design Serif",
+        "weight": "700",
+        "path": ".foundation/fonts/LiberationSerif-Bold.ttf",
+        "format": "truetype",
+        "sha256": "9e66c25e20868756bf12eb24a520a4552727c9cd108f577f7ae33e3c0110e39c",
+        "postScriptName": "LiberationSerif-Bold"
+      },
+      {
+        "family": "Foundation Symbols",
+        "weight": "400",
+        "path": ".foundation/fonts/DejaVuSans.ttf",
+        "format": "truetype",
+        "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
+        "postScriptName": "DejaVuSans"
+      },
+      {
+        "family": "Foundation Symbols",
+        "weight": "700",
+        "path": ".foundation/fonts/DejaVuSans-Bold.ttf",
+        "format": "truetype",
+        "sha256": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895",
+        "postScriptName": "DejaVuSans-Bold"
+      },
+      {
+        "family": "Hanken Grotesk",
+        "weight": "700",
+        "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-700-normal.woff2",
+        "format": "woff2",
+        "sha256": "d85de6e272296d06f8205ad11e27140274e0ef97050232777d146eabb71c312d",
+        "postScriptName": "HankenGrotesk-Bold"
+      },
+      {
+        "family": "IBM Plex Mono",
+        "weight": "500",
+        "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2",
+        "format": "woff2",
+        "sha256": "01d285447409c8a588692162439a038b8cbd7871309ee20267b0d2d91c6e8e22",
+        "postScriptName": "IBMPlexMono-Medium"
+      }
+    ],
+    "binding": "chain-head",
+    "fontPolicy": {
+      "sans": "Foundation Design Sans",
+      "mono": "Foundation Design Mono",
+      "serif": "Foundation Design Serif",
+      "fallback": "Foundation Symbols",
+      "requireCustomFonts": true
+    },
+    "browserVersion": "151.0.7922.34",
+    "platform": "linux",
+    "designHtmlSha256": "5fd37f92bb3d214b73a36786dce7ae89d9552db29efd262cc88699de01694431"
+  },
+  "fixtureSource": ".foundation/heldout-fixtures.ts",
+  "fixtureSha256": "2227789ecb6368e74841c02ac3e3d251034831b3160e049db3e19533fb4da509",
+  "mocks": "Props fixture, no-op callbacks; no live I/O"
+}

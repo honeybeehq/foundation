@@ -1,0 +1,86 @@
+[
+  {
+    "state": "track-selected",
+    "side": "design",
+    "pngEqual": false,
+    "domEqual": false,
+    "oldFrame": {
+      "width": 1416,
+      "height": 525.5
+    },
+    "newFrame": {
+      "width": 1416,
+      "height": 525.5
+    }
+  },
+  {
+    "state": "track-selected",
+    "side": "code",
+    "pngEqual": true,
+    "domEqual": true,
+    "oldFrame": {
+      "width": 1416,
+      "height": 525.5
+    },
+    "newFrame": {
+      "width": 1416,
+      "height": 525.5
+    }
+  },
+  {
+    "state": "proposal-pending",
+    "side": "design",
+    "pngEqual": false,
+    "domEqual": false,
+    "oldFrame": {
+      "width": 1416,
+      "height": 611
+    },
+    "newFrame": {
+      "width": 1416,
+      "height": 611
+    }
+  },
+  {
+    "state": "proposal-pending",
+    "side": "code",
+    "pngEqual": true,
+    "domEqual": false,
+    "oldFrame": {
+      "width": 1416,
+      "height": 611
+    },
+    "newFrame": {
+      "width": 1416,
+      "height": 611
+    }
+  },
+  {
+    "state": "empty",
+    "side": "design",
+    "pngEqual": false,
+    "domEqual": false,
+    "oldFrame": {
+      "width": 724,
+      "height": 468
+    },
+    "newFrame": {
+      "width": 1114,
+      "height": 468
+    }
+  },
+  {
+    "state": "empty",
+    "side": "code",
+    "pngEqual": false,
+    "domEqual": false,
+    "oldFrame": {
+      "width": 724,
+      "height": 468
+    },
+    "newFrame": {
+      "width": 1114,
+      "height": 468
+    }
+  }
+]

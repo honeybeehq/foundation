@@ -1,0 +1,1883 @@
+{
+  "result": {
+    "component": "inbox-row",
+    "state": "selected",
+    "optimistic": {
+      "tp": 7,
+      "fp": 3,
+      "fn": 0,
+      "precision": 0.7,
+      "recall": 1,
+      "predicted": 10,
+      "labelled": 7,
+      "agreement": [
+        {
+          "defect": "def-d6321f12760f9ba06e3e",
+          "label": "IS-06",
+          "description": "Rows are taller in code: line 1 is 19px and line 2 17px (line-height 1.45) vs 16px and 15px in design, so the row is 54px instead of 49px, line 2 sits 3px lower and the row overruns the 49px design frame by 5px"
+        },
+        {
+          "defect": "def-1efc5d26a00e1cd5a58b",
+          "label": "IS-02",
+          "description": "Title ink is pure black in the design (var(--color-text-primary) is undefined on the board) vs warm near-black #2E2B27 in code"
+        },
+        {
+          "defect": "def-aa584ed33e802eab2972",
+          "label": "IS-01",
+          "description": "Title and note render in a serif face in the design but in Hanken Grotesk (sans) in code: the inbox board uses var(--font-sans) but never defines it, so the design falls back to the default serif"
+        },
+        {
+          "defect": "def-ca065e7442f148875529",
+          "label": "IS-05",
+          "description": "Age \"56m\" is bright blue #3565D4 in code vs faint grey #A8A59E in design"
+        },
+        {
+          "defect": "def-d079cd53dc86c52d8810",
+          "label": "IS-03",
+          "description": "Leading glyph is the row-kind icon (window/card) in muted #8A877F in design; code always shows the agent's model logo (OpenAI mark) in lighter #A29D93"
+        },
+        {
+          "defect": "def-b58f18ab5a68367e229b",
+          "label": "IS-07",
+          "description": "Leading glyph sits 3px lower relative to the title (y 11 vs 8): code nudges marks down 2px to the title baseline on top of the taller line"
+        },
+        {
+          "defect": "def-dcf0788aabbc9a73c354",
+          "label": "IS-04",
+          "description": "Orange status dot and \"review\" word are missing on line 2; the code renders this row as a plain completed row (no dot, no word), so the note starts at the indent instead of after the status"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-ee4f281dbd96555e9914",
+          "layer": {
+            "design": "n249#1::n249::n25",
+            "code": "0/0/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d23",
+            "d25"
+          ],
+          "summary": "layout configuration differs at n249#1::n249::n25"
+        },
+        {
+          "id": "def-c359d70738e94c6d95c5",
+          "layer": {
+            "design": "n249#1::n249::n19::n1",
+            "code": "0/0/0/0/0/0"
+          },
+          "kind": "token",
+          "cause": "style:icon",
+          "classification": "product",
+          "findings": [
+            "d34"
+          ],
+          "summary": "style icon differs at n249#1::n249::n19::n1"
+        },
+        {
+          "id": "def-5a56a212a6862218a6aa",
+          "layer": {
+            "design": "n249#1::n249::n24"
+          },
+          "kind": "missing",
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d37"
+          ],
+          "summary": "missing subtree differs at n249#1::n249::n24"
+        }
+      ],
+      "falseNegatives": []
+    },
+    "strict": {
+      "tp": 7,
+      "fp": 3,
+      "fn": 0,
+      "precision": 0.7,
+      "recall": 1,
+      "predicted": 10,
+      "labelled": 7,
+      "agreement": [
+        {
+          "defect": "def-d6321f12760f9ba06e3e",
+          "label": "IS-06",
+          "description": "Rows are taller in code: line 1 is 19px and line 2 17px (line-height 1.45) vs 16px and 15px in design, so the row is 54px instead of 49px, line 2 sits 3px lower and the row overruns the 49px design frame by 5px"
+        },
+        {
+          "defect": "def-1efc5d26a00e1cd5a58b",
+          "label": "IS-02",
+          "description": "Title ink is pure black in the design (var(--color-text-primary) is undefined on the board) vs warm near-black #2E2B27 in code"
+        },
+        {
+          "defect": "def-aa584ed33e802eab2972",
+          "label": "IS-01",
+          "description": "Title and note render in a serif face in the design but in Hanken Grotesk (sans) in code: the inbox board uses var(--font-sans) but never defines it, so the design falls back to the default serif"
+        },
+        {
+          "defect": "def-ca065e7442f148875529",
+          "label": "IS-05",
+          "description": "Age \"56m\" is bright blue #3565D4 in code vs faint grey #A8A59E in design"
+        },
+        {
+          "defect": "def-d079cd53dc86c52d8810",
+          "label": "IS-03",
+          "description": "Leading glyph is the row-kind icon (window/card) in muted #8A877F in design; code always shows the agent's model logo (OpenAI mark) in lighter #A29D93"
+        },
+        {
+          "defect": "def-b58f18ab5a68367e229b",
+          "label": "IS-07",
+          "description": "Leading glyph sits 3px lower relative to the title (y 11 vs 8): code nudges marks down 2px to the title baseline on top of the taller line"
+        },
+        {
+          "defect": "def-dcf0788aabbc9a73c354",
+          "label": "IS-04",
+          "description": "Orange status dot and \"review\" word are missing on line 2; the code renders this row as a plain completed row (no dot, no word), so the note starts at the indent instead of after the status"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-ee4f281dbd96555e9914",
+          "layer": {
+            "design": "n249#1::n249::n25",
+            "code": "0/0/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d23",
+            "d25"
+          ],
+          "summary": "layout configuration differs at n249#1::n249::n25"
+        },
+        {
+          "id": "def-c359d70738e94c6d95c5",
+          "layer": {
+            "design": "n249#1::n249::n19::n1",
+            "code": "0/0/0/0/0/0"
+          },
+          "kind": "token",
+          "cause": "style:icon",
+          "classification": "product",
+          "findings": [
+            "d34"
+          ],
+          "summary": "style icon differs at n249#1::n249::n19::n1"
+        },
+        {
+          "id": "def-5a56a212a6862218a6aa",
+          "layer": {
+            "design": "n249#1::n249::n24"
+          },
+          "kind": "missing",
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d37"
+          ],
+          "summary": "missing subtree differs at n249#1::n249::n24"
+        }
+      ],
+      "falseNegatives": []
+    }
+  },
+  "report": {
+    "schema": "fdn-drift/0",
+    "artboard": "inbox-row",
+    "state": "selected",
+    "viewport": {
+      "width": 340,
+      "height": 100,
+      "dpr": 1
+    },
+    "design": {
+      "file": "boards/inbox-unified.fdn.html",
+      "head": "1c290036c2a26ad4884d480ddf5aa15cc9258bb736a8fc8c5b873ebfd9abe29a",
+      "htmlSha256": "80a0e8fcce2928b3f71cf956495f097bbf9c709ccd183a9ac796ce8784987f9e",
+      "binding": "chain-head"
+    },
+    "code": {
+      "repo": "honeybeehq/apiary",
+      "commit": "5850046fe9541d6c044db5674b795a2dfcee3a75",
+      "root": "apps/desktop/src/renderer/src/panes/inbox/InboxRow.tsx#InboxRow"
+    },
+    "provable": true,
+    "captureEnvironment": {
+      "browserVersion": "151.0.7922.34",
+      "platform": "linux",
+      "fontPolicy": {
+        "sans": "Foundation Design Sans",
+        "mono": "Foundation Design Mono",
+        "serif": "Foundation Design Serif",
+        "fallback": "Foundation Symbols",
+        "requireCustomFonts": true
+      },
+      "fontAssets": [
+        {
+          "family": "Foundation Design Mono",
+          "weight": "400",
+          "format": "truetype",
+          "sha256": "c805f9436dbc268644c1d9584f01a601a653e028e08fd74b9b949f6cf8304d88",
+          "postScriptName": "DejaVuSansMono"
+        },
+        {
+          "family": "Foundation Design Mono",
+          "weight": "700",
+          "format": "truetype",
+          "sha256": "3a3c502eeff669a231549e80df9f7c49de109bafe303170409e905d0b31a38fe",
+          "postScriptName": "DejaVuSansMono-Bold"
+        },
+        {
+          "family": "Foundation Design Sans",
+          "weight": "400",
+          "format": "truetype",
+          "sha256": "4659bc0c58c5028dd488ec928d41d9265db43d9b669fc14ca8b0832daca7b144",
+          "postScriptName": "LiberationSans"
+        },
+        {
+          "family": "Foundation Design Sans",
+          "weight": "700",
+          "format": "truetype",
+          "sha256": "3973aa5054fb467dd5627245d3dc82e37bf16fe075756156a570455871351582",
+          "postScriptName": "LiberationSans-Bold"
+        },
+        {
+          "family": "Foundation Design Serif",
+          "weight": "400",
+          "format": "truetype",
+          "sha256": "705903ae1382f0150f115d6f10a30f5b2f3d6ade649c474afe6366c39174fb65",
+          "postScriptName": "LiberationSerif"
+        },
+        {
+          "family": "Foundation Design Serif",
+          "weight": "700",
+          "format": "truetype",
+          "sha256": "9e66c25e20868756bf12eb24a520a4552727c9cd108f577f7ae33e3c0110e39c",
+          "postScriptName": "LiberationSerif-Bold"
+        },
+        {
+          "family": "Foundation Symbols",
+          "weight": "400",
+          "format": "truetype",
+          "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
+          "postScriptName": "DejaVuSans"
+        },
+        {
+          "family": "Foundation Symbols",
+          "weight": "700",
+          "format": "truetype",
+          "sha256": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895",
+          "postScriptName": "DejaVuSans-Bold"
+        },
+        {
+          "family": "Hanken Grotesk",
+          "weight": "700",
+          "format": "woff2",
+          "sha256": "d85de6e272296d06f8205ad11e27140274e0ef97050232777d146eabb71c312d",
+          "postScriptName": "HankenGrotesk-Bold"
+        },
+        {
+          "family": "Hanken Grotesk",
+          "weight": "500",
+          "format": "woff2",
+          "sha256": "31f666af7bff625900c46aa34a05d8620482ba2db37db7b63749b693ab0c72ec",
+          "postScriptName": "HankenGrotesk-Medium"
+        },
+        {
+          "family": "Hanken Grotesk",
+          "weight": "400",
+          "format": "woff2",
+          "sha256": "787b3fdd0b7e6d59ae7ce14ce7a41d1a44616584b4c919b527da951972d5d87d",
+          "postScriptName": "HankenGrotesk-Regular"
+        },
+        {
+          "family": "Hanken Grotesk",
+          "weight": "600",
+          "format": "woff2",
+          "sha256": "58f23b7ae3e13b21a4dca4c05360be87b3531d60fc1cbff89732cac8fb3019ae",
+          "postScriptName": "HankenGrotesk-SemiBold"
+        },
+        {
+          "family": "IBM Plex Mono",
+          "weight": "500",
+          "format": "woff2",
+          "sha256": "01d285447409c8a588692162439a038b8cbd7871309ee20267b0d2d91c6e8e22",
+          "postScriptName": "IBMPlexMono-Medium"
+        },
+        {
+          "family": "IBM Plex Mono",
+          "weight": "400",
+          "format": "woff2",
+          "sha256": "08949f728dc52d528e69b1667d15c89a5686a4ee9a296ff90983985f99c380f7",
+          "postScriptName": "IBMPlexMono-Regular"
+        }
+      ],
+      "rendererSourceHash": "93c6f566b93af848e58782f40603f61eb7819279ac481904364fcd8f5e515b1c"
+    },
+    "styles": {
+      "properties": [
+        "color",
+        "background-color",
+        "background-image",
+        "border-top-color",
+        "border-right-color",
+        "border-bottom-color",
+        "border-left-color",
+        "border-top-width",
+        "border-right-width",
+        "border-bottom-width",
+        "border-left-width",
+        "border-top-style",
+        "border-right-style",
+        "border-bottom-style",
+        "border-left-style",
+        "border-top-left-radius",
+        "border-top-right-radius",
+        "border-bottom-left-radius",
+        "border-bottom-right-radius",
+        "padding-top",
+        "padding-right",
+        "padding-bottom",
+        "padding-left",
+        "margin-top",
+        "margin-right",
+        "margin-bottom",
+        "margin-left",
+        "row-gap",
+        "column-gap",
+        "font-family",
+        "font-size",
+        "font-weight",
+        "line-height",
+        "letter-spacing",
+        "text-align",
+        "text-transform",
+        "opacity",
+        "box-shadow",
+        "text-shadow",
+        "display",
+        "align-items",
+        "justify-content",
+        "flex-direction",
+        "visibility",
+        "position",
+        "box-sizing",
+        "overflow-x",
+        "overflow-y",
+        "font-style",
+        "text-decoration-line",
+        "white-space",
+        "gap",
+        "flex-grow",
+        "flex-shrink"
+      ],
+      "unavailable": []
+    },
+    "matching": {
+      "algorithm": "hungarian",
+      "maxCost": 0.48,
+      "weights": {
+        "text": 0.4,
+        "tag": 0.15,
+        "roleName": 0.15,
+        "iou": 0.25,
+        "path": 0.05
+      },
+      "containerText": "descendant-Dice",
+      "confidence": "1-cost; uncalibrated"
+    },
+    "offscreen": {
+      "status": "measured"
+    },
+    "tolerances": {
+      "pixelRatio": 0.001,
+      "boxPx": 1,
+      "colorDeltaE": 1,
+      "stylePx": 1,
+      "pixelThreshold": 0.1
+    },
+    "pixels": {
+      "diffRatio": 0.03835294117647059,
+      "diffPixels": 1304,
+      "diffImage": "diff.png",
+      "designImage": "design.png",
+      "codeImage": "code.png"
+    },
+    "drifts": [
+      {
+        "id": "d1",
+        "designNode": "n249#1::n249::n17",
+        "codeNode": "n249#1::n249::n17",
+        "match": "id",
+        "confidence": 1,
+        "designBox": [
+          0,
+          0,
+          340,
+          49
+        ],
+        "codeBox": [
+          0,
+          0,
+          340,
+          54.234375
+        ],
+        "kind": "layout",
+        "property": "height",
+        "design": 49,
+        "code": 54.234375
+      },
+      {
+        "id": "d2",
+        "designNode": "n249#1::n249::n17",
+        "codeNode": "n249#1::n249::n17",
+        "match": "id",
+        "confidence": 1,
+        "designBox": [
+          0,
+          0,
+          340,
+          49
+        ],
+        "codeBox": [
+          0,
+          0,
+          340,
+          54.234375
+        ],
+        "kind": "style",
+        "property": "position",
+        "design": "static",
+        "code": "relative",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d3",
+        "designNode": "n249#1::n249::n17",
+        "codeNode": "n249#1::n249::n17",
+        "match": "id",
+        "confidence": 1,
+        "designBox": [
+          0,
+          0,
+          340,
+          49
+        ],
+        "codeBox": [
+          0,
+          0,
+          340,
+          54.234375
+        ],
+        "kind": "style",
+        "property": "box-sizing",
+        "design": "content-box",
+        "code": "border-box",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d4",
+        "designNode": "n249#1::n249::n20",
+        "codeNode": "n249#1::n249::n20",
+        "match": "id",
+        "confidence": 1,
+        "designBox": [
+          31,
+          7,
+          272.1875,
+          16
+        ],
+        "codeBox": [
+          31,
+          7,
+          272.1875,
+          18.84375
+        ],
+        "kind": "layout",
+        "property": "height",
+        "design": 16,
+        "code": 18.84375
+      },
+      {
+        "id": "d5",
+        "designNode": "n249#1::n249::n20",
+        "codeNode": "n249#1::n249::n20",
+        "match": "id",
+        "confidence": 1,
+        "designBox": [
+          31,
+          7,
+          272.1875,
+          16
+        ],
+        "codeBox": [
+          31,
+          7,
+          272.1875,
+          18.84375
+        ],
+        "kind": "style",
+        "property": "color",
+        "design": "rgb(0, 0, 0)",
+        "code": "rgb(46, 43, 39)",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d6",
+        "designNode": "n249#1::n249::n20",
+        "codeNode": "n249#1::n249::n20",
+        "match": "id",
+        "confidence": 1,
+        "designBox": [
+          31,
+          7,
+          272.1875,
+          16
+        ],
+        "codeBox": [
+          31,
+          7,
+          272.1875,
+          18.84375
+        ],
+        "rendered": {
+          "design": "\"Foundation Design Serif\", \"Foundation Symbols\"",
+          "code": "\"Hanken Grotesk\", \"Foundation Design Sans\", \"Foundation Symbols\""
+        },
+        "kind": "style",
+        "property": "font-family",
+        "design": "\"Times New Roman\"",
+        "code": "\"Hanken Grotesk\", system-ui, sans-serif",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d7",
+        "designNode": "n249#1::n249::n20",
+        "codeNode": "n249#1::n249::n20",
+        "match": "id",
+        "confidence": 1,
+        "designBox": [
+          31,
+          7,
+          272.1875,
+          16
+        ],
+        "codeBox": [
+          31,
+          7,
+          272.1875,
+          18.84375
+        ],
+        "kind": "style",
+        "property": "line-height",
+        "design": "normal",
+        "code": "18.85px",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d8",
+        "designNode": "n249#1::n249::n20",
+        "codeNode": "n249#1::n249::n20",
+        "match": "id",
+        "confidence": 1,
+        "designBox": [
+          31,
+          7,
+          272.1875,
+          16
+        ],
+        "codeBox": [
+          31,
+          7,
+          272.1875,
+          18.84375
+        ],
+        "kind": "style",
+        "property": "text-align",
+        "design": "start",
+        "code": "left",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d9",
+        "designNode": "n249#1::n249::n20",
+        "codeNode": "n249#1::n249::n20",
+        "match": "id",
+        "confidence": 1,
+        "designBox": [
+          31,
+          7,
+          272.1875,
+          16
+        ],
+        "codeBox": [
+          31,
+          7,
+          272.1875,
+          18.84375
+        ],
+        "kind": "style",
+        "property": "box-sizing",
+        "design": "content-box",
+        "code": "border-box",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d10",
+        "designNode": "n249#1::n249::n21",
+        "codeNode": "n249#1::n249::n21",
+        "match": "id",
+        "confidence": 1,
+        "designBox": [
+          311.1875,
+          8,
+          19.8125,
+          14
+        ],
+        "codeBox": [
+          311.1875,
+          8.453125,
+          19.8125,
+          15.9375
+        ],
+        "kind": "layout",
+        "property": "height",
+        "design": 14,
+        "code": 15.9375
+      },
+      {
+        "id": "d11",
+        "designNode": "n249#1::n249::n21",
+        "codeNode": "n249#1::n249::n21",
+        "match": "id",
+        "confidence": 1,
+        "designBox": [
+          311.1875,
+          8,
+          19.8125,
+          14
+        ],
+        "codeBox": [
+          311.1875,
+          8.453125,
+          19.8125,
+          15.9375
+        ],
+        "kind": "token",
+        "property": "color",
+        "design": "rgb(168, 165, 158)",
+        "code": "rgb(53, 101, 212)",
+        "token": {
+          "design": "--color-text-faint",
+          "code": null
+        }
+      },
+      {
+        "id": "d12",
+        "designNode": "n249#1::n249::n21",
+        "codeNode": "n249#1::n249::n21",
+        "match": "id",
+        "confidence": 1,
+        "designBox": [
+          311.1875,
+          8,
+          19.8125,
+          14
+        ],
+        "codeBox": [
+          311.1875,
+          8.453125,
+          19.8125,
+          15.9375
+        ],
+        "rendered": {
+          "design": "\"IBM Plex Mono\", \"Foundation Design Mono\", \"Foundation Symbols\"",
+          "code": "\"IBM Plex Mono\", \"Foundation Design Mono\", \"Foundation Symbols\""
+        },
+        "kind": "style",
+        "property": "font-family",
+        "design": "\"IBM Plex Mono\", monospace",
+        "code": "\"IBM Plex Mono\", ui-monospace, monospace",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d13",
+        "designNode": "n249#1::n249::n21",
+        "codeNode": "n249#1::n249::n21",
+        "match": "id",
+        "confidence": 1,
+        "designBox": [
+          311.1875,
+          8,
+          19.8125,
+          14
+        ],
+        "codeBox": [
+          311.1875,
+          8.453125,
+          19.8125,
+          15.9375
+        ],
+        "kind": "style",
+        "property": "line-height",
+        "design": "normal",
+        "code": "15.95px",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d14",
+        "designNode": "n249#1::n249::n21",
+        "codeNode": "n249#1::n249::n21",
+        "match": "id",
+        "confidence": 1,
+        "designBox": [
+          311.1875,
+          8,
+          19.8125,
+          14
+        ],
+        "codeBox": [
+          311.1875,
+          8.453125,
+          19.8125,
+          15.9375
+        ],
+        "kind": "style",
+        "property": "text-align",
+        "design": "start",
+        "code": "left",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d15",
+        "designNode": "n249#1::n249::n21",
+        "codeNode": "n249#1::n249::n21",
+        "match": "id",
+        "confidence": 1,
+        "designBox": [
+          311.1875,
+          8,
+          19.8125,
+          14
+        ],
+        "codeBox": [
+          311.1875,
+          8.453125,
+          19.8125,
+          15.9375
+        ],
+        "kind": "style",
+        "property": "box-sizing",
+        "design": "content-box",
+        "code": "border-box",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d16",
+        "designNode": "n249#1::n249::n18",
+        "codeNode": "0/0/0",
+        "match": "heuristic",
+        "confidence": 0.962,
+        "designBox": [
+          9,
+          7,
+          322,
+          16
+        ],
+        "codeBox": [
+          9,
+          7,
+          322,
+          18.84375
+        ],
+        "kind": "layout",
+        "property": "height",
+        "design": 16,
+        "code": 18.84375
+      },
+      {
+        "id": "d17",
+        "designNode": "n249#1::n249::n18",
+        "codeNode": "0/0/0",
+        "match": "heuristic",
+        "confidence": 0.962,
+        "designBox": [
+          9,
+          7,
+          322,
+          16
+        ],
+        "codeBox": [
+          9,
+          7,
+          322,
+          18.84375
+        ],
+        "kind": "style",
+        "property": "position",
+        "design": "static",
+        "code": "relative",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d18",
+        "designNode": "n249#1::n249::n18",
+        "codeNode": "0/0/0",
+        "match": "heuristic",
+        "confidence": 0.962,
+        "designBox": [
+          9,
+          7,
+          322,
+          16
+        ],
+        "codeBox": [
+          9,
+          7,
+          322,
+          18.84375
+        ],
+        "kind": "style",
+        "property": "box-sizing",
+        "design": "content-box",
+        "code": "border-box",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d19",
+        "designNode": "n249#1::n249::n22",
+        "codeNode": "0/0/1",
+        "match": "heuristic",
+        "confidence": 0.78,
+        "designBox": [
+          9,
+          26,
+          322,
+          15
+        ],
+        "codeBox": [
+          9,
+          28.84375,
+          322,
+          17.390625
+        ],
+        "kind": "layout",
+        "property": "y",
+        "design": 26,
+        "code": 28.84375
+      },
+      {
+        "id": "d20",
+        "designNode": "n249#1::n249::n22",
+        "codeNode": "0/0/1",
+        "match": "heuristic",
+        "confidence": 0.78,
+        "designBox": [
+          9,
+          26,
+          322,
+          15
+        ],
+        "codeBox": [
+          9,
+          28.84375,
+          322,
+          17.390625
+        ],
+        "kind": "layout",
+        "property": "height",
+        "design": 15,
+        "code": 17.390625
+      },
+      {
+        "id": "d21",
+        "designNode": "n249#1::n249::n22",
+        "codeNode": "0/0/1",
+        "match": "heuristic",
+        "confidence": 0.78,
+        "designBox": [
+          9,
+          26,
+          322,
+          15
+        ],
+        "codeBox": [
+          9,
+          28.84375,
+          322,
+          17.390625
+        ],
+        "kind": "style",
+        "property": "position",
+        "design": "static",
+        "code": "relative",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d22",
+        "designNode": "n249#1::n249::n22",
+        "codeNode": "0/0/1",
+        "match": "heuristic",
+        "confidence": 0.78,
+        "designBox": [
+          9,
+          26,
+          322,
+          15
+        ],
+        "codeBox": [
+          9,
+          28.84375,
+          322,
+          17.390625
+        ],
+        "kind": "style",
+        "property": "box-sizing",
+        "design": "content-box",
+        "code": "border-box",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d23",
+        "designNode": "n249#1::n249::n25",
+        "codeNode": "0/0/1/0",
+        "match": "heuristic",
+        "confidence": 0.824,
+        "designBox": [
+          89.8125,
+          26,
+          241.1875,
+          15
+        ],
+        "codeBox": [
+          31,
+          28.84375,
+          300,
+          17.390625
+        ],
+        "kind": "layout",
+        "property": "x",
+        "design": 89.8125,
+        "code": 31
+      },
+      {
+        "id": "d24",
+        "designNode": "n249#1::n249::n25",
+        "codeNode": "0/0/1/0",
+        "match": "heuristic",
+        "confidence": 0.824,
+        "designBox": [
+          89.8125,
+          26,
+          241.1875,
+          15
+        ],
+        "codeBox": [
+          31,
+          28.84375,
+          300,
+          17.390625
+        ],
+        "kind": "layout",
+        "property": "y",
+        "design": 26,
+        "code": 28.84375
+      },
+      {
+        "id": "d25",
+        "designNode": "n249#1::n249::n25",
+        "codeNode": "0/0/1/0",
+        "match": "heuristic",
+        "confidence": 0.824,
+        "designBox": [
+          89.8125,
+          26,
+          241.1875,
+          15
+        ],
+        "codeBox": [
+          31,
+          28.84375,
+          300,
+          17.390625
+        ],
+        "kind": "layout",
+        "property": "width",
+        "design": 241.1875,
+        "code": 300
+      },
+      {
+        "id": "d26",
+        "designNode": "n249#1::n249::n25",
+        "codeNode": "0/0/1/0",
+        "match": "heuristic",
+        "confidence": 0.824,
+        "designBox": [
+          89.8125,
+          26,
+          241.1875,
+          15
+        ],
+        "codeBox": [
+          31,
+          28.84375,
+          300,
+          17.390625
+        ],
+        "kind": "layout",
+        "property": "height",
+        "design": 15,
+        "code": 17.390625
+      },
+      {
+        "id": "d27",
+        "designNode": "n249#1::n249::n25",
+        "codeNode": "0/0/1/0",
+        "match": "heuristic",
+        "confidence": 0.824,
+        "designBox": [
+          89.8125,
+          26,
+          241.1875,
+          15
+        ],
+        "codeBox": [
+          31,
+          28.84375,
+          300,
+          17.390625
+        ],
+        "rendered": {
+          "design": "\"Foundation Design Serif\", \"Foundation Symbols\"",
+          "code": "\"Hanken Grotesk\", \"Foundation Design Sans\", \"Foundation Symbols\""
+        },
+        "kind": "style",
+        "property": "font-family",
+        "design": "\"Times New Roman\"",
+        "code": "\"Hanken Grotesk\", system-ui, sans-serif",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d28",
+        "designNode": "n249#1::n249::n25",
+        "codeNode": "0/0/1/0",
+        "match": "heuristic",
+        "confidence": 0.824,
+        "designBox": [
+          89.8125,
+          26,
+          241.1875,
+          15
+        ],
+        "codeBox": [
+          31,
+          28.84375,
+          300,
+          17.390625
+        ],
+        "kind": "style",
+        "property": "line-height",
+        "design": "normal",
+        "code": "17.4px",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d29",
+        "designNode": "n249#1::n249::n25",
+        "codeNode": "0/0/1/0",
+        "match": "heuristic",
+        "confidence": 0.824,
+        "designBox": [
+          89.8125,
+          26,
+          241.1875,
+          15
+        ],
+        "codeBox": [
+          31,
+          28.84375,
+          300,
+          17.390625
+        ],
+        "kind": "style",
+        "property": "text-align",
+        "design": "start",
+        "code": "left",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d30",
+        "designNode": "n249#1::n249::n25",
+        "codeNode": "0/0/1/0",
+        "match": "heuristic",
+        "confidence": 0.824,
+        "designBox": [
+          89.8125,
+          26,
+          241.1875,
+          15
+        ],
+        "codeBox": [
+          31,
+          28.84375,
+          300,
+          17.390625
+        ],
+        "kind": "style",
+        "property": "box-sizing",
+        "design": "content-box",
+        "code": "border-box",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d31",
+        "designNode": "n249#1::n249::n19::n1",
+        "codeNode": "0/0/0/0/0/0",
+        "match": "heuristic",
+        "confidence": 0.7,
+        "designBox": [
+          9,
+          8,
+          14,
+          14
+        ],
+        "codeBox": [
+          9,
+          11.421875,
+          14,
+          14
+        ],
+        "kind": "layout",
+        "property": "y",
+        "design": 8,
+        "code": 11.421875
+      },
+      {
+        "id": "d32",
+        "designNode": "n249#1::n249::n19::n1",
+        "codeNode": "0/0/0/0/0/0",
+        "match": "heuristic",
+        "confidence": 0.7,
+        "designBox": [
+          9,
+          8,
+          14,
+          14
+        ],
+        "codeBox": [
+          9,
+          11.421875,
+          14,
+          14
+        ],
+        "kind": "style",
+        "property": "icon",
+        "design": [
+          {
+            "tag": "svg",
+            "attributes": {
+              "fill": "none",
+              "viewBox": "0 0 16 16"
+            }
+          },
+          {
+            "tag": "rect",
+            "attributes": {
+              "rx": "2",
+              "stroke": "currentColor",
+              "stroke-width": "1.3",
+              "x": "2",
+              "y": "3"
+            }
+          },
+          {
+            "tag": "path",
+            "attributes": {
+              "d": "M2 6.2h12",
+              "stroke": "currentColor",
+              "stroke-width": "1.3"
+            }
+          },
+          {
+            "tag": "circle",
+            "attributes": {
+              "cx": "4.4",
+              "cy": "4.6",
+              "fill": "currentColor",
+              "r": ".55"
+            }
+          }
+        ],
+        "code": [
+          {
+            "tag": "svg",
+            "attributes": {
+              "fill": "currentColor",
+              "fill-rule": "evenodd",
+              "viewBox": "0 0 24 24"
+            }
+          },
+          {
+            "tag": "path",
+            "attributes": {
+              "d": "M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523zm5.899 2.83a5.947 5.947 0 005.827-4.756C22.287 18.339 24 15.84 24 13.296c0-1.665-.713-3.282-1.998-4.448.119-.5.19-.999.19-1.498 0-3.401-2.759-5.947-5.946-5.947-.642 0-1.26.095-1.88.31A5.962 5.962 0 0010.205 0a5.947 5.947 0 00-5.827 4.757C1.713 5.447 0 7.945 0 10.49c0 1.666.713 3.283 1.998 4.448-.119.5-.19 1-.19 1.499 0 3.401 2.759 5.946 5.946 5.946.642 0 1.26-.095 1.88-.309a5.96 5.96 0 004.162 1.713z"
+            }
+          }
+        ]
+      },
+      {
+        "id": "d33",
+        "designNode": "n249#1::n249::n19::n1",
+        "codeNode": "0/0/0/0/0/0",
+        "match": "heuristic",
+        "confidence": 0.7,
+        "designBox": [
+          9,
+          8,
+          14,
+          14
+        ],
+        "codeBox": [
+          9,
+          11.421875,
+          14,
+          14
+        ],
+        "kind": "layout",
+        "property": "transform",
+        "design": [],
+        "code": [
+          "matrix(1, 0, 0, 1, 0, 2)"
+        ]
+      },
+      {
+        "id": "d34",
+        "designNode": "n249#1::n249::n19::n1",
+        "codeNode": "0/0/0/0/0/0",
+        "match": "heuristic",
+        "confidence": 0.7,
+        "designBox": [
+          9,
+          8,
+          14,
+          14
+        ],
+        "codeBox": [
+          9,
+          11.421875,
+          14,
+          14
+        ],
+        "kind": "token",
+        "property": "color",
+        "design": "rgb(138, 135, 127)",
+        "code": "rgb(162, 157, 147)",
+        "token": {
+          "design": "--color-text-muted",
+          "code": null
+        }
+      },
+      {
+        "id": "d35",
+        "designNode": "n249#1::n249::n19::n1",
+        "codeNode": "0/0/0/0/0/0",
+        "match": "heuristic",
+        "confidence": 0.7,
+        "designBox": [
+          9,
+          8,
+          14,
+          14
+        ],
+        "codeBox": [
+          9,
+          11.421875,
+          14,
+          14
+        ],
+        "kind": "style",
+        "property": "box-sizing",
+        "design": "content-box",
+        "code": "border-box",
+        "token": {
+          "design": null,
+          "code": null
+        }
+      },
+      {
+        "id": "d36",
+        "kind": "missing",
+        "designNode": "n249#1::n249::n23::n14",
+        "confidence": 0,
+        "property": "node",
+        "designBox": [
+          31,
+          30,
+          7,
+          7
+        ]
+      },
+      {
+        "id": "d37",
+        "kind": "missing",
+        "designNode": "n249#1::n249::n24",
+        "confidence": 0,
+        "property": "node",
+        "designBox": [
+          45,
+          26.5,
+          37.8125,
+          14
+        ]
+      },
+      {
+        "id": "d38",
+        "kind": "layout",
+        "property": "offscreen",
+        "designNode": "n249#1::n249::n17",
+        "codeNode": "n249#1::n249::n17",
+        "confidence": 1,
+        "codeBox": [
+          0,
+          0,
+          340,
+          54.234375
+        ],
+        "code": {
+          "box": [
+            0,
+            0,
+            340,
+            54.234375
+          ],
+          "frame": [
+            0,
+            0,
+            340,
+            49
+          ],
+          "viewport": [
+            0,
+            0,
+            340,
+            100
+          ],
+          "elements": [
+            "0/0"
+          ],
+          "clips": [
+            {
+              "path": "0",
+              "box": [
+                0,
+                0,
+                340,
+                49
+              ],
+              "x": true,
+              "y": true,
+              "pan": false,
+              "scrollX": false,
+              "scrollY": false
+            }
+          ],
+          "summary": "rendered outside the visible pane: button · Checkout — guest cart merge · 56m · drone-12 · +412 −96 · preview live"
+        }
+      }
+    ],
+    "defects": [
+      {
+        "id": "def-d6321f12760f9ba06e3e",
+        "layer": {
+          "design": "n249#1::n249::n17",
+          "code": "n249#1::n249::n17"
+        },
+        "kind": "layout",
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d1",
+          "d4",
+          "d7",
+          "d10",
+          "d13",
+          "d16",
+          "d19",
+          "d20",
+          "d24",
+          "d26",
+          "d28",
+          "d31",
+          "d38"
+        ],
+        "summary": "layout configuration differs at n249#1::n249::n17",
+        "offscreen": {
+          "box": [
+            0,
+            0,
+            340,
+            54.234375
+          ],
+          "frame": [
+            0,
+            0,
+            340,
+            49
+          ],
+          "viewport": [
+            0,
+            0,
+            340,
+            100
+          ],
+          "elements": [
+            "0/0"
+          ],
+          "clips": [
+            {
+              "path": "0",
+              "box": [
+                0,
+                0,
+                340,
+                49
+              ],
+              "x": true,
+              "y": true,
+              "pan": false,
+              "scrollX": false,
+              "scrollY": false
+            }
+          ]
+        }
+      },
+      {
+        "id": "def-07910d3029faec916eba",
+        "layer": {
+          "design": "n249#1::n249::n17",
+          "code": "n249#1::n249::n17"
+        },
+        "kind": "style",
+        "cause": "positioning-technique",
+        "classification": "uncertain",
+        "findings": [
+          "d2"
+        ],
+        "summary": "positioning-technique differs at n249#1::n249::n17"
+      },
+      {
+        "id": "def-c0d9cc1bfdd4271c4185",
+        "layer": {
+          "design": "n249#1::n249::n17",
+          "code": "n249#1::n249::n17"
+        },
+        "kind": "style",
+        "cause": "equivalent-borderless-box-model",
+        "classification": "uncertain",
+        "findings": [
+          "d3"
+        ],
+        "summary": "equivalent-borderless-box-model differs at n249#1::n249::n17"
+      },
+      {
+        "id": "def-1efc5d26a00e1cd5a58b",
+        "layer": {
+          "design": "n249#1::n249::n17",
+          "code": "n249#1::n249::n17"
+        },
+        "kind": "style",
+        "cause": "style:color",
+        "classification": "product",
+        "findings": [
+          "d5"
+        ],
+        "summary": "style color differs at n249#1::n249::n17"
+      },
+      {
+        "id": "def-aa584ed33e802eab2972",
+        "layer": {
+          "design": "n249#1::n249::n17",
+          "code": "n249#1::n249::n17"
+        },
+        "kind": "style",
+        "cause": "style:font-family",
+        "classification": "product",
+        "findings": [
+          "d6",
+          "d27"
+        ],
+        "summary": "style font-family differs at n249#1::n249::n17"
+      },
+      {
+        "id": "def-d7e103bcd05879e92a49",
+        "layer": {
+          "design": "n249#1::n249::n17",
+          "code": "n249#1::n249::n17"
+        },
+        "kind": "style",
+        "cause": "computed-directional-alignment",
+        "classification": "uncertain",
+        "findings": [
+          "d8",
+          "d14",
+          "d29"
+        ],
+        "summary": "computed-directional-alignment differs at n249#1::n249::n17"
+      },
+      {
+        "id": "def-48b2105725b9c500ec64",
+        "layer": {
+          "design": "n249#1::n249::n20",
+          "code": "n249#1::n249::n20"
+        },
+        "kind": "style",
+        "cause": "equivalent-borderless-box-model",
+        "classification": "uncertain",
+        "findings": [
+          "d9"
+        ],
+        "summary": "equivalent-borderless-box-model differs at n249#1::n249::n20"
+      },
+      {
+        "id": "def-ca065e7442f148875529",
+        "layer": {
+          "design": "n249#1::n249::n21",
+          "code": "n249#1::n249::n21"
+        },
+        "kind": "token",
+        "cause": "token:color",
+        "classification": "product",
+        "findings": [
+          "d11"
+        ],
+        "summary": "token color differs at n249#1::n249::n21"
+      },
+      {
+        "id": "def-c63f5750717fb826f12c",
+        "layer": {
+          "design": "0",
+          "code": "0"
+        },
+        "kind": "style",
+        "cause": "equivalent-rendered-font-stack",
+        "classification": "environment",
+        "findings": [
+          "d12"
+        ],
+        "summary": "Font family differs under the declared Linux substitution"
+      },
+      {
+        "id": "def-d4ef846a50e28e00bfa2",
+        "layer": {
+          "design": "n249#1::n249::n21",
+          "code": "n249#1::n249::n21"
+        },
+        "kind": "style",
+        "cause": "equivalent-borderless-box-model",
+        "classification": "uncertain",
+        "findings": [
+          "d15"
+        ],
+        "summary": "equivalent-borderless-box-model differs at n249#1::n249::n21"
+      },
+      {
+        "id": "def-c6e97235e693453d786b",
+        "layer": {
+          "design": "n249#1::n249::n18",
+          "code": "0/0/0"
+        },
+        "kind": "style",
+        "cause": "positioning-technique",
+        "classification": "uncertain",
+        "findings": [
+          "d17"
+        ],
+        "summary": "positioning-technique differs at n249#1::n249::n18"
+      },
+      {
+        "id": "def-01cf7f27b4174160f4e1",
+        "layer": {
+          "design": "n249#1::n249::n18",
+          "code": "0/0/0"
+        },
+        "kind": "style",
+        "cause": "equivalent-borderless-box-model",
+        "classification": "uncertain",
+        "findings": [
+          "d18"
+        ],
+        "summary": "equivalent-borderless-box-model differs at n249#1::n249::n18"
+      },
+      {
+        "id": "def-e4dbfc7707bcccf280b6",
+        "layer": {
+          "design": "n249#1::n249::n22",
+          "code": "0/0/1"
+        },
+        "kind": "style",
+        "cause": "positioning-technique",
+        "classification": "uncertain",
+        "findings": [
+          "d21"
+        ],
+        "summary": "positioning-technique differs at n249#1::n249::n22"
+      },
+      {
+        "id": "def-74e8cb818fe35f8fb171",
+        "layer": {
+          "design": "n249#1::n249::n22",
+          "code": "0/0/1"
+        },
+        "kind": "style",
+        "cause": "equivalent-borderless-box-model",
+        "classification": "uncertain",
+        "findings": [
+          "d22"
+        ],
+        "summary": "equivalent-borderless-box-model differs at n249#1::n249::n22"
+      },
+      {
+        "id": "def-ee4f281dbd96555e9914",
+        "layer": {
+          "design": "n249#1::n249::n25",
+          "code": "0/0/1/0"
+        },
+        "kind": "layout",
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d23",
+          "d25"
+        ],
+        "summary": "layout configuration differs at n249#1::n249::n25"
+      },
+      {
+        "id": "def-95499f7c0ce399c941e0",
+        "layer": {
+          "design": "n249#1::n249::n25",
+          "code": "0/0/1/0"
+        },
+        "kind": "style",
+        "cause": "equivalent-borderless-box-model",
+        "classification": "uncertain",
+        "findings": [
+          "d30"
+        ],
+        "summary": "equivalent-borderless-box-model differs at n249#1::n249::n25"
+      },
+      {
+        "id": "def-d079cd53dc86c52d8810",
+        "layer": {
+          "design": "n249#1::n249::n19::n1",
+          "code": "0/0/0/0/0/0"
+        },
+        "kind": "style",
+        "cause": "style:icon",
+        "classification": "product",
+        "findings": [
+          "d32"
+        ],
+        "summary": "style icon differs at n249#1::n249::n19::n1"
+      },
+      {
+        "id": "def-b58f18ab5a68367e229b",
+        "layer": {
+          "design": "n249#1::n249::n19::n1",
+          "code": "0/0/0/0/0/0"
+        },
+        "kind": "layout",
+        "cause": "layout:transform",
+        "classification": "product",
+        "findings": [
+          "d33"
+        ],
+        "summary": "layout transform differs at n249#1::n249::n19::n1"
+      },
+      {
+        "id": "def-c359d70738e94c6d95c5",
+        "layer": {
+          "design": "n249#1::n249::n19::n1",
+          "code": "0/0/0/0/0/0"
+        },
+        "kind": "token",
+        "cause": "style:icon",
+        "classification": "product",
+        "findings": [
+          "d34"
+        ],
+        "summary": "style icon differs at n249#1::n249::n19::n1"
+      },
+      {
+        "id": "def-4c72e139a7f92513053d",
+        "layer": {
+          "design": "n249#1::n249::n19::n1",
+          "code": "0/0/0/0/0/0"
+        },
+        "kind": "style",
+        "cause": "equivalent-borderless-box-model",
+        "classification": "uncertain",
+        "findings": [
+          "d35"
+        ],
+        "summary": "equivalent-borderless-box-model differs at n249#1::n249::n19::n1"
+      },
+      {
+        "id": "def-dcf0788aabbc9a73c354",
+        "layer": {
+          "design": "n249#1::n249::n23::n14"
+        },
+        "kind": "missing",
+        "cause": "missing:subtree",
+        "classification": "product",
+        "findings": [
+          "d36"
+        ],
+        "summary": "missing subtree differs at n249#1::n249::n23::n14"
+      },
+      {
+        "id": "def-5a56a212a6862218a6aa",
+        "layer": {
+          "design": "n249#1::n249::n24"
+        },
+        "kind": "missing",
+        "cause": "missing:subtree",
+        "classification": "product",
+        "findings": [
+          "d37"
+        ],
+        "summary": "missing subtree differs at n249#1::n249::n24"
+      }
+    ],
+    "summary": {
+      "uniqueDefects": 10,
+      "accepted": 0,
+      "raw": 38,
+      "uncertainMatches": 0,
+      "environment": 1,
+      "uncertain": 11
+    },
+    "matches": [
+      {
+        "designNode": "n249#1::n249::n17",
+        "codeNode": "n249#1::n249::n17",
+        "kind": "id",
+        "confidence": 1,
+        "wrappers": {
+          "design": [],
+          "code": [
+            "0"
+          ]
+        }
+      },
+      {
+        "designNode": "n249#1::n249::n20",
+        "codeNode": "n249#1::n249::n20",
+        "kind": "id",
+        "confidence": 1
+      },
+      {
+        "designNode": "n249#1::n249::n21",
+        "codeNode": "n249#1::n249::n21",
+        "kind": "id",
+        "confidence": 1
+      },
+      {
+        "designNode": "n249#1::n249::n18",
+        "codeNode": "0/0/0",
+        "kind": "heuristic",
+        "confidence": 0.962
+      },
+      {
+        "designNode": "n249#1::n249::n22",
+        "codeNode": "0/0/1",
+        "kind": "heuristic",
+        "confidence": 0.78
+      },
+      {
+        "designNode": "n249#1::n249::n25",
+        "codeNode": "0/0/1/0",
+        "kind": "heuristic",
+        "confidence": 0.824
+      },
+      {
+        "designNode": "n249#1::n249::n19::n1",
+        "codeNode": "0/0/0/0/0/0",
+        "kind": "heuristic",
+        "confidence": 0.7,
+        "wrappers": {
+          "design": [],
+          "code": [
+            "0/0/0/0",
+            "0/0/0/0/0"
+          ]
+        }
+      }
+    ],
+    "verdict": "drift",
+    "timingsMs": {
+      "compare": 33.96544499999999
+    },
+    "reportHash": "0b769828d8b632ee1f4bbc12f27e658d950fa93c9253c064663d171b3015e712"
+  }
+}

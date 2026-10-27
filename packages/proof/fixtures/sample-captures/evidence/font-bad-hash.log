@@ -1,0 +1,15 @@
+$ tsx src/capture/cli.ts --code /var/tmp/dtc-t2-apiary --links /tmp/t2-font-hash-bad.json --out .artifacts/t2/bad-font
+/home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/packages/proof/src/capture/cli.ts:34
+  if (font.sha256 && font.sha256 !== sha256) throw new Error(`Font asset hash mismatch: ${font.path}`)
+                                                   ^
+
+Error: Font asset hash mismatch: apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-400-normal.woff2
+    at <anonymous> (/home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/packages/proof/src/capture/cli.ts:34:52)
+    at async Promise.all (index 0)
+    at async <anonymous> (/home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/packages/proof/src/capture/cli.ts:31:20)
+
+Node.js v24.18.0
+/home/trmd/.hive/v2/cells/dtc-t2-harness-1f489e24ceb2/github-com-honeybeehq-foundation-ddad6d63099e-space-1f489e24ceb2/packages/proof:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] proof@ capture: `tsx src/capture/cli.ts --code /var/tmp/dtc-t2-apiary --links /tmp/t2-font-hash-bad.json --out .artifacts/t2/bad-font`
+Exit status 1
+[WARN]  Local package.json exists, but node_modules missing, did you mean to install?

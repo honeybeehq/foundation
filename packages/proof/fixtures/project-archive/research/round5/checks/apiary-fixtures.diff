@@ -1,0 +1,1353 @@
+diff --git a/.foundation/component-fixtures.ts b/.foundation/component-fixtures.ts
+index e3803e6da..8fac1d8a0 100644
+--- a/.foundation/component-fixtures.ts
++++ b/.foundation/component-fixtures.ts
+@@ -1,3 +1,5 @@
++import {setHelpSamples} from './help-sample-atlas'
++import helpSamples from './help-design-samples.json'
+ import helpCommands from './help-commands.json'
+ export const keycap = { props: { children: '⌘T' }, anchors: { kbd: 'n203::n1' }, expected: '⌘T', rootAlign: 'flex-start' }
+ 
+@@ -35,8 +37,10 @@ export const inboxSelected = makeInbox(true)
+ export const inboxFailed = makeInbox(false)
+ 
+ export const helpCenter = {
++  prepare: () => setHelpSamples(helpSamples.agentRun),
+   props: { contextViewType: 'hive.agent-run', onClose: noop },
+   commands: helpCommands,
++  helpSamples: helpSamples.agentRun,
+   anchors: { '[data-help-center]': 'n45' },
+   expected: 'Keyboard shortcuts',
+ }
+diff --git a/.foundation/components.vite.config.ts b/.foundation/components.vite.config.ts
+index 7c958123c..136ea869d 100644
+--- a/.foundation/components.vite.config.ts
++++ b/.foundation/components.vite.config.ts
+@@ -12,6 +12,7 @@ export default {
+       if (!importer || !source.startsWith('.')) return
+       const full = resolve(dirname(importer.split('?')[0]!), source).replace(/\.tsx?$/, '')
+       if (full === state) return resolve(root, '.foundation/help-environment.ts')
++      if (!importer.includes('/.foundation/') && ['helpShortcuts','helpTopics'].some(name => full === resolve(root, `apps/desktop/src/renderer/src/${name}`))) return resolve(root, '.foundation/help-sample-atlas.ts')
+     },
+   }],
+ }
+diff --git a/.foundation/fixtures.ts b/.foundation/fixtures.ts
+index c2738802c..76d8c0ec6 100644
+--- a/.foundation/fixtures.ts
++++ b/.foundation/fixtures.ts
+@@ -1,3 +1,4 @@
++import regionAnchors from './track-region-anchors.json'
+ import type { TrackDefinitionV2, TrackItem, TrackNode, TrackAttachment, TrackStateItem } from '../packages/core/src/index'
+ import data from './design-data.json'
+ const rows = data.spinerows
+@@ -21,7 +22,7 @@ const attachments: TrackAttachment[] = data.attached.map((bee, i) => {
+   return { schemaVersion: 2, track: 'review-and-ship', version: 3, bee: bee.name, beeId: bee.id, attachedAt: age(60), updatedAt: age(Number.parseInt(bee.age)), items: items.map(item => 'branch' in item ? { branch: item.branch.map(lane => lane.map(runtimeNode)) } : runtimeNode(item)) as TrackStateItem[], steps: [], exceptions: i === 0 ? [{ note: data.exceptions[0]!.what, at: age(9), stepId: 'n3a' }] : [], queue: i === 0 ? data.queued.map(q => ({ track: q.behind, queuedAt: age(2), queuedBy: q.name })) : [] }
+ })
+ const props = { pane: { id: 'foundation-tracks', viewType: 'hive.tracks', params: { track: 'review-and-ship' } }, focused: false, active: false }
+-const base = { props, mirror: { definitions, attachments }, sessions: [], proposal: null }
++const base = { frame: {width:1416,height:525.5}, regionAnchors: regionAnchors['track-selected'], expectedTexts: ['Fix findings', 'Publish preview', 'review-and-ship'], props, mirror: { definitions, attachments }, sessions: [], proposal: null }
+ export const atRest = { ...base }
+ export const trackSelected = { ...base }
+ // The proposal adds steps the track does not have yet; Fix findings and Publish preview stay normal steps.
+@@ -30,5 +31,5 @@ const proposedSteps: TrackNode[] = [
+   { id: 'n5b', type: 'action', name: 'Write release notes', instruction: 'summarise what changed for the reviewer' },
+ ]
+ const proposedItems = items.flatMap(item => 'branch' in item || item.id !== 'n5' ? [item] : [item, ...proposedSteps])
+-export const proposalPending = { ...base, proposal: { definition: { ...definitions[0]!, items: proposedItems }, rationale: 'Smoke-test the preview before the ask; add release notes for the reviewer', proposedAt: age(2), baseVersion: 3 } }
+-export const empty = { ...base, mirror: { definitions: [], attachments: [] }, props: { ...props, pane: { ...props.pane, params: {} } } }
++export const proposalPending = { ...base, frame: {width:1416,height:611}, regionAnchors: regionAnchors['proposal-pending'], expectedTexts: [...base.expectedTexts, ...proposedSteps.map(step=>step.name)], proposal: { definition: { ...definitions[0]!, items: proposedItems }, rationale: 'Smoke-test the preview before the ask; add release notes for the reviewer', proposedAt: age(2), baseVersion: 3 } }
++export const empty = { ...base, frame: {width:1114,height:468}, regionAnchors: [], expectedTexts: ["Write down how you’d want it done.", 'New track'], mirror: { definitions: [], attachments: [] }, props: { ...props, pane: { ...props.pane, params: {} } } }
+diff --git a/.foundation/heldout-fixtures.ts b/.foundation/heldout-fixtures.ts
+index 42f602908..0b8ff9468 100644
+--- a/.foundation/heldout-fixtures.ts
++++ b/.foundation/heldout-fixtures.ts
+@@ -1,3 +1,5 @@
++import {setHelpSamples} from './help-sample-atlas'
++import helpSamples from './help-design-samples.json'
+ import helpCommands from './help-commands.json'
+ const noop = () => undefined
+ const frame = () => new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
+@@ -37,8 +39,9 @@ export const commandEnter = {
+   props: { children: '⌘↵' }, anchors: { kbd: 'n231::n1' }, expected: '⌘↵', rootAlign: 'flex-start',
+ }
+ export const helpSplit = {
++  prepare: () => setHelpSamples(helpSamples.searchSplit),
+   props: { contextViewType: null, onClose: noop },
+-  commands: helpCommands, anchors: { '[data-help-center]': 'n145' }, expected: 'Keyboard shortcuts',
++  commands: helpCommands, helpSamples: helpSamples.searchSplit, anchors: { '[data-help-center]': 'n145' }, expected: 'Keyboard shortcuts',
+   async afterMount(root: HTMLElement): Promise<void> {
+     const input = root.querySelector<HTMLInputElement>('[data-help-search]')
+     if (!input) throw new Error('Search input missing')
+diff --git a/.foundation/help-design-samples.json b/.foundation/help-design-samples.json
+new file mode 100644
+index 000000000..cdfbc5e9c
+--- /dev/null
++++ b/.foundation/help-design-samples.json
+@@ -0,0 +1,506 @@
++{
++  "agentRun": {
++    "sections": [
++      {
++        "id": "agent-run",
++        "title": "This pane",
++        "note": "\u00b7 opened from drone-07",
++        "viewTypes": [
++          "hive.agent-run"
++        ],
++        "rows": [
++          {
++            "id": "sample-0",
++            "label": "Reply",
++            "note": "queued \u00b7 delivered when the turn ends",
++            "display": [
++              "\u21b5"
++            ],
++            "designRow": "n58#0::n58::n2",
++            "designLabel": "n58#0::n58::n3",
++            "designNote": "n58#0::n58::n4"
++          },
++          {
++            "id": "sample-1",
++            "label": "Interrupt & send now",
++            "display": [
++              "\u2318\u21b5"
++            ],
++            "designRow": "n58#1::n58::n2",
++            "designLabel": "n58#1::n58::n3",
++            "designNote": "n58#1::n58::n4"
++          },
++          {
++            "id": "sample-2",
++            "label": "Surface a card",
++            "note": "changes \u00b7 browser \u00b7 terminal \u00b7 swarm",
++            "display": [
++              "\u2325D",
++              "\u2325B",
++              "\u2325T",
++              "\u2325S"
++            ],
++            "designRow": "n58#2::n58::n2",
++            "designLabel": "n58#2::n58::n3",
++            "designNote": "n58#2::n58::n4"
++          },
++          {
++            "id": "sample-3",
++            "label": "Archive agent",
++            "display": [
++              "e",
++              "\u2318\u21e7E"
++            ],
++            "designRow": "n58#3::n58::n2",
++            "designLabel": "n58#3::n58::n3",
++            "designNote": "n58#3::n58::n4"
++          },
++          {
++            "id": "sample-4",
++            "label": "Toggle important",
++            "note": "feeds needs-me + jump",
++            "display": [
++              "\u2318\u2325J"
++            ],
++            "designRow": "n58#4::n58::n2",
++            "designLabel": "n58#4::n58::n3",
++            "designNote": "n58#4::n58::n4"
++          },
++          {
++            "id": "sample-5",
++            "label": "Copy bee id",
++            "display": [
++              "\u2318\u21e7C"
++            ],
++            "designRow": "n58#5::n58::n2",
++            "designLabel": "n58#5::n58::n3",
++            "designNote": "n58#5::n58::n4"
++          },
++          {
++            "id": "sample-6",
++            "label": "Ask agent to self-seal",
++            "display": [
++              "\u2318\u2325\u21e7L"
++            ],
++            "designRow": "n58#6::n58::n2",
++            "designLabel": "n58#6::n58::n3",
++            "designNote": "n58#6::n58::n4"
++          },
++          {
++            "id": "sample-7",
++            "label": "Back to previous view",
++            "display": [
++              "\u2318\u2190"
++            ],
++            "designRow": "n58#7::n58::n2",
++            "designLabel": "n58#7::n58::n3",
++            "designNote": "n58#7::n58::n4"
++          }
++        ]
++      },
++      {
++        "id": "global",
++        "title": "Global",
++        "rows": [
++          {
++            "id": "sample-0",
++            "label": "Command palette",
++            "display": [
++              "\u2318K"
++            ],
++            "designRow": "n60#0::n60::n2",
++            "designLabel": "n60#0::n60::n3",
++            "designNote": "n60#0::n60::n4"
++          },
++          {
++            "id": "sample-1",
++            "label": "New agent \u2014 quick compose",
++            "note": "from any view \u00b7 layout untouched",
++            "display": [
++              "\u2318\u21e7N"
++            ],
++            "designRow": "n60#1::n60::n2",
++            "designLabel": "n60#1::n60::n3",
++            "designNote": "n60#1::n60::n4"
++          },
++          {
++            "id": "sample-2",
++            "label": "Jump to pane \u2014 picker",
++            "display": [
++              "\u2318S"
++            ],
++            "designRow": "n60#2::n60::n2",
++            "designLabel": "n60#2::n60::n3",
++            "designNote": "n60#2::n60::n4"
++          },
++          {
++            "id": "sample-3",
++            "label": "Jump to most important",
++            "display": [
++              "\u2318\u21e7S",
++              "\u2318J"
++            ],
++            "designRow": "n60#3::n60::n2",
++            "designLabel": "n60#3::n60::n3",
++            "designNote": "n60#3::n60::n4"
++          },
++          {
++            "id": "sample-4",
++            "label": "Needs me \u2014 triage",
++            "display": [
++              "g j"
++            ],
++            "designRow": "n60#4::n60::n2",
++            "designLabel": "n60#4::n60::n3",
++            "designNote": "n60#4::n60::n4"
++          },
++          {
++            "id": "sample-5",
++            "label": "Search everything",
++            "display": [
++              "/"
++            ],
++            "designRow": "n60#5::n60::n2",
++            "designLabel": "n60#5::n60::n3",
++            "designNote": "n60#5::n60::n4"
++          },
++          {
++            "id": "sample-6",
++            "label": "Toggle sidebar",
++            "display": [
++              "\u2318B"
++            ],
++            "designRow": "n60#6::n60::n2",
++            "designLabel": "n60#6::n60::n3",
++            "designNote": "n60#6::n60::n4"
++          },
++          {
++            "id": "sample-7",
++            "label": "Switch workspace \u00b7 switch yard",
++            "display": [
++              "o w",
++              "o y"
++            ],
++            "designRow": "n60#7::n60::n2",
++            "designLabel": "n60#7::n60::n3",
++            "designNote": "n60#7::n60::n4"
++          },
++          {
++            "id": "sample-8",
++            "label": "New window tab",
++            "display": [
++              "\u2318T"
++            ],
++            "designRow": "n60#8::n60::n2",
++            "designLabel": "n60#8::n60::n3",
++            "designNote": "n60#8::n60::n4"
++          },
++          {
++            "id": "sample-9",
++            "label": "Next \u00b7 previous window tab",
++            "display": [
++              "\u2303\u21e5",
++              "\u2303\u21e7\u21e5"
++            ],
++            "designRow": "n60#9::n60::n2",
++            "designLabel": "n60#9::n60::n3",
++            "designNote": "n60#9::n60::n4"
++          },
++          {
++            "id": "sample-10",
++            "label": "Keyboard shortcuts \u2014 this panel",
++            "display": [
++              "?"
++            ],
++            "designRow": "n60#10::n60::n2",
++            "designLabel": "n60#10::n60::n3",
++            "designNote": "n60#10::n60::n4"
++          }
++        ]
++      },
++      {
++        "id": "panes",
++        "title": "Panes & tabs",
++        "rows": [
++          {
++            "id": "sample-62",
++            "label": "Split pane",
++            "note": "row \u00b7 column",
++            "display": [
++              "\u2318D",
++              "\u2318\u21e7D"
++            ],
++            "designRow": "n62::n2",
++            "designLabel": "n62::n3",
++            "designNote": "n62::n4"
++          },
++          {
++            "id": "sample-63",
++            "label": "Close pane",
++            "display": [
++              "\u2318W"
++            ],
++            "designRow": "n63::n2",
++            "designLabel": "n63::n3",
++            "designNote": "n63::n4"
++          },
++          {
++            "id": "sample-64",
++            "label": "Focus pane in direction",
++            "display": [
++              "\u2325\u2190\u2191\u2193\u2192"
++            ],
++            "designRow": "n64::n2",
++            "designLabel": "n64::n3",
++            "designNote": "n64::n4"
++          }
++        ]
++      },
++      {
++        "id": "lists",
++        "title": "Lists",
++        "rows": []
++      },
++      {
++        "id": "composer",
++        "title": "Composer",
++        "rows": []
++      },
++      {
++        "id": "fleet",
++        "title": "Fleet",
++        "rows": []
++      },
++      {
++        "id": "changes",
++        "title": "Changes",
++        "rows": []
++      },
++      {
++        "id": "editor",
++        "title": "Editor",
++        "rows": []
++      },
++      {
++        "id": "search",
++        "title": "Search",
++        "rows": []
++      },
++      {
++        "id": "sidebar-&-pickers",
++        "title": "Sidebar & pickers",
++        "rows": []
++      }
++    ],
++    "topics": [
++      {
++        "id": "guide-0",
++        "title": "Getting started",
++        "group": "guide",
++        "blocks": []
++      },
++      {
++        "id": "guide-1",
++        "title": "Bees & the fleet",
++        "group": "guide",
++        "blocks": []
++      },
++      {
++        "id": "guide-2",
++        "title": "Yards & quests",
++        "group": "guide",
++        "blocks": []
++      },
++      {
++        "id": "guide-3",
++        "title": "Reviewing changes",
++        "group": "guide",
++        "blocks": []
++      },
++      {
++        "id": "guide-4",
++        "title": "Loops",
++        "group": "guide",
++        "blocks": []
++      },
++      {
++        "id": "ref-0",
++        "title": "Command palette",
++        "group": "reference",
++        "blocks": []
++      },
++      {
++        "id": "ref-1",
++        "title": "Message delivery",
++        "group": "reference",
++        "blocks": []
++      },
++      {
++        "id": "ref-2",
++        "title": "What's new 0.4.2",
++        "group": "reference",
++        "blocks": []
++      },
++      {
++        "id": "ref-3",
++        "title": "About Apiary",
++        "group": "reference",
++        "blocks": []
++      }
++    ]
++  },
++  "searchSplit": {
++    "sections": [
++      {
++        "id": "panes-&-tabs",
++        "title": "Panes & tabs",
++        "rows": [
++          {
++            "id": "sample-154",
++            "label": "Split pane",
++            "note": "row \u00b7 column",
++            "display": [
++              "\u2318D",
++              "\u2318\u21e7D"
++            ],
++            "designRow": "n154::n2",
++            "designLabel": "n154::n3",
++            "designNote": "n154::n4"
++          },
++          {
++            "id": "sample-155",
++            "label": "Open files in a split",
++            "note": "vertical \u00b7 horizontal",
++            "display": [
++              "\u2318\u2325O",
++              "\u2318\u2325\u21e7O"
++            ],
++            "designRow": "n155::n2",
++            "designLabel": "n155::n3",
++            "designNote": "n155::n4"
++          },
++          {
++            "id": "sample-158",
++            "label": "Move pane in direction \u2014 splits off at an edge",
++            "display": [
++              "\u2318\u2325\u21e7\u2190\u2191\u2193\u2192"
++            ],
++            "designRow": "n158::n2",
++            "designLabel": "n158::n3",
++            "designNote": "n158::n4"
++          },
++          {
++            "id": "sample-159",
++            "label": "Add pane to group \u2014 unsplit a tab",
++            "note": "not available in this pane",
++            "display": [
++              "\u2318\u21e7T"
++            ],
++            "designRow": "n159::n2",
++            "designLabel": "n159::n3",
++            "designNote": "n159::n4"
++          }
++        ]
++      },
++      {
++        "id": "lists",
++        "title": "Lists",
++        "rows": [
++          {
++            "id": "sample-156",
++            "label": "Preview beside \u2014 split stays",
++            "display": [
++              "\u21e5"
++            ],
++            "designRow": "n156::n2",
++            "designLabel": "n156::n3",
++            "designNote": "n156::n4"
++          }
++        ]
++      },
++      {
++        "id": "changes",
++        "title": "Changes",
++        "rows": [
++          {
++            "id": "sample-157",
++            "label": "Inline \u21c4 split diff",
++            "note": "auto by pane width",
++            "display": [
++              "i"
++            ],
++            "designRow": "n157::n2",
++            "designLabel": "n157::n3",
++            "designNote": "n157::n4"
++          }
++        ]
++      }
++    ],
++    "topics": [
++      {
++        "id": "guide-0",
++        "title": "Getting started",
++        "group": "guide",
++        "blocks": []
++      },
++      {
++        "id": "guide-1",
++        "title": "Bees & the fleet",
++        "group": "guide",
++        "blocks": []
++      },
++      {
++        "id": "guide-2",
++        "title": "Yards & quests",
++        "group": "guide",
++        "blocks": []
++      },
++      {
++        "id": "guide-3",
++        "title": "Reviewing changes",
++        "group": "guide",
++        "blocks": []
++      },
++      {
++        "id": "guide-4",
++        "title": "Loops",
++        "group": "guide",
++        "blocks": []
++      },
++      {
++        "id": "ref-0",
++        "title": "Command palette",
++        "group": "reference",
++        "blocks": []
++      },
++      {
++        "id": "ref-1",
++        "title": "Message delivery",
++        "group": "reference",
++        "blocks": []
++      },
++      {
++        "id": "ref-2",
++        "title": "What's new 0.4.2",
++        "group": "reference",
++        "blocks": []
++      },
++      {
++        "id": "ref-3",
++        "title": "About Apiary",
++        "group": "reference",
++        "blocks": []
++      }
++    ]
++  },
++  "source": {
++    "repo": "honeybeehq/foundation",
++    "commit": "8bfa810393d84a94cc5c3d2ee192ad8071af4bdb",
++    "designFile": "boards/system-help-center.fdn.html",
++    "htmlSha256": "5d3cce513cd26d3b0cc8e4ff6118a9fa3666602de1edbe15880cb2ae9cf5dab9",
++    "states": [
++      "dialog-agent-run",
++      "dialog-search"
++    ]
++  }
++}
+diff --git a/.foundation/help-sample-atlas.ts b/.foundation/help-sample-atlas.ts
+new file mode 100644
+index 000000000..07f20a57c
+--- /dev/null
++++ b/.foundation/help-sample-atlas.ts
+@@ -0,0 +1,22 @@
++import type {HelpSection,HelpRowRef} from '../apps/desktop/src/renderer/src/helpShortcuts'
++import type {HelpTopic} from '../apps/desktop/src/renderer/src/helpTopics'
++export * from '../apps/desktop/src/renderer/src/helpShortcuts'
++export type {HelpRow,HelpSection,HelpRowRef} from '../apps/desktop/src/renderer/src/helpShortcuts'
++export type {HelpInline,HelpTopic} from '../apps/desktop/src/renderer/src/helpTopics'
++export let HELP_SECTIONS: readonly HelpSection[] = []
++export let HELP_TOPICS: readonly HelpTopic[] = []
++export function setHelpSamples(samples: {sections: readonly HelpSection[];topics: readonly (Omit<HelpTopic,'group'> & {group:string})[]}): void {
++  HELP_SECTIONS = samples.sections
++  HELP_TOPICS = samples.topics.map(topic => {
++    if (topic.group!=='guide' && topic.group!=='reference') throw new Error(`Invalid sample topic group: ${topic.group}`)
++    return {...topic,group:topic.group}
++  })
++}
++export function sectionIdForViewType(viewType: string | null | undefined): string | null {
++  return HELP_SECTIONS.find(section => section.viewTypes?.includes(viewType ?? ''))?.id ?? null
++}
++export function findHelpRow(sectionId: string,rowId: string): HelpRowRef | null {
++  const section=HELP_SECTIONS.find(value=>value.id===sectionId)
++  const row=section?.rows.find(value=>value.id===rowId)
++  return section && row ? {section,row} : null
++}
+diff --git a/.foundation/links-help-center.json b/.foundation/links-help-center.json
+index f2a247b2b..954473d1b 100644
+--- a/.foundation/links-help-center.json
++++ b/.foundation/links-help-center.json
+@@ -21,7 +21,55 @@
+           "designState": "dialog-agent-run"
+         }
+       ],
+-      "components": []
++      "components": [],
++      "layoutOnly": {
++        "regions": [
++          {
++            "id": "dialog",
++            "designNode": "n45",
++            "codeSelector": "[data-help-center]"
++          },
++          {
++            "id": "guide",
++            "designNode": "n46::n16",
++            "codeSelector": "[data-help-center] > div:first-child"
++          },
++          {
++            "id": "content",
++            "designNode": "n47",
++            "codeSelector": "[data-help-center] > div:nth-child(2)"
++          },
++          {
++            "id": "search",
++            "designNode": "n48",
++            "codeSelector": "[data-help-center] > div:nth-child(2) > div:first-child"
++          },
++          {
++            "id": "count",
++            "designNode": "n52",
++            "codeSelector": "[data-help-center] > div:nth-child(2) > div:first-child > span"
++          },
++          {
++            "id": "catalog",
++            "designNode": "n54",
++            "codeSelector": "[data-help-center] > div:nth-child(2) > div:nth-child(2) > div:first-child",
++            "repeat": {
++              "designSelector": "fdn-use > div[data-fdn-id$=\"::n2\"]",
++              "codeSelector": "[data-help-row]"
++            }
++          },
++          {
++            "id": "anchor-rail",
++            "designNode": "n65",
++            "codeSelector": "[data-help-center] > div:nth-child(2) > div:nth-child(2) > div:nth-child(2)"
++          },
++          {
++            "id": "footer",
++            "designNode": "n76",
++            "codeSelector": "[data-help-center] > div:nth-child(2) > div:last-child"
++          }
++        ]
++      }
+     }
+   ],
+   "fonts": [
+diff --git a/.foundation/links-help-search-split.json b/.foundation/links-help-search-split.json
+new file mode 100644
+index 000000000..57f1fa2f5
+--- /dev/null
++++ b/.foundation/links-help-search-split.json
+@@ -0,0 +1,181 @@
++{
++  "schema": "fdn-links/0",
++  "designFile": "boards/system-help-center.fdn.html",
++  "designHead": "9ecb6cc7215d7d955053117cbfb920c53fc2508afec9ac46e1e0a5f22bae0a9a",
++  "viteConfig": ".foundation/components.vite.config.ts",
++  "harness": "foundation.harness.tsx",
++  "artboards": [
++    {
++      "id": "help-search-split",
++      "component": "apps/desktop/src/renderer/src/chrome/HelpCenter.tsx#HelpCenter",
++      "designNode": "n145",
++      "viewport": {
++        "width": 980,
++        "height": 638,
++        "dpr": 1
++      },
++      "states": [
++        {
++          "name": "split",
++          "fixture": ".foundation/heldout-fixtures.ts#helpSplit",
++          "designState": "dialog-search"
++        }
++      ],
++      "components": [],
++      "layoutOnly": {
++        "regions": [
++          {
++            "id": "dialog",
++            "designNode": "n145",
++            "codeSelector": "[data-help-center]"
++          },
++          {
++            "id": "search",
++            "designNode": "n146",
++            "codeSelector": "[data-help-center] > div:nth-child(2) > div:first-child"
++          },
++          {
++            "id": "count",
++            "designNode": "n151",
++            "codeSelector": "[data-help-center] > div:nth-child(2) > div:first-child > span"
++          },
++          {
++            "id": "results",
++            "designNode": "n153",
++            "codeSelector": "[data-help-center] > div:nth-child(2) > div:nth-child(2) > div:first-child",
++            "repeat": {
++              "designSelector": "fdn-use > div[data-fdn-id$=\"::n2\"]",
++              "codeSelector": "[data-help-row]"
++            }
++          },
++          {
++            "id": "footer",
++            "designNode": "n163",
++            "codeSelector": "[data-help-center] > div:nth-child(2) > div:last-child"
++          }
++        ]
++      }
++    }
++  ],
++  "fonts": [
++    {
++      "family": "Hanken Grotesk",
++      "weight": "400",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-400-normal.woff2",
++      "sha256": "787b3fdd0b7e6d59ae7ce14ce7a41d1a44616584b4c919b527da951972d5d87d",
++      "postScriptName": "HankenGrotesk-Regular"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "500",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-500-normal.woff2",
++      "sha256": "31f666af7bff625900c46aa34a05d8620482ba2db37db7b63749b693ab0c72ec",
++      "postScriptName": "HankenGrotesk-Medium"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "600",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-600-normal.woff2",
++      "sha256": "58f23b7ae3e13b21a4dca4c05360be87b3531d60fc1cbff89732cac8fb3019ae",
++      "postScriptName": "HankenGrotesk-SemiBold"
++    },
++    {
++      "family": "IBM Plex Mono",
++      "weight": "400",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2",
++      "sha256": "08949f728dc52d528e69b1667d15c89a5686a4ee9a296ff90983985f99c380f7",
++      "postScriptName": "IBMPlexMono-Regular"
++    },
++    {
++      "family": "Foundation Design Sans",
++      "weight": "400",
++      "path": ".foundation/fonts/LiberationSans-Regular.ttf",
++      "format": "truetype",
++      "sha256": "4659bc0c58c5028dd488ec928d41d9265db43d9b669fc14ca8b0832daca7b144",
++      "postScriptName": "LiberationSans"
++    },
++    {
++      "family": "Foundation Design Sans",
++      "weight": "700",
++      "path": ".foundation/fonts/LiberationSans-Bold.ttf",
++      "format": "truetype",
++      "sha256": "3973aa5054fb467dd5627245d3dc82e37bf16fe075756156a570455871351582",
++      "postScriptName": "LiberationSans-Bold"
++    },
++    {
++      "family": "Foundation Design Mono",
++      "weight": "400",
++      "path": ".foundation/fonts/DejaVuSansMono.ttf",
++      "format": "truetype",
++      "sha256": "c805f9436dbc268644c1d9584f01a601a653e028e08fd74b9b949f6cf8304d88",
++      "postScriptName": "DejaVuSansMono"
++    },
++    {
++      "family": "Foundation Design Mono",
++      "weight": "700",
++      "path": ".foundation/fonts/DejaVuSansMono-Bold.ttf",
++      "format": "truetype",
++      "sha256": "3a3c502eeff669a231549e80df9f7c49de109bafe303170409e905d0b31a38fe",
++      "postScriptName": "DejaVuSansMono-Bold"
++    },
++    {
++      "family": "Foundation Design Serif",
++      "weight": "400",
++      "path": ".foundation/fonts/LiberationSerif-Regular.ttf",
++      "format": "truetype",
++      "sha256": "705903ae1382f0150f115d6f10a30f5b2f3d6ade649c474afe6366c39174fb65",
++      "postScriptName": "LiberationSerif"
++    },
++    {
++      "family": "Foundation Design Serif",
++      "weight": "700",
++      "path": ".foundation/fonts/LiberationSerif-Bold.ttf",
++      "format": "truetype",
++      "sha256": "9e66c25e20868756bf12eb24a520a4552727c9cd108f577f7ae33e3c0110e39c",
++      "postScriptName": "LiberationSerif-Bold"
++    },
++    {
++      "family": "Foundation Symbols",
++      "weight": "400",
++      "path": ".foundation/fonts/DejaVuSans.ttf",
++      "format": "truetype",
++      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
++      "postScriptName": "DejaVuSans"
++    },
++    {
++      "family": "Foundation Symbols",
++      "weight": "700",
++      "path": ".foundation/fonts/DejaVuSans-Bold.ttf",
++      "format": "truetype",
++      "sha256": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895",
++      "postScriptName": "DejaVuSans-Bold"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "700",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-700-normal.woff2",
++      "format": "woff2",
++      "sha256": "d85de6e272296d06f8205ad11e27140274e0ef97050232777d146eabb71c312d",
++      "postScriptName": "HankenGrotesk-Bold"
++    },
++    {
++      "family": "IBM Plex Mono",
++      "weight": "500",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2",
++      "format": "woff2",
++      "sha256": "01d285447409c8a588692162439a038b8cbd7871309ee20267b0d2d91c6e8e22",
++      "postScriptName": "IBMPlexMono-Medium"
++    }
++  ],
++  "binding": "chain-head",
++  "fontPolicy": {
++    "sans": "Foundation Design Sans",
++    "mono": "Foundation Design Mono",
++    "serif": "Foundation Design Serif",
++    "fallback": "Foundation Symbols",
++    "requireCustomFonts": true
++  },
++  "browserVersion": "151.0.7922.34",
++  "platform": "linux",
++  "designHtmlSha256": "5fd37f92bb3d214b73a36786dce7ae89d9552db29efd262cc88699de01694431"
++}
+diff --git a/.foundation/links-tracks-flowview.json b/.foundation/links-tracks-flowview.json
+new file mode 100644
+index 000000000..ce02bcc68
+--- /dev/null
++++ b/.foundation/links-tracks-flowview.json
+@@ -0,0 +1,372 @@
++{
++  "schema": "fdn-links/0",
++  "designFile": "packages/proof/fixtures/design/tracks-pane-flowview.fdn.html",
++  "viteConfig": "apps/next-desktop-beta/foundation.vite.config.ts",
++  "harness": "foundation.harness.tsx",
++  "artboards": [
++    {
++      "id": "tracks-pane",
++      "component": "apps/desktop/src/renderer/src/panes/TracksPane.tsx#TracksPane",
++      "designNode": "n97::n71",
++      "viewport": {
++        "width": 1416,
++        "height": 720,
++        "dpr": 1
++      },
++      "states": [
++        {
++          "name": "track-selected",
++          "fixture": ".foundation/fixtures.ts#trackSelected",
++          "designState": "track-selected",
++          "designNode": "n212::n136",
++          "layoutOnly": {
++            "regions": [
++              {
++                "id": "pane",
++                "designNode": "n212::n136",
++                "codeSelector": "#foundation-root > :nth-child(1)"
++              },
++              {
++                "id": "rail",
++                "designNode": "n212::n143",
++                "codeSelector": "#foundation-root > :nth-child(1) > :nth-child(1) > :nth-child(1)"
++              },
++              {
++                "id": "main",
++                "designNode": "n212::n150",
++                "codeSelector": "#foundation-root > :nth-child(1) > :nth-child(1) > :nth-child(2)"
++              },
++              {
++                "id": "sidecar",
++                "designNode": "n212::n598::n538",
++                "codeSelector": "#foundation-root > :nth-child(1) > :nth-child(1) > :nth-child(3)"
++              },
++              {
++                "id": "header",
++                "designNode": "n212::n151",
++                "codeSelector": "[data-fdn-id=\"n212::n151\"]"
++              },
++              {
++                "id": "card-0",
++                "designNode": "n212::n590::n442::n405",
++                "codeSelector": "[data-foundation-region=\"card-0\"]"
++              },
++              {
++                "id": "card-1",
++                "designNode": "n212::n590::n444::n405",
++                "codeSelector": "[data-foundation-region=\"card-1\"]"
++              },
++              {
++                "id": "card-3",
++                "designNode": "n212::n590::n452::n405",
++                "codeSelector": "[data-foundation-region=\"card-3\"]"
++              },
++              {
++                "id": "card-4",
++                "designNode": "n212::n590::n455::n405",
++                "codeSelector": "[data-foundation-region=\"card-4\"]"
++              },
++              {
++                "id": "card-5",
++                "designNode": "n212::n590::n457::n405",
++                "codeSelector": "[data-foundation-region=\"card-5\"]"
++              },
++              {
++                "id": "card-6",
++                "designNode": "n212::n590::n462::n405",
++                "codeSelector": "[data-foundation-region=\"card-6\"]"
++              },
++              {
++                "id": "card-7",
++                "designNode": "n212::n590::n465::n405",
++                "codeSelector": "[data-foundation-region=\"card-7\"]"
++              },
++              {
++                "id": "card-8",
++                "designNode": "n212::n590::n467::n405",
++                "codeSelector": "[data-foundation-region=\"card-8\"]"
++              }
++            ]
++          }
++        },
++        {
++          "name": "proposal-pending",
++          "fixture": ".foundation/fixtures.ts#proposalPending",
++          "designState": "proposal-pending",
++          "designNode": "n212::n136",
++          "layoutOnly": {
++            "regions": [
++              {
++                "id": "pane",
++                "designNode": "n212::n136",
++                "codeSelector": "#foundation-root > :nth-child(1)"
++              },
++              {
++                "id": "rail",
++                "designNode": "n212::n143",
++                "codeSelector": "#foundation-root > :nth-child(1) > :nth-child(1) > :nth-child(1)"
++              },
++              {
++                "id": "main",
++                "designNode": "n212::n150",
++                "codeSelector": "#foundation-root > :nth-child(1) > :nth-child(1) > :nth-child(2)"
++              },
++              {
++                "id": "sidecar",
++                "designNode": "n212::n598::n538",
++                "codeSelector": "#foundation-root > :nth-child(1) > :nth-child(1) > :nth-child(3)"
++              },
++              {
++                "id": "header",
++                "designNode": "n212::n151",
++                "codeSelector": "[data-fdn-id=\"n212::n151\"]"
++              },
++              {
++                "id": "card-0",
++                "designNode": "n212::n591::n484::n405",
++                "codeSelector": "[data-foundation-region=\"card-0\"]"
++              },
++              {
++                "id": "card-1",
++                "designNode": "n212::n591::n486::n405",
++                "codeSelector": "[data-foundation-region=\"card-1\"]"
++              },
++              {
++                "id": "card-3",
++                "designNode": "n212::n591::n494::n405",
++                "codeSelector": "[data-foundation-region=\"card-3\"]"
++              },
++              {
++                "id": "card-4",
++                "designNode": "n212::n591::n497::n405",
++                "codeSelector": "[data-foundation-region=\"card-4\"]"
++              },
++              {
++                "id": "card-5",
++                "designNode": "n212::n591::n499::n405",
++                "codeSelector": "[data-foundation-region=\"card-5\"]"
++              },
++              {
++                "id": "card-6",
++                "designNode": "n212::n591::n504::n405",
++                "codeSelector": "[data-foundation-region=\"card-6\"]"
++              },
++              {
++                "id": "card-7",
++                "designNode": "n212::n591::n507::n405",
++                "codeSelector": "[data-foundation-region=\"card-7\"]"
++              },
++              {
++                "id": "card-8",
++                "designNode": "n212::n591::n513::n405",
++                "codeSelector": "[data-foundation-region=\"card-8\"]"
++              },
++              {
++                "id": "card-9",
++                "designNode": "n212::n591::n509::n519",
++                "codeSelector": "[data-foundation-region=\"card-9\"]"
++              },
++              {
++                "id": "card-10",
++                "designNode": "n212::n591::n511::n519",
++                "codeSelector": "[data-foundation-region=\"card-10\"]"
++              },
++              {
++                "id": "proposal-actions",
++                "designNode": "n212::n591::n518::n471",
++                "codeSelector": "[data-foundation-region=\"proposal-actions\"]"
++              }
++            ]
++          }
++        },
++        {
++          "name": "empty",
++          "fixture": ".foundation/fixtures.ts#empty",
++          "designState": "at-rest",
++          "designNode": "n284::n265",
++          "layoutOnly": {
++            "regions": [
++              {
++                "id": "pane",
++                "designNode": "n284::n265",
++                "codeSelector": "#foundation-root > :nth-child(1)"
++              },
++              {
++                "id": "rail",
++                "designNode": "n284::n600",
++                "codeSelector": "#foundation-root > :nth-child(1) > :nth-child(1) > :nth-child(1)"
++              },
++              {
++                "id": "main",
++                "designNode": "n284::n607",
++                "codeSelector": "#foundation-root > :nth-child(1) > :nth-child(1) > :nth-child(2)"
++              },
++              {
++                "id": "sidecar",
++                "designNode": "n284::n609::n538",
++                "codeSelector": "#foundation-root > :nth-child(1) > :nth-child(1) > :nth-child(3)"
++              },
++              {
++                "id": "empty-content",
++                "designNode": "n284::n271",
++                "codeSelector": "[data-fdn-id=\"n284::n271\"]"
++              },
++              {
++                "id": "empty-action",
++                "designNode": "n284::n276::n40",
++                "codeSelector": "[data-fdn-id=\"n284::n276::n40\"]"
++              }
++            ]
++          }
++        }
++      ],
++      "components": [
++        {
++          "designComponent": "TrackRow",
++          "code": "apps/desktop/src/renderer/src/panes/tracks/TracksRail.tsx#TracksRail",
++          "selector": "[data-foundation-track-row]"
++        }
++      ]
++    }
++  ],
++  "fonts": [
++    {
++      "family": "Hanken Grotesk",
++      "weight": "400",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-400-normal.woff2",
++      "sha256": "787b3fdd0b7e6d59ae7ce14ce7a41d1a44616584b4c919b527da951972d5d87d",
++      "postScriptName": "HankenGrotesk-Regular"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "500",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-500-normal.woff2",
++      "sha256": "31f666af7bff625900c46aa34a05d8620482ba2db37db7b63749b693ab0c72ec",
++      "postScriptName": "HankenGrotesk-Medium"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "600",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-600-normal.woff2",
++      "sha256": "58f23b7ae3e13b21a4dca4c05360be87b3531d60fc1cbff89732cac8fb3019ae",
++      "postScriptName": "HankenGrotesk-SemiBold"
++    },
++    {
++      "family": "IBM Plex Mono",
++      "weight": "400",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2",
++      "sha256": "08949f728dc52d528e69b1667d15c89a5686a4ee9a296ff90983985f99c380f7",
++      "postScriptName": "IBMPlexMono-Regular"
++    },
++    {
++      "family": "Foundation Design Sans",
++      "weight": "400",
++      "path": ".foundation/fonts/LiberationSans-Regular.ttf",
++      "format": "truetype",
++      "sha256": "4659bc0c58c5028dd488ec928d41d9265db43d9b669fc14ca8b0832daca7b144",
++      "postScriptName": "LiberationSans"
++    },
++    {
++      "family": "Foundation Design Sans",
++      "weight": "700",
++      "path": ".foundation/fonts/LiberationSans-Bold.ttf",
++      "format": "truetype",
++      "sha256": "3973aa5054fb467dd5627245d3dc82e37bf16fe075756156a570455871351582",
++      "postScriptName": "LiberationSans-Bold"
++    },
++    {
++      "family": "Foundation Design Mono",
++      "weight": "400",
++      "path": ".foundation/fonts/DejaVuSansMono.ttf",
++      "format": "truetype",
++      "sha256": "c805f9436dbc268644c1d9584f01a601a653e028e08fd74b9b949f6cf8304d88",
++      "postScriptName": "DejaVuSansMono"
++    },
++    {
++      "family": "Foundation Design Mono",
++      "weight": "700",
++      "path": ".foundation/fonts/DejaVuSansMono-Bold.ttf",
++      "format": "truetype",
++      "sha256": "3a3c502eeff669a231549e80df9f7c49de109bafe303170409e905d0b31a38fe",
++      "postScriptName": "DejaVuSansMono-Bold"
++    },
++    {
++      "family": "Foundation Design Serif",
++      "weight": "400",
++      "path": ".foundation/fonts/LiberationSerif-Regular.ttf",
++      "format": "truetype",
++      "sha256": "705903ae1382f0150f115d6f10a30f5b2f3d6ade649c474afe6366c39174fb65",
++      "postScriptName": "LiberationSerif"
++    },
++    {
++      "family": "Foundation Design Serif",
++      "weight": "700",
++      "path": ".foundation/fonts/LiberationSerif-Bold.ttf",
++      "format": "truetype",
++      "sha256": "9e66c25e20868756bf12eb24a520a4552727c9cd108f577f7ae33e3c0110e39c",
++      "postScriptName": "LiberationSerif-Bold"
++    },
++    {
++      "family": "Foundation Symbols",
++      "weight": "400",
++      "path": ".foundation/fonts/DejaVuSans.ttf",
++      "format": "truetype",
++      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
++      "postScriptName": "DejaVuSans"
++    },
++    {
++      "family": "Foundation Symbols",
++      "weight": "700",
++      "path": ".foundation/fonts/DejaVuSans-Bold.ttf",
++      "format": "truetype",
++      "sha256": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895",
++      "postScriptName": "DejaVuSans-Bold"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "700",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-700-normal.woff2",
++      "format": "woff2",
++      "sha256": "d85de6e272296d06f8205ad11e27140274e0ef97050232777d146eabb71c312d",
++      "postScriptName": "HankenGrotesk-Bold"
++    },
++    {
++      "family": "IBM Plex Mono",
++      "weight": "500",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2",
++      "format": "woff2",
++      "sha256": "01d285447409c8a588692162439a038b8cbd7871309ee20267b0d2d91c6e8e22",
++      "postScriptName": "IBMPlexMono-Medium"
++    }
++  ],
++  "binding": "chain-head",
++  "fontPolicy": {
++    "sans": "Foundation Design Sans",
++    "mono": "Foundation Design Mono",
++    "serif": "Foundation Design Serif",
++    "fallback": "Foundation Symbols",
++    "requireCustomFonts": true
++  },
++  "browserVersion": "151.0.7922.34",
++  "platform": "linux",
++  "componentManifests": [
++    {
++      "id": "keycap",
++      "manifest": ".foundation/links-keycap.json",
++      "designFile": "boards/system-help-center.fdn.html",
++      "component": "packages/ui/src/bits.tsx#Keycap"
++    },
++    {
++      "id": "inbox-row",
++      "manifest": ".foundation/links-inbox-row.json",
++      "designFile": "boards/inbox-unified.fdn.html",
++      "component": "apps/desktop/src/renderer/src/panes/inbox/InboxRow.tsx#InboxRow"
++    },
++    {
++      "id": "help-center",
++      "manifest": ".foundation/links-help-center.json",
++      "designFile": "boards/system-help-center.fdn.html",
++      "component": "apps/desktop/src/renderer/src/chrome/HelpCenter.tsx#HelpCenter"
++    }
++  ]
++}
+diff --git a/.foundation/track-region-anchors.json b/.foundation/track-region-anchors.json
+new file mode 100644
+index 000000000..0fb28d1f2
+--- /dev/null
++++ b/.foundation/track-region-anchors.json
+@@ -0,0 +1,101 @@
++{
++  "track-selected": [
++    {
++      "id": "card-0",
++      "text": "Read the diff",
++      "levels": 1
++    },
++    {
++      "id": "card-1",
++      "text": "Fan out reviewers",
++      "levels": 1
++    },
++    {
++      "id": "card-3",
++      "text": "Typecheck & lint",
++      "levels": 1
++    },
++    {
++      "id": "card-4",
++      "text": "Run the suite",
++      "levels": 1
++    },
++    {
++      "id": "card-5",
++      "text": "Verdict gate",
++      "levels": 1
++    },
++    {
++      "id": "card-6",
++      "text": "Fix findings",
++      "levels": 1
++    },
++    {
++      "id": "card-7",
++      "text": "Publish preview",
++      "levels": 1
++    },
++    {
++      "id": "card-8",
++      "text": "Ship it?",
++      "levels": 1
++    }
++  ],
++  "proposal-pending": [
++    {
++      "id": "card-0",
++      "text": "Read the diff",
++      "levels": 1
++    },
++    {
++      "id": "card-1",
++      "text": "Fan out reviewers",
++      "levels": 1
++    },
++    {
++      "id": "card-3",
++      "text": "Typecheck & lint",
++      "levels": 1
++    },
++    {
++      "id": "card-4",
++      "text": "Run the suite",
++      "levels": 1
++    },
++    {
++      "id": "card-5",
++      "text": "Verdict gate",
++      "levels": 1
++    },
++    {
++      "id": "card-6",
++      "text": "Fix findings",
++      "levels": 1
++    },
++    {
++      "id": "card-7",
++      "text": "Publish preview",
++      "levels": 1
++    },
++    {
++      "id": "card-8",
++      "text": "Ship it?",
++      "levels": 1
++    },
++    {
++      "id": "card-9",
++      "text": "Smoke-test the preview",
++      "levels": 1
++    },
++    {
++      "id": "card-10",
++      "text": "Write release notes",
++      "levels": 1
++    },
++    {
++      "id": "proposal-actions",
++      "text": "Accept",
++      "levels": 1
++    }
++  ]
++}

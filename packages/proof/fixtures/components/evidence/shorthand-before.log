@@ -1,0 +1,49 @@
+
+ RUN  v4.1.10 /home/trmd/.hive/v2/cells/dtc-c-components-36f122de7649/github-com-honeybeehq-foundation-ddad6d63099e-space-36f122de7649
+
+ ❯ packages/proof/src/compare/ground-truth.test.ts (10 tests | 9 failed) 12ms
+   × credits border-color labels for border-top-color evidence 7ms
+   × credits border-width labels for border-left-width evidence 1ms
+   × credits border-style labels for border-bottom-style evidence 1ms
+   × credits padding labels for padding-right evidence 0ms
+   × credits margin labels for margin-top evidence 0ms
+   × credits inset labels for left evidence 0ms
+   × credits gap labels for column-gap evidence 0ms
+   × credits border-radius labels for border-top-right-radius evidence 0ms
+   × credits font labels for font-family evidence 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/proof/src/compare/ground-truth.test.ts > credits border-color labels for border-top-color evidence
+ FAIL  packages/proof/src/compare/ground-truth.test.ts > credits border-width labels for border-left-width evidence
+ FAIL  packages/proof/src/compare/ground-truth.test.ts > credits border-style labels for border-bottom-style evidence
+ FAIL  packages/proof/src/compare/ground-truth.test.ts > credits padding labels for padding-right evidence
+ FAIL  packages/proof/src/compare/ground-truth.test.ts > credits margin labels for margin-top evidence
+ FAIL  packages/proof/src/compare/ground-truth.test.ts > credits inset labels for left evidence
+ FAIL  packages/proof/src/compare/ground-truth.test.ts > credits gap labels for column-gap evidence
+ FAIL  packages/proof/src/compare/ground-truth.test.ts > credits border-radius labels for border-top-right-radius evidence
+ FAIL  packages/proof/src/compare/ground-truth.test.ts > credits font labels for font-family evidence
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ packages/proof/src/compare/ground-truth.test.ts:14:20
+     12|  const labels=[{id:'truth',kind:'style',design_layer:'0/0',code_layer:…
+     13|  const result=defectMetrics([defect],[drift],labels,[],[])
+     14|  expect(result.tp).toBe(1)
+       |                    ^
+     15|  expect(result.fp).toBe(0)
+     16|  expect(result.fn).toBe(0)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  9 failed | 1 passed (10)
+   Start at  20:11:45
+   Duration  247ms (transform 50ms, setup 0ms, import 70ms, tests 12ms, environment 0ms)
+

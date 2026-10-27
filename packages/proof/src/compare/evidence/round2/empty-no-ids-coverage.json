@@ -1,0 +1,79 @@
+{
+  "state": "empty",
+  "mode": "no-ids",
+  "product": 6,
+  "uncertain": 0,
+  "oneToOneSupport": 5,
+  "productPrecision": 0.8333333333333334,
+  "productRecall": 0.35714285714285715,
+  "inclusivePrecision": 0.8333333333333334,
+  "productLabelCoverage": 5,
+  "allLabelCoverage": 5,
+  "onlyUncertainLabels": [],
+  "compositeProductCandidates": 3,
+  "broadLabelsExcluded": [
+    "E-01",
+    "E-11",
+    "E-14"
+  ],
+  "narrowScopeSupport": 3,
+  "narrowScopePrecision": 0.5,
+  "narrowScopeRecall": 0.2727272727272727,
+  "coverage": [
+    {
+      "id": "def-d527fb3d3fef2877c598",
+      "classification": "product",
+      "cause": "style:surface",
+      "findings": 6,
+      "labels": [
+        "E-11"
+      ]
+    },
+    {
+      "id": "def-9068b5b1cfaf9e4528ee",
+      "classification": "product",
+      "cause": "layout:configuration",
+      "findings": 5,
+      "labels": []
+    },
+    {
+      "id": "def-1f14bcf4968ed891b7d3",
+      "classification": "product",
+      "cause": "missing:subtree",
+      "findings": 4,
+      "labels": [
+        "E-01"
+      ]
+    },
+    {
+      "id": "def-5839b35b3ed8b7e05f7a",
+      "classification": "product",
+      "cause": "missing:subtree",
+      "findings": 44,
+      "labels": [
+        "E-01",
+        "E-09"
+      ]
+    },
+    {
+      "id": "def-3b004bb8e7f3382b8443",
+      "classification": "product",
+      "cause": "missing:subtree",
+      "findings": 3,
+      "labels": [
+        "E-01",
+        "E-10"
+      ]
+    },
+    {
+      "id": "def-be2f5a39bd50d8db8e1f",
+      "classification": "product",
+      "cause": "extra:subtree",
+      "findings": 17,
+      "labels": [
+        "E-01",
+        "E-12"
+      ]
+    }
+  ]
+}

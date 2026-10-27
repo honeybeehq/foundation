@@ -1,0 +1,130 @@
+design_path,design_fdn_id,design_desc,code_path,code_desc,confidence,note
+0/0,n45,div bg+bd+sh,0/0,div bg+bd+sh,sure,
+0/0/0/0,n46::n16,div bg+bd,0/0/0,div bg+bd,sure,guide sidebar; 216px vs 253px wide
+0/0/0/0/0/0,n46::n18,"text ""Help""",0/0/0/0/0,"text ""Help""",sure,
+0/0/0/0/0/1/0/0,n46::n20::n1,"text ""esc""",0/0/0/0/1,"text ""esc""",sure,same unique text; box shifted by 37px
+0/0/0/0/1/0,n46::n21::n9,div,0/0/0/1,"text ""GUIDE""",sure,label text sits in the block itself in code
+0/0/0/0/1/0/0,n46::n21::n10,"text ""GUIDE""",0/0/0/1,"text ""GUIDE""",sure,same unique text; box shifted by 158px
+0/0/0/0/2/0,n46::n22#0::n22::n12,span,0/0/0/2,"text ""Getting started""",sure,nav row and its label are one <button> in code
+0/0/0/0/2/0/0,n46::n22#0::n22::n13,"text ""Getting started""",0/0/0/2,"text ""Getting started""",sure,
+0/0/0/0/3/0,n46::n22#1::n22::n12,span,0/0/0/3,"text ""Bees & the fleet""",sure,nav row and its label are one <button> in code
+0/0/0/0/3/0/0,n46::n22#1::n22::n13,"text ""Bees & the fleet""",0/0/0/3,"text ""Bees & the fleet""",sure,
+0/0/0/0/4/0,n46::n22#2::n22::n12,span,0/0/0/4,"text ""Yards & quests""",sure,nav row and its label are one <button> in code
+0/0/0/0/4/0/0,n46::n22#2::n22::n13,"text ""Yards & quests""",0/0/0/4,"text ""Yards & quests""",sure,
+0/0/0/0/5/0,n46::n22#3::n22::n12,span,0/0/0/5,"text ""Reviewing changes""",sure,nav row and its label are one <button> in code
+0/0/0/0/5/0/0,n46::n22#3::n22::n13,"text ""Reviewing changes""",0/0/0/5,"text ""Reviewing changes""",sure,
+0/0/0/0/6/0,n46::n22#4::n22::n12,span,0/0/0/6,"text ""Loops""",sure,nav row and its label are one <button> in code
+0/0/0/0/6/0/0,n46::n22#4::n22::n13,"text ""Loops""",0/0/0/6,"text ""Loops""",sure,
+0/0/0/0/7/0,n46::n23::n9,div,0/0/0/7,"text ""REFERENCE""",sure,label text sits in the block itself in code
+0/0/0/0/7/0/0,n46::n23::n10,"text ""REFERENCE""",0/0/0/7,"text ""REFERENCE""",sure,same unique text; box shifted by 126px
+0/0/0/0/8/0,n46::n24#0::n24::n12,span bg,0/0/0/8,"text ""Keyboard shortcuts""",sure,nav row and its label are one <button> in code
+0/0/0/0/8/0/0,n46::n24#0::n24::n13,"text ""Keyboard shortcuts""",0/0/0/8,"text ""Keyboard shortcuts""",sure,
+0/0/0/0/9/0,n46::n24#1::n24::n12,span,0/0/0/9,"text ""Command palette""",sure,nav row and its label are one <button> in code
+0/0/0/0/9/0/0,n46::n24#1::n24::n13,"text ""Command palette""",0/0/0/9,"text ""Command palette""",sure,
+0/0/0/0/10/0,n46::n24#2::n24::n12,span,0/0/0/10,"text ""Message delivery""",sure,nav row and its label are one <button> in code
+0/0/0/0/10/0/0,n46::n24#2::n24::n13,"text ""Message delivery""",0/0/0/10,"text ""Message delivery""",sure,
+0/0/0/0/12/0,n46::n26::n12,span,0/0/0/11,"text ""What's new 0.4.2""",sure,flows after Message delivery instead of being pinned to the bottom
+0/0/0/0/12/0/0,n46::n26::n13,"text ""What's new""",0/0/0/11,"text ""What's new 0.4.2""",sure,"code label reads ""What's new 0.4.2"" in one run"
+0/0/0/0/12/0/1,n46::n26::n14,"text ""0.4.2""",0/0/0/11,"text ""What's new 0.4.2""",unsure,"version is part of the code label, not a right-aligned mono figure"
+0/0/0/0/13/0,n46::n27::n12,span,0/0/0/12,"text ""About Apiary""",sure,flows after What's new instead of being pinned to the bottom
+0/0/0/0/13/0/0,n46::n27::n13,"text ""About Apiary""",0/0/0/12,"text ""About Apiary""",sure,
+0/0/1/0/0,n49,div bd,0/0/1/0/0,div bd,sure,search field
+0/0/1/0/0/0,n50,"text ""Search shortcuts — command, key, or surface…""",0/0/1/0/0/0,input ,sure,input placeholder
+0/0/1/0/0/1,n51,span bg,0/0/1/0/0/0,input ,unsure,painted caret vs the native input caret (not visible in a still capture)
+0/0/1/0/1,n52,"text ""86 bindings · 10 surfaces""",0/0/1/0/1,"text ""22 shortcuts · 10 surfaces""",sure,"""22 shortcuts · 10 surfaces"""
+0/0/1/1/0/0/0/0,n56::n9,div,0/0/1/1/0/0/0,div ,sure,
+0/0/1/1/0/0/0/0/0,n56::n10,"text ""THIS PANE · AGENT RUN""",0/0/1/1/0/0/0/0,"text ""This pane""",sure,"""THIS PANE · AGENT RUN"" vs ""THIS PANE"" + ""THIS PANE"" pill"
+0/0/1/1/0/0/0/0/1,n56::n11,"text ""· opened from drone-07""",0/0/1/1/0/0/0/2,"text ""· opened from drone-07""",sure,same unique text; box shifted by 45px
+0/0/1/1/0/0/1,n57,div bd,none,,sure,code draws no bordered card around the section
+0/0/1/1/0/0/1/0/0,n58#0::n58::n2,div,0/0/1/1/0/0/1/0,div ,sure,
+0/0/1/1/0/0/1/0/0/0,n58#0::n58::n3,"text ""Reply""",0/0/1/1/0/0/1/0/0/0,"text ""Reply""",sure,
+0/0/1/1/0/0/1/0/0/1,n58#0::n58::n4,"text ""queued · delivered when the turn ends""",0/0/1/1/0/0/1/0/0/1,"text ""queued · delivered when the turn ends""",sure,
+0/0/1/1/0/0/1/0/0/2/0/0/0,n58#0::n58::n7#0::n8::n1,"text ""↵""",0/0/1/1/0/0/1/0/1/0/0,"text ""↵""",sure,same unique text; box shifted by 44px
+0/0/1/1/0/0/1/1/0,n58#1::n58::n2,div,0/0/1/1/0/0/2/0,div ,sure,
+0/0/1/1/0/0/1/1/0/0,n58#1::n58::n3,"text ""Interrupt & send now""",0/0/1/1/0/0/2/0/0/0,"text ""Interrupt & send now""",sure,
+0/0/1/1/0/0/1/1/0/1/0/0/0,n58#1::n58::n7#0::n8::n1,"text ""⌘↵""",0/0/1/1/0/0/2/0/1/0/0,"text ""⌘↵""",sure,same unique text; box shifted by 44px
+0/0/1/1/0/0/1/2/0,n58#2::n58::n2,div,0/0/1/1/0/0/3/0,div ,sure,
+0/0/1/1/0/0/1/2/0/0,n58#2::n58::n3,"text ""Surface a card""",0/0/1/1/0/0/3/0/0/0,"text ""Surface a card""",sure,
+0/0/1/1/0/0/1/2/0/1,n58#2::n58::n4,"text ""changes · browser · terminal · swarm""",0/0/1/1/0/0/3/0/0/1,"text ""changes · browser · terminal · swarm""",sure,
+0/0/1/1/0/0/1/2/0/2/0/0/0,n58#2::n58::n7#0::n8::n1,"text ""⌥D""",0/0/1/1/0/0/3/0/1/0/0,"text ""⌥D""",sure,same unique text; box shifted by 11px
+0/0/1/1/0/0/1/2/0/2/1/0/0,n58#2::n58::n7#1::n8::n1,"text ""⌥B""",0/0/1/1/0/0/3/0/1/1/1,"text ""⌥B""",sure,same unique text; box shifted by 22px
+0/0/1/1/0/0/1/2/0/2/2/0/0,n58#2::n58::n7#2::n8::n1,"text ""⌥T""",0/0/1/1/0/0/3/0/1/2/1,"text ""⌥T""",sure,same unique text; box shifted by 33px
+0/0/1/1/0/0/1/2/0/2/3/0/0,n58#2::n58::n7#3::n8::n1,"text ""⌥S""",0/0/1/1/0/0/3/0/1/3/1,"text ""⌥S""",sure,same unique text; box shifted by 44px
+0/0/1/1/0/0/1/3/0,n58#3::n58::n2,div,0/0/1/1/0/0/4/0,div ,sure,
+0/0/1/1/0/0/1/3/0/0,n58#3::n58::n3,"text ""Archive agent""",0/0/1/1/0/0/4/0/0/0,"text ""Archive agent""",sure,
+0/0/1/1/0/0/1/3/0/1/0/0/0,n58#3::n58::n7#0::n8::n1,"text ""e""",0/0/1/1/0/0/4/0/1/0/0,"text ""e""",sure,same unique text; box shifted by 33px
+0/0/1/1/0/0/1/3/0/1/1/0/0,n58#3::n58::n7#1::n8::n1,"text ""⌘⇧E""",0/0/1/1/0/0/4/0/1/1/1,"text ""⌘⇧E""",sure,same unique text; box shifted by 44px
+0/0/1/1/0/0/1/4/0,n58#4::n58::n2,div,0/0/1/1/0/0/5/0,div ,sure,
+0/0/1/1/0/0/1/4/0/0,n58#4::n58::n3,"text ""Toggle important""",0/0/1/1/0/0/5/0/0/0,"text ""Toggle important""",sure,
+0/0/1/1/0/0/1/4/0/1,n58#4::n58::n4,"text ""feeds needs-me + jump""",0/0/1/1/0/0/5/0/0/1,"text ""feeds needs-me + jump""",sure,
+0/0/1/1/0/0/1/4/0/2/0/0/0,n58#4::n58::n7#0::n8::n1,"text ""⌘⌥J""",0/0/1/1/0/0/5/0/1/0/0,"text ""⌘⌥J""",sure,same unique text; box shifted by 44px
+0/0/1/1/0/0/1/5/0,n58#5::n58::n2,div,0/0/1/1/0/0/6/0,div ,sure,
+0/0/1/1/0/0/1/5/0/0,n58#5::n58::n3,"text ""Copy bee id""",0/0/1/1/0/0/6/0/0/0,"text ""Copy bee id""",sure,
+0/0/1/1/0/0/1/5/0/1/0/0/0,n58#5::n58::n7#0::n8::n1,"text ""⌘⇧C""",0/0/1/1/0/0/6/0/1/0/0,"text ""⌘⇧C""",sure,same unique text; box shifted by 44px
+0/0/1/1/0/0/1/6/0,n58#6::n58::n2,div,0/0/1/1/0/0/7/0,div ,sure,
+0/0/1/1/0/0/1/6/0/0,n58#6::n58::n3,"text ""Ask agent to self-seal""",0/0/1/1/0/0/7/0/0/0,"text ""Ask agent to self-seal""",sure,
+0/0/1/1/0/0/1/6/0/1/0/0/0,n58#6::n58::n7#0::n8::n1,"text ""⌘⌥⇧L""",0/0/1/1/0/0/7/0/1/0/0,"text ""⌘⌥⇧L""",sure,same unique text; box shifted by 44px
+0/0/1/1/0/0/1/7/0,n58#7::n58::n2,div,0/0/1/1/0/0/8/0,div ,sure,
+0/0/1/1/0/0/1/7/0/0,n58#7::n58::n3,"text ""Back to previous view""",0/0/1/1/0/0/8/0/0/0,"text ""Back to previous view""",sure,
+0/0/1/1/0/0/1/7/0/1/0/0/0,n58#7::n58::n7#0::n8::n1,"text ""⌘←""",0/0/1/1/0/0/8/0/1/0/0,"text ""⌘←""",sure,same unique text; box shifted by 44px
+0/0/1/1/0/1/0,n59::n9,div,0/0/1/1/0/1/0,div ,sure,
+0/0/1/1/0/1/0/0,n59::n10,"text ""GLOBAL""",0/0/1/1/0/1/0/0,"text ""Global""",sure,"""GLOBAL"" vs ""Global"" uppercased"
+0/0/1/1/0/2/0,n60#0::n60::n2,div,0/0/1/1/0/1/1/0,div ,sure,
+0/0/1/1/0/2/0/0,n60#0::n60::n3,"text ""Command palette""",0/0/1/1/0/1/1/0/0/0,"text ""Command palette""",sure,
+0/0/1/1/0/2/0/1/0/0/0,n60#0::n60::n7#0::n8::n1,"text ""⌘K""",0/0/1/1/0/1/1/0/1/0/0,"text ""⌘K""",sure,same unique text; box shifted by 33px
+0/0/1/1/0/3/0,n60#1::n60::n2,div,0/0/1/1/0/1/2/0,div ,sure,
+0/0/1/1/0/3/0/0,n60#1::n60::n3,"text ""New agent — quick compose""",0/0/1/1/0/1/2/0/0/0,"text ""New agent — quick compose""",sure,
+0/0/1/1/0/3/0/1,n60#1::n60::n4,"text ""from any view · layout untouched""",0/0/1/1/0/1/2/0/0/1,"text ""from any view · layout untouched""",sure,
+0/0/1/1/0/3/0/2/0/0/0,n60#1::n60::n7#0::n8::n1,"text ""⌘⇧N""",0/0/1/1/0/1/2/0/1/0/0,"text ""⌘⇧N""",sure,same unique text; box shifted by 33px
+0/0/1/1/0/4/0,n60#2::n60::n2,div,0/0/1/1/0/1/3/0,div ,sure,
+0/0/1/1/0/4/0/0,n60#2::n60::n3,"text ""Jump to pane — picker""",0/0/1/1/0/1/3/0/0/0,"text ""Jump to pane — picker""",sure,
+0/0/1/1/0/4/0/1/0/0/0,n60#2::n60::n7#0::n8::n1,"text ""⌘S""",0/0/1/1/0/1/3/0/1/0/0,"text ""⌘S""",sure,same unique text; box shifted by 33px
+0/0/1/1/0/5/0,n60#3::n60::n2,div,0/0/1/1/0/1/4/0,div ,sure,
+0/0/1/1/0/5/0/0,n60#3::n60::n3,"text ""Jump to most important""",0/0/1/1/0/1/4/0/0/0,"text ""Jump to most important""",sure,
+0/0/1/1/0/5/0/1/0/0/0,n60#3::n60::n7#0::n8::n1,"text ""⌘⇧S""",0/0/1/1/0/1/4/0/1/0/0,"text ""⌘⇧S""",sure,same unique text; box shifted by 22px
+0/0/1/1/0/5/0/1/1/0/0,n60#3::n60::n7#1::n8::n1,"text ""⌘J""",0/0/1/1/0/1/4/0/1/1/1,"text ""⌘J""",sure,same unique text; box shifted by 33px
+0/0/1/1/0/6/0,n60#4::n60::n2,div,0/0/1/1/0/1/5/0,div ,sure,
+0/0/1/1/0/6/0/0,n60#4::n60::n3,"text ""Needs me — triage""",0/0/1/1/0/1/5/0/0/0,"text ""Needs me — triage""",sure,
+0/0/1/1/0/6/0/1/0/0/0,n60#4::n60::n7#0::n8::n1,"text ""g j""",0/0/1/1/0/1/5/0/1/0/0,"text ""g j""",sure,same unique text; box shifted by 33px
+0/0/1/1/0/7/0,n60#5::n60::n2,div,0/0/1/1/0/1/6/0,div ,sure,
+0/0/1/1/0/7/0/0,n60#5::n60::n3,"text ""Search everything""",0/0/1/1/0/1/6/0/0/0,"text ""Search everything""",sure,
+0/0/1/1/0/7/0/1/0/0/0,n60#5::n60::n7#0::n8::n1,"text ""/""",0/0/1/1/0/1/6/0/1/0/0,"text ""/""",sure,same unique text; box shifted by 33px
+0/0/1/1/0/8/0,n60#6::n60::n2,div,0/0/1/1/0/1/7/0,div ,sure,
+0/0/1/1/0/8/0/0,n60#6::n60::n3,"text ""Toggle sidebar""",0/0/1/1/0/1/7/0/0/0,"text ""Toggle sidebar""",sure,
+0/0/1/1/0/8/0/1/0/0/0,n60#6::n60::n7#0::n8::n1,"text ""⌘B""",0/0/1/1/0/1/7/0/1/0/0,"text ""⌘B""",sure,same unique text; box shifted by 33px
+0/0/1/1/0/9/0,n60#7::n60::n2,div,0/0/1/1/0/1/8/0,div ,sure,
+0/0/1/1/0/9/0/0,n60#7::n60::n3,"text ""Switch workspace · switch yard""",0/0/1/1/0/1/8/0/0/0,"text ""Switch workspace · switch yard""",sure,
+0/0/1/1/0/9/0/1/0/0/0,n60#7::n60::n7#0::n8::n1,"text ""o w""",0/0/1/1/0/1/8/0/1/0/0,"text ""o w""",sure,same unique text; box shifted by 22px
+0/0/1/1/0/9/0/1/1/0/0,n60#7::n60::n7#1::n8::n1,"text ""o y""",0/0/1/1/0/1/8/0/1/1/1,"text ""o y""",sure,same unique text; box shifted by 33px
+0/0/1/1/0/10/0,n60#8::n60::n2,div,0/0/1/1/0/1/9/0,div ,sure,
+0/0/1/1/0/10/0/0,n60#8::n60::n3,"text ""New window tab""",0/0/1/1/0/1/9/0/0/0,"text ""New window tab""",sure,
+0/0/1/1/0/10/0/1/0/0/0,n60#8::n60::n7#0::n8::n1,"text ""⌘T""",0/0/1/1/0/1/9/0/1/0/0,"text ""⌘T""",sure,same unique text; box shifted by 33px
+0/0/1/1/0/11/0,n60#9::n60::n2,div,0/0/1/1/0/1/10/0,div ,sure,
+0/0/1/1/0/11/0/0,n60#9::n60::n3,"text ""Next · previous window tab""",0/0/1/1/0/1/10/0/0/0,"text ""Next · previous window tab""",sure,
+0/0/1/1/0/11/0/1/0/0/0,n60#9::n60::n7#0::n8::n1,"text ""⌃⇥""",0/0/1/1/0/1/10/0/1/0/0,"text ""⌃⇥""",sure,same unique text; box shifted by 22px
+0/0/1/1/0/11/0/1/1/0/0,n60#9::n60::n7#1::n8::n1,"text ""⌃⇧⇥""",0/0/1/1/0/1/10/0/1/1/1,"text ""⌃⇧⇥""",sure,same unique text; box shifted by 33px
+0/0/1/1/0/12/0,n60#10::n60::n2,div,0/0/1/1/0/1/11/0,div ,sure,
+0/0/1/1/0/12/0/0,n60#10::n60::n3,"text ""Keyboard shortcuts — this panel""",0/0/1/1/0/1/11/0/0/0,"text ""Keyboard shortcuts — this panel""",sure,
+0/0/1/1/0/12/0/1/0/0/0,n60#10::n60::n7#0::n8::n1,"text ""?""",0/0/1/1/0/1/11/0/1/0/0,"text ""?""",sure,same unique text; box shifted by 33px
+0/0/1/1/1,n65,div bd,0/0/1/1/1,div bd,sure,anchor rail
+0/0/1/1/1/0/0,n66::n15,"text ""This pane""",0/0/1/1/1/0,"text ""This pane""",sure,anchor rail entry
+0/0/1/1/1/1/0,n67::n15,"text ""Global""",0/0/1/1/1/1,"text ""Global""",sure,anchor rail entry
+0/0/1/1/1/2/0,n68::n15,"text ""Panes & tabs""",0/0/1/1/1/2,"text ""Panes & tabs""",sure,anchor rail entry
+0/0/1/1/1/3/0,n69::n15,"text ""Lists""",0/0/1/1/1/3,"text ""Lists""",sure,anchor rail entry
+0/0/1/1/1/4/0,n70::n15,"text ""Composer""",0/0/1/1/1/4,"text ""Composer""",sure,anchor rail entry
+0/0/1/1/1/5/0,n71::n15,"text ""Fleet""",0/0/1/1/1/5,"text ""Fleet""",sure,anchor rail entry
+0/0/1/1/1/6/0,n72::n15,"text ""Changes""",0/0/1/1/1/6,"text ""Changes""",sure,anchor rail entry
+0/0/1/1/1/7/0,n73::n15,"text ""Editor""",0/0/1/1/1/7,"text ""Editor""",sure,anchor rail entry
+0/0/1/1/1/8/0,n74::n15,"text ""Search""",0/0/1/1/1/8,"text ""Search""",sure,anchor rail entry
+0/0/1/1/1/9/0,n75::n15,"text ""Sidebar & pickers""",0/0/1/1/1/9,"text ""Sidebar & pickers""",sure,anchor rail entry
+0/0/1/2,n76,div bd,0/0/1/2,div bd,sure,footer
+0/0/1/2/0,n77,"text ""type to search""",none,,sure,no code layer renders this
+0/0/1/2/1,n78,"text ""·""",none,,sure,footer hint separators absent
+0/0/1/2/2,n79,"text ""↑↓ move""",none,,sure,no code layer renders this
+0/0/1/2/3,n80,"text ""·""",none,,sure,footer hint separators absent
+0/0/1/2/4,n81,"text ""↵ run command""",none,,sure,no code layer renders this
+0/0/1/2/5,n82,"text ""·""",none,,sure,footer hint separators absent
+0/0/1/2/6,n83,"text ""click keys to rebind""",0/0/1/2/0,"text ""click keys to rebind""",sure,same unique text; box shifted by 354px
+0/0/1/2/7,n84,"text ""·""",none,,sure,footer hint separators absent
+0/0/1/2/8,n85,"text ""esc close""",none,,sure,no code layer renders this
+0/0/1/2/9,n86,"text ""live from the command registry""",0/0/1/2/1,"text ""live from the command registry""",sure,

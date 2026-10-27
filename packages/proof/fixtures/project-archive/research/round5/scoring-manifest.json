@@ -1,0 +1,55 @@
+{
+  "frozenRules": "ac58c1ad1cc69f6ba6d4671dd933441bb996ef63",
+  "cases": [
+    {
+      "name": "help-agent-kind",
+      "pair": "packages/proof/fixtures/round5-big-panels/captures/help/help-center/agent-run/1480x830@1",
+      "labels": "packages/proof/fixtures/ground-truth-r5-big/help-center/agent-run.defects.csv"
+    },
+    {
+      "name": "help-agent-scope",
+      "pair": "packages/proof/fixtures/round5-big-panels/captures/help/help-center/agent-run/1480x830@1",
+      "labels": "research/round5/evaluation-inputs/help-agent-scope.defects.csv"
+    },
+    {
+      "name": "help-split-kind",
+      "pair": "packages/proof/fixtures/round5-big-panels/captures/search/help-search-split/split/980x638@1",
+      "labels": "packages/proof/fixtures/ground-truth-r5-big/help-search-split/split.defects.csv"
+    },
+    {
+      "name": "help-split-scope",
+      "pair": "packages/proof/fixtures/round5-big-panels/captures/search/help-search-split/split/980x638@1",
+      "labels": "research/round5/evaluation-inputs/help-split-scope.defects.csv"
+    },
+    {
+      "name": "tracks-selected-kind",
+      "pair": "packages/proof/fixtures/round5-big-panels/captures/tracks/tracks-pane/track-selected/1416x720@1",
+      "labels": "packages/proof/fixtures/ground-truth-r5-big/tracks/track-selected.defects.csv"
+    },
+    {
+      "name": "tracks-selected-scope",
+      "pair": "packages/proof/fixtures/round5-big-panels/captures/tracks/tracks-pane/track-selected/1416x720@1",
+      "labels": "research/round5/evaluation-inputs/tracks-selected-scope.defects.csv"
+    },
+    {
+      "name": "tracks-proposal-kind",
+      "pair": "packages/proof/fixtures/round5-big-panels/captures/tracks/tracks-pane/proposal-pending/1416x720@1",
+      "labels": "packages/proof/fixtures/ground-truth-r5-big/tracks/proposal-pending.defects.csv"
+    },
+    {
+      "name": "tracks-proposal-scope",
+      "pair": "packages/proof/fixtures/round5-big-panels/captures/tracks/tracks-pane/proposal-pending/1416x720@1",
+      "labels": "research/round5/evaluation-inputs/tracks-proposal-scope.defects.csv"
+    },
+    {
+      "name": "tracks-empty-kind",
+      "pair": "packages/proof/fixtures/round5-big-panels/captures/tracks/tracks-pane/empty/1416x720@1",
+      "labels": "packages/proof/fixtures/ground-truth-r5-big/tracks/empty.defects.csv"
+    },
+    {
+      "name": "tracks-empty-scope",
+      "pair": "packages/proof/fixtures/round5-big-panels/captures/tracks/tracks-pane/empty/1416x720@1",
+      "labels": "research/round5/evaluation-inputs/tracks-empty-scope.defects.csv"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "frozenComparator": "168a0286",
+  "sourceCommit": "0087d692bba2e70e0b44febfa47e76e451ba4e34",
+  "labelsCommit": "0a726d99fae93a7bf4928b7e41be2ccca9d31a1a",
+  "sourceRun": "40469303506.1",
+  "inputs": [
+    {
+      "case": "button-retry",
+      "report": ".audit/P1-run1/foundation-pilot-40469303506-1/proof/button-retry/default/240x80@1/drift-report.json",
+      "labels": ".audit/P1-labels/packages/proof/fixtures/ground-truth-pilot/button-retry/default.defects.csv",
+      "reportSha256": "a124f33fd1e0850d2dbc4b6e84b10b6473fcb13065ac23d4d24cc6d879a5804b",
+      "labelsSha256": "27220e94dac074b12bd44daa96d181b7cbbaf90e459876d4d86abf64de9eaa18"
+    },
+    {
+      "case": "section-label",
+      "report": ".audit/P1-run1/foundation-pilot-40469303506-1/proof/section-label/default/240x60@1/drift-report.json",
+      "labels": ".audit/P1-labels/packages/proof/fixtures/ground-truth-pilot/section-label/default.defects.csv",
+      "reportSha256": "0400d08caba4246d689bb618094f248fae43a35776480f50ac7c45957ef010d3",
+      "labelsSha256": "c21603abcb3847e94d187b06cc6d934799f728bb575aa17954c894a3317b0ebf"
+    },
+    {
+      "case": "status-dot",
+      "report": ".audit/P1-run1/foundation-pilot-40469303506-1/proof/status-dot/running/100x60@1/drift-report.json",
+      "labels": ".audit/P1-labels/packages/proof/fixtures/ground-truth-pilot/status-dot/running.defects.csv",
+      "reportSha256": "fed44ab1997d50026cd88a306f440508dbc23a066374efc76048d48d13fbb3ad",
+      "labelsSha256": "62736505b50b86d5e73f4485c37e2bad857ad31b7734d2f5c57b11e556b4be3b"
+    }
+  ]
+}

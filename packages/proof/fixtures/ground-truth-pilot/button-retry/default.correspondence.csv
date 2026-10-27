@@ -1,0 +1,3 @@
+design_path,design_fdn_id,design_desc,code_path,code_desc,confidence,note
+0/0,n228::n216::n29,"ghost button box (1px border, 6px radius)",0/0,"<button> ghost variant",sure,
+0/0/0,n228::n216::n30,"text ""retry fresh""",0/0,"text ""retry fresh"" (label sits in the button itself)",sure,code has no separate label span

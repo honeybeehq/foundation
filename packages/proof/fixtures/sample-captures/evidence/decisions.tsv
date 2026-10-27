@@ -1,0 +1,13 @@
+ts	phase	decision	why	evidence	result
+2026-10-25T04:46:00Z	setup	Keep links in code repository	Code owns fixtures and import paths; preserve design format	packages/proof/src/capture	implementing
+2026-10-25T04:47:42Z	target	Use Classic TracksPane and authoritative Project design	Next has no Tracks pane and repo board differs	packages/proof/fixtures/design; research/tracks-pane-application.md	orchestrator confirmed
+2026-10-25T04:51:00Z	capture	Use unique entry URL per state	Vite inline script cache reused first fixture	packages/proof/src/capture/vite.ts	four distinct case entries
+2026-10-25T04:59:00Z	verify	Compare repeated real captures	Determinism needs actual screenshot and DOM evidence	packages/proof/fixtures/sample-captures/evidence/repeat-check.json	16 of16 hashes identical
+2026-10-25T05:01:00Z	audit	Give removed smoke test its own node id	Independent audit found fixture misrepresented add and removal	https://github.com/honeybeehq/apiary/commit/61f6992f08e3d18c8c4f48cbe21cfa60092f65b9	proposal shows3 changes
+2026-10-25T05:03:00Z	capture	Mark absent rest state not provable and record renderer provenance	Determinism cannot imply unsupported state equality	packages/proof/fixtures/sample-captures/tracks-pane/at-rest/1416x600@1/code/meta.json	false with reason; source clean
+2026-10-25T05:04:00Z	audit	Disclose compiler pipeline and keybinding limitations	Headless component is not shipped Electron CSS or focus semantics	research/tracks-pane-application.md	Claude Opus5.5 review has no further flags
+2026-10-25T05:05:00Z	audit	Match code container to measured design frame	The previous full viewport code container introduced artificial empty-state drift	packages/proof/src/capture/cli.ts	four equal frames at shared1416x720 viewport
+2026-10-25T05:33:00Z	reopen	Pin browser-used mono font instead of declared stack alone	Independent metal2 and metal3 used WenQuanYi while metal1 used DejaVuSansMono	research/e2e-check.md	cause confirmed by CDP
+2026-10-25T05:41:00Z	fonts	Bundle original faces and reject any noncustom rendered glyph	Font availability must not silently change geometry	packages/proof/src/capture/fonts.ts	all actual glyph faces bundled; original frames restored
+2026-10-25T05:43:00Z	cold-start	Use a new optimizer cache and scan full entries before every run	Warm caches had hidden a late StyleX injection import reload	packages/proof/src/capture/vite.ts	three cold runs pass without retry
+2026-10-25T05:44:00Z	verify	Preserve prior9pixel failure and add SVG paint settling diagnostics	An exact-repeat claim needed independent reproduction	packages/proof/fixtures/sample-captures/evidence/repeat-check.json	32of32 localchecks and8of8 metal2PNG match

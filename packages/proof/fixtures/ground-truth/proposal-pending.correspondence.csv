@@ -1,0 +1,262 @@
+design_path,design_fdn_id,design_desc,code_path,code_desc,confidence,note
+0/0,n212::n136,"pane (white card, 8px radius, shadow)",0/0/0,pane root (no background),sure,whole pane; code pane root has no card background
+0/0/0,n212::n137,pane title bar,0/0/0/0/0,rail header,unsure,"design title bar spans the pane; nearest code equivalent is the rail header, which carries the pane name"
+0/0/0/0,n212::n138,"text ""Tracks""",0/0/0/0/0/0,"text ""TRACKS""",sure,"pane name: ""Tracks"" vs ""TRACKS"" label"
+0/0/0/1,n212::n139,"text ""7 defined · 5 attached · 3 queued""",0/0/0/0/0/1,"text ""7""",unsure,"track count summary vs bare count ""7"""
+0/0/0/2/0/0,n212::n141::n1,icon,none,,sure,more menu; code has a + button instead
+0/0/1/0,n212::n143,track list column,0/0/0/0,track rail <aside>,sure,track rail column
+0/0/1/0/0,n212::n144,filter tab row (All/Attached/Idle),none,,sure,filter tabs absent in code
+0/0/1/0/0/0/0,n212::n145::n43,rounded box,none,,sure,filter tabs absent in code
+0/0/1/0/0/0/0/0,n212::n145::n44,"text ""All""",none,,sure,filter tabs absent in code
+0/0/1/0/0/0/0/1,n212::n145::n45,"text ""7""",none,,sure,filter tabs absent in code
+0/0/1/0/0/1/0,n212::n146::n43,filled rounded box,none,,sure,filter tabs absent in code
+0/0/1/0/0/1/0/0,n212::n146::n44,"text ""Attached""",none,,sure,filter tabs absent in code
+0/0/1/0/0/1/0/1,n212::n146::n45,"text ""5""",none,,sure,filter tabs absent in code
+0/0/1/0/0/2/0,n212::n147::n43,rounded box,none,,sure,filter tabs absent in code
+0/0/1/0/0/2/0/0,n212::n147::n44,"text ""Idle""",none,,sure,filter tabs absent in code
+0/0/1/0/0/2/0/1,n212::n147::n45,"text ""2""",none,,sure,filter tabs absent in code
+0/0/1/0/1,n212::n148,track list,0/0/0/0/1,rail list,sure,track list
+0/0/1/0/1/0/0,n212::n149#0::n149::n46,track row review-and-ship,0/0/0/0/1/0,filled rounded box,sure,"same track, same order"
+0/0/1/0/1/0/0/0/0/0,n212::n149#0::n149::n48::n1,icon,0/0/0/0/1/0/0/0,icon,sure,track glyph (different drawing)
+0/0/1/0/1/0/0/0/1,n212::n149#0::n149::n49,"text ""review-and-ship""",0/0/0/0/1/0/1/0,"text ""review-and-ship""",sure,track name
+0/0/1/0/1/0/0/0/2,n212::n149#0::n149::n50,"text ""v3""",none,,sure,version / last-activity time absent in code
+0/0/1/0/1/0/0/0/4,n212::n149#0::n149::n52,"text ""12m""",none,,sure,version / last-activity time absent in code
+0/0/1/0/1/0/0/1,n212::n149#0::n149::n53,track row review-and-ship status line,0/0/0/0/1/0/1/1,"text ""7 steps · action ×4 · orchestrate · review · ask""",unsure,second line exists in both but content differs (status counts vs step summary)
+0/0/1/0/1/0/0/1/0/0/0/0,n212::n149#0::n149::n54::n27::n25,filled rounded box,0/0/0/0/1/0/2,filled rounded box,unsure,green running dot vs code attached dot at row end
+0/0/1/0/1/0/0/1/0/0/1,n212::n149#0::n149::n54::n28,"text ""2""",none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/0/0/1/0/0/2,n212::n149#0::n149::n54::n29,"text ""running""",none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/0/0/1/1/0/0/0,n212::n149#0::n149::n55::n27::n25,filled rounded box,none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/0/0/1/1/0/1,n212::n149#0::n149::n55::n28,"text ""1""",none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/0/0/1/1/0/2,n212::n149#0::n149::n55::n29,"text ""review""",none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/0/0/1/3/0/0,n212::n149#0::n149::n65::n31,rounded box,none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/0/0/1/3/0/1,n212::n149#0::n149::n65::n32,"text ""1""",none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/0/0/1/3/0/2,n212::n149#0::n149::n65::n33,"text ""exception""",none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/1/0,n212::n149#1::n149::n46,track row pr-triage,0/0/0/0/1/1,rounded box,sure,"same track, same order"
+0/0/1/0/1/1/0/0/0/0,n212::n149#1::n149::n48::n1,icon,0/0/0/0/1/1/0/0,icon,sure,track glyph (different drawing)
+0/0/1/0/1/1/0/0/1,n212::n149#1::n149::n49,"text ""pr-triage""",0/0/0/0/1/1/1/0,"text ""pr-triage""",sure,track name
+0/0/1/0/1/1/0/0/2,n212::n149#1::n149::n50,"text ""v7""",none,,sure,version / last-activity time absent in code
+0/0/1/0/1/1/0/0/4,n212::n149#1::n149::n52,"text ""3m""",none,,sure,version / last-activity time absent in code
+0/0/1/0/1/1/0/1,n212::n149#1::n149::n53,track row pr-triage status line,0/0/0/0/1/1/1/1,"text ""5 steps · action ×3 · orchestrate · review""",unsure,second line exists in both but content differs (status counts vs step summary)
+0/0/1/0/1/1/0/1/0/0/0/0,n212::n149#1::n149::n54::n27::n25,filled rounded box,none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/1/0/1/0/0/1,n212::n149#1::n149::n54::n28,"text ""1""",none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/1/0/1/0/0/2,n212::n149#1::n149::n54::n29,"text ""running""",none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/2/0,n212::n149#2::n149::n46,track row spec-round,0/0/0/0/1/2,rounded box,sure,"same track, same order"
+0/0/1/0/1/2/0/0/0/0,n212::n149#2::n149::n48::n1,icon,0/0/0/0/1/2/0/0,icon,sure,track glyph (different drawing)
+0/0/1/0/1/2/0/0/1,n212::n149#2::n149::n49,"text ""spec-round""",0/0/0/0/1/2/1/0,"text ""spec-round""",sure,track name
+0/0/1/0/1/2/0/0/2,n212::n149#2::n149::n50,"text ""v2""",none,,sure,version / last-activity time absent in code
+0/0/1/0/1/2/0/0/4,n212::n149#2::n149::n52,"text ""41m""",none,,sure,version / last-activity time absent in code
+0/0/1/0/1/2/0/1,n212::n149#2::n149::n53,track row spec-round status line,0/0/0/0/1/2/1/1,"text ""5 steps · action ×3 · orchestrate · review""",unsure,second line exists in both but content differs (status counts vs step summary)
+0/0/1/0/1/2/0/1/0/0/0/0,n212::n149#2::n149::n55::n27::n25,filled rounded box,none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/2/0/1/0/0/1,n212::n149#2::n149::n55::n28,"text ""1""",none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/2/0/1/0/0/2,n212::n149#2::n149::n55::n29,"text ""review""",none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/3/0,n212::n149#3::n149::n46,track row board-draw,0/0/0/0/1/3,rounded box,sure,"same track, same order"
+0/0/1/0/1/3/0/0/0/0,n212::n149#3::n149::n48::n1,icon,0/0/0/0/1/3/0/0,icon,sure,track glyph (different drawing)
+0/0/1/0/1/3/0/0/1,n212::n149#3::n149::n49,"text ""board-draw""",0/0/0/0/1/3/1/0,"text ""board-draw""",sure,track name
+0/0/1/0/1/3/0/0/2,n212::n149#3::n149::n50,"text ""v1""",none,,sure,version / last-activity time absent in code
+0/0/1/0/1/3/0/0/4,n212::n149#3::n149::n52,"text ""6m""",none,,sure,version / last-activity time absent in code
+0/0/1/0/1/3/0/1,n212::n149#3::n149::n53,track row board-draw status line,0/0/0/0/1/3/1/1,"text ""5 steps · action ×3 · orchestrate · review""",unsure,second line exists in both but content differs (status counts vs step summary)
+0/0/1/0/1/3/0/1/0/0/0/0,n212::n149#3::n149::n54::n27::n25,filled rounded box,none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/3/0/1/0/0/1,n212::n149#3::n149::n54::n28,"text ""1""",none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/3/0/1/0/0/2,n212::n149#3::n149::n54::n29,"text ""running""",none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/4/0,n212::n149#4::n149::n46,track row flaky-hunt,0/0/0/0/1/4,rounded box,sure,"same track, same order"
+0/0/1/0/1/4/0/0/0/0,n212::n149#4::n149::n48::n1,icon,0/0/0/0/1/4/0/0,icon,sure,track glyph (different drawing)
+0/0/1/0/1/4/0/0/1,n212::n149#4::n149::n49,"text ""flaky-hunt""",0/0/0/0/1/4/1/0,"text ""flaky-hunt""",sure,track name
+0/0/1/0/1/4/0/0/2,n212::n149#4::n149::n50,"text ""v4""",none,,sure,version / last-activity time absent in code
+0/0/1/0/1/4/0/0/4,n212::n149#4::n149::n52,"text ""1h04""",none,,sure,version / last-activity time absent in code
+0/0/1/0/1/4/0/1,n212::n149#4::n149::n53,track row flaky-hunt status line,0/0/0/0/1/4/1/1,"text ""5 steps · action ×3 · orchestrate · review""",unsure,second line exists in both but content differs (status counts vs step summary)
+0/0/1/0/1/4/0/1/0/0/0/0,n212::n149#4::n149::n57::n27::n25,filled rounded box,none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/4/0/1/0/0/1,n212::n149#4::n149::n57::n28,"text ""1""",none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/4/0/1/0/0/2,n212::n149#4::n149::n57::n29,"text ""blocked""",none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/4/0/1/2/0/0,n212::n149#4::n149::n65::n31,rounded box,none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/4/0/1/2/0/1,n212::n149#4::n149::n65::n32,"text ""2""",none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/4/0/1/2/0/2,n212::n149#4::n149::n65::n33,"text ""exceptions""",none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/5/0,n212::n149#5::n149::n46,track row dep-bump,0/0/0/0/1/5,rounded box,sure,"same track, same order"
+0/0/1/0/1/5/0/0/0/0,n212::n149#5::n149::n48::n1,icon,0/0/0/0/1/5/0/0,icon,sure,track glyph (different drawing)
+0/0/1/0/1/5/0/0/1,n212::n149#5::n149::n49,"text ""dep-bump""",0/0/0/0/1/5/1/0,"text ""dep-bump""",sure,track name
+0/0/1/0/1/5/0/0/2,n212::n149#5::n149::n50,"text ""v2""",none,,sure,version / last-activity time absent in code
+0/0/1/0/1/5/0/0/4,n212::n149#5::n149::n52,"text ""2d""",none,,sure,version / last-activity time absent in code
+0/0/1/0/1/5/0/1,n212::n149#5::n149::n53,track row dep-bump status line,0/0/0/0/1/5/1/1,"text ""4 steps · action ×3 · orchestrate""",unsure,second line exists in both but content differs (status counts vs step summary)
+0/0/1/0/1/5/0/1/0,n212::n149#5::n149::n58,"text ""no attachments""",none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/0/1/6/0,n212::n149#6::n149::n46,track row nectar-preview,0/0/0/0/1/6,rounded box,sure,"same track, same order"
+0/0/1/0/1/6/0/0/0/0,n212::n149#6::n149::n48::n1,icon,0/0/0/0/1/6/0/0,icon,sure,track glyph (different drawing)
+0/0/1/0/1/6/0/0/1,n212::n149#6::n149::n49,"text ""nectar-preview""",0/0/0/0/1/6/1/0,"text ""nectar-preview""",sure,track name
+0/0/1/0/1/6/0/0/2,n212::n149#6::n149::n50,"text ""v1""",none,,sure,version / last-activity time absent in code
+0/0/1/0/1/6/0/0/4,n212::n149#6::n149::n52,"text ""5d""",none,,sure,version / last-activity time absent in code
+0/0/1/0/1/6/0/1,n212::n149#6::n149::n53,track row nectar-preview status line,0/0/0/0/1/6/1/1,"text ""5 steps · action ×3 · orchestrate · review""",unsure,second line exists in both but content differs (status counts vs step summary)
+0/0/1/0/1/6/0/1/0,n212::n149#6::n149::n58,"text ""no attachments""",none,,sure,"per-row status counts / ""no attachments"" absent in code"
+0/0/1/1,n212::n150,detail column,0/0/0/1,<main> detail,sure,detail column
+0/0/1/1/0,n212::n151,detail header bar,0/0/0/1/0,detail header (main) / empty body,sure,detail header
+0/0/1/1/0/0/0,n212::n152::n1,icon,none,,sure,header track glyph absent
+0/0/1/1/0/1,n212::n153,"text ""review-and-ship""",0/0/0/1/0/0,"text ""review-and-ship""",sure,track name
+0/0/1/1/0/2,n212::n154,"text ""v3""",none,,sure,version badge absent
+0/0/1/1/0/3,n212::n155,"text ""the standing shape for a change that ends in a human verdict""",none,,unsure,description absent; code shows proposal status line in that spot
+0/0/1/1/0/4/0/0,n212::n157::n37,rounded box,0/0/0/1/0/4,"text ""Attach to agent""",unsure,"""Attach a bee"" vs disabled ""Attach to agent"""
+0/0/1/1/0/4/0/0/0,n212::n157::n38,"text ""Attach a bee""",0/0/0/1/0/4,"text ""Attach to agent""",unsure,button label
+0/0/1/1/0/4/0/0/1,n212::n157::n39,"text ""a""",none,,sure,shortcut hint absent
+0/0/1/1/0/4/1/0,n212::n158::n37,rounded box,none,,sure,"""Edit spine"" absent"
+0/0/1/1/0/4/1/0/0,n212::n158::n38,"text ""Edit spine""",none,,sure,"""Edit spine"" absent"
+0/0/1/1/0/4/1/0/1,n212::n158::n39,"text ""e""",none,,sure,"""Edit spine"" absent"
+0/0/1/1/0/4/2/0,n212::n159::n1,icon,none,,sure,more menu absent
+0/0/1/1/1,n212::n160,detail body,0/0/0/1/1,detail body,sure,detail body
+0/0/1/1/1/0,n212::n161,spine column,0/0/0/1/1/0,flow canvas (dot grid),sure,spine area -> flow canvas
+0/0/1/1/1/0/0/0,n212::n162::n34,box,none,,sure,SPINE section header absent in code
+0/0/1/1/1/0/0/0/0,n212::n162::n35,"text ""SPINE""",none,,sure,SPINE section header absent in code
+0/0/1/1/1/0/0/0/1,n212::n162::n36,"text ""6 items · 1 branch · 9 nodes""",none,,sure,SPINE section header absent in code
+0/0/1/1/1/0/1/0,n212::n163#0::n163::n98,spine row Read the diff,0/0/0/1/1/0/0/0/1,filled rounded box,sure,step card
+0/0/1/1/1/0/1/0/0,n212::n163#0::n163::n99,filled rounded box,none,,sure,step status marker absent in this code view
+0/0/1/1/1/0/1/0/0/0/0,n212::n163#0::n163::n100::n1,icon,none,,sure,step status marker absent in this code view
+0/0/1/1/1/0/1/0/1/0,n212::n163#0::n163::n104::n1,icon,0/0/0/1/1/0/0/0/1/0/0,icon,unsure,step kind icon
+0/0/1/1/1/0/1/0/2,n212::n163#0::n163::n105,"text ""ACTION""",none,,sure,kind label (ACTION/REVIEW...)
+0/0/1/1/1/0/1/0/3,n212::n163#0::n163::n106,"text ""Read the diff""",0/0/0/1/1/0/0/0/1/1,"text ""Read the diff""",sure,step title
+0/0/1/1/1/0/1/0/4,n212::n163#0::n163::n109,"text ""every changed file, plus the packet it hangs off""",none,,sure,lane tag / DENIED badge / description
+0/0/1/1/1/0/2/0,n212::n163#1::n163::n98,spine row Fan out reviewers,0/0/0/1/1/0/0/0/3,filled rounded box,sure,step card
+0/0/1/1/1/0/2/0/0,n212::n163#1::n163::n99,filled rounded box,none,,sure,step status marker absent in this code view
+0/0/1/1/1/0/2/0/0/0/0,n212::n163#1::n163::n100::n1,icon,none,,sure,step status marker absent in this code view
+0/0/1/1/1/0/2/0/1/0,n212::n163#1::n163::n104::n1,icon,0/0/0/1/1/0/0/0/3/0/0,icon,unsure,step kind icon
+0/0/1/1/1/0/2/0/2,n212::n163#1::n163::n105,"text ""ORCHESTRATE""",0/0/0/1/1/0/0/0/3/2,"text ""orchestrate""",unsure,kind label (ACTION/REVIEW...)
+0/0/1/1/1/0/2/0/3,n212::n163#1::n163::n106,"text ""Fan out reviewers""",0/0/0/1/1/0/0/0/3/1,"text ""Fan out reviewers""",sure,step title
+0/0/1/1/1/0/2/0/4,n212::n163#1::n163::n109,"text ""max 3 · claude · one lens each""",none,,sure,lane tag / DENIED badge / description
+0/0/1/1/1/0/3/0,n212::n163#2::n163::n98,spine row Parallel (branch),0/0/0/1/1/0/0/0/5,box,unsure,branch row vs untitled parallel frame
+0/0/1/1/1/0/3/0/0,n212::n163#2::n163::n99,filled rounded box,none,,sure,step status marker absent in this code view
+0/0/1/1/1/0/3/0/0/0/0,n212::n163#2::n163::n100::n1,icon,none,,sure,step status marker absent in this code view
+0/0/1/1/1/0/3/0/1/0,n212::n163#2::n163::n104::n1,icon,none,,sure,step kind icon
+0/0/1/1/1/0/3/0/2,n212::n163#2::n163::n105,"text ""BRANCH""",none,,sure,kind label (ACTION/REVIEW...)
+0/0/1/1/1/0/3/0/3,n212::n163#2::n163::n106,"text ""Parallel""",none,,sure,step title
+0/0/1/1/1/0/3/0/4,n212::n163#2::n163::n109,"text ""both lanes must land before the gate""",none,,sure,lane tag / DENIED badge / description
+0/0/1/1/1/0/4/0,n212::n163#3::n163::n98,spine row Typecheck & lint,0/0/0/1/1/0/0/0/5/0/0/0,filled rounded box,sure,lane A card
+0/0/1/1/1/0/4/0/0,n212::n163#3::n163::n99,filled rounded box,none,,sure,step status marker absent in this code view
+0/0/1/1/1/0/4/0/0/0/0,n212::n163#3::n163::n100::n1,icon,none,,sure,step status marker absent in this code view
+0/0/1/1/1/0/4/0/1/0,n212::n163#3::n163::n104::n1,icon,0/0/0/1/1/0/0/0/5/0/0/0/0/0,icon,unsure,step kind icon
+0/0/1/1/1/0/4/0/2,n212::n163#3::n163::n105,"text ""ACTION""",none,,sure,kind label (ACTION/REVIEW...)
+0/0/1/1/1/0/4/0/3,n212::n163#3::n163::n106,"text ""Typecheck & lint""",0/0/0/1/1/0/0/0/5/0/0/0/1,"text ""Typecheck & lint""",sure,step title
+0/0/1/1/1/0/4/0/4,n212::n163#3::n163::n107,"text ""LANE A""",none,,sure,lane tag / DENIED badge / description
+0/0/1/1/1/0/4/0/5,n212::n163#3::n163::n109,"text ""pnpm -w typecheck && lint""",none,,sure,step description
+0/0/1/1/1/0/5/0,n212::n163#4::n163::n98,spine row Run the suite,0/0/0/1/1/0/0/0/5/0/1/0,filled rounded box,sure,lane B card
+0/0/1/1/1/0/5/0/0,n212::n163#4::n163::n101,rounded box,none,,sure,step status marker absent in this code view
+0/0/1/1/1/0/5/0/0/0,n212::n163#4::n163::n102,filled rounded box,none,,sure,step status marker absent in this code view
+0/0/1/1/1/0/5/0/1/0,n212::n163#4::n163::n104::n1,icon,0/0/0/1/1/0/0/0/5/0/1/0/0/0,icon,unsure,step kind icon
+0/0/1/1/1/0/5/0/2,n212::n163#4::n163::n105,"text ""ACTION""",none,,sure,kind label (ACTION/REVIEW...)
+0/0/1/1/1/0/5/0/3,n212::n163#4::n163::n106,"text ""Run the suite""",0/0/0/1/1/0/0/0/5/0/1/0/1,"text ""Run the suite""",sure,step title
+0/0/1/1/1/0/5/0/4,n212::n163#4::n163::n107,"text ""LANE B""",none,,sure,lane tag / DENIED badge / description
+0/0/1/1/1/0/5/0/5,n212::n163#4::n163::n109,"text ""pnpm test — 352 tests""",none,,sure,step description
+0/0/1/1/1/0/6/0,n212::n163#5::n163::n98,spine row Verdict gate,0/0/0/1/1/0/0/0/7,filled rounded box,sure,gate card
+0/0/1/1/1/0/6/0/0,n212::n163#5::n163::n103,rounded box,none,,sure,step status marker absent in this code view
+0/0/1/1/1/0/6/0/1/0,n212::n163#5::n163::n104::n1,icon,0/0/0/1/1/0/0/0/7/0/0,icon,unsure,step kind icon
+0/0/1/1/1/0/6/0/2,n212::n163#5::n163::n105,"text ""REVIEW""",0/0/0/1/1/0/0/0/7/2,"text ""gate""",unsure,kind label (ACTION/REVIEW...)
+0/0/1/1/1/0/6/0/3,n212::n163#5::n163::n106,"text ""Verdict gate""",0/0/0/1/1/0/0/0/7/1,"text ""Verdict gate""",sure,step title
+0/0/1/1/1/0/6/0/4,n212::n163#5::n163::n109,"text ""a human verdict on the packet""",none,,sure,lane tag / DENIED badge / description
+0/0/1/1/1/0/7/0,n212::n163#6::n163::n98,spine row Fix findings,0/0/0/1/1/0/0/0/8/1/1/0,filled rounded box,unsure,"existing step in design, shown as a proposed ghost card in code"
+0/0/1/1/1/0/7/0/0,n212::n163#6::n163::n103,rounded box,none,,sure,step status marker absent in this code view
+0/0/1/1/1/0/7/0/1/0,n212::n163#6::n163::n104::n1,icon,0/0/0/1/1/0/0/0/8/1/1/0/0/0/0,icon,unsure,step kind icon
+0/0/1/1/1/0/7/0/2,n212::n163#6::n163::n105,"text ""ACTION""",0/0/0/1/1/0/0/0/8/1/1/0/0/1,"text ""ACTION""",unsure,kind label (ACTION/REVIEW...)
+0/0/1/1/1/0/7/0/3,n212::n163#6::n163::n106,"text ""Fix findings""",0/0/0/1/1/0/0/0/8/1/1/0/1,"text ""Fix findings""",sure,step title
+0/0/1/1/1/0/7/0/4,n212::n163#6::n163::n108,"text ""DENIED""",0/0/0/1/1/0/0/0/0/1/0,"text ""DENIED ↺""",unsure,DENIED badge vs DENIED connector label
+0/0/1/1/1/0/7/0/5,n212::n163#6::n163::n109,"text ""then back to the gate""",0/0/0/1/1/0/0/0/8/1/1/0/2/1,"text ""then back to the gate""",sure,"same text ""then back to the gate"" as instruction field"
+0/0/1/1/1/0/8/0,n212::n163#7::n163::n98,spine row Publish preview,0/0/0/1/1/0/0/0/12,filled rounded box,unsure,"existing step in design, shown as a proposed ghost card in code (below visible area)"
+0/0/1/1/1/0/8/0/0,n212::n163#7::n163::n103,rounded box,none,,sure,step status marker absent in this code view
+0/0/1/1/1/0/8/0/1/0,n212::n163#7::n163::n104::n1,icon,0/0/0/1/1/0/0/0/12/0/0/0,icon,unsure,step kind icon
+0/0/1/1/1/0/8/0/2,n212::n163#7::n163::n105,"text ""DEPLOY""",0/0/0/1/1/0/0/0/12/0/1,"text ""DEPLOY""",unsure,kind label (ACTION/REVIEW...)
+0/0/1/1/1/0/8/0/3,n212::n163#7::n163::n106,"text ""Publish preview""",0/0/0/1/1/0/0/0/12/1,"text ""Publish preview""",sure,step title
+0/0/1/1/1/0/8/0/4,n212::n163#7::n163::n109,"text ""nectar · label review""",0/0/0/1/1/0/0/0/12/2/1,"text ""nectar ""review""""",unsure,description vs TARGET field value
+0/0/1/1/1/0/9/0,n212::n163#8::n163::n98,spine row Ship it?,0/0/0/1/1/0/0/0/14,filled rounded box,sure,step card (below visible area)
+0/0/1/1/1/0/9/0/0,n212::n163#8::n163::n103,rounded box,none,,sure,step status marker absent in this code view
+0/0/1/1/1/0/9/0/1/0,n212::n163#8::n163::n104::n1,icon,0/0/0/1/1/0/0/0/14/0/0,icon,unsure,step kind icon
+0/0/1/1/1/0/9/0/2,n212::n163#8::n163::n105,"text ""ASK""",0/0/0/1/1/0/0/0/14/2,"text ""blocking""",unsure,kind label (ACTION/REVIEW...)
+0/0/1/1/1/0/9/0/3,n212::n163#8::n163::n106,"text ""Ship it?""",0/0/0/1/1/0/0/0/14/1,"text ""Ship it?""",sure,step title
+0/0/1/1/1/0/9/0/4,n212::n163#8::n163::n109,"text ""blocking — the agent stops here""",none,,sure,lane tag / DENIED badge / description
+0/0/1/1/1/0/10,n212::n370,exceptions section,none,,sure,exceptions section absent in code
+0/0/1/1/1/0/10/0/0/0,n212::n371::n35,"text ""EXCEPTIONS""",none,,sure,exceptions section absent in code
+0/0/1/1/1/0/10/0/0/1,n212::n371::n36,"text ""recorded, not punished · 1""",none,,sure,no exception count in proposal view
+0/0/1/1/1/0/10/1/0,n212::n372#0::n372::n363,exception row,none,,sure,exceptions section absent in code
+0/0/1/1/1/0/10/1/0/0,n212::n372#0::n372::n364,rounded box,none,,sure,exceptions section absent in code
+0/0/1/1/1/0/10/1/0/1,n212::n372#0::n372::n365,"text ""drone-12""",none,,sure,exceptions section absent in code
+0/0/1/1/1/0/10/1/0/2,n212::n372#0::n372::n366,"text ""deviated at""",none,,sure,exceptions section absent in code
+0/0/1/1/1/0/10/1/0/3,n212::n372#0::n372::n367,"text ""Typecheck & lint""",none,,sure,exceptions section absent in code
+0/0/1/1/1/0/10/1/0/4,n212::n372#0::n372::n368,"text ""ran the suite first, then came back — lint was still install""",none,,sure,exceptions section absent in code
+0/0/1/1/1/0/10/1/0/5,n212::n372#0::n372::n369,"text ""9m""",none,,sure,exceptions section absent in code
+0/0/1/1/1/0/11,n212::n164,help note block (top rule),none,,sure,help note absent in code
+0/0/1/1/1/0/11/0,n212::n165,"text ""Steps are the agent's own to mark. Deviating is allowed — it""",none,,sure,help note absent in code
+0/0/1/1/1/1,n212::n166,right column (attached/queued),none,,sure,right column absent; code right edge is the AI sidecar rail (different function)
+0/0/1/1/1/1/0,n212::n167,attached section,none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/0/0,n212::n168::n34,box,none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/0/0/0,n212::n168::n35,"text ""ATTACHED""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/0/0/1,n212::n168::n36,"text ""3 bees""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/1/0,n212::n169#0::n169::n110,attached bee card drone-12,none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/1/0/0/0/0,n212::n169#0::n169::n112::n25,filled rounded box,none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/1/0/0/1,n212::n169#0::n169::n113,"text ""drone-12""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/1/0/0/2,n212::n169#0::n169::n114,"text ""claude · opus 4.8""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/1/0/0/4,n212::n169#0::n169::n116,"text ""running""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/1/0/0/5,n212::n169#0::n169::n117,"text ""12m""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/1/0/1/0,n212::n169#0::n169::n119,"text ""at""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/1/0/1/1,n212::n169#0::n169::n120,"text ""Run the suite""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/1/0/1/2,n212::n169#0::n169::n121,"text ""5/9""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/1/0/2/0,n212::n169#0::n169::n123,rounded box,none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/1/0/2/1,n212::n169#0::n169::n124,"text ""skipped Typecheck & lint — ran the suite first""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/2/0,n212::n169#1::n169::n110,attached bee card wren-2,none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/2/0/0/0/0,n212::n169#1::n169::n112::n25,filled rounded box,none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/2/0/0/1,n212::n169#1::n169::n113,"text ""wren-2""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/2/0/0/2,n212::n169#1::n169::n114,"text ""claude · sonnet 5""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/2/0/0/4,n212::n169#1::n169::n116,"text ""running""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/2/0/0/5,n212::n169#1::n169::n117,"text ""3m""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/2/0/1/0,n212::n169#1::n169::n119,"text ""at""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/2/0/1/1,n212::n169#1::n169::n120,"text ""Fan out reviewers""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/2/0/1/2,n212::n169#1::n169::n121,"text ""2/9""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/3/0,n212::n169#2::n169::n110,attached bee card scout-4,none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/3/0/0/0/0,n212::n169#2::n169::n112::n25,filled rounded box,none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/3/0/0/1,n212::n169#2::n169::n113,"text ""scout-4""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/3/0/0/2,n212::n169#2::n169::n114,"text ""codex""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/3/0/0/4,n212::n169#2::n169::n116,"text ""review""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/3/0/0/5,n212::n169#2::n169::n117,"text ""41m""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/3/0/1/0,n212::n169#2::n169::n119,"text ""at""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/3/0/1/1,n212::n169#2::n169::n120,"text ""Verdict gate""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/3/0/1/2,n212::n169#2::n169::n121,"text ""6/9""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/0/3/0/2/0,n212::n169#2::n169::n124,"text ""waiting on a human verdict""",none,,sure,attached bees section absent in code
+0/0/1/1/1/1/1,n212::n170,queued section,none,,sure,queued section absent in proposal view
+0/0/1/1/1/1/1/0/0,n212::n171::n34,box,none,,sure,queued section absent in proposal view
+0/0/1/1/1/1/1/0/0/0,n212::n171::n35,"text ""QUEUED""",none,,sure,queued section absent in proposal view
+0/0/1/1/1/1/1/0/0/1,n212::n171::n36,"text ""fifo · 2""",none,,sure,queued section absent in proposal view
+0/0/1/1/1/1/1/1/0,n212::n172#0::n172::n357,queued row bumble-7,none,,sure,queued section absent in proposal view
+0/0/1/1/1/1/1/1/0/0,n212::n172#0::n172::n358,"text ""1""",none,,sure,queued section absent in proposal view
+0/0/1/1/1/1/1/1/0/1/0,n212::n172#0::n172::n359::n1,icon,none,,sure,queued section absent in proposal view
+0/0/1/1/1/1/1/1/0/2,n212::n172#0::n172::n360,"text ""bumble-7""",none,,sure,queued section absent in proposal view
+0/0/1/1/1/1/1/1/0/3,n212::n172#0::n172::n361,"text ""behind""",none,,sure,queued section absent in proposal view
+0/0/1/1/1/1/1/1/0/4,n212::n172#0::n172::n362,"text ""pr-triage""",none,,sure,queued section absent in proposal view
+0/0/1/1/1/1/1/2/0,n212::n172#1::n172::n357,queued row mite-3,none,,sure,queued section absent in proposal view
+0/0/1/1/1/1/1/2/0/0,n212::n172#1::n172::n358,"text ""2""",none,,sure,queued section absent in proposal view
+0/0/1/1/1/1/1/2/0/1/0,n212::n172#1::n172::n359::n1,icon,none,,sure,queued section absent in proposal view
+0/0/1/1/1/1/1/2/0/2,n212::n172#1::n172::n360,"text ""mite-3""",none,,sure,queued section absent in proposal view
+0/0/1/1/1/1/1/2/0/3,n212::n172#1::n172::n361,"text ""behind""",none,,sure,queued section absent in proposal view
+0/0/1/1/1/1/1/2/0/4,n212::n172#1::n172::n362,"text ""spec-round""",none,,sure,queued section absent in proposal view
+0/0/1/1/1/1/2,n212::n173,proposed edit card,0/0/0/1/1/0/0/0/15,filled rounded box,unsure,proposal card vs action bar at end of canvas (below visible area)
+0/0/1/1/1/1/2/0/0,n212::n174::n34,box,none,,sure,proposal card header row absent
+0/0/1/1/1/1/2/0/0/0,n212::n174::n35,"text ""PROPOSED EDIT""",none,,sure,PROPOSED EDIT label absent
+0/0/1/1/1/1/2/0/0/1,n212::n174::n36,"text ""sidecar-1 · 2m""",none,,sure,author/age absent
+0/0/1/1/1/1/2/1,n212::n175,"text ""The suite passes but nothing publishes a preview for the hum""",0/0/0/1/1/0/0/0/16,"text ""Publish preview after the gate; add Fix findings on denial; """,unsure,proposal rationale; different wording
+0/0/1/1/1/1/2/2/0,n212::n176#0::n176::n131,proposal change row + Publish preview,0/0/0/1/1/0/0/0/12,filled rounded box,sure,added Publish preview change -> ghost card
+0/0/1/1/1/1/2/2/0/0,n212::n176#0::n176::n132,"text ""+""",none,,sure,change sign / kind / description absent for this change
+0/0/1/1/1/1/2/2/0/1,n212::n176#0::n176::n133,"text ""DEPLOY""",0/0/0/1/1/0/0/0/12/0/1,"text ""DEPLOY""",sure,kind label
+0/0/1/1/1/1/2/2/0/2,n212::n176#0::n176::n134,"text ""Publish preview""",0/0/0/1/1/0/0/0/12/1,"text ""Publish preview""",sure,title
+0/0/1/1/1/1/2/2/0/3,n212::n176#0::n176::n135,"text ""nectar · label review — after the gate, before the ask""",0/0/0/1/1/0/0/0/12/2/1,"text ""nectar ""review""""",unsure,description vs TARGET field
+0/0/1/1/1/1/2/3/0,n212::n176#1::n176::n131,proposal change row ~ Verdict gate,0/0/0/1/1/0/0/0/8/1/1/0,filled rounded box,unsure,changed gate (denied arm gains Fix findings) -> ghost Fix findings card
+0/0/1/1/1/1/2/3/0/0,n212::n176#1::n176::n132,"text ""~""",none,,sure,change sign / kind / description absent for this change
+0/0/1/1/1/1/2/3/0/1,n212::n176#1::n176::n133,"text ""REVIEW""",none,,sure,change sign / kind / description absent for this change
+0/0/1/1/1/1/2/3/0/2,n212::n176#1::n176::n134,"text ""Verdict gate""",0/0/0/1/1/0/0/0/7/1,"text ""Verdict gate""",unsure,changed step title
+0/0/1/1/1/1/2/3/0/3,n212::n176#1::n176::n135,"text ""denied arm gains → Fix findings""",none,,sure,change sign / kind / description absent for this change
+0/0/1/1/1/1/2/4/0,n212::n176#2::n176::n131,proposal change row - Manual smoke test,0/0/0/1/1/0/0/0/10,filled rounded box,sure,removed Manual smoke test -> removed card
+0/0/1/1/1/1/2/4/0/0,n212::n176#2::n176::n132,"text ""−""",none,,sure,change sign / kind / description absent for this change
+0/0/1/1/1/1/2/4/0/1,n212::n176#2::n176::n133,"text ""ACTION""",none,,sure,change sign / kind / description absent for this change
+0/0/1/1/1/1/2/4/0/2,n212::n176#2::n176::n134,"text ""Manual smoke test""",0/0/0/1/1/0/0/0/10/1,"text ""Manual smoke test""",sure,title
+0/0/1/1/1/1/2/4/0/3,n212::n176#2::n176::n135,"text ""superseded by the preview""",none,,sure,change sign / kind / description absent for this change
+0/0/1/1/1/1/2/5,n212::n177,"proposal footer (version note, discard, accept)",0/0/0/1/1/0/0/0/15,filled rounded box,unsure,proposal footer row vs action bar
+0/0/1/1/1/1/2/5/0,n212::n178,"text ""v3 → v4 · one pending at a time""",none,,sure,"""v3 -> v4 · one pending at a time"" absent"
+0/0/1/1/1/1/2/5/1/0,n212::n179::n37,rounded box,0/0/0/1/1/0/0/0/15/4,"text ""Discard""",sure,discard button
+0/0/1/1/1/1/2/5/1/0/0,n212::n179::n38,"text ""discard""",0/0/0/1/1/0/0/0/15/4,"text ""Discard""",sure,discard button
+0/0/1/1/1/1/2/5/2/0,n212::n180::n40,filled rounded box,0/0/0/1/1/0/0/0/15/2,"text ""Accept""",sure,accept button
+0/0/1/1/1/1/2/5/2/0/0,n212::n180::n41,"text ""accept""",0/0/0/1/1/0/0/0/15/2,"text ""Accept""",sure,accept button
+0/0/1/1/1/1/2/5/2/0/1,n212::n180::n42,"text ""⌘↵""",0/0/0/1/1/0/0/0/15/2/0,"text ""⌘↵""",sure,accept shortcut hint
+0/0/1/1/2,n212::n184,detail footer bar,0/0/0/1/2,detail footer,sure,detail footer bar
+0/0/1/1/2/0,n212::n185,"text ""a attach""",0/0/0/1/2/0,"text ""a proposed diff from the sidecar — nothing is real until you""",unsure,left footer hint text; different content
+0/0/1/1/2/1,n212::n186,"text ""q queue behind""",0/0/0/1/2/0,"text ""a proposed diff from the sidecar — nothing is real until you""",unsure,left footer hint text; different content
+0/0/1/1/2/2,n212::n187,"text ""e edit spine""",0/0/0/1/2/0,"text ""a proposed diff from the sidecar — nothing is real until you""",unsure,left footer hint text; different content
+0/0/1/1/2/3,n212::n188,"text ""x exceptions""",0/0/0/1/2/0,"text ""a proposed diff from the sidecar — nothing is real until you""",unsure,left footer hint text; different content
+0/0/1/1/2/4,n212::n189,"text ""defined 4d ago · 3 versions · promoted on edit""",none,,sure,definition age/versions absent in code

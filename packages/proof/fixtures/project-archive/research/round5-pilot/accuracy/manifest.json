@@ -1,0 +1,17 @@
+[
+  {
+    "case": "button-retry",
+    "report": ".audit/P1-run1/foundation-pilot-40469303506-1/proof/button-retry/default/240x80@1/drift-report.json",
+    "labels": ".audit/P1-labels/packages/proof/fixtures/ground-truth-pilot/button-retry/default.defects.csv"
+  },
+  {
+    "case": "section-label",
+    "report": ".audit/P1-run1/foundation-pilot-40469303506-1/proof/section-label/default/240x60@1/drift-report.json",
+    "labels": ".audit/P1-labels/packages/proof/fixtures/ground-truth-pilot/section-label/default.defects.csv"
+  },
+  {
+    "case": "status-dot",
+    "report": ".audit/P1-run1/foundation-pilot-40469303506-1/proof/status-dot/running/100x60@1/drift-report.json",
+    "labels": ".audit/P1-labels/packages/proof/fixtures/ground-truth-pilot/status-dot/running.defects.csv"
+  }
+]

@@ -1,0 +1,259 @@
+[
+  {
+    "pair": "tracks-pane/empty/1416x720@1",
+    "state": "empty",
+    "viewport": {
+      "width": 1416,
+      "height": 720,
+      "dpr": 1
+    },
+    "frame": {
+      "width": 724,
+      "height": 468
+    },
+    "before": 25,
+    "after": 25,
+    "added": 0,
+    "defects": []
+  },
+  {
+    "pair": "tracks-pane/proposal-pending/1416x720@1",
+    "state": "proposal-pending",
+    "viewport": {
+      "width": 1416,
+      "height": 720,
+      "dpr": 1
+    },
+    "frame": {
+      "width": 1416,
+      "height": 611
+    },
+    "before": 95,
+    "after": 97,
+    "added": 2,
+    "defects": [
+      {
+        "id": "def-412c46cb84092f5be22c",
+        "layer": {
+          "code": "0/0/0/1/1/0/0/0/15"
+        },
+        "kind": "layout",
+        "cause": "offscreen",
+        "classification": "product",
+        "findings": [
+          "d423"
+        ],
+        "summary": "rendered outside the visible pane: 3 change s · +n4d · +n5 · −n5old · Accept · ⌘↵ · Refine · Discard · ⌘⌫",
+        "offscreen": {
+          "box": [
+            566,
+            1023.40625,
+            480,
+            44
+          ],
+          "frame": [
+            0,
+            0,
+            1416,
+            611
+          ],
+          "viewport": [
+            0,
+            0,
+            1416,
+            720
+          ],
+          "elements": [
+            "0/0/0/1/1/0/0/0/15/0",
+            "0/0/0/1/1/0/0/0/15/1",
+            "0/0/0/1/1/0/0/0/15/2",
+            "0/0/0/1/1/0/0/0/15/2/0",
+            "0/0/0/1/1/0/0/0/15/3",
+            "0/0/0/1/1/0/0/0/15/4",
+            "0/0/0/1/1/0/0/0/15/4/0"
+          ],
+          "clips": [
+            {
+              "path": "0/0/0/1/1/0",
+              "box": [
+                232,
+                40,
+                1148,
+                539
+              ],
+              "x": true,
+              "y": true,
+              "pan": true,
+              "scrollX": false,
+              "scrollY": false
+            },
+            {
+              "path": "0",
+              "box": [
+                0,
+                0,
+                1416,
+                611
+              ],
+              "x": true,
+              "y": true,
+              "pan": false,
+              "scrollX": false,
+              "scrollY": false
+            }
+          ]
+        }
+      },
+      {
+        "id": "def-2cb09bc7c6a0164d3402",
+        "layer": {
+          "code": "0/0/0/1/1/0/0/0/16"
+        },
+        "kind": "layout",
+        "cause": "offscreen",
+        "classification": "product",
+        "findings": [
+          "d424"
+        ],
+        "summary": "rendered outside the visible pane: Publish preview after the gate; add Fix findings on denial; replace Manual smoke test",
+        "offscreen": {
+          "box": [
+            566,
+            1077.40625,
+            480,
+            30.4375
+          ],
+          "frame": [
+            0,
+            0,
+            1416,
+            611
+          ],
+          "viewport": [
+            0,
+            0,
+            1416,
+            720
+          ],
+          "elements": [
+            "0/0/0/1/1/0/0/0/16"
+          ],
+          "clips": [
+            {
+              "path": "0/0/0/1/1/0",
+              "box": [
+                232,
+                40,
+                1148,
+                539
+              ],
+              "x": true,
+              "y": true,
+              "pan": true,
+              "scrollX": false,
+              "scrollY": false
+            },
+            {
+              "path": "0",
+              "box": [
+                0,
+                0,
+                1416,
+                611
+              ],
+              "x": true,
+              "y": true,
+              "pan": false,
+              "scrollX": false,
+              "scrollY": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "pair": "tracks-pane/track-selected/1416x720@1",
+    "state": "track-selected",
+    "viewport": {
+      "width": 1416,
+      "height": 720,
+      "dpr": 1
+    },
+    "frame": {
+      "width": 1416,
+      "height": 525.5
+    },
+    "before": 104,
+    "after": 105,
+    "added": 1,
+    "defects": [
+      {
+        "id": "def-5c33f0bdb421911a9cd1",
+        "layer": {
+          "code": "0/0/0/1/1/0/0/0/14"
+        },
+        "kind": "layout",
+        "cause": "offscreen",
+        "classification": "product",
+        "findings": [
+          "d376"
+        ],
+        "summary": "rendered outside the visible pane: up next · pr-triage · queued by bumble-7 · 11:58 — spec-round · queued by mite-3 · 11:58",
+        "offscreen": {
+          "box": [
+            566,
+            801.125,
+            480,
+            30.4375
+          ],
+          "frame": [
+            0,
+            0,
+            1416,
+            525.5
+          ],
+          "viewport": [
+            0,
+            0,
+            1416,
+            720
+          ],
+          "elements": [
+            "0/0/0/1/1/0/0/0/14"
+          ],
+          "clips": [
+            {
+              "path": "0/0/0/1/1/0",
+              "box": [
+                232,
+                40,
+                1148,
+                454
+              ],
+              "x": true,
+              "y": true,
+              "pan": true,
+              "scrollX": false,
+              "scrollY": false
+            },
+            {
+              "path": "0",
+              "box": [
+                0,
+                0,
+                1416,
+                526
+              ],
+              "x": true,
+              "y": true,
+              "pan": false,
+              "scrollX": false,
+              "scrollY": false
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

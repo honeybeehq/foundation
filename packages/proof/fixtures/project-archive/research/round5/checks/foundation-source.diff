@@ -1,0 +1,838 @@
+diff --git a/packages/proof/src/capture/cli.ts b/packages/proof/src/capture/cli.ts
+index 2feb092..45667cb 100644
+--- a/packages/proof/src/capture/cli.ts
++++ b/packages/proof/src/capture/cli.ts
+@@ -1,3 +1,8 @@
++import {preserveCodeContext} from "./code-context.ts";
++import {captureLayoutRegions} from "./layout-regions.js";
++import {captureFrames} from './frame.ts'
++import {preserveDesignContext} from './design-context.ts'
++
+ import { captureFullExtent } from "./extent.ts";
+ import { readFile, writeFile, mkdir } from 'node:fs/promises'
+ import { execFileSync } from 'node:child_process'
+@@ -21,6 +26,14 @@ const linksPath = resolve(repo, option('--links', '.foundation/links.json')!)
+ const out = resolve(option('--out', 'captures')!)
+ const designPath = resolve(option('--design', resolve(import.meta.dirname, '../../fixtures/design/tracks-pane.fdn.html'))!)
+ const codeBoundary = option('--code-boundary')
++const codeContextBoundary = option('--code-context-boundary')
++const preserveContext = args.includes('--preserve-design-context')
++if(codeContextBoundary && (!preserveContext || codeBoundary)) throw Error('Code context boundary requires --preserve-design-context and cannot use legacy extraction')
++const layoutSize = option('--design-viewport')?.match(/^(\d+)x(\d+)$/)
++if (option('--design-viewport') && (!preserveContext || !layoutSize)) throw Error('--design-viewport requires in-place mode and WIDTHxHEIGHT')
++const designViewport = layoutSize ? {width:Number(layoutSize[1]),height:Number(layoutSize[2])} : undefined
++
++if (preserveContext && codeBoundary) throw Error('Choose design-context preservation or legacy card extraction, not both')
+ const started = performance.now()
+ const links = JSON.parse(await readFile(linksPath, 'utf8')) as Links
+ if (links.schema !== 'fdn-links/0' || !links.artboards?.length) throw new Error('Expected fdn-links/0 with artboards')
+@@ -58,7 +71,7 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
+       const captureStart = performance.now()
+       const blocked: string[] = []
+       const errors: string[] = []
+-      const context = await browser.newContext({ viewport: { width: board.viewport.width, height: board.viewport.height }, deviceScaleFactor: board.viewport.dpr, colorScheme: 'light', reducedMotion: 'reduce', forcedColors: 'none', timezoneId: 'UTC', locale: 'en-US', serviceWorkers: 'block' })
++      const context = await browser.newContext({ viewport: side === 'design' && designViewport ? designViewport : { width: board.viewport.width, height: board.viewport.height }, deviceScaleFactor: board.viewport.dpr, colorScheme: 'light', reducedMotion: 'reduce', forcedColors: 'none', timezoneId: 'UTC', locale: 'en-US', serviceWorkers: 'block' })
+       await context.addInitScript(() => {
+         ;(window as any).__name = (fn: unknown) => fn
+         const pending = new Set<number>()
+@@ -91,6 +104,9 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
+       page.on('pageerror', error => errors.push(error.message))
+       page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()) })
+       let url = 'foundation:baked'
++      let designIsolation: Awaited<ReturnType<typeof preserveDesignContext>> | undefined
++      let codeIsolation: Awaited<ReturnType<typeof preserveCodeContext>> | undefined
++      let originalFontSubstitutions: Awaited<ReturnType<typeof pinFontStacks>> | undefined
+       try {
+         if (side === 'code') {
+           url = `${target.url}__foundation/${index}`
+@@ -101,7 +117,11 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
+         } else {
+           const baked = bakeDocument(doc, { state: state.designState, includeNodeIds: true })
+           await page.setContent(baked.html)
+-          await page.evaluate(({id,properties,audit}) => {
++          if (preserveContext) {
++            await page.addStyleTag({content:fontAssets.map(font=>font.css).join('\n')+'\n*{animation:none!important;transition:none!important;caret-color:transparent!important}'})
++            originalFontSubstitutions = await pinFontStacks(page,links.fontPolicy,'body')
++            designIsolation = await preserveDesignContext(page,`[data-fdn-id="${state.designNode ?? board.designNode}"]`,STYLE_PROPERTIES)
++          } else await page.evaluate(({id,properties,audit}) => {
+             const selected = document.querySelector(`[data-fdn-id="${id}"]`)
+             if (!selected) throw new Error(`Design node missing: ${id}`)
+             const elements = [selected, ...selected.querySelectorAll('*')]
+@@ -141,17 +161,21 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
+           ;(window as any).__foundationBoundaryAudit = {nodes:elements.length,properties:properties.length,differences,unexpected,scrolls:scrolls.flatMap(({el,x,y},i) => x || y ? [{node:i,x,y}] : []),designExtraction:(window as any).__foundationDesignExtraction}
+           if (unexpected.length || (window as any).__foundationDesignExtraction?.differences.length) throw new Error('Computed styles changed during boundary extraction: '+JSON.stringify(unexpected))
+         }, {side, selector:codeBoundary,properties:[...STYLE_PROPERTIES]})
+-        await page.addStyleTag({ content: fontAssets.map(font => font.css).join('\n') + '\n*{animation:none!important;transition:none!important;caret-color:transparent!important} #foundation-root{width:100vw;height:100vh;overflow:hidden}' })
++        const rootLayout = preserveContext && side === 'design' ? '' : '#foundation-root{width:100vw;height:100vh;overflow:hidden}'
++        await page.addStyleTag({ content: fontAssets.map(font => font.css).join('\n') + '\n*{animation:none!important;transition:none!important;caret-color:transparent!important} ' + rootLayout })
+         await page.evaluate(() => document.fonts.ready)
+-        const fontSubstitutions = await pinFontStacks(page, links.fontPolicy)
++        const fontSubstitutions = originalFontSubstitutions ?? await pinFontStacks(page, links.fontPolicy)
+         if (side === 'design') frame = await page.evaluate(() => {
+-          const rect = document.querySelector('#foundation-root')!.firstElementChild!.getBoundingClientRect()
++          const root=document.querySelector('#foundation-root')!
++          const rect = root.firstElementChild!.getBoundingClientRect()
+           return {width: rect.width, height: rect.height}
+         })
+-        await page.addStyleTag({content: `#foundation-root{width:${frame.width}px;height:${frame.height}px}`})
++        const {hostFrame}=captureFrames(frame,board.viewport,preserveContext && side === 'code')
++        if (!(preserveContext && side === 'design')) await page.addStyleTag({content: `#foundation-root{width:${hostFrame.width}px;height:${hostFrame.height}px}`})
+         await page.waitForFunction(() => (window as any).__foundationPendingTimers === 0, undefined, {timeout:5000})
+         await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
+         await settleRoot(page)
++        if(side === "code" && codeContextBoundary) codeIsolation=await preserveCodeContext(page,codeContextBoundary,STYLE_PROPERTIES)
+         const platformFonts = await usedFonts(page, links.fontPolicy?.requireCustomFonts ?? false, fontAssets.map(font => font.postScriptName).filter((name): name is string => Boolean(name)))
+         const boundaryAudit = codeBoundary ? await page.evaluate(() => {
+           const audit = (window as any).__foundationBoundaryAudit
+@@ -159,15 +183,21 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
+           return {...audit, finalScrolls:audit.scrolls.map((s:any) => ({...s,finalX:elements[s.node]!.scrollLeft,finalY:elements[s.node]!.scrollTop}))}
+         }) : undefined
+         const dom = await collectDom(page, '#foundation-root')
++        if (designIsolation || codeIsolation) dom.extent.frame=[0,0,frame.width,frame.height]
++        const regionLinks=state.layoutOnly?.regions ?? board.layoutOnly?.regions
++        const layoutOnlyRegions=regionLinks ? await captureLayoutRegions(page,side,regionLinks) : undefined
++
+         if (errors.length || blocked.length) throw new Error(JSON.stringify({ errors, blocked }))
+         const fonts = await page.evaluate(() => [...new Set(Array.from(document.querySelectorAll('#foundation-root *')).map(el => getComputedStyle(el).fontFamily))].sort())
+         const tokens = await page.evaluate(() => { const css = getComputedStyle(document.documentElement); return Object.fromEntries(Array.from(css).filter(k => k.startsWith('--')).sort().map(k => [k, css.getPropertyValue(k).trim()])) })
+         const destination = join(folder, side)
+         await mkdir(destination, { recursive: true })
+-        await page.screenshot({ path: join(destination, 'screenshot.png'), animations: 'disabled' })
++        await page.screenshot({ path: join(destination, 'screenshot.png'), animations: 'disabled', ...(side === 'design' && designViewport ? {clip:{x:0,y:0,width:board.viewport.width,height:board.viewport.height}} : {}) })
+         const fullExtent = await captureFullExtent(page, '#foundation-root', join(destination, 'full-extent.png'))
+         await writeFile(join(destination, 'dom.json'), JSON.stringify(dom, null, 2) + '\n')
+-        const meta = { schema: 'fdn-capture/0', ...provenance, rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, extent: dom.extent, fullExtent, frame, ...(codeBoundary ? {boundary:{codeSelector:codeBoundary, originNormalized:true, bothRootsNormalized:true, sizePreserved:true,audit:boundaryAudit}} : {}), url, fonts, fontPolicy: links.fontPolicy, fontSubstitutions, platformFonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
++        const meta = { schema: 'fdn-capture/0', ...(layoutOnlyRegions?{layoutOnlyRegions}:{}), ...provenance, rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, extent: dom.extent, fullExtent, frame, ...(designIsolation ? {designIsolation,designViewport:designViewport ?? {width:board.viewport.width,height:board.viewport.height}} : {}), ...(codeIsolation?{codeIsolation}:{}), ...(preserveContext && side === 'code' ? {componentFrame:codeIsolation?'in-place-boundary':'unconstrained-host'} : {}), ...(codeBoundary ? {boundary:{codeSelector:codeBoundary, originNormalized:true, bothRootsNormalized:true, sizePreserved:true,audit:boundaryAudit}} : {}), url, fonts, fontPolicy: links.fontPolicy, fontSubstitutions, platformFonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
++
++
+         await writeFile(join(destination, 'meta.json'), JSON.stringify(meta, null, 2) + '\n')
+         console.log(`${board.id}/${state.name} ${side}: ${dom.nodes.length} nodes, ${meta.timingsMs.capture} ms`)
+       } finally { await context.close() }
+diff --git a/packages/proof/src/capture/code-cli.ts b/packages/proof/src/capture/code-cli.ts
+index 6cfa206..b164313 100644
+--- a/packages/proof/src/capture/code-cli.ts
++++ b/packages/proof/src/capture/code-cli.ts
+@@ -1,3 +1,4 @@
++import {captureFrames} from './frame.ts'
+ import { captureFullExtent } from "./extent.ts";
+ import { readFile, writeFile, mkdir } from "node:fs/promises";
+ import { execFileSync } from "node:child_process";
+@@ -101,7 +102,7 @@ try {
+       throw Error(
+         "Baseline design binding differs from links; regenerate baseline",
+       );
+-    const frame = design.meta.frame;
++    const {frame,hostFrame}=captureFrames(design.meta.frame,board.viewport,design.meta.designIsolation?.mode === 'in-place');
+     const folder = join(
+       out,
+       board.id,
+@@ -221,7 +222,7 @@ try {
+         await page.evaluate(() => document.fonts.ready);
+         const fontSubstitutions = await pinFontStacks(page, links.fontPolicy);
+         await page.addStyleTag({
+-          content: `#foundation-root{width:${frame.width}px;height:${frame.height}px}`,
++          content: `#foundation-root{width:${hostFrame.width}px;height:${hostFrame.height}px}`,
+         });
+         await page.waitForFunction(
+           () => (window as any).__foundationPendingTimers === 0,
+diff --git a/packages/proof/src/capture/code-context.test.ts b/packages/proof/src/capture/code-context.test.ts
+new file mode 100644
+index 0000000..f61b4a9
+--- /dev/null
++++ b/packages/proof/src/capture/code-context.test.ts
+@@ -0,0 +1,36 @@
++import {it,expect} from 'vitest';
++import {chromium} from 'playwright';
++import {preserveCodeContext} from './code-context.ts';
++import {STYLE_PROPERTIES} from './dom.ts';
++it('normalizes a fixed-position card without reparenting it or shrinking its host',async()=>{
++ const browser=await chromium.launch();const page=await browser.newPage({viewport:{width:800,height:600}});
++ try {
++  await page.evaluate('globalThis.__name=f=>f');
++  await page.setContent('<style>body{margin:0}#foundation-root{width:100vw;height:100vh}#card{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:200px;height:100px}</style><div id="foundation-root"><section id="card">Code card</section></div>');
++  const audit=await preserveCodeContext(page,'#card',STYLE_PROPERTIES);
++  expect(audit.styleChanges).toHaveLength(0);expect(audit.geometryChanges).toHaveLength(0);
++  expect(audit.fixtureHost.frame.slice(2)).toEqual([800,600]);
++  expect((await page.locator('#card').boundingBox())?.x).toBeCloseTo(0);
++ } finally {await browser.close();}
++});
++it('preserves a focused input and scroll position while adding the isolation wrapper',async()=>{
++ const browser=await chromium.launch();const page=await browser.newPage({viewport:{width:800,height:600}});
++ try {
++  await page.evaluate('globalThis.__name=f=>f');
++  await page.setContent('<style>#foundation-root{width:800px;height:600px}#card{width:200px;height:100px;overflow:auto}input{border:1px solid gray}input:focus{border-color:blue}</style><div id="foundation-root"><section id="card"><input><div style="height:500px">Content</div></section></div>');
++  await page.locator('input').focus();await page.locator('#card').evaluate(el=>el.scrollTop=10);
++  const audit=await preserveCodeContext(page,'#card',STYLE_PROPERTIES);
++  expect(audit.focusRestored).toBe(true);expect(audit.styleChanges).toHaveLength(0);
++  expect(await page.locator('input').evaluate(el=>document.activeElement===el)).toBe(true);
++  expect(await page.locator('#card').evaluate(el=>el.scrollTop)).toBe(10);
++ } finally {await browser.close();}
++});
++it('does not turn fixture-root overflow into a zero-area clip on the synthetic wrapper',async()=>{
++ const browser=await chromium.launch();const page=await browser.newPage({viewport:{width:400,height:300}});
++ try {
++  await page.evaluate('globalThis.__name=f=>f');
++  await page.setContent('<style>#foundation-root{width:400px;height:300px;overflow:hidden}</style><div id="foundation-root"><section id="card" style="width:200px;height:100px"><button>Keep visible</button></section></div>');
++  await preserveCodeContext(page,'#card',STYLE_PROPERTIES);
++  expect(await page.locator('#foundation-root').evaluate(el=>getComputedStyle(el).overflow)).toBe('visible');
++ } finally {await browser.close();}
++});
+diff --git a/packages/proof/src/capture/code-context.ts b/packages/proof/src/capture/code-context.ts
+new file mode 100644
+index 0000000..035c8a3
+--- /dev/null
++++ b/packages/proof/src/capture/code-context.ts
+@@ -0,0 +1,24 @@
++import type {Page} from 'playwright';
++import {preserveDesignContext} from './design-context.ts';
++
++/** Select a code component in place, preserving its ambient host dimensions. */
++export async function preserveCodeContext(page:Page,selector:string,properties:readonly string[]) {
++ const host=await page.evaluate(({selector,properties})=>{
++  const root=document.querySelector<HTMLElement>('#foundation-root');
++  const selected=document.querySelector<HTMLElement>(selector);
++  if(!root || !selected || root===selected || !root.contains(selected)) throw Error('Code context boundary must select one descendant of the fixture host');
++  if(document.querySelectorAll(selector).length!==1) throw Error('Code context boundary is ambiguous');
++  if(document.getElementById('foundation-code-host')) throw Error('Code context host marker already exists');
++  const nodes=[selected,...selected.querySelectorAll('*')],origin=selected.getBoundingClientRect();
++  const before=nodes.map(el=>{const box=el.getBoundingClientRect();return {box:[box.x-origin.x,box.y-origin.y,box.width,box.height],style:properties.map(p=>getComputedStyle(el).getPropertyValue(p))};});
++  const rect=root.getBoundingClientRect(),css=getComputedStyle(root);
++  const extra=(axis:'x'|'y')=>css.boxSizing==='border-box'?0:(axis==='x'?['paddingLeft','paddingRight','borderLeftWidth','borderRightWidth']:['paddingTop','paddingBottom','borderTopWidth','borderBottomWidth']).reduce((n,k)=>n+parseFloat(css[k as keyof CSSStyleDeclaration] as string||'0'),0);
++  root.style.width=`${rect.width-extra('x')}px`;root.style.height=`${rect.height-extra('y')}px`;root.id='foundation-code-host';
++  const afterOrigin=selected.getBoundingClientRect();
++  const changed=nodes.some((el,i)=>{const r=el.getBoundingClientRect(),b=before[i]!;return [r.x-afterOrigin.x,r.y-afterOrigin.y,r.width,r.height].some((v,j)=>Math.abs(v-b.box[j]!)>.05)||properties.some((p,j)=>getComputedStyle(el).getPropertyValue(p)!==b.style[j]);});
++  if(changed) throw Error('Code context changed while preserving the fixture host');
++  return {frame:[rect.x,rect.y,rect.width,rect.height],nodes:nodes.length};
++ },{selector,properties:[...properties]});
++ const isolation=await preserveDesignContext(page,selector,properties);
++ return {...isolation,fixtureHost:host};
++}
+diff --git a/packages/proof/src/capture/design-context.test.ts b/packages/proof/src/capture/design-context.test.ts
+new file mode 100644
+index 0000000..00b6b7b
+--- /dev/null
++++ b/packages/proof/src/capture/design-context.test.ts
+@@ -0,0 +1,78 @@
++import {afterAll,beforeAll,expect,it} from 'vitest'
++import {chromium,type Browser,type Page} from 'playwright'
++import {preserveDesignContext} from './design-context.ts'
++import {STYLE_PROPERTIES} from './dom.ts'
++let browser:Browser,page:Page
++beforeAll(async()=>{browser=await chromium.launch();page=await browser.newPage({viewport:{width:240,height:100}});await page.evaluate('globalThis.__name = f => f')})
++afterAll(async()=>{await browser?.close()})
++it.each([
++ ['dot','<span id="selected" style="height:6px;width:6px;background:green;flex:none"></span>'],
++ ['button','<span id="selected" style="display:flex;border:1px solid;padding:0 12px;height:28px">retry fresh</span>'],
++])('preserves the intrinsic %s geometry from a flex context',async(_name,child)=>{
++ await page.setContent(`<style>body{margin:8px}.host{display:flex;gap:8px;width:200px;font:12px sans-serif}</style><div class="host">${child}<span>sibling</span></div>`)
++ const result=await preserveDesignContext(page,'#selected',STYLE_PROPERTIES)
++ expect(result.originalBox[2]).toBeGreaterThan(0)
++ expect(result.isolatedBox.slice(2)).toEqual(result.originalBox.slice(2))
++ expect(result.isolatedBox.slice(0,2)).toEqual([0,0])
++})
++it('retains inherited font and variable styles from real ancestors',async()=>{
++ await page.setContent('<div class="host" style="display:flex;font:17px monospace;--ink:rgb(12, 34, 56)"><span id="selected" style="display:inline-flex;color:var(--ink)">Native</span></div>')
++ const result=await preserveDesignContext(page,'#selected',STYLE_PROPERTIES)
++ expect(result.styleChanges).toEqual([])
++ expect(result.geometryChanges).toEqual([])
++ expect(await page.locator('#foundation-root > #selected').evaluate(el=>getComputedStyle(el).color)).toBe('rgb(12, 34, 56)')
++})
++it('fails closed if assigning the capture id changes authored selectors',async()=>{
++ await page.setContent('<style>.host > #selected{color:red}</style><div class="host"><span id="selected">Native</span></div>')
++ await expect(preserveDesignContext(page,'#selected',STYLE_PROPERTIES)).rejects.toThrow('Design context changed')
++})
++it('ignores meaningless positions of empty display-contents rectangles',async()=>{
++ await page.setContent('<div style="display:flex;margin:25px"><div id="selected" style="display:flex"><span style="display:contents"><b>Content</b></span></div></div>')
++ const result=await preserveDesignContext(page,'#selected',STYLE_PROPERTIES)
++ expect(result.geometryChanges).toEqual([])
++ expect(await page.locator('#foundation-root > #selected').count()).toBe(1)
++})
++it('keeps diagnostic overflow paint at the isolated origin',async()=>{
++ const {captureFullExtent}=await import('./extent.ts')
++ const {mkdtemp,readFile,rm}=await import('node:fs/promises')
++ const {tmpdir}=await import('node:os')
++ const {join}=await import('node:path')
++ const {PNG}=await import('pngjs')
++ const directory=await mkdtemp(join(tmpdir(),'foundation-context-'))
++ try {
++  await page.setContent('<div style="display:flex;margin:28px"><span id="selected" style="width:6px;height:6px;background:rgb(0,128,0);flex:none"></span></div>')
++  await preserveDesignContext(page,'#selected',STYLE_PROPERTIES)
++  const path=join(directory,'extent.png')
++  await captureFullExtent(page,'#foundation-root',path)
++  const png=PNG.sync.read(await readFile(path))
++  expect([png.width,png.height]).toEqual([6,6])
++  const i=(2*png.width+2)*4
++  expect([...png.data.subarray(i,i+3)]).toEqual([0,128,0])
++ } finally {await rm(directory,{recursive:true,force:true})}
++})
++it('keeps the reference frame for overflow detection inside a larger rendering host',async()=>{
++ const {captureFrames}=await import('./frame.ts')
++ const {offscreenDefects}=await import('../compare/offscreen.ts')
++ const reference={width:20,height:20},viewport={width:100,height:100}
++ const {frame,hostFrame}=captureFrames(reference,viewport,true)
++ expect(frame).toEqual(reference)
++ expect(hostFrame).toEqual(viewport)
++ const node=(height:number)=>({path:'0/0',tag:'button',fdnId:'action',text:'Action',box:[0,0,20,height] as [number,number,number,number],style:{},visibility:{eligible:true,interactive:true,clips:[]}})
++ const design={nodes:[node(20)],meta:{frame,viewport},screenshot:Buffer.alloc(0)}
++ const code={nodes:[node(40)],meta:{frame,viewport},screenshot:Buffer.alloc(0)}
++ expect(offscreenDefects(design,code,[]).some(d=>d.cause==='offscreen')).toBe(true)
++})
++it('keeps a wide board layout while clipping a small specimen screenshot',async()=>{
++ const {mkdtemp,readFile,rm}=await import('node:fs/promises')
++ const {tmpdir}=await import('node:os');const {join}=await import('node:path');const {PNG}=await import('pngjs')
++ const directory=await mkdtemp(join(tmpdir(),'foundation-viewport-'))
++ try {
++  await page.setViewportSize({width:1600,height:1200})
++  await page.setContent('<style>body{margin:0}.board{display:flex;width:80vw}.spacer{width:1100px;flex:none}#selected{font:11px monospace}</style><div class="board"><div class="spacer"></div><span id="selected">WHAT A ROW SAYS</span></div>')
++  const result=await preserveDesignContext(page,'#selected',STYLE_PROPERTIES)
++  const file=join(directory,'normal.png');await page.screenshot({path:file,clip:{x:0,y:0,width:240,height:60}})
++  const png=PNG.sync.read(await readFile(file))
++  expect([png.width,png.height]).toEqual([240,60]);expect(result.originalBox[3]).toBeLessThan(20)
++  expect(await page.viewportSize()).toEqual({width:1600,height:1200})
++ } finally {await page.setViewportSize({width:240,height:100});await rm(directory,{recursive:true,force:true})}
++})
+diff --git a/packages/proof/src/capture/design-context.ts b/packages/proof/src/capture/design-context.ts
+new file mode 100644
+index 0000000..d49e486
+--- /dev/null
++++ b/packages/proof/src/capture/design-context.ts
+@@ -0,0 +1,43 @@
++import type {Page} from 'playwright'
++
++export async function preserveDesignContext(page: Page, selector: string, properties: readonly string[]) {
++  await page.evaluate(() => document.fonts.ready)
++  return page.evaluate(({selector, properties}) => {
++    const selected = document.querySelector<HTMLElement>(selector)
++    if (!selected) throw Error(`Design node missing: ${selector}`)
++    const elements = [selected, ...selected.querySelectorAll('*')]
++    const original = selected.getBoundingClientRect()
++    if (original.width <= 0 || original.height <= 0) throw Error('Selected design root has no painted size in its original context')
++    const boxes = elements.map(el => {const r=el.getBoundingClientRect();return [r.x-original.x,r.y-original.y,r.width,r.height]})
++    const styles = elements.map(el => properties.map(p => getComputedStyle(el).getPropertyValue(p)))
++    if (document.getElementById('foundation-root')) throw Error('Capture root already exists')
++    if (getComputedStyle(document.documentElement).transform !== 'none') throw Error('Authored html transforms need a dedicated capture adapter')
++    const focused=selected.contains(document.activeElement) ? document.activeElement as HTMLElement : null
++    const scrolls=elements.map(el=>({el,x:el.scrollLeft,y:el.scrollTop}))
++    const originalId = selected.id
++    const wrapper=document.createElement('div')
++    wrapper.id='foundation-root'
++    wrapper.style.display='contents'
++    wrapper.style.overflow='visible'
++    selected.before(wrapper)
++    wrapper.append(selected)
++    focused?.focus({preventScroll:true})
++    for(const {el,x,y} of scrolls) {el.scrollLeft=x;el.scrollTop=y}
++    if(focused && document.activeElement!==focused) throw Error('Capture context lost focused element')
++    const isolation = document.createElement('style')
++    isolation.textContent = `html{transform:translate(${-original.x}px,${-original.y}px)!important;transform-origin:0 0!important}body *:not(#foundation-root):not(#foundation-root *){visibility:hidden!important}#foundation-root{visibility:visible!important}`
++    document.head.append(isolation)
++    const after = selected.getBoundingClientRect()
++    const geometryChanges = elements.flatMap((el,i) => {
++      const r=el.getBoundingClientRect(), actual=[r.x-after.x,r.y-after.y,r.width,r.height]
++      const empty = boxes[i]![2] === 0 && boxes[i]![3] === 0 && actual[2] === 0 && actual[3] === 0
++      return actual.some((v,j)=>(j>=2 || !empty) && Math.abs(v-boxes[i]![j]!)>0.05)?[{node:i,before:boxes[i],after:actual}]:[]
++    })
++    const styleChanges = elements.flatMap((el,i) => properties.flatMap((property,j) => {
++      const actual=getComputedStyle(el).getPropertyValue(property)
++      return actual===styles[i]![j]?[]:[{node:i,property,before:styles[i]![j],after:actual}]
++    }))
++    if (geometryChanges.length || styleChanges.length || Math.abs(after.x)>0.05 || Math.abs(after.y)>0.05) throw Error('Design context changed during isolation: '+JSON.stringify({geometryChanges,styleChanges,origin:[after.x,after.y]}))
++    return {mode:'in-place' as const,focusRestored:Boolean(focused),scrollPositionsPreserved:scrolls.length, originalId, originalBox:[original.x,original.y,original.width,original.height], isolatedBox:[after.x,after.y,after.width,after.height], properties:properties.length, nodes:elements.length,geometryChanges,styleChanges,wrapper:'display:contents',ancestorContextPreserved:true,outsidePaint:'visibility:hidden',backgrounds:'authored html/body retained',ancestorClips:'retained'}
++  },{selector,properties:[...properties]})
++}
+diff --git a/packages/proof/src/capture/dom.ts b/packages/proof/src/capture/dom.ts
+index 0a16bb0..9dd4164 100644
+--- a/packages/proof/src/capture/dom.ts
++++ b/packages/proof/src/capture/dom.ts
+@@ -35,7 +35,7 @@ export async function collectDom(page: Page, root: string) {
+       const rect = el.getBoundingClientRect()
+       const vars = Object.fromEntries(Array.from(css).filter(key => key.startsWith('--')).sort().map(key => [key, css.getPropertyValue(key).trim()]))
+       const labelled = el.getAttribute('aria-labelledby')?.split(/\s+/).map(id => document.getElementById(id)?.textContent ?? '').join(' ').trim()
+-      const text = Array.from(el.childNodes).filter(n => n.nodeType === Node.TEXT_NODE).map(n => n.textContent).join(' ').replace(/\s+/g, ' ').trim()
++      const text = Array.from(el.childNodes).filter(n => n.nodeType === Node.TEXT_NODE).map(n => n.textContent).join('').replace(/\s+/g, ' ').trim()
+       const paint = {transform:css.transform, fill:css.fill, stroke:css.stroke, strokeWidth:css.strokeWidth, filter:css.filter, clipPath:css.clipPath, ...(el.namespaceURI === 'http://www.w3.org/2000/svg' ? {attributes:Object.fromEntries(el.getAttributeNames().filter(key => key !== 'class' && key !== 'style').sort().map(key => [key,el.getAttribute(key)]))} : {})}
+       const authoredFontFamily = (window as any).__foundationAuthoredFontFamilies?.get(el)
+       nodes.push({ visibility: visibility(el, rect, css), path, ...(authoredFontFamily ? {authoredFontFamily} : {}), tag: el.tagName.toLowerCase(), fdnId: el.getAttribute('data-fdn-id'), role: el.getAttribute('role') ?? ({ BUTTON: 'button', INPUT: 'textbox', IMG: 'img', A: 'link' }[el.tagName] ?? ''), name: el.getAttribute('aria-label') ?? labelled ?? el.getAttribute('alt') ?? text, text, box: [rect.x - origin.x, rect.y - origin.y, rect.width, rect.height], style: Object.fromEntries(properties.map(key => [key, css.getPropertyValue(key)])), vars, paint })
+diff --git a/packages/proof/src/capture/fonts.ts b/packages/proof/src/capture/fonts.ts
+index fc84ce5..104443e 100644
+--- a/packages/proof/src/capture/fonts.ts
++++ b/packages/proof/src/capture/fonts.ts
+@@ -1,13 +1,13 @@
+ import type { Page } from 'playwright'
+ import type { Links } from './types.js'
+ 
+-export async function pinFontStacks(page: Page, policy: Links['fontPolicy']) {
++export async function pinFontStacks(page: Page, policy: Links['fontPolicy'], root = '#foundation-root') {
+   if (!policy) return []
+-  const substitutions = await page.evaluate(policy => {
++  const substitutions = await page.evaluate(({policy,root}) => {
+     const authored = new WeakMap<Element,string>()
+     ;(window as any).__foundationAuthoredFontFamilies = authored
+     const replacements = new Map<string, string>()
+-    const rows = Array.from(document.querySelectorAll<HTMLElement>('#foundation-root, #foundation-root *')).map(el => ({el, family: getComputedStyle(el).fontFamily}))
++    const rows = Array.from(document.querySelectorAll<HTMLElement>(`${root}, ${root} *`)).map(el => ({el, family: getComputedStyle(el).fontFamily}))
+     for (const {el, family} of rows) {
+       authored.set(el, family)
+       const names = family.split(',').map(value => value.trim().replace(/^['"]|['"]$/g, ''))
+@@ -22,7 +22,7 @@ export async function pinFontStacks(page: Page, policy: Links['fontPolicy']) {
+     }
+     document.body.getBoundingClientRect()
+     return [...replacements].sort(([a], [b]) => a.localeCompare(b)).map(([from, to]) => ({from, to}))
+-  }, policy)
++  }, {policy,root})
+   await page.evaluate(() => document.fonts.ready)
+   return substitutions
+ }
+diff --git a/packages/proof/src/capture/frame.ts b/packages/proof/src/capture/frame.ts
+new file mode 100644
+index 0000000..579406f
+--- /dev/null
++++ b/packages/proof/src/capture/frame.ts
+@@ -0,0 +1,3 @@
++export function captureFrames(reference: {width:number;height:number}, viewport: {width:number;height:number}, preserveContext: boolean) {
++  return {frame:reference, hostFrame:preserveContext ? {width:viewport.width,height:viewport.height} : reference}
++}
+diff --git a/packages/proof/src/capture/layout-regions.test.ts b/packages/proof/src/capture/layout-regions.test.ts
+new file mode 100644
+index 0000000..e50a1d0
+--- /dev/null
++++ b/packages/proof/src/capture/layout-regions.test.ts
+@@ -0,0 +1,24 @@
++import {it,expect} from 'vitest';
++import {chromium} from 'playwright';
++import {captureLayoutRegions} from './layout-regions.ts';
++import {collectDom} from './dom.ts';
++it('resolves paired region selectors and records missing markers explicitly',async()=>{
++ const browser=await chromium.launch();const page=await browser.newPage();
++ try {
++  await page.evaluate('globalThis.__name = f => f');
++  await page.setContent('<div id="foundation-root"><section data-fdn-id="list"><p>A</p><p>B</p></section></div>');
++  const regions=[{id:'list',designNode:'list',codeSelector:'section',repeat:{designSelector:'p',codeSelector:'p'}}];
++  expect(await captureLayoutRegions(page,'design',regions)).toEqual(await captureLayoutRegions(page,'code',regions));
++  expect((await captureLayoutRegions(page,'code',[{...regions[0]!,codeSelector:'aside'}]))[0]?.root).toBe(null);
++ } finally {await browser.close();}
++});
++it('does not insert whitespace between adjacent React-style text nodes',async()=>{
++ const browser=await chromium.launch();const page=await browser.newPage();
++ try {
++  await page.evaluate('globalThis.__name = f => f');
++  await page.setContent('<div id="foundation-root"><span></span></div>');
++  await page.locator('span').evaluate(el=>el.append(document.createTextNode('2 change'),document.createTextNode('s')));
++  const captured=await collectDom(page,'#foundation-root');
++  expect((captured.nodes as {text:string}[]).find(n=>n.text)?.text).toBe('2 changes');
++ } finally {await browser.close();}
++});
+diff --git a/packages/proof/src/capture/layout-regions.ts b/packages/proof/src/capture/layout-regions.ts
+new file mode 100644
+index 0000000..e7de05a
+--- /dev/null
++++ b/packages/proof/src/capture/layout-regions.ts
+@@ -0,0 +1,31 @@
++import type {Page} from 'playwright';
++export interface LayoutRegionLink {
++  id: string;
++  designNode: string;
++  codeSelector: string;
++  repeat?: {designSelector: string; codeSelector: string};
++}
++export interface CapturedLayoutRegion {
++  id: string;
++  root: string | null;
++  items?: string[];
++}
++export async function captureLayoutRegions(page:Page,side:'design'|'code',regions:LayoutRegionLink[]):Promise<CapturedLayoutRegion[]> {
++  if(new Set(regions.map(r=>r.id)).size!==regions.length || regions.some(r=>!r.id || !r.designNode || !r.codeSelector)) throw Error('Layout-only regions need unique ids and paired selectors');
++  return page.evaluate(({side,regions})=>{
++    const boundary=document.querySelector('#foundation-root')!;
++    const paths=new Map<Element,string>();
++    const visit=(el:Element,path:string)=>{paths.set(el,path);Array.from(el.children).forEach((child,i)=>visit(child,`${path}/${i}`));};
++    visit(boundary,'0');
++    return regions.map(region=>{
++      const selector=side==='design' ? `[data-fdn-id="${CSS.escape(region.designNode)}"]` : region.codeSelector;
++      const roots=[...(boundary.matches(selector)?[boundary]:[]),...Array.from(boundary.querySelectorAll(selector))];
++      if(roots.length>1) throw Error(`Layout-only region ${region.id} has ambiguous ${side} marker`);
++      const root=roots[0];
++      if(!root) return {id:region.id,root:null,...(region.repeat?{items:[]}: {})};
++      const items=region.repeat ? Array.from(root.querySelectorAll(side==='design'?region.repeat.designSelector:region.repeat.codeSelector)).map(el=>paths.get(el)!) : undefined;
++      if(items && items.some((path,i)=>items.some((other,j)=>i!==j && path.startsWith(other+'/')))) throw Error(`Layout-only region ${region.id} has nested repeated items`);
++      return {id:region.id,root:paths.get(root)!,...(items?{items}: {})};
++    });
++  },{side,regions});
++}
+diff --git a/packages/proof/src/capture/types.ts b/packages/proof/src/capture/types.ts
+index c43ecee..a6a0938 100644
+--- a/packages/proof/src/capture/types.ts
++++ b/packages/proof/src/capture/types.ts
+@@ -1,4 +1,6 @@
++import type {LayoutRegionLink} from "./layout-regions.js"
+ export interface StateLink {
++  layoutOnly?: {regions: LayoutRegionLink[]}
+   name: string
+   fixture: string
+   designState: string
+@@ -8,6 +10,7 @@ export interface StateLink {
+ }
+ 
+ export interface ArtboardLink {
++  layoutOnly?: {regions: LayoutRegionLink[]}
+   id: string
+   component: string
+   designNode: string
+diff --git a/packages/proof/src/compare/README.md b/packages/proof/src/compare/README.md
+index 14d0e9f..b5d0425 100644
+--- a/packages/proof/src/compare/README.md
++++ b/packages/proof/src/compare/README.md
+@@ -13,3 +13,19 @@ Both captures must provide the same 54-property list; incomplete captures are no
+ Output reports use canonical SHA256 hashes and bundle source DOM/meta/screenshots in `design-capture/` and `code-capture/` for verifier replay.
+ 
+ Pinned captures validate the actual CDP glyph inventory against hashed declared assets and matching browser/platform/source fingerprints. Source authoredFontFamily is compared for font-family drift while rendered normalized stacks are retained separately; alias normalization does not erase authored stack changes. The environment regression test covers invalid capture metadata and hidden family drift. Final dataset provenance and the historical fallback-font incident are in RESULTS.md.
++
++Layout-only mode is opt-in: `cli.ts DESIGN CODE OUT --layout-only`, or
++`compare(design, code, tolerances, {mode:'layout-only'})`. Captures must carry
++`layoutOnlyRegions`, resolved from artboard/state `layoutOnly.regions` in
++links.json. Each declaration pairs `id`, `designNode` and `codeSelector`; an
++optional `repeat` contains `designSelector` and `codeSelector`. Excess repeated
++items are ignored; loss of all items is a presence finding. Shared stable ids
++preserve semantic order, with ordinal geometry for remaining common templates.
++
++Only declared markers and common template boxes are checked. Descendant marked
++regions use a declared parent as their coordinate frame to avoid repeating a
++parent displacement. This mode does not establish full-panel equality: text,
++styles, pixels, unmarked content and excess declared repetition do not set the
++verdict. The report records coverage and ignored item counts. Missing/ambiguous
++markers are not-provable. Pixel output remains diagnostic. Full mode is the
++unchanged default.
+diff --git a/packages/proof/src/compare/cli.ts b/packages/proof/src/compare/cli.ts
+index eb15750..bed3826 100644
+--- a/packages/proof/src/compare/cli.ts
++++ b/packages/proof/src/compare/cli.ts
+@@ -2,7 +2,7 @@ import { compareDirectories } from "./index.ts";
+ const [design, code, out] = process.argv.slice(2);
+ if (!design || !code || !out)
+   throw Error("Usage: tsx packages/proof/src/compare/cli.ts DESIGN CODE OUT");
+-const r = await compareDirectories(design, code, out);
++const r = await compareDirectories(design, code, out, {}, {mode:process.argv.includes("--layout-only")?"layout-only":"full"});
+ console.log(
+   JSON.stringify({
+     verdict: r.verdict,
+diff --git a/packages/proof/src/compare/index.ts b/packages/proof/src/compare/index.ts
+index d68f2f4..2d6a32e 100644
+--- a/packages/proof/src/compare/index.ts
++++ b/packages/proof/src/compare/index.ts
+@@ -4,6 +4,7 @@ import { readFile, mkdir, writeFile } from "node:fs/promises";
+ import path from "node:path";
+ import { PNG } from "pngjs";
+ import pixelmatch from "pixelmatch";
++import {layoutOnlyEvidence} from "./layout-only.ts";
+ import { belowFoldMatches } from "./below-fold.ts";
+ import { offscreenDefects } from "./offscreen.ts";
+ import { groupDefects } from "./defects.ts";
+@@ -47,6 +48,7 @@ export function compare(
+   design: Capture,
+   code: Capture,
+   tolerances: Partial<Tolerances> = {},
++  options: {mode?: "full" | "layout-only"} = {},
+ ) {
+   const start = performance.now(),
+     t = { ...defaults, ...tolerances },
+@@ -211,7 +213,9 @@ export function compare(
+       c.meta.blocked?.length,
+   );
+   const fontIssues = pairEnvironmentIssues(design, code);
+-  const reason = failure
++  const layout=options.mode === "layout-only" ? layoutOnlyEvidence(design,code,t) : undefined;
++  if(layout) {drifts.splice(0,drifts.length,...layout.drifts); matches.splice(0,matches.length,...layout.matches);}
++  const reason = layout?.reason || (failure
+     ? String(
+         failure.meta.reason ||
+           (failure.meta.dirty || failure.meta.rendererDirty
+@@ -224,10 +228,10 @@ export function compare(
+       ? fontIssues.join("; ")
+       : unavailable.length
+         ? "Capture lacks visual properties: " + unavailable.join(", ")
+-        : null;
++        : null);
+   const meta = design.meta;
+-  const defects = groupDefects(drifts, matches, design, code);
+-  for (const defect of offscreenDefects(design, code, matches)) {
++  const defects = layout?.defects ?? groupDefects(drifts, matches, design, code);
++  for (const defect of layout ? [] : offscreenDefects(design, code, matches)) {
+     add({kind:'layout', property:'offscreen', ...(defect.layer.design ? {designNode:defect.layer.design}:{}), codeNode:defect.layer.code, confidence:1,
+       codeBox:defect.offscreen!.box, code:{...defect.offscreen, summary:defect.summary}});
+     defect.findings = [drifts.at(-1)!.id];
+@@ -238,6 +242,7 @@ export function compare(
+   }
+   const report = {
+     schema: "fdn-drift/0",
++    ...(layout ? {comparison:{mode:"layout-only",scope:"declared-regions",ignored:["text-content","style","pixels","excess-declared-repetition"],coverage:layout.coverage}} : {}),
+     artboard: meta.artboard ?? "unknown",
+     state: meta.state ?? "default",
+     viewport: meta.viewport ?? { width: a.width, height: a.height, dpr: 1 },
+@@ -274,14 +279,14 @@ export function compare(
+       ? { captureEnvironment: captureEnvironment(design.meta) }
+       : {}),
+     styles: { properties, unavailable },
+-    matching: {
++    matching: layout ? {algorithm:"declared-layout-regions",repeat:"shared-stable-id-or-ordinal-template"} : {
+       algorithm: "hungarian",
+       maxCost: 0.48,
+       weights: { text: 0.4, tag: 0.15, roleName: 0.15, iou: 0.25, path: 0.05 },
+       containerText: "descendant-Dice",
+       confidence: "1-cost; uncalibrated",
+     },
+-    offscreen: [design,code].every(c=>c.nodes.every(n=>n.visibility))
++    offscreen: layout ? {status:"declared-regions-only",reason:"Only declared geometry is checked; the independent off-screen eligibility scan is not run."} : [design,code].every(c=>c.nodes.every(n=>n.visibility))
+       ? {status:'measured'}
+       : {status:'unavailable',reason:'offscreen-unavailable: capture lacks per-node visibility facts; recapture both sides to check clipping and off-screen content'},
+     tolerances: t,
+@@ -314,7 +319,7 @@ export function compare(
+     })),
+     verdict: reason
+       ? "not-provable"
+-      : defects.length || drifts.length || count / (a.width * a.height) > t.pixelRatio
++      : defects.length || drifts.length || !layout && count / (a.width * a.height) > t.pixelRatio
+         ? "drift"
+         : "match",
+     timingsMs: { compare: performance.now() - start },
+@@ -333,12 +338,13 @@ export async function compareDirectories(
+   codeDir: string,
+   out: string,
+   tolerances: Partial<Tolerances> = {},
++  options: {mode?: "full" | "layout-only"} = {},
+ ) {
+   const [a, b] = await Promise.all([
+     readCapture(designDir),
+     readCapture(codeDir),
+   ]);
+-  const result = compare(a, b, tolerances);
++  const result = compare(a, b, tolerances, options);
+   const report = seal({
+     ...result.report,
+     inputs: {
+diff --git a/packages/proof/src/compare/layout-only.test.ts b/packages/proof/src/compare/layout-only.test.ts
+new file mode 100644
+index 0000000..a10e2c0
+--- /dev/null
++++ b/packages/proof/src/compare/layout-only.test.ts
+@@ -0,0 +1,71 @@
++import {it,expect} from 'vitest';
++import {PNG} from 'pngjs';
++import {compare} from './index.ts';
++import {properties} from './style.ts';
++import type {Capture,CaptureNode} from './types.ts';
++const image=PNG.sync.write(new PNG({width:200,height:200}));
++const n=(path:string,text='',box:CaptureNode['box']=[0,0,100,20]):CaptureNode=>({path,text,tag:'div',box,style:Object.fromEntries(properties.map(p=>[p,'0px']))});
++const cap=(nodes:CaptureNode[],items?:string[]):Capture=>({nodes,screenshot:image,meta:{layoutOnlyRegions:[{id:'region',root:'0',...(items?{items}:{})}]}});
++const run=(a:Capture,b:Capture)=>compare(a,b,{}, {mode:'layout-only'}).report;
++it('ignores text and style but reports declared box differences',()=>{
++ const a=cap([n('0','Original')]),b=cap([n('0','Different')]);
++ b.nodes[0]!.style.color='red';
++ expect(run(a,b).verdict).toBe('match');
++ b.nodes[0]!.box[2]+=10;
++ expect(run(a,b).drifts.map(d=>d.property)).toEqual(['width']);
++});
++it('does not let pixel-only changes set a layout verdict',()=>{
++ const a=cap([n('0')]),b=cap([n('0')]);const p=new PNG({width:200,height:200});p.data.fill(255);b.screenshot=PNG.sync.write(p);
++ expect(run(a,b).pixels.diffRatio).toBeGreaterThan(0);
++ expect(run(a,b).verdict).toBe('match');
++});
++it('fails visibly for absent declarations or missing markers',()=>{
++ const a=cap([n('0')]),b=cap([n('0')]);delete b.meta.layoutOnlyRegions;
++ expect(run(a,b)).toMatchObject({provable:false,verdict:'not-provable'});
++ b.meta.layoutOnlyRegions=[{id:'region',root:null}];
++ expect(run(a,b).reason).toContain('missing marker');
++});
++it('ignores excess repeated data while comparing the common template',()=>{
++ const root=n('0'),one=n('0/0','A',[0,0,100,20]),two=n('0/1','B',[0,30,100,20]);
++ const a=cap([root,one],['0/0']),b=cap([root,one,two],['0/0','0/1']);
++ expect(run(a,b).verdict).toBe('match');
++ expect(run(a,b).comparison?.coverage[0]?.ignoredCodeItems).toBe(1);
++});
++it('detects loss of every item and spacing/alignment changes',()=>{
++ const root=n('0'),one=n('0/0','A',[0,0,100,20]),two=n('0/1','B',[0,30,100,20]);
++ const a=cap([root,one,two],['0/0','0/1']),b=cap([root],[]);
++ expect(run(a,b).drifts.some(d=>d.property==='presence')).toBe(true);
++ const c=cap([root,one,{...two,box:[10,40,100,20]}],['0/0','0/1']);
++ expect(run(a,c).drifts.map(d=>d.property)).toEqual(['x','y']);
++});
++it('retains semantic order with shared stable item ids',()=>{
++ const root=n('0'),a={...n('0/0','First'),fdnId:'first'},b={...n('0/1','Second'),fdnId:'second'};
++ const left=cap([root,a,b],['0/0','0/1']),right=cap([root,{...b,path:'0/0'},{...a,path:'0/1'}],['0/0','0/1']);
++ expect(run(left,right).drifts.some(d=>d.property==='order')).toBe(true);
++});
++it('does not change the default full check',()=>{
++ const a=cap([n('0','A')]),b=cap([n('0','B')]);
++ expect(compare(a,b).report.drifts.some(d=>d.property==='text')).toBe(true);
++ expect(compare(a,b).report).not.toHaveProperty('comparison');
++});
++it('does not duplicate a parent displacement in a declared child',()=>{
++ const a=cap([n('0'),n('0/0','child',[10,5,20,10])]),b=cap([n('0','',[20,0,100,20]),n('0/0','new',[30,5,20,10])]);
++ a.meta.layoutOnlyRegions.push({id:'child',root:'0/0'});b.meta.layoutOnlyRegions.push({id:'child',root:'0/0'});
++ const r=run(a,b);
++ expect(r.drifts).toHaveLength(1);expect(r.drifts[0]?.designNode).toBe('0');
++});
++it('compares all common template items when stable ids overlap only partially',()=>{
++ const root=n('0'),one={...n('0/0','A'),fdnId:'shared'},two=n('0/1','B');
++ const a=cap([root,one,two],['0/0','0/1']),b=cap([root,one,{...two,box:[0,0,130,20]}],['0/0','0/1']);
++ expect(run(a,b).drifts.map(d=>d.property)).toEqual(['width']);
++});
++it('groups equal repeated-item geometry vectors without swallowing independent item changes',()=>{
++ const root=n('0','',[0,0,100,100]);
++ const a=cap([root,n('0/0','A',[0,0,100,20]),n('0/1','B',[0,30,100,20]),n('0/2','C',[0,60,100,20])],['0/0','0/1','0/2']);
++ const b=cap([root,n('0/0','Other',[5,0,100,20]),n('0/1','Data',[5,30,100,20]),n('0/2','Values',[0,60,130,20])],['0/0','0/1','0/2']);
++ const r=run(a,b);
++ expect(r.defects.filter(d=>d.cause==='layout:repeated-template')).toHaveLength(1);
++ expect(r.defects.filter(d=>d.cause==='layout:geometry')).toHaveLength(1);
++ expect(r.drifts).toHaveLength(3);
++ expect(r.defects.flatMap(d=>d.findings).sort()).toEqual(r.drifts.map(d=>d.id).sort());
++});
+diff --git a/packages/proof/src/compare/layout-only.ts b/packages/proof/src/compare/layout-only.ts
+new file mode 100644
+index 0000000..2aea8fc
+--- /dev/null
++++ b/packages/proof/src/compare/layout-only.ts
+@@ -0,0 +1,72 @@
++import type {CapturedLayoutRegion} from '../capture/layout-regions.ts';
++import type {Capture,CaptureNode,Defect,Drift,Match,Tolerances} from './types.ts';
++import {hash} from './canonical.ts';
++
++export function layoutOnlyEvidence(design:Capture,code:Capture,t:Tolerances) {
++ const drifts:Drift[]=[],defects:Defect[]=[],matches:Match[]=[];
++ const templates:{region:string;root:{design:string;code:string};unit:{design:string;code:string};findings:string[];signature:string}[]=[];
++ const coverage:{id:string;design:string|null;code:string|null;comparedItems:number;ignoredDesignItems:number;ignoredCodeItems:number}[]=[];
++ const dm=design.meta.layoutOnlyRegions as CapturedLayoutRegion[]|undefined,cm=code.meta.layoutOnlyRegions as CapturedLayoutRegion[]|undefined;
++ const fail=(reason:string)=>({drifts,defects,matches,coverage,reason:`layout-only not-provable: ${reason}`});
++ if(!Array.isArray(dm) || !Array.isArray(cm) || !dm.length || !cm.length) return fail('capture lacks declared regions');
++ if([...dm,...cm].some(r=>!r || typeof r.id!=='string' || (r.root!==null && typeof r.root!=='string') || r.items!==undefined && (!Array.isArray(r.items) || r.items.some(p=>typeof p!=='string')))) return fail('invalid region facts');
++ if(new Set(dm.map(r=>r.id)).size!==dm.length || new Set(cm.map(r=>r.id)).size!==cm.length || dm.length!==cm.length || dm.some(a=>!cm.some(b=>a.id===b.id))) return fail('region declarations differ');
++ const dp=new Map(design.nodes.map(n=>[n.path,n])),cp=new Map(code.nodes.map(n=>[n.path,n]));
++ const id=(n:CaptureNode)=>n.fdnId || n.path;
++ const add=(region:string,a:CaptureNode,b:CaptureNode,property:string,av:unknown,bv:unknown)=>{
++  const d:Drift={id:`d${drifts.length+1}`,kind:'layout',property,designNode:id(a),codeNode:id(b),design:av,code:bv,designBox:a.box,codeBox:b.box,confidence:1};
++  drifts.push(d);
++  const cause=property==='order'?'layout:order':'layout:geometry';
++  let group=defects.find(g=>g.cause===cause && g.layer.design===id(a) && g.layer.code===id(b));
++  if(!group) {group={id:'def-'+hash({region,layer:{design:id(a),code:id(b)},cause}).slice(0,20),kind:'layout',classification:'product',cause,layer:{design:id(a),code:id(b)},findings:[],summary:`${cause} differs in ${region}`};defects.push(group);}
++  group.findings.push(d.id);
++ };
++ const boxes=(region:string,a:CaptureNode,b:CaptureNode,ar?:CaptureNode,br?:CaptureNode)=>{
++  matches.push({design:a,code:b,kind:'heuristic',confidence:1});
++  a.box.forEach((value,i)=>{
++   const av=value-(ar && i<2?ar.box[i]!:0),bv=b.box[i]!-(br && i<2?br.box[i]!:0);
++   if(Math.abs(av-bv)>t.boxPx) add(region,a,b,['x','y','width','height'][i]!,av,bv);
++  });
++ };
++ for(const a of dm) {
++  const b=cm.find(r=>r.id===a.id)!;
++  const ar=a.root?dp.get(a.root):undefined,br=b.root?cp.get(b.root):undefined;
++  if(!ar || !br) return fail(`missing marker for ${a.id}`);
++  if(Boolean(a.items)!==Boolean(b.items)) return fail(`repeat declaration differs for ${a.id}`);
++  const left=(a.items??[]).map(p=>dp.get(p)),right=(b.items??[]).map(p=>cp.get(p));
++  if(left.some(n=>!n) || right.some(n=>!n)) return fail(`missing repeated item facts for ${a.id}`);
++  const parent=dm.filter(p=>p!==a && p.root && ar.path.startsWith(p.root+'/')).map(p=>({a:p,b:cm.find(q=>q.id===p.id)}))
++    .filter(p=>p.b?.root && br.path.startsWith(p.b.root+'/')).sort((x,y)=>y.a.root!.length-x.a.root!.length)[0];
++  boxes(a.id,ar,br,parent?dp.get(parent.a.root!):undefined,parent?cp.get(parent.b!.root!):undefined);
++  const count=Math.min(left.length,right.length);
++  coverage.push({id:a.id,design:a.root,code:b.root,comparedItems:count,ignoredDesignItems:left.length-count,ignoredCodeItems:right.length-count});
++  if(a.items && Boolean(left.length)!==Boolean(right.length)) add(a.id,ar,br,'presence',left.length>0,right.length>0);
++  const unique=(nodes:(CaptureNode|undefined)[],n:CaptureNode)=>!!n.fdnId && nodes.filter(x=>x?.fdnId===n.fdnId).length===1;
++  const keyed=left.filter((n):n is CaptureNode=>!!n && unique(left,n) && right.some(x=>!!x && x.fdnId===n.fdnId && unique(right,x)));
++  // Shared stable item ids retain semantic order; otherwise compare ordinal
++  // template geometry, explicitly ignoring surplus data-dependent rows.
++  if(keyed.length) {
++   const sequence=keyed.map(n=>right.findIndex(x=>x?.fdnId===n.fdnId));
++   if(sequence.some((v,i)=>i>0 && v<sequence[i-1]!)) add(a.id,ar,br,'order',keyed.map(id),sequence);
++  }
++  const pairs=keyed.map(n=>({a:n,b:right.find(x=>x?.fdnId===n.fdnId)!}));
++  const restA=left.filter(n=>!pairs.some(p=>p.a===n)),restB=right.filter(n=>!pairs.some(p=>p.b===n));
++  for(let i=0;i<Math.min(restA.length,restB.length);i++) pairs.push({a:restA[i]!,b:restB[i]!});
++  for(const pair of pairs) {
++   const start=drifts.length;boxes(a.id,pair.a,pair.b,ar,br);
++   const changes=drifts.slice(start);
++   if(changes.length) templates.push({region:a.id,root:{design:id(ar),code:id(br)},unit:{design:id(pair.a),code:id(pair.b)},findings:changes.map(d=>d.id),signature:changes.map(d=>`${d.property}:${Math.round((Number(d.code)-Number(d.design))/.05)}`).join('|')});
++  }
++ }
++ // Equal displacement/size vectors across multiple repeated items are one
++ // template-geometry hypothesis. Distinct vectors remain independent causes;
++ // every raw item measurement is retained and styles never enter this group.
++ const buckets=new Map<string,typeof templates>();
++ for(const item of templates) {const key=item.region+":"+item.signature;buckets.set(key,[...(buckets.get(key)??[]),item]);}
++ for(const [key,items] of buckets) if(items.length>=2) {
++  const findings=items.flatMap(i=>i.findings),set=new Set(findings);
++  for(let i=defects.length-1;i>=0;i--) if(defects[i]!.cause==='layout:geometry' && defects[i]!.findings.every(f=>set.has(f))) defects.splice(i,1);
++  defects.push({id:'def-'+hash({template:key,layer:items[0]!.root}).slice(0,20),kind:'layout',cause:'layout:repeated-template',classification:'product',layer:items[0]!.root,findings,summary:`Repeated template geometry differs in ${items[0]!.region}`});
++ }
++ return {drifts,defects,matches,coverage,reason:null};
++}
+diff --git a/packages/proof/src/compare/round5-measure.ts b/packages/proof/src/compare/round5-measure.ts
+new file mode 100644
+index 0000000..9903959
+--- /dev/null
++++ b/packages/proof/src/compare/round5-measure.ts
+@@ -0,0 +1,26 @@
++/** Label-free replay and report generation; never discovers any label files. */
++import {mkdir,readdir,writeFile} from 'node:fs/promises';
++import {join,relative} from 'node:path';
++import {compare,readCapture} from './index.ts';
++import {canonical,hash} from './canonical.ts';
++const [root,out]=process.argv.slice(2);
++if(!root || !out) throw Error('Usage: round5-measure.ts CAPTURES OUT');
++await mkdir(out,{recursive:true});
++async function pairs(path:string):Promise<string[]> {
++ const entries=await readdir(path,{withFileTypes:true});
++ if(entries.some(e=>e.name==='design') && entries.some(e=>e.name==='code')) return [path];
++ return (await Promise.all(entries.filter(e=>e.isDirectory()).map(e=>pairs(join(path,e.name))))).flat();
++}
++const rows=[];
++for(const pair of await pairs(root)) {
++ const a=await readCapture(pair+'/design'),b=await readCapture(pair+'/code'),name=relative(root,pair).replaceAll('/','-');
++ for(const mode of ['full','layout-only'] as const) {
++  const first=compare(a,b,{}, {mode}),second=compare(a,b,{}, {mode});
++  const normal=(report:typeof first.report)=>{const {timingsMs,reportHash,...body}=report;return canonical(body);};
++  if(normal(first.report)!==normal(second.report) || !first.diff.equals(second.diff)) throw Error(`Non-deterministic ${mode} replay at ${name}`);
++  await writeFile(`${out}/${name}-${mode}.json`,JSON.stringify(first.report,null,2)+'\n');
++  rows.push({case:name,mode,provable:first.report.provable,reason:first.report.reason??null,summary:first.report.summary,coverage:first.report.comparison?.coverage??null,replayHash:hash(JSON.parse(normal(first.report))),replayEqual:true,diffEqual:true});
++ }
++}
++await writeFile(out+'/summary.json',JSON.stringify(rows,null,2)+'\n');
++console.log(JSON.stringify(rows.map(r=>({case:r.case,mode:r.mode,provable:r.provable,candidates:r.summary.uniqueDefects})),null,2));
+diff --git a/packages/proof/src/compare/round5-score.ts b/packages/proof/src/compare/round5-score.ts
+new file mode 100644
+index 0000000..458518f
+--- /dev/null
++++ b/packages/proof/src/compare/round5-score.ts
+@@ -0,0 +1,34 @@
++/** One post-freeze scoring run for B1. The manifest supplies released labels. */
++import {access,mkdir,readFile,writeFile} from 'node:fs/promises';
++import {execFileSync} from 'node:child_process';
++import {createHash} from 'node:crypto';
++import {compare,readCapture} from './index.ts';
++import {csv,defectMetrics} from './ground-truth.ts';
++const [manifestPath,out]=process.argv.slice(2);
++if(!manifestPath || !out) throw Error('Usage: round5-score.ts MANIFEST OUT');
++const manifest:{frozenRules:string;cases:{name:string;pair:string;labels:string}[]}=JSON.parse(await readFile(manifestPath,'utf8'));
++if(!/^[a-f0-9]{40}$/.test(manifest.frozenRules)) throw Error('Manifest must identify the frozen rules commit');
++const delta=execFileSync('git',['diff',manifest.frozenRules,'--','packages/proof/src/compare','packages/proof/src/capture'],{encoding:'utf8'});
++if(delta) throw Error('Checker or capture source differs from frozen rules');
++try {await access(out+'/attempt.json');throw Error('A score attempt already exists; labels must not be used for retuning');}
++catch(e) {if((e as NodeJS.ErrnoException).code!=='ENOENT') throw e;}
++await mkdir(out,{recursive:true});
++await writeFile(out+'/attempt.json',JSON.stringify({frozenRules:manifest.frozenRules,head:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),sourceDiffBytes:0,at:new Date().toISOString()},null,2)+'\n');
++const results=[];
++for(const entry of manifest.cases) {
++ const a=await readCapture(entry.pair+'/design'),b=await readCapture(entry.pair+'/code');
++ const labelText=await readFile(entry.labels,'utf8'),labels=csv(labelText);
++ const modes=[];
++ for(const mode of ['full','layout-only'] as const) {
++  const report=compare(a,b,{}, {mode}).report;
++  const truth=mode==='layout-only'?labels.filter(l=>l.kind==='layout'):labels;
++  const result={mode,provable:report.provable,
++    strict:report.provable?defectMetrics(report.defects,report.drifts,truth,a.nodes,b.nodes,{strictScope:true}):null,
++    optimistic:report.provable?defectMetrics(report.defects,report.drifts,truth,a.nodes,b.nodes):null,
++    ...(report.provable?{}:{reason:report.reason})};
++  await writeFile(`${out}/${entry.name}-${mode}.json`,JSON.stringify({result,report},null,2)+'\n');modes.push(result);
++ }
++ results.push({case:entry.name,labelSha256:createHash('sha256').update(labelText).digest('hex'),modes});
++}
++await writeFile(out+'/summary.json',JSON.stringify(results,null,2)+'\n');
++console.log(JSON.stringify(results.map(r=>({case:r.case,modes:r.modes.map(m=>({mode:m.mode,provable:m.provable,strict:m.strict?{tp:m.strict.tp,fp:m.strict.fp,fn:m.strict.fn,precision:m.strict.precision,recall:m.strict.recall}:null,optimistic:m.optimistic?{tp:m.optimistic.tp,fp:m.optimistic.fp,fn:m.optimistic.fn,precision:m.optimistic.precision,recall:m.optimistic.recall}:null}))})),null,2));

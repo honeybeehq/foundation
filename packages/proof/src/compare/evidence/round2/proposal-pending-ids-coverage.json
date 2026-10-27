@@ -1,0 +1,415 @@
+{
+  "state": "proposal-pending",
+  "mode": "ids",
+  "product": 24,
+  "uncertain": 18,
+  "oneToOneSupport": 11,
+  "productPrecision": 0.4583333333333333,
+  "productRecall": 0.3142857142857143,
+  "inclusivePrecision": 0.2619047619047619,
+  "productLabelCoverage": 18,
+  "allLabelCoverage": 23,
+  "onlyUncertainLabels": [
+    "P-08",
+    "P-09",
+    "P-10",
+    "P-25",
+    "P-11"
+  ],
+  "compositeProductCandidates": 3,
+  "broadLabelsExcluded": [
+    "P-18",
+    "P-25"
+  ],
+  "narrowScopeSupport": 10,
+  "narrowScopePrecision": 0.4166666666666667,
+  "narrowScopeRecall": 0.30303030303030304,
+  "coverage": [
+    {
+      "id": "def-426ef28617f9ccf35dec",
+      "classification": "product",
+      "cause": "style:surface",
+      "findings": 6,
+      "labels": [
+        "P-18"
+      ]
+    },
+    {
+      "id": "def-8ab0502364aa3c58d851",
+      "classification": "product",
+      "cause": "layout:configuration",
+      "findings": 5,
+      "labels": []
+    },
+    {
+      "id": "def-02bc2841d90590bf8783",
+      "classification": "product",
+      "cause": "layout:configuration",
+      "findings": 8,
+      "labels": []
+    },
+    {
+      "id": "def-fc93d28ce5a31e08e047",
+      "classification": "product",
+      "cause": "layout:configuration",
+      "findings": 4,
+      "labels": [
+        "P-07"
+      ]
+    },
+    {
+      "id": "def-b0cf38940b96243d850e",
+      "classification": "product",
+      "cause": "style:surface",
+      "findings": 1,
+      "labels": [
+        "P-18"
+      ]
+    },
+    {
+      "id": "def-7a4c896fedec867d7851",
+      "classification": "product",
+      "cause": "layout:configuration",
+      "findings": 3,
+      "labels": []
+    },
+    {
+      "id": "def-642777e8fd16d58de35b",
+      "classification": "product",
+      "cause": "layout:configuration",
+      "findings": 5,
+      "labels": [
+        "P-16"
+      ]
+    },
+    {
+      "id": "def-0256a2567505b63b5d15",
+      "classification": "product",
+      "cause": "layout:configuration",
+      "findings": 8,
+      "labels": [
+        "P-16"
+      ]
+    },
+    {
+      "id": "def-01f8533ecb45dc78ec31",
+      "classification": "product",
+      "cause": "style:white-space",
+      "findings": 1,
+      "labels": []
+    },
+    {
+      "id": "def-56542cb91d5564c1dc7d",
+      "classification": "uncertain",
+      "cause": "layout:region-structure",
+      "findings": 44,
+      "labels": [
+        "P-07",
+        "P-08",
+        "P-09",
+        "P-10",
+        "P-18",
+        "P-25"
+      ]
+    },
+    {
+      "id": "def-d98ba71a966314689d41",
+      "classification": "uncertain",
+      "cause": "layout:region-structure",
+      "findings": 33,
+      "labels": [
+        "P-07",
+        "P-08",
+        "P-09",
+        "P-25"
+      ]
+    },
+    {
+      "id": "def-648d4945e050702cd0c5",
+      "classification": "uncertain",
+      "cause": "layout:region-structure",
+      "findings": 33,
+      "labels": [
+        "P-07",
+        "P-08",
+        "P-09",
+        "P-25"
+      ]
+    },
+    {
+      "id": "def-9a5074bade34564f0d82",
+      "classification": "uncertain",
+      "cause": "layout:region-structure",
+      "findings": 33,
+      "labels": [
+        "P-07",
+        "P-08",
+        "P-09",
+        "P-25"
+      ]
+    },
+    {
+      "id": "def-bd0267003e3639292d8d",
+      "classification": "uncertain",
+      "cause": "layout:region-structure",
+      "findings": 37,
+      "labels": [
+        "P-07",
+        "P-08",
+        "P-09",
+        "P-25"
+      ]
+    },
+    {
+      "id": "def-ab9e67737758de23c5c9",
+      "classification": "uncertain",
+      "cause": "layout:region-structure",
+      "findings": 31,
+      "labels": [
+        "P-07",
+        "P-08",
+        "P-09",
+        "P-11",
+        "P-25"
+      ]
+    },
+    {
+      "id": "def-23957e3ffadd0515c272",
+      "classification": "uncertain",
+      "cause": "layout:region-structure",
+      "findings": 31,
+      "labels": [
+        "P-07",
+        "P-08",
+        "P-09",
+        "P-11",
+        "P-25"
+      ]
+    },
+    {
+      "id": "def-7c6a03f624ef75c99b9c",
+      "classification": "uncertain",
+      "cause": "layout:x",
+      "findings": 1,
+      "labels": [
+        "P-01"
+      ]
+    },
+    {
+      "id": "def-dce9e8e9547ad021158c",
+      "classification": "uncertain",
+      "cause": "layout:y",
+      "findings": 1,
+      "labels": [
+        "P-01"
+      ]
+    },
+    {
+      "id": "def-72d631b035024a16ebfd",
+      "classification": "uncertain",
+      "cause": "layout:width",
+      "findings": 1,
+      "labels": [
+        "P-01"
+      ]
+    },
+    {
+      "id": "def-6d7d5e64247f3887ea8b",
+      "classification": "uncertain",
+      "cause": "layout:height",
+      "findings": 1,
+      "labels": [
+        "P-01"
+      ]
+    },
+    {
+      "id": "def-15b6825359e09abf2791",
+      "classification": "uncertain",
+      "cause": "style:background-image",
+      "findings": 1,
+      "labels": [
+        "P-17"
+      ]
+    },
+    {
+      "id": "def-2636c7635938e406113c",
+      "classification": "uncertain",
+      "cause": "style:display",
+      "findings": 1,
+      "labels": []
+    },
+    {
+      "id": "def-5141112f833c8b7b2bb8",
+      "classification": "uncertain",
+      "cause": "style:position",
+      "findings": 1,
+      "labels": []
+    },
+    {
+      "id": "def-c41cefa2b317ae9b9e01",
+      "classification": "uncertain",
+      "cause": "style:box-sizing",
+      "findings": 1,
+      "labels": []
+    },
+    {
+      "id": "def-4f70d7a3d88195104fbe",
+      "classification": "uncertain",
+      "cause": "style:overflow-x",
+      "findings": 1,
+      "labels": []
+    },
+    {
+      "id": "def-95166e7e8b1db4dadcbb",
+      "classification": "uncertain",
+      "cause": "style:overflow-y",
+      "findings": 1,
+      "labels": []
+    },
+    {
+      "id": "def-2efba8ea998ea76fb511",
+      "classification": "uncertain",
+      "cause": "style:flex-grow",
+      "findings": 1,
+      "labels": []
+    },
+    {
+      "id": "def-6aa4be00c26c29edcc2e",
+      "classification": "product",
+      "cause": "layout:region-structure",
+      "findings": 319,
+      "labels": [
+        "P-01",
+        "P-03",
+        "P-17",
+        "P-18",
+        "P-22",
+        "P-23",
+        "P-27",
+        "P-34",
+        "P-36"
+      ]
+    },
+    {
+      "id": "def-1602eaa13058a9926a44",
+      "classification": "product",
+      "cause": "missing:subtree",
+      "findings": 4,
+      "labels": []
+    },
+    {
+      "id": "def-44a5d8f7a036426785eb",
+      "classification": "product",
+      "cause": "missing:subtree",
+      "findings": 10,
+      "labels": [
+        "P-06"
+      ]
+    },
+    {
+      "id": "def-eb58e07dcd15d9b060d7",
+      "classification": "product",
+      "cause": "missing:subtree",
+      "findings": 1,
+      "labels": [
+        "P-13"
+      ]
+    },
+    {
+      "id": "def-f6f50ac87909dac93604",
+      "classification": "product",
+      "cause": "missing:subtree",
+      "findings": 1,
+      "labels": [
+        "P-13"
+      ]
+    },
+    {
+      "id": "def-cbdf44ab3f5f8279e4cc",
+      "classification": "product",
+      "cause": "missing:subtree",
+      "findings": 1,
+      "labels": [
+        "P-13"
+      ]
+    },
+    {
+      "id": "def-49a933eff26a7901ab2f",
+      "classification": "product",
+      "cause": "missing:subtree",
+      "findings": 8,
+      "labels": [
+        "P-14"
+      ]
+    },
+    {
+      "id": "def-1adbd7afd6d858ad4c0e",
+      "classification": "product",
+      "cause": "missing:subtree",
+      "findings": 86,
+      "labels": [
+        "P-02",
+        "P-27",
+        "P-31"
+      ]
+    },
+    {
+      "id": "def-4203e4fd0a7bc48db425",
+      "classification": "product",
+      "cause": "missing:subtree",
+      "findings": 6,
+      "labels": []
+    },
+    {
+      "id": "def-4aaa87ac3013a95ad50d",
+      "classification": "product",
+      "cause": "extra:subtree",
+      "findings": 5,
+      "labels": []
+    },
+    {
+      "id": "def-c94b9be861d25e1fbb28",
+      "classification": "product",
+      "cause": "extra:subtree",
+      "findings": 2,
+      "labels": [
+        "P-13",
+        "P-31"
+      ]
+    },
+    {
+      "id": "def-b054a40bf7a75a449827",
+      "classification": "product",
+      "cause": "extra:subtree",
+      "findings": 3,
+      "labels": [
+        "P-15"
+      ]
+    },
+    {
+      "id": "def-a0d240154f3ce3b7be3f",
+      "classification": "product",
+      "cause": "extra:subtree",
+      "findings": 1,
+      "labels": [
+        "P-14"
+      ]
+    },
+    {
+      "id": "def-476294cf78aac0664130",
+      "classification": "product",
+      "cause": "extra:subtree",
+      "findings": 2,
+      "labels": []
+    },
+    {
+      "id": "def-df819624850fdeefaca7",
+      "classification": "product",
+      "cause": "extra:subtree",
+      "findings": 4,
+      "labels": [
+        "P-19"
+      ]
+    }
+  ]
+}

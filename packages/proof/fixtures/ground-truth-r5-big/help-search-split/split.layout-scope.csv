@@ -1,0 +1,13 @@
+id,in_layout_check,why
+SS-01,yes,presence: extra sidebar; geometry: narrower content
+SS-02,yes,order of results
+SS-03,no,opacity only
+SS-04,yes,position of the count
+SS-05,yes,presence: missing clear button
+SS-06,yes,presence: missing hint
+SS-07,yes,presence: missing footer hints
+SS-08,yes,presence: extra separator glyphs
+SS-09,yes,geometry: heights
+SS-10,no,colour
+SS-11,no,colour token
+SS-12,no,environment

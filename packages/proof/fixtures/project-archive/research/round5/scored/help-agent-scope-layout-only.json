@@ -1,0 +1,2824 @@
+{
+  "result": {
+    "mode": "layout-only",
+    "provable": true,
+    "strict": {
+      "tp": 3,
+      "fp": 8,
+      "fn": 6,
+      "precision": 0.2727272727272727,
+      "recall": 0.3333333333333333,
+      "predicted": 11,
+      "labelled": 9,
+      "agreement": [
+        {
+          "defect": "def-c042d7ef28b9e5015a0a",
+          "label": "HC-07",
+          "description": "Bordered boxes are smaller in code because the design adds borders outside the authored size and code includes them: key caps 18px vs 21px tall (label 1.5px higher), search field 34px vs 36px, footer 34px vs 35px, card 1060×716 vs 1062×718"
+        },
+        {
+          "defect": "def-f25b25bc4b9f75154c71",
+          "label": "HC-01",
+          "description": "Guide sidebar is 216px wide in code vs 253px in design, so the search field, the list, the esc cap and the anchor rail all start about 37px further left"
+        },
+        {
+          "defect": "def-a0ac5c0d3a182f9b6082",
+          "label": "HC-16",
+          "description": "Anchor rail is 128px wide vs 163px and its items are spaced 22.7px apart vs 21px"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-50990757b7f96cf0f388",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n47",
+            "code": "0/0/1"
+          },
+          "findings": [
+            "d5",
+            "d6",
+            "d7"
+          ],
+          "summary": "layout:geometry differs in content"
+        },
+        {
+          "id": "def-4ed53f54824947e92094",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n48",
+            "code": "0/0/1/0"
+          },
+          "findings": [
+            "d8",
+            "d9"
+          ],
+          "summary": "layout:geometry differs in search"
+        },
+        {
+          "id": "def-6b85729587768c763821",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n52",
+            "code": "0/0/1/0/1"
+          },
+          "findings": [
+            "d10",
+            "d11",
+            "d12",
+            "d13"
+          ],
+          "summary": "layout:geometry differs in count"
+        },
+        {
+          "id": "def-d924c1f3f0f44dd49ada",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n54",
+            "code": "0/0/1/1/0"
+          },
+          "findings": [
+            "d14",
+            "d15"
+          ],
+          "summary": "layout:geometry differs in catalog"
+        },
+        {
+          "id": "def-70f968928d82dcc8e91d",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n76",
+            "code": "0/0/1/2"
+          },
+          "findings": [
+            "d71"
+          ],
+          "summary": "layout:geometry differs in footer"
+        },
+        {
+          "id": "def-535ff63a73407d71cf57",
+          "kind": "layout",
+          "cause": "layout:repeated-template",
+          "classification": "product",
+          "layer": {
+            "design": "n54",
+            "code": "0/0/1/1/0"
+          },
+          "findings": [
+            "d16",
+            "d17",
+            "d18",
+            "d19",
+            "d20",
+            "d21",
+            "d22",
+            "d23",
+            "d24",
+            "d25",
+            "d26",
+            "d27",
+            "d28",
+            "d29",
+            "d30",
+            "d31",
+            "d32",
+            "d33",
+            "d34",
+            "d35",
+            "d36",
+            "d37",
+            "d38",
+            "d39"
+          ],
+          "summary": "Repeated template geometry differs in catalog"
+        },
+        {
+          "id": "def-8be3082dc0781cfd2647",
+          "kind": "layout",
+          "cause": "layout:repeated-template",
+          "classification": "product",
+          "layer": {
+            "design": "n54",
+            "code": "0/0/1/1/0"
+          },
+          "findings": [
+            "d40",
+            "d41",
+            "d42",
+            "d43",
+            "d44",
+            "d45",
+            "d46",
+            "d47",
+            "d48",
+            "d49",
+            "d50",
+            "d51",
+            "d52",
+            "d53",
+            "d54",
+            "d55",
+            "d56",
+            "d57",
+            "d58",
+            "d59",
+            "d60",
+            "d61"
+          ],
+          "summary": "Repeated template geometry differs in catalog"
+        },
+        {
+          "id": "def-a7a9ad93557d01811ed8",
+          "kind": "layout",
+          "cause": "layout:repeated-template",
+          "classification": "product",
+          "layer": {
+            "design": "n54",
+            "code": "0/0/1/1/0"
+          },
+          "findings": [
+            "d62",
+            "d63",
+            "d64",
+            "d65",
+            "d66",
+            "d67"
+          ],
+          "summary": "Repeated template geometry differs in catalog"
+        }
+      ],
+      "falseNegatives": [
+        {
+          "id": "HC-02",
+          "design_layer": "0/0/0/0/12/0;0/0/0/0/13/0",
+          "code_layer": "0/0/0/11;0/0/0/12",
+          "kind": "layout",
+          "description": "\"What's new\" and \"About Apiary\" are pinned to the bottom of the sidebar in design; in code they flow straight after Message delivery, at the top half of the sidebar",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[sidebar-footer-pinned]",
+          "properties": "position;top;layout",
+          "original_kind": "layout",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "HC-04",
+          "design_layer": "0/0/0/0/1/0;0/0/0/0/7/0;0/0/0/0/*/0",
+          "code_layer": "0/0/0/1;0/0/0/7;0/0/0/*",
+          "kind": "layout",
+          "description": "Sidebar group labels and topics sit about 6px higher (GUIDE text y≈59 vs 66, Getting started y≈86 vs 92); the group label blocks are spaced differently",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[nav-spacing]",
+          "properties": "padding;margin;top",
+          "original_kind": "layout",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "HC-05",
+          "design_layer": "0/0/1/1/0/0/0/0/0",
+          "code_layer": "0/0/1/1/0/0/0/0;0/0/1/1/0/0/0/1",
+          "kind": "layout",
+          "description": "Section header reads \"THIS PANE\" followed by a grey \"THIS PANE\" pill (the same words twice) instead of \"THIS PANE · AGENT RUN\"; the pane name \"Agent run\" is not shown",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[this-pane-header] code header = section name + this-pane tag; with this data the section name is also This pane",
+          "properties": "text;background-color;layout",
+          "original_kind": "text",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "HC-06",
+          "design_layer": "0/0/1/1/0/0/1",
+          "code_layer": "none",
+          "kind": "layout",
+          "description": "The this-pane rows sit in a bordered rounded card (1px #ECEAE5, 8px radius) in design; code has no card, so the rows are flush with the GLOBAL list",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[this-pane-card]",
+          "properties": "border;border-radius;subtree",
+          "original_kind": "missing",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "HC-08",
+          "design_layer": "0/0/1/1/0/*/0/2;0/0/1/1/0/0/1/*/0/2",
+          "code_layer": "0/0/1/1/0/*/*/0/1",
+          "kind": "layout",
+          "description": "When a command has several key groups, code puts a faint \"·\" between the caps (⌥D · ⌥B · ⌥T · ⌥S, e · ⌘⇧E); design spaces the caps 3px apart",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[key-sep]",
+          "properties": "text;layout",
+          "original_kind": "style",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "HC-14",
+          "design_layer": "0/0/1/2/0;0/0/1/2/1;0/0/1/2/2;0/0/1/2/3;0/0/1/2/4;0/0/1/2/5;0/0/1/2/7;0/0/1/2/8",
+          "code_layer": "none",
+          "kind": "layout",
+          "description": "Footer hints \"type to search · ↑↓ move · ↵ run command · esc close\" and their separators are missing; only \"click keys to rebind\" and \"live from the command registry\" remain",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[footer-hints] footer copy is hard-coded in the app",
+          "properties": "subtree",
+          "original_kind": "missing",
+          "in_layout_check": "yes"
+        }
+      ]
+    },
+    "optimistic": {
+      "tp": 3,
+      "fp": 8,
+      "fn": 6,
+      "precision": 0.2727272727272727,
+      "recall": 0.3333333333333333,
+      "predicted": 11,
+      "labelled": 9,
+      "agreement": [
+        {
+          "defect": "def-c042d7ef28b9e5015a0a",
+          "label": "HC-07",
+          "description": "Bordered boxes are smaller in code because the design adds borders outside the authored size and code includes them: key caps 18px vs 21px tall (label 1.5px higher), search field 34px vs 36px, footer 34px vs 35px, card 1060×716 vs 1062×718"
+        },
+        {
+          "defect": "def-f25b25bc4b9f75154c71",
+          "label": "HC-01",
+          "description": "Guide sidebar is 216px wide in code vs 253px in design, so the search field, the list, the esc cap and the anchor rail all start about 37px further left"
+        },
+        {
+          "defect": "def-a0ac5c0d3a182f9b6082",
+          "label": "HC-16",
+          "description": "Anchor rail is 128px wide vs 163px and its items are spaced 22.7px apart vs 21px"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-50990757b7f96cf0f388",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n47",
+            "code": "0/0/1"
+          },
+          "findings": [
+            "d5",
+            "d6",
+            "d7"
+          ],
+          "summary": "layout:geometry differs in content"
+        },
+        {
+          "id": "def-4ed53f54824947e92094",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n48",
+            "code": "0/0/1/0"
+          },
+          "findings": [
+            "d8",
+            "d9"
+          ],
+          "summary": "layout:geometry differs in search"
+        },
+        {
+          "id": "def-6b85729587768c763821",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n52",
+            "code": "0/0/1/0/1"
+          },
+          "findings": [
+            "d10",
+            "d11",
+            "d12",
+            "d13"
+          ],
+          "summary": "layout:geometry differs in count"
+        },
+        {
+          "id": "def-d924c1f3f0f44dd49ada",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n54",
+            "code": "0/0/1/1/0"
+          },
+          "findings": [
+            "d14",
+            "d15"
+          ],
+          "summary": "layout:geometry differs in catalog"
+        },
+        {
+          "id": "def-70f968928d82dcc8e91d",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n76",
+            "code": "0/0/1/2"
+          },
+          "findings": [
+            "d71"
+          ],
+          "summary": "layout:geometry differs in footer"
+        },
+        {
+          "id": "def-535ff63a73407d71cf57",
+          "kind": "layout",
+          "cause": "layout:repeated-template",
+          "classification": "product",
+          "layer": {
+            "design": "n54",
+            "code": "0/0/1/1/0"
+          },
+          "findings": [
+            "d16",
+            "d17",
+            "d18",
+            "d19",
+            "d20",
+            "d21",
+            "d22",
+            "d23",
+            "d24",
+            "d25",
+            "d26",
+            "d27",
+            "d28",
+            "d29",
+            "d30",
+            "d31",
+            "d32",
+            "d33",
+            "d34",
+            "d35",
+            "d36",
+            "d37",
+            "d38",
+            "d39"
+          ],
+          "summary": "Repeated template geometry differs in catalog"
+        },
+        {
+          "id": "def-8be3082dc0781cfd2647",
+          "kind": "layout",
+          "cause": "layout:repeated-template",
+          "classification": "product",
+          "layer": {
+            "design": "n54",
+            "code": "0/0/1/1/0"
+          },
+          "findings": [
+            "d40",
+            "d41",
+            "d42",
+            "d43",
+            "d44",
+            "d45",
+            "d46",
+            "d47",
+            "d48",
+            "d49",
+            "d50",
+            "d51",
+            "d52",
+            "d53",
+            "d54",
+            "d55",
+            "d56",
+            "d57",
+            "d58",
+            "d59",
+            "d60",
+            "d61"
+          ],
+          "summary": "Repeated template geometry differs in catalog"
+        },
+        {
+          "id": "def-a7a9ad93557d01811ed8",
+          "kind": "layout",
+          "cause": "layout:repeated-template",
+          "classification": "product",
+          "layer": {
+            "design": "n54",
+            "code": "0/0/1/1/0"
+          },
+          "findings": [
+            "d62",
+            "d63",
+            "d64",
+            "d65",
+            "d66",
+            "d67"
+          ],
+          "summary": "Repeated template geometry differs in catalog"
+        }
+      ],
+      "falseNegatives": [
+        {
+          "id": "HC-02",
+          "design_layer": "0/0/0/0/12/0;0/0/0/0/13/0",
+          "code_layer": "0/0/0/11;0/0/0/12",
+          "kind": "layout",
+          "description": "\"What's new\" and \"About Apiary\" are pinned to the bottom of the sidebar in design; in code they flow straight after Message delivery, at the top half of the sidebar",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[sidebar-footer-pinned]",
+          "properties": "position;top;layout",
+          "original_kind": "layout",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "HC-04",
+          "design_layer": "0/0/0/0/1/0;0/0/0/0/7/0;0/0/0/0/*/0",
+          "code_layer": "0/0/0/1;0/0/0/7;0/0/0/*",
+          "kind": "layout",
+          "description": "Sidebar group labels and topics sit about 6px higher (GUIDE text y≈59 vs 66, Getting started y≈86 vs 92); the group label blocks are spaced differently",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[nav-spacing]",
+          "properties": "padding;margin;top",
+          "original_kind": "layout",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "HC-05",
+          "design_layer": "0/0/1/1/0/0/0/0/0",
+          "code_layer": "0/0/1/1/0/0/0/0;0/0/1/1/0/0/0/1",
+          "kind": "layout",
+          "description": "Section header reads \"THIS PANE\" followed by a grey \"THIS PANE\" pill (the same words twice) instead of \"THIS PANE · AGENT RUN\"; the pane name \"Agent run\" is not shown",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[this-pane-header] code header = section name + this-pane tag; with this data the section name is also This pane",
+          "properties": "text;background-color;layout",
+          "original_kind": "text",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "HC-06",
+          "design_layer": "0/0/1/1/0/0/1",
+          "code_layer": "none",
+          "kind": "layout",
+          "description": "The this-pane rows sit in a bordered rounded card (1px #ECEAE5, 8px radius) in design; code has no card, so the rows are flush with the GLOBAL list",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[this-pane-card]",
+          "properties": "border;border-radius;subtree",
+          "original_kind": "missing",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "HC-08",
+          "design_layer": "0/0/1/1/0/*/0/2;0/0/1/1/0/0/1/*/0/2",
+          "code_layer": "0/0/1/1/0/*/*/0/1",
+          "kind": "layout",
+          "description": "When a command has several key groups, code puts a faint \"·\" between the caps (⌥D · ⌥B · ⌥T · ⌥S, e · ⌘⇧E); design spaces the caps 3px apart",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[key-sep]",
+          "properties": "text;layout",
+          "original_kind": "style",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "HC-14",
+          "design_layer": "0/0/1/2/0;0/0/1/2/1;0/0/1/2/2;0/0/1/2/3;0/0/1/2/4;0/0/1/2/5;0/0/1/2/7;0/0/1/2/8",
+          "code_layer": "none",
+          "kind": "layout",
+          "description": "Footer hints \"type to search · ↑↓ move · ↵ run command · esc close\" and their separators are missing; only \"click keys to rebind\" and \"live from the command registry\" remain",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[footer-hints] footer copy is hard-coded in the app",
+          "properties": "subtree",
+          "original_kind": "missing",
+          "in_layout_check": "yes"
+        }
+      ]
+    }
+  },
+  "report": {
+    "schema": "fdn-drift/0",
+    "comparison": {
+      "mode": "layout-only",
+      "scope": "declared-regions",
+      "ignored": [
+        "text-content",
+        "style",
+        "pixels",
+        "excess-declared-repetition"
+      ],
+      "coverage": [
+        {
+          "id": "dialog",
+          "design": "0/0",
+          "code": "0/0",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "guide",
+          "design": "0/0/0/0",
+          "code": "0/0/0",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "content",
+          "design": "0/0/1",
+          "code": "0/0/1",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "search",
+          "design": "0/0/1/0",
+          "code": "0/0/1/0",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "count",
+          "design": "0/0/1/0/1",
+          "code": "0/0/1/0/1",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "catalog",
+          "design": "0/0/1/1/0",
+          "code": "0/0/1/1/0",
+          "comparedItems": 22,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "anchor-rail",
+          "design": "0/0/1/1/1",
+          "code": "0/0/1/1/1",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "footer",
+          "design": "0/0/1/2",
+          "code": "0/0/1/2",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        }
+      ]
+    },
+    "artboard": "help-center",
+    "state": "agent-run",
+    "viewport": {
+      "width": 1480,
+      "height": 830,
+      "dpr": 1
+    },
+    "design": {
+      "file": "boards/system-help-center.fdn.html",
+      "head": "9ecb6cc7215d7d955053117cbfb920c53fc2508afec9ac46e1e0a5f22bae0a9a",
+      "htmlSha256": "5d3cce513cd26d3b0cc8e4ff6118a9fa3666602de1edbe15880cb2ae9cf5dab9",
+      "binding": "chain-head"
+    },
+    "code": {
+      "repo": "honeybeehq/apiary",
+      "commit": "de190984abad4cdfa2bcd7a92717858801fea8ae",
+      "root": "apps/desktop/src/renderer/src/chrome/HelpCenter.tsx#HelpCenter"
+    },
+    "provable": true,
+    "captureEnvironment": {
+      "browserVersion": "151.0.7922.34",
+      "platform": "linux",
+      "fontPolicy": {
+        "sans": "Foundation Design Sans",
+        "mono": "Foundation Design Mono",
+        "serif": "Foundation Design Serif",
+        "fallback": "Foundation Symbols",
+        "requireCustomFonts": true
+      },
+      "fontAssets": [
+        {
+          "family": "Foundation Design Mono",
+          "weight": "400",
+          "format": "truetype",
+          "sha256": "c805f9436dbc268644c1d9584f01a601a653e028e08fd74b9b949f6cf8304d88",
+          "postScriptName": "DejaVuSansMono"
+        },
+        {
+          "family": "Foundation Design Mono",
+          "weight": "700",
+          "format": "truetype",
+          "sha256": "3a3c502eeff669a231549e80df9f7c49de109bafe303170409e905d0b31a38fe",
+          "postScriptName": "DejaVuSansMono-Bold"
+        },
+        {
+          "family": "Foundation Design Sans",
+          "weight": "400",
+          "format": "truetype",
+          "sha256": "4659bc0c58c5028dd488ec928d41d9265db43d9b669fc14ca8b0832daca7b144",
+          "postScriptName": "LiberationSans"
+        },
+        {
+          "family": "Foundation Design Sans",
+          "weight": "700",
+          "format": "truetype",
+          "sha256": "3973aa5054fb467dd5627245d3dc82e37bf16fe075756156a570455871351582",
+          "postScriptName": "LiberationSans-Bold"
+        },
+        {
+          "family": "Foundation Design Serif",
+          "weight": "400",
+          "format": "truetype",
+          "sha256": "705903ae1382f0150f115d6f10a30f5b2f3d6ade649c474afe6366c39174fb65",
+          "postScriptName": "LiberationSerif"
+        },
+        {
+          "family": "Foundation Design Serif",
+          "weight": "700",
+          "format": "truetype",
+          "sha256": "9e66c25e20868756bf12eb24a520a4552727c9cd108f577f7ae33e3c0110e39c",
+          "postScriptName": "LiberationSerif-Bold"
+        },
+        {
+          "family": "Foundation Symbols",
+          "weight": "400",
+          "format": "truetype",
+          "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
+          "postScriptName": "DejaVuSans"
+        },
+        {
+          "family": "Foundation Symbols",
+          "weight": "700",
+          "format": "truetype",
+          "sha256": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895",
+          "postScriptName": "DejaVuSans-Bold"
+        },
+        {
+          "family": "Hanken Grotesk",
+          "weight": "700",
+          "format": "woff2",
+          "sha256": "d85de6e272296d06f8205ad11e27140274e0ef97050232777d146eabb71c312d",
+          "postScriptName": "HankenGrotesk-Bold"
+        },
+        {
+          "family": "Hanken Grotesk",
+          "weight": "500",
+          "format": "woff2",
+          "sha256": "31f666af7bff625900c46aa34a05d8620482ba2db37db7b63749b693ab0c72ec",
+          "postScriptName": "HankenGrotesk-Medium"
+        },
+        {
+          "family": "Hanken Grotesk",
+          "weight": "400",
+          "format": "woff2",
+          "sha256": "787b3fdd0b7e6d59ae7ce14ce7a41d1a44616584b4c919b527da951972d5d87d",
+          "postScriptName": "HankenGrotesk-Regular"
+        },
+        {
+          "family": "Hanken Grotesk",
+          "weight": "600",
+          "format": "woff2",
+          "sha256": "58f23b7ae3e13b21a4dca4c05360be87b3531d60fc1cbff89732cac8fb3019ae",
+          "postScriptName": "HankenGrotesk-SemiBold"
+        },
+        {
+          "family": "IBM Plex Mono",
+          "weight": "500",
+          "format": "woff2",
+          "sha256": "01d285447409c8a588692162439a038b8cbd7871309ee20267b0d2d91c6e8e22",
+          "postScriptName": "IBMPlexMono-Medium"
+        },
+        {
+          "family": "IBM Plex Mono",
+          "weight": "400",
+          "format": "woff2",
+          "sha256": "08949f728dc52d528e69b1667d15c89a5686a4ee9a296ff90983985f99c380f7",
+          "postScriptName": "IBMPlexMono-Regular"
+        }
+      ],
+      "rendererSourceHash": "55e1c9a1aa9c78062f0470e01d73d5a6ef97d5b2e44230e921be6f745829e960"
+    },
+    "styles": {
+      "properties": [
+        "color",
+        "background-color",
+        "background-image",
+        "border-top-color",
+        "border-right-color",
+        "border-bottom-color",
+        "border-left-color",
+        "border-top-width",
+        "border-right-width",
+        "border-bottom-width",
+        "border-left-width",
+        "border-top-style",
+        "border-right-style",
+        "border-bottom-style",
+        "border-left-style",
+        "border-top-left-radius",
+        "border-top-right-radius",
+        "border-bottom-left-radius",
+        "border-bottom-right-radius",
+        "padding-top",
+        "padding-right",
+        "padding-bottom",
+        "padding-left",
+        "margin-top",
+        "margin-right",
+        "margin-bottom",
+        "margin-left",
+        "row-gap",
+        "column-gap",
+        "font-family",
+        "font-size",
+        "font-weight",
+        "line-height",
+        "letter-spacing",
+        "text-align",
+        "text-transform",
+        "opacity",
+        "box-shadow",
+        "text-shadow",
+        "display",
+        "align-items",
+        "justify-content",
+        "flex-direction",
+        "visibility",
+        "position",
+        "box-sizing",
+        "overflow-x",
+        "overflow-y",
+        "font-style",
+        "text-decoration-line",
+        "white-space",
+        "gap",
+        "flex-grow",
+        "flex-shrink"
+      ],
+      "unavailable": []
+    },
+    "matching": {
+      "algorithm": "declared-layout-regions",
+      "repeat": "shared-stable-id-or-ordinal-template"
+    },
+    "offscreen": {
+      "status": "declared-regions-only",
+      "reason": "Only declared geometry is checked; the independent off-screen eligibility scan is not run."
+    },
+    "tolerances": {
+      "pixelRatio": 0.001,
+      "boxPx": 1,
+      "colorDeltaE": 1,
+      "stylePx": 1,
+      "pixelThreshold": 0.1
+    },
+    "pixels": {
+      "diffRatio": 0.020468902637577335,
+      "diffPixels": 25144,
+      "diffImage": "diff.png",
+      "designImage": "design.png",
+      "codeImage": "code.png"
+    },
+    "drifts": [
+      {
+        "id": "d1",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n45",
+        "codeNode": "n45",
+        "design": 1062,
+        "code": 1060,
+        "designBox": [
+          0,
+          0,
+          1062,
+          718
+        ],
+        "codeBox": [
+          0,
+          0,
+          1060,
+          716
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d2",
+        "kind": "layout",
+        "property": "height",
+        "designNode": "n45",
+        "codeNode": "n45",
+        "design": 718,
+        "code": 716,
+        "designBox": [
+          0,
+          0,
+          1062,
+          718
+        ],
+        "codeBox": [
+          0,
+          0,
+          1060,
+          716
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d3",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n46::n16",
+        "codeNode": "0/0/0",
+        "design": 253,
+        "code": 216,
+        "designBox": [
+          1,
+          1,
+          253,
+          716
+        ],
+        "codeBox": [
+          1,
+          1,
+          216,
+          714
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d4",
+        "kind": "layout",
+        "property": "height",
+        "designNode": "n46::n16",
+        "codeNode": "0/0/0",
+        "design": 716,
+        "code": 714,
+        "designBox": [
+          1,
+          1,
+          253,
+          716
+        ],
+        "codeBox": [
+          1,
+          1,
+          216,
+          714
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d5",
+        "kind": "layout",
+        "property": "x",
+        "designNode": "n47",
+        "codeNode": "0/0/1",
+        "design": 254,
+        "code": 217,
+        "designBox": [
+          254,
+          1,
+          807,
+          716
+        ],
+        "codeBox": [
+          217,
+          1,
+          842,
+          714
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d6",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n47",
+        "codeNode": "0/0/1",
+        "design": 807,
+        "code": 842,
+        "designBox": [
+          254,
+          1,
+          807,
+          716
+        ],
+        "codeBox": [
+          217,
+          1,
+          842,
+          714
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d7",
+        "kind": "layout",
+        "property": "height",
+        "designNode": "n47",
+        "codeNode": "0/0/1",
+        "design": 716,
+        "code": 714,
+        "designBox": [
+          254,
+          1,
+          807,
+          716
+        ],
+        "codeBox": [
+          217,
+          1,
+          842,
+          714
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d8",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n48",
+        "codeNode": "0/0/1/0",
+        "design": 807,
+        "code": 842,
+        "designBox": [
+          254,
+          1,
+          807,
+          60
+        ],
+        "codeBox": [
+          217,
+          1,
+          842,
+          58
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d9",
+        "kind": "layout",
+        "property": "height",
+        "designNode": "n48",
+        "codeNode": "0/0/1/0",
+        "design": 60,
+        "code": 58,
+        "designBox": [
+          254,
+          1,
+          807,
+          60
+        ],
+        "codeBox": [
+          217,
+          1,
+          842,
+          58
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d10",
+        "kind": "layout",
+        "property": "x",
+        "designNode": "n52",
+        "codeNode": "0/0/1/0/1",
+        "design": 629.5,
+        "code": 658.1875,
+        "designBox": [
+          883.5,
+          26,
+          157.5,
+          14
+        ],
+        "codeBox": [
+          875.1875,
+          24.390625,
+          163.8125,
+          15.21875
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d11",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n52",
+        "codeNode": "0/0/1/0/1",
+        "design": 25,
+        "code": 23.390625,
+        "designBox": [
+          883.5,
+          26,
+          157.5,
+          14
+        ],
+        "codeBox": [
+          875.1875,
+          24.390625,
+          163.8125,
+          15.21875
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d12",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n52",
+        "codeNode": "0/0/1/0/1",
+        "design": 157.5,
+        "code": 163.8125,
+        "designBox": [
+          883.5,
+          26,
+          157.5,
+          14
+        ],
+        "codeBox": [
+          875.1875,
+          24.390625,
+          163.8125,
+          15.21875
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d13",
+        "kind": "layout",
+        "property": "height",
+        "designNode": "n52",
+        "codeNode": "0/0/1/0/1",
+        "design": 14,
+        "code": 15.21875,
+        "designBox": [
+          883.5,
+          26,
+          157.5,
+          14
+        ],
+        "codeBox": [
+          875.1875,
+          24.390625,
+          163.8125,
+          15.21875
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d14",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n54",
+        "codeNode": "0/0/1/1/0",
+        "design": 60,
+        "code": 58,
+        "designBox": [
+          254,
+          61,
+          644,
+          621
+        ],
+        "codeBox": [
+          217,
+          59,
+          714,
+          622
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d15",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n54",
+        "codeNode": "0/0/1/1/0",
+        "design": 644,
+        "code": 714,
+        "designBox": [
+          254,
+          61,
+          644,
+          621
+        ],
+        "codeBox": [
+          217,
+          59,
+          714,
+          622
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d16",
+        "kind": "layout",
+        "property": "x",
+        "designNode": "n58#0::n58::n2",
+        "codeNode": "n58#0::n58::n2",
+        "design": 23,
+        "code": 12,
+        "designBox": [
+          277,
+          105,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          97.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d17",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n58#0::n58::n2",
+        "codeNode": "n58#0::n58::n2",
+        "design": 44,
+        "code": 38.765625,
+        "designBox": [
+          277,
+          105,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          97.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d18",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n58#0::n58::n2",
+        "codeNode": "n58#0::n58::n2",
+        "design": 600,
+        "code": 692,
+        "designBox": [
+          277,
+          105,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          97.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d19",
+        "kind": "layout",
+        "property": "x",
+        "designNode": "n58#1::n58::n2",
+        "codeNode": "n58#1::n58::n2",
+        "design": 23,
+        "code": 12,
+        "designBox": [
+          277,
+          135,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          127.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d20",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n58#1::n58::n2",
+        "codeNode": "n58#1::n58::n2",
+        "design": 74,
+        "code": 68.765625,
+        "designBox": [
+          277,
+          135,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          127.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d21",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n58#1::n58::n2",
+        "codeNode": "n58#1::n58::n2",
+        "design": 600,
+        "code": 692,
+        "designBox": [
+          277,
+          135,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          127.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d22",
+        "kind": "layout",
+        "property": "x",
+        "designNode": "n58#2::n58::n2",
+        "codeNode": "n58#2::n58::n2",
+        "design": 23,
+        "code": 12,
+        "designBox": [
+          277,
+          165,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          157.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d23",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n58#2::n58::n2",
+        "codeNode": "n58#2::n58::n2",
+        "design": 104,
+        "code": 98.765625,
+        "designBox": [
+          277,
+          165,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          157.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d24",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n58#2::n58::n2",
+        "codeNode": "n58#2::n58::n2",
+        "design": 600,
+        "code": 692,
+        "designBox": [
+          277,
+          165,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          157.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d25",
+        "kind": "layout",
+        "property": "x",
+        "designNode": "n58#3::n58::n2",
+        "codeNode": "n58#3::n58::n2",
+        "design": 23,
+        "code": 12,
+        "designBox": [
+          277,
+          195,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          187.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d26",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n58#3::n58::n2",
+        "codeNode": "n58#3::n58::n2",
+        "design": 134,
+        "code": 128.765625,
+        "designBox": [
+          277,
+          195,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          187.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d27",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n58#3::n58::n2",
+        "codeNode": "n58#3::n58::n2",
+        "design": 600,
+        "code": 692,
+        "designBox": [
+          277,
+          195,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          187.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d28",
+        "kind": "layout",
+        "property": "x",
+        "designNode": "n58#4::n58::n2",
+        "codeNode": "n58#4::n58::n2",
+        "design": 23,
+        "code": 12,
+        "designBox": [
+          277,
+          225,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          217.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d29",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n58#4::n58::n2",
+        "codeNode": "n58#4::n58::n2",
+        "design": 164,
+        "code": 158.765625,
+        "designBox": [
+          277,
+          225,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          217.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d30",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n58#4::n58::n2",
+        "codeNode": "n58#4::n58::n2",
+        "design": 600,
+        "code": 692,
+        "designBox": [
+          277,
+          225,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          217.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d31",
+        "kind": "layout",
+        "property": "x",
+        "designNode": "n58#5::n58::n2",
+        "codeNode": "n58#5::n58::n2",
+        "design": 23,
+        "code": 12,
+        "designBox": [
+          277,
+          255,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          247.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d32",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n58#5::n58::n2",
+        "codeNode": "n58#5::n58::n2",
+        "design": 194,
+        "code": 188.765625,
+        "designBox": [
+          277,
+          255,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          247.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d33",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n58#5::n58::n2",
+        "codeNode": "n58#5::n58::n2",
+        "design": 600,
+        "code": 692,
+        "designBox": [
+          277,
+          255,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          247.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d34",
+        "kind": "layout",
+        "property": "x",
+        "designNode": "n58#6::n58::n2",
+        "codeNode": "n58#6::n58::n2",
+        "design": 23,
+        "code": 12,
+        "designBox": [
+          277,
+          285,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          277.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d35",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n58#6::n58::n2",
+        "codeNode": "n58#6::n58::n2",
+        "design": 224,
+        "code": 218.765625,
+        "designBox": [
+          277,
+          285,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          277.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d36",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n58#6::n58::n2",
+        "codeNode": "n58#6::n58::n2",
+        "design": 600,
+        "code": 692,
+        "designBox": [
+          277,
+          285,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          277.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d37",
+        "kind": "layout",
+        "property": "x",
+        "designNode": "n58#7::n58::n2",
+        "codeNode": "n58#7::n58::n2",
+        "design": 23,
+        "code": 12,
+        "designBox": [
+          277,
+          315,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          307.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d38",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n58#7::n58::n2",
+        "codeNode": "n58#7::n58::n2",
+        "design": 254,
+        "code": 248.765625,
+        "designBox": [
+          277,
+          315,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          307.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d39",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n58#7::n58::n2",
+        "codeNode": "n58#7::n58::n2",
+        "design": 600,
+        "code": 692,
+        "designBox": [
+          277,
+          315,
+          600,
+          30
+        ],
+        "codeBox": [
+          229,
+          307.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d40",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n60#0::n60::n2",
+        "codeNode": "n60#0::n60::n2",
+        "design": 326,
+        "code": 320.265625,
+        "designBox": [
+          266,
+          387,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          379.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d41",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n60#0::n60::n2",
+        "codeNode": "n60#0::n60::n2",
+        "design": 622,
+        "code": 692,
+        "designBox": [
+          266,
+          387,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          379.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d42",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n60#1::n60::n2",
+        "codeNode": "n60#1::n60::n2",
+        "design": 356,
+        "code": 350.265625,
+        "designBox": [
+          266,
+          417,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          409.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d43",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n60#1::n60::n2",
+        "codeNode": "n60#1::n60::n2",
+        "design": 622,
+        "code": 692,
+        "designBox": [
+          266,
+          417,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          409.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d44",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n60#2::n60::n2",
+        "codeNode": "n60#2::n60::n2",
+        "design": 386,
+        "code": 380.265625,
+        "designBox": [
+          266,
+          447,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          439.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d45",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n60#2::n60::n2",
+        "codeNode": "n60#2::n60::n2",
+        "design": 622,
+        "code": 692,
+        "designBox": [
+          266,
+          447,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          439.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d46",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n60#3::n60::n2",
+        "codeNode": "n60#3::n60::n2",
+        "design": 416,
+        "code": 410.265625,
+        "designBox": [
+          266,
+          477,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          469.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d47",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n60#3::n60::n2",
+        "codeNode": "n60#3::n60::n2",
+        "design": 622,
+        "code": 692,
+        "designBox": [
+          266,
+          477,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          469.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d48",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n60#4::n60::n2",
+        "codeNode": "n60#4::n60::n2",
+        "design": 446,
+        "code": 440.265625,
+        "designBox": [
+          266,
+          507,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          499.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d49",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n60#4::n60::n2",
+        "codeNode": "n60#4::n60::n2",
+        "design": 622,
+        "code": 692,
+        "designBox": [
+          266,
+          507,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          499.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d50",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n60#5::n60::n2",
+        "codeNode": "n60#5::n60::n2",
+        "design": 476,
+        "code": 470.265625,
+        "designBox": [
+          266,
+          537,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          529.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d51",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n60#5::n60::n2",
+        "codeNode": "n60#5::n60::n2",
+        "design": 622,
+        "code": 692,
+        "designBox": [
+          266,
+          537,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          529.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d52",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n60#6::n60::n2",
+        "codeNode": "n60#6::n60::n2",
+        "design": 506,
+        "code": 500.265625,
+        "designBox": [
+          266,
+          567,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          559.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d53",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n60#6::n60::n2",
+        "codeNode": "n60#6::n60::n2",
+        "design": 622,
+        "code": 692,
+        "designBox": [
+          266,
+          567,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          559.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d54",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n60#7::n60::n2",
+        "codeNode": "n60#7::n60::n2",
+        "design": 536,
+        "code": 530.265625,
+        "designBox": [
+          266,
+          597,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          589.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d55",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n60#7::n60::n2",
+        "codeNode": "n60#7::n60::n2",
+        "design": 622,
+        "code": 692,
+        "designBox": [
+          266,
+          597,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          589.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d56",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n60#8::n60::n2",
+        "codeNode": "n60#8::n60::n2",
+        "design": 566,
+        "code": 560.265625,
+        "designBox": [
+          266,
+          627,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          619.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d57",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n60#8::n60::n2",
+        "codeNode": "n60#8::n60::n2",
+        "design": 622,
+        "code": 692,
+        "designBox": [
+          266,
+          627,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          619.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d58",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n60#9::n60::n2",
+        "codeNode": "n60#9::n60::n2",
+        "design": 596,
+        "code": 590.265625,
+        "designBox": [
+          266,
+          657,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          649.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d59",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n60#9::n60::n2",
+        "codeNode": "n60#9::n60::n2",
+        "design": 622,
+        "code": 692,
+        "designBox": [
+          266,
+          657,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          649.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d60",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n60#10::n60::n2",
+        "codeNode": "n60#10::n60::n2",
+        "design": 626,
+        "code": 620.265625,
+        "designBox": [
+          266,
+          687,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          679.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d61",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n60#10::n60::n2",
+        "codeNode": "n60#10::n60::n2",
+        "design": 622,
+        "code": 692,
+        "designBox": [
+          266,
+          687,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          679.265625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d62",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n62::n2",
+        "codeNode": "n62::n2",
+        "design": 693,
+        "code": 691.765625,
+        "designBox": [
+          266,
+          754,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          750.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d63",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n62::n2",
+        "codeNode": "n62::n2",
+        "design": 622,
+        "code": 692,
+        "designBox": [
+          266,
+          754,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          750.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d64",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n63::n2",
+        "codeNode": "n63::n2",
+        "design": 723,
+        "code": 721.765625,
+        "designBox": [
+          266,
+          784,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          780.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d65",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n63::n2",
+        "codeNode": "n63::n2",
+        "design": 622,
+        "code": 692,
+        "designBox": [
+          266,
+          784,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          780.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d66",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n64::n2",
+        "codeNode": "n64::n2",
+        "design": 753,
+        "code": 751.765625,
+        "designBox": [
+          266,
+          814,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          810.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d67",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n64::n2",
+        "codeNode": "n64::n2",
+        "design": 622,
+        "code": 692,
+        "designBox": [
+          266,
+          814,
+          622,
+          30
+        ],
+        "codeBox": [
+          229,
+          810.765625,
+          692,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d68",
+        "kind": "layout",
+        "property": "x",
+        "designNode": "n65",
+        "codeNode": "0/0/1/1/1",
+        "design": 644,
+        "code": 714,
+        "designBox": [
+          898,
+          61,
+          163,
+          621
+        ],
+        "codeBox": [
+          931,
+          59,
+          128,
+          622
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d69",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n65",
+        "codeNode": "0/0/1/1/1",
+        "design": 60,
+        "code": 58,
+        "designBox": [
+          898,
+          61,
+          163,
+          621
+        ],
+        "codeBox": [
+          931,
+          59,
+          128,
+          622
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d70",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n65",
+        "codeNode": "0/0/1/1/1",
+        "design": 163,
+        "code": 128,
+        "designBox": [
+          898,
+          61,
+          163,
+          621
+        ],
+        "codeBox": [
+          931,
+          59,
+          128,
+          622
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d71",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n76",
+        "codeNode": "0/0/1/2",
+        "design": 807,
+        "code": 842,
+        "designBox": [
+          254,
+          682,
+          807,
+          35
+        ],
+        "codeBox": [
+          217,
+          681,
+          842,
+          34
+        ],
+        "confidence": 1
+      }
+    ],
+    "defects": [
+      {
+        "id": "def-c042d7ef28b9e5015a0a",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n45",
+          "code": "n45"
+        },
+        "findings": [
+          "d1",
+          "d2"
+        ],
+        "summary": "layout:geometry differs in dialog"
+      },
+      {
+        "id": "def-f25b25bc4b9f75154c71",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n46::n16",
+          "code": "0/0/0"
+        },
+        "findings": [
+          "d3",
+          "d4"
+        ],
+        "summary": "layout:geometry differs in guide"
+      },
+      {
+        "id": "def-50990757b7f96cf0f388",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n47",
+          "code": "0/0/1"
+        },
+        "findings": [
+          "d5",
+          "d6",
+          "d7"
+        ],
+        "summary": "layout:geometry differs in content"
+      },
+      {
+        "id": "def-4ed53f54824947e92094",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n48",
+          "code": "0/0/1/0"
+        },
+        "findings": [
+          "d8",
+          "d9"
+        ],
+        "summary": "layout:geometry differs in search"
+      },
+      {
+        "id": "def-6b85729587768c763821",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n52",
+          "code": "0/0/1/0/1"
+        },
+        "findings": [
+          "d10",
+          "d11",
+          "d12",
+          "d13"
+        ],
+        "summary": "layout:geometry differs in count"
+      },
+      {
+        "id": "def-d924c1f3f0f44dd49ada",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n54",
+          "code": "0/0/1/1/0"
+        },
+        "findings": [
+          "d14",
+          "d15"
+        ],
+        "summary": "layout:geometry differs in catalog"
+      },
+      {
+        "id": "def-a0ac5c0d3a182f9b6082",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n65",
+          "code": "0/0/1/1/1"
+        },
+        "findings": [
+          "d68",
+          "d69",
+          "d70"
+        ],
+        "summary": "layout:geometry differs in anchor-rail"
+      },
+      {
+        "id": "def-70f968928d82dcc8e91d",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n76",
+          "code": "0/0/1/2"
+        },
+        "findings": [
+          "d71"
+        ],
+        "summary": "layout:geometry differs in footer"
+      },
+      {
+        "id": "def-535ff63a73407d71cf57",
+        "kind": "layout",
+        "cause": "layout:repeated-template",
+        "classification": "product",
+        "layer": {
+          "design": "n54",
+          "code": "0/0/1/1/0"
+        },
+        "findings": [
+          "d16",
+          "d17",
+          "d18",
+          "d19",
+          "d20",
+          "d21",
+          "d22",
+          "d23",
+          "d24",
+          "d25",
+          "d26",
+          "d27",
+          "d28",
+          "d29",
+          "d30",
+          "d31",
+          "d32",
+          "d33",
+          "d34",
+          "d35",
+          "d36",
+          "d37",
+          "d38",
+          "d39"
+        ],
+        "summary": "Repeated template geometry differs in catalog"
+      },
+      {
+        "id": "def-8be3082dc0781cfd2647",
+        "kind": "layout",
+        "cause": "layout:repeated-template",
+        "classification": "product",
+        "layer": {
+          "design": "n54",
+          "code": "0/0/1/1/0"
+        },
+        "findings": [
+          "d40",
+          "d41",
+          "d42",
+          "d43",
+          "d44",
+          "d45",
+          "d46",
+          "d47",
+          "d48",
+          "d49",
+          "d50",
+          "d51",
+          "d52",
+          "d53",
+          "d54",
+          "d55",
+          "d56",
+          "d57",
+          "d58",
+          "d59",
+          "d60",
+          "d61"
+        ],
+        "summary": "Repeated template geometry differs in catalog"
+      },
+      {
+        "id": "def-a7a9ad93557d01811ed8",
+        "kind": "layout",
+        "cause": "layout:repeated-template",
+        "classification": "product",
+        "layer": {
+          "design": "n54",
+          "code": "0/0/1/1/0"
+        },
+        "findings": [
+          "d62",
+          "d63",
+          "d64",
+          "d65",
+          "d66",
+          "d67"
+        ],
+        "summary": "Repeated template geometry differs in catalog"
+      }
+    ],
+    "summary": {
+      "uniqueDefects": 11,
+      "accepted": 0,
+      "raw": 71,
+      "uncertainMatches": 0,
+      "environment": 0,
+      "uncertain": 0
+    },
+    "matches": [
+      {
+        "designNode": "n45",
+        "codeNode": "n45",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n46::n16",
+        "codeNode": "0/0/0",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n47",
+        "codeNode": "0/0/1",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n48",
+        "codeNode": "0/0/1/0",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n52",
+        "codeNode": "0/0/1/0/1",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n54",
+        "codeNode": "0/0/1/1/0",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n58#0::n58::n2",
+        "codeNode": "n58#0::n58::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n58#1::n58::n2",
+        "codeNode": "n58#1::n58::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n58#2::n58::n2",
+        "codeNode": "n58#2::n58::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n58#3::n58::n2",
+        "codeNode": "n58#3::n58::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n58#4::n58::n2",
+        "codeNode": "n58#4::n58::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n58#5::n58::n2",
+        "codeNode": "n58#5::n58::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n58#6::n58::n2",
+        "codeNode": "n58#6::n58::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n58#7::n58::n2",
+        "codeNode": "n58#7::n58::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n60#0::n60::n2",
+        "codeNode": "n60#0::n60::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n60#1::n60::n2",
+        "codeNode": "n60#1::n60::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n60#2::n60::n2",
+        "codeNode": "n60#2::n60::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n60#3::n60::n2",
+        "codeNode": "n60#3::n60::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n60#4::n60::n2",
+        "codeNode": "n60#4::n60::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n60#5::n60::n2",
+        "codeNode": "n60#5::n60::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n60#6::n60::n2",
+        "codeNode": "n60#6::n60::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n60#7::n60::n2",
+        "codeNode": "n60#7::n60::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n60#8::n60::n2",
+        "codeNode": "n60#8::n60::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n60#9::n60::n2",
+        "codeNode": "n60#9::n60::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n60#10::n60::n2",
+        "codeNode": "n60#10::n60::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n62::n2",
+        "codeNode": "n62::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n63::n2",
+        "codeNode": "n63::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n64::n2",
+        "codeNode": "n64::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n65",
+        "codeNode": "0/0/1/1/1",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n76",
+        "codeNode": "0/0/1/2",
+        "kind": "heuristic",
+        "confidence": 1
+      }
+    ],
+    "verdict": "drift",
+    "timingsMs": {
+      "compare": 284.07741699999997
+    },
+    "reportHash": "82b97c6faada4d0f3fc91f5c8b0b7d428e8f567663b0d15e45656c2543f9913d"
+  }
+}

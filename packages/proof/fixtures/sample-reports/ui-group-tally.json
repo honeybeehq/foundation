@@ -1,0 +1,41 @@
+[
+  {
+    "state": "track-selected",
+    "reportHash": "bb7bc9870e9246968d5a71d37526c69e54ac434e8cc6e0e2d4ca61008c158f13",
+    "layers": 28,
+    "changed": 19,
+    "designOnly": 6,
+    "codeOnly": 3,
+    "inside": 296,
+    "leftOutLayers": 3,
+    "leftOutFindings": 17,
+    "raw": 513,
+    "method": "T5 groups.ts folding + current report-bound known-false audit; projected after UI reimports these hashes"
+  },
+  {
+    "state": "proposal-pending",
+    "reportHash": "eb31936f853f89c7805e127ec24b30c7d4bb5a72473bb34a0a04fb3368962b7b",
+    "layers": 30,
+    "changed": 21,
+    "designOnly": 6,
+    "codeOnly": 3,
+    "inside": 322,
+    "leftOutLayers": 3,
+    "leftOutFindings": 17,
+    "raw": 581,
+    "method": "T5 groups.ts folding + current report-bound known-false audit; projected after UI reimports these hashes"
+  },
+  {
+    "state": "empty",
+    "reportHash": "d1425507cb03877bf8b42c10ca7b0d486c7cb1bd3c6e4dafb7bb64d320d80d88",
+    "layers": 5,
+    "changed": 1,
+    "designOnly": 3,
+    "codeOnly": 1,
+    "inside": 63,
+    "leftOutLayers": 1,
+    "leftOutFindings": 5,
+    "raw": 83,
+    "method": "T5 groups.ts folding + current report-bound known-false audit; projected after UI reimports these hashes"
+  }
+]

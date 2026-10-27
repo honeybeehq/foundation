@@ -1,0 +1,4462 @@
+[
+  {
+    "component": "keycap",
+    "state": "default",
+    "optimistic": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "predicted": 3,
+      "labelled": 3,
+      "agreement": [
+        {
+          "defect": "def-db1dff5c581fd8abccd0",
+          "label": "K-01",
+          "description": "Key cap is 18px tall in code but 21px in design (both author height 18px; design adds the 1px top and 2px bottom border outside it, code's border-box puts them inside), so the cap looks squatter and the \"⌘T\" sits about 1.5px higher"
+        },
+        {
+          "defect": "def-a90f8172b6dec2f6c6d6",
+          "label": "K-02",
+          "description": "Key label ink is lighter in code: #6B6862 (inkSoft token) vs the design's #5A564E"
+        },
+        {
+          "defect": "def-38c91ede9c3543fac351",
+          "label": "K-03",
+          "description": "Key border is #E2E0DB (ghostBorder) in code vs --color-border #E7E5E0 in design, a barely visible shade darker"
+        }
+      ],
+      "falsePositives": [],
+      "falseNegatives": []
+    },
+    "strict": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "predicted": 3,
+      "labelled": 3,
+      "agreement": [
+        {
+          "defect": "def-db1dff5c581fd8abccd0",
+          "label": "K-01",
+          "description": "Key cap is 18px tall in code but 21px in design (both author height 18px; design adds the 1px top and 2px bottom border outside it, code's border-box puts them inside), so the cap looks squatter and the \"⌘T\" sits about 1.5px higher"
+        },
+        {
+          "defect": "def-a90f8172b6dec2f6c6d6",
+          "label": "K-02",
+          "description": "Key label ink is lighter in code: #6B6862 (inkSoft token) vs the design's #5A564E"
+        },
+        {
+          "defect": "def-38c91ede9c3543fac351",
+          "label": "K-03",
+          "description": "Key border is #E2E0DB (ghostBorder) in code vs --color-border #E7E5E0 in design, a barely visible shade darker"
+        }
+      ],
+      "falsePositives": [],
+      "falseNegatives": []
+    }
+  },
+  {
+    "component": "inbox-row",
+    "state": "selected",
+    "optimistic": {
+      "tp": 7,
+      "fp": 3,
+      "fn": 0,
+      "precision": 0.7,
+      "recall": 1,
+      "predicted": 10,
+      "labelled": 7,
+      "agreement": [
+        {
+          "defect": "def-d6321f12760f9ba06e3e",
+          "label": "IS-06",
+          "description": "Rows are taller in code: line 1 is 19px and line 2 17px (line-height 1.45) vs 16px and 15px in design, so the row is 54px instead of 49px, line 2 sits 3px lower and the row overruns the 49px design frame by 5px"
+        },
+        {
+          "defect": "def-1efc5d26a00e1cd5a58b",
+          "label": "IS-02",
+          "description": "Title ink is pure black in the design (var(--color-text-primary) is undefined on the board) vs warm near-black #2E2B27 in code"
+        },
+        {
+          "defect": "def-aa584ed33e802eab2972",
+          "label": "IS-01",
+          "description": "Title and note render in a serif face in the design but in Hanken Grotesk (sans) in code: the inbox board uses var(--font-sans) but never defines it, so the design falls back to the default serif"
+        },
+        {
+          "defect": "def-ca065e7442f148875529",
+          "label": "IS-05",
+          "description": "Age \"56m\" is bright blue #3565D4 in code vs faint grey #A8A59E in design"
+        },
+        {
+          "defect": "def-d079cd53dc86c52d8810",
+          "label": "IS-03",
+          "description": "Leading glyph is the row-kind icon (window/card) in muted #8A877F in design; code always shows the agent's model logo (OpenAI mark) in lighter #A29D93"
+        },
+        {
+          "defect": "def-b58f18ab5a68367e229b",
+          "label": "IS-07",
+          "description": "Leading glyph sits 3px lower relative to the title (y 11 vs 8): code nudges marks down 2px to the title baseline on top of the taller line"
+        },
+        {
+          "defect": "def-dcf0788aabbc9a73c354",
+          "label": "IS-04",
+          "description": "Orange status dot and \"review\" word are missing on line 2; the code renders this row as a plain completed row (no dot, no word), so the note starts at the indent instead of after the status"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-ee4f281dbd96555e9914",
+          "layer": {
+            "design": "n249#1::n249::n25",
+            "code": "0/0/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d23",
+            "d25"
+          ],
+          "summary": "layout configuration differs at n249#1::n249::n25"
+        },
+        {
+          "id": "def-c359d70738e94c6d95c5",
+          "layer": {
+            "design": "n249#1::n249::n19::n1",
+            "code": "0/0/0/0/0/0"
+          },
+          "kind": "token",
+          "cause": "style:icon",
+          "classification": "product",
+          "findings": [
+            "d34"
+          ],
+          "summary": "style icon differs at n249#1::n249::n19::n1"
+        },
+        {
+          "id": "def-5a56a212a6862218a6aa",
+          "layer": {
+            "design": "n249#1::n249::n24"
+          },
+          "kind": "missing",
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d37"
+          ],
+          "summary": "missing subtree differs at n249#1::n249::n24"
+        }
+      ],
+      "falseNegatives": []
+    },
+    "strict": {
+      "tp": 7,
+      "fp": 3,
+      "fn": 0,
+      "precision": 0.7,
+      "recall": 1,
+      "predicted": 10,
+      "labelled": 7,
+      "agreement": [
+        {
+          "defect": "def-d6321f12760f9ba06e3e",
+          "label": "IS-06",
+          "description": "Rows are taller in code: line 1 is 19px and line 2 17px (line-height 1.45) vs 16px and 15px in design, so the row is 54px instead of 49px, line 2 sits 3px lower and the row overruns the 49px design frame by 5px"
+        },
+        {
+          "defect": "def-1efc5d26a00e1cd5a58b",
+          "label": "IS-02",
+          "description": "Title ink is pure black in the design (var(--color-text-primary) is undefined on the board) vs warm near-black #2E2B27 in code"
+        },
+        {
+          "defect": "def-aa584ed33e802eab2972",
+          "label": "IS-01",
+          "description": "Title and note render in a serif face in the design but in Hanken Grotesk (sans) in code: the inbox board uses var(--font-sans) but never defines it, so the design falls back to the default serif"
+        },
+        {
+          "defect": "def-ca065e7442f148875529",
+          "label": "IS-05",
+          "description": "Age \"56m\" is bright blue #3565D4 in code vs faint grey #A8A59E in design"
+        },
+        {
+          "defect": "def-d079cd53dc86c52d8810",
+          "label": "IS-03",
+          "description": "Leading glyph is the row-kind icon (window/card) in muted #8A877F in design; code always shows the agent's model logo (OpenAI mark) in lighter #A29D93"
+        },
+        {
+          "defect": "def-b58f18ab5a68367e229b",
+          "label": "IS-07",
+          "description": "Leading glyph sits 3px lower relative to the title (y 11 vs 8): code nudges marks down 2px to the title baseline on top of the taller line"
+        },
+        {
+          "defect": "def-dcf0788aabbc9a73c354",
+          "label": "IS-04",
+          "description": "Orange status dot and \"review\" word are missing on line 2; the code renders this row as a plain completed row (no dot, no word), so the note starts at the indent instead of after the status"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-ee4f281dbd96555e9914",
+          "layer": {
+            "design": "n249#1::n249::n25",
+            "code": "0/0/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d23",
+            "d25"
+          ],
+          "summary": "layout configuration differs at n249#1::n249::n25"
+        },
+        {
+          "id": "def-c359d70738e94c6d95c5",
+          "layer": {
+            "design": "n249#1::n249::n19::n1",
+            "code": "0/0/0/0/0/0"
+          },
+          "kind": "token",
+          "cause": "style:icon",
+          "classification": "product",
+          "findings": [
+            "d34"
+          ],
+          "summary": "style icon differs at n249#1::n249::n19::n1"
+        },
+        {
+          "id": "def-5a56a212a6862218a6aa",
+          "layer": {
+            "design": "n249#1::n249::n24"
+          },
+          "kind": "missing",
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d37"
+          ],
+          "summary": "missing subtree differs at n249#1::n249::n24"
+        }
+      ],
+      "falseNegatives": []
+    }
+  },
+  {
+    "component": "inbox-row",
+    "state": "failed",
+    "optimistic": {
+      "tp": 6,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.8571428571428571,
+      "recall": 1,
+      "predicted": 7,
+      "labelled": 6,
+      "agreement": [
+        {
+          "defect": "def-638ef1b23690ca5395b5",
+          "label": "IF-05",
+          "description": "Rows are taller in code: line 1 is 19px and line 2 19px/17px (line-height 1.45) vs 16px and 15px in design, so the row is 54px instead of 49px, the dot, \"failed\" and note sit 3-4px lower and the row overruns the 49px design frame by 5px"
+        },
+        {
+          "defect": "def-bada26d8ab3de86b3112",
+          "label": "IF-02",
+          "description": "Title ink is pure black in the design (var(--color-text-primary) is undefined on the board) vs warm near-black #2E2B27 in code"
+        },
+        {
+          "defect": "def-5769f1cb79bdec263df8",
+          "label": "IF-01",
+          "description": "Title and note render in a serif face in the design but in Hanken Grotesk (sans) in code: the inbox board uses var(--font-sans) but never defines it, so the design falls back to the default serif"
+        },
+        {
+          "defect": "def-2f1650e2540ca2dcf6ce",
+          "label": "IF-03",
+          "description": "Leading glyph is the agent hexagon in muted #8A877F in design; code shows the agent's model logo (OpenAI mark) in lighter #A29D93"
+        },
+        {
+          "defect": "def-cacc4298c4c8aa7e3ea9",
+          "label": "IF-06",
+          "description": "Leading glyph sits 3px lower relative to the title (y 11 vs 8): code nudges marks down 2px to the title baseline on top of the taller line"
+        },
+        {
+          "defect": "def-2217f14a964fbe34a82a",
+          "label": "IF-04",
+          "description": "Note copy differs: \"tmux host died mid-write — revive\" in design vs \"runtime died un-commanded — revive\" in code"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-a28624c7a3a213d46a8f",
+          "layer": {
+            "design": "n249#0::n249::n19::n1",
+            "code": "0/0/0/0/0/0"
+          },
+          "kind": "token",
+          "cause": "style:icon",
+          "classification": "product",
+          "findings": [
+            "d21"
+          ],
+          "summary": "style icon differs at n249#0::n249::n19::n1"
+        }
+      ],
+      "falseNegatives": []
+    },
+    "strict": {
+      "tp": 6,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.8571428571428571,
+      "recall": 1,
+      "predicted": 7,
+      "labelled": 6,
+      "agreement": [
+        {
+          "defect": "def-638ef1b23690ca5395b5",
+          "label": "IF-05",
+          "description": "Rows are taller in code: line 1 is 19px and line 2 19px/17px (line-height 1.45) vs 16px and 15px in design, so the row is 54px instead of 49px, the dot, \"failed\" and note sit 3-4px lower and the row overruns the 49px design frame by 5px"
+        },
+        {
+          "defect": "def-bada26d8ab3de86b3112",
+          "label": "IF-02",
+          "description": "Title ink is pure black in the design (var(--color-text-primary) is undefined on the board) vs warm near-black #2E2B27 in code"
+        },
+        {
+          "defect": "def-5769f1cb79bdec263df8",
+          "label": "IF-01",
+          "description": "Title and note render in a serif face in the design but in Hanken Grotesk (sans) in code: the inbox board uses var(--font-sans) but never defines it, so the design falls back to the default serif"
+        },
+        {
+          "defect": "def-2f1650e2540ca2dcf6ce",
+          "label": "IF-03",
+          "description": "Leading glyph is the agent hexagon in muted #8A877F in design; code shows the agent's model logo (OpenAI mark) in lighter #A29D93"
+        },
+        {
+          "defect": "def-cacc4298c4c8aa7e3ea9",
+          "label": "IF-06",
+          "description": "Leading glyph sits 3px lower relative to the title (y 11 vs 8): code nudges marks down 2px to the title baseline on top of the taller line"
+        },
+        {
+          "defect": "def-2217f14a964fbe34a82a",
+          "label": "IF-04",
+          "description": "Note copy differs: \"tmux host died mid-write — revive\" in design vs \"runtime died un-commanded — revive\" in code"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-a28624c7a3a213d46a8f",
+          "layer": {
+            "design": "n249#0::n249::n19::n1",
+            "code": "0/0/0/0/0/0"
+          },
+          "kind": "token",
+          "cause": "style:icon",
+          "classification": "product",
+          "findings": [
+            "d21"
+          ],
+          "summary": "style icon differs at n249#0::n249::n19::n1"
+        }
+      ],
+      "falseNegatives": []
+    }
+  },
+  {
+    "component": "help-center",
+    "state": "agent-run",
+    "optimistic": {
+      "tp": 13,
+      "fp": 51,
+      "fn": 8,
+      "precision": 0.203125,
+      "recall": 0.6190476190476191,
+      "predicted": 64,
+      "labelled": 21,
+      "agreement": [
+        {
+          "defect": "def-783a4e2aecc696297c2d",
+          "label": "H-20",
+          "description": "Dialog shadow is lighter and tighter in code: 0 16px 40px rgba(40,35,30,.15) vs --shadow-panel 0 24px 64px rgba(40,35,30,.30); only a 4px strip of it shows inside the card-only capture"
+        },
+        {
+          "defect": "def-5aae1955e337709eb6dd",
+          "label": "H-17",
+          "description": "Boxes with borders are smaller in code because the design adds borders outside the authored size and code includes them: key caps 18px vs 21px tall (label sits 1.5px higher), search field 34px vs 36px, footer 34px vs 35px, card 1060×716 vs 1062×718"
+        },
+        {
+          "defect": "def-7cd58e1a36a0b3c5d91d",
+          "label": "H-18",
+          "description": "Key-cap label ink is lighter in code: #6B6862 (inkSoft) vs #5A564E"
+        },
+        {
+          "defect": "def-1e5c72bc6fc68b591ade",
+          "label": "H-19",
+          "description": "Key caps use border #E2E0DB (ghostBorder) instead of --color-border #E7E5E0"
+        },
+        {
+          "defect": "def-a5f8b1e9c31763a21eba",
+          "label": "H-01",
+          "description": "Design pins the \"this pane\" section at the top of the catalog, followed by GLOBAL; code keeps Agent run in its normal catalog slot (after Lists) and scrolls the list to it, so the view starts at AGENT RUN and GLOBAL is out of sight"
+        },
+        {
+          "defect": "def-da2c607e558c8e9b7bfc",
+          "label": "H-08",
+          "description": "Guide topic \"Loops\" is missing from the sidebar"
+        },
+        {
+          "defect": "def-7bd55bc2581fdb57b4c5",
+          "label": "H-09",
+          "description": "\"What's new 0.4.2\" and \"About Apiary\" at the bottom of the sidebar are missing"
+        },
+        {
+          "defect": "def-1bb4f1d59ccfe1a42466",
+          "label": "H-06",
+          "description": "Guide sidebar is 216px wide in code vs 253px in design, so the search field, the list and the esc cap all start 37px further left"
+        },
+        {
+          "defect": "def-5e03bba5d8a08d49ab16",
+          "label": "H-10",
+          "description": "Sidebar group labels and topics sit about 6px higher (GUIDE text y≈59 vs 66, Getting started y≈86 vs 92); group label blocks are spaced differently"
+        },
+        {
+          "defect": "def-01bc8df7df738b81602a",
+          "label": "H-16",
+          "description": "When a command has several key groups, code puts a faint \"·\" between the caps (\"⌃. · ⌘.\", \"⇥ · ⌘⌥F\"); design just spaces the caps 3px apart"
+        },
+        {
+          "defect": "def-ede64b92f8b429def82a",
+          "label": "H-05",
+          "description": "The this-pane rows sit in a bordered rounded card (1px #ECEAE5, 8px radius) in design; code has no card, so the rows are flush with the rest of the list"
+        },
+        {
+          "defect": "def-9e5f2fff78662f2c00f2",
+          "label": "H-15",
+          "description": "Anchor rail is 128px wide vs 163px and its items are spaced 22.7px apart vs 21px"
+        },
+        {
+          "defect": "def-5b3411d334e4fe622568",
+          "label": "H-14",
+          "description": "Active anchor styling differs: design highlights \"This pane\" in primary ink #2E2B27 (600) with \"Global\" in #6F6B63; code highlights \"Agent run\" in #6F6B63 (600) and \"Global\" is faint like the rest"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-4774cb4160dec72560bd",
+          "layer": {
+            "design": "n45",
+            "code": "n45"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d1",
+            "d2",
+            "d4",
+            "d6",
+            "d11",
+            "d18",
+            "d19",
+            "d21",
+            "d24",
+            "d25",
+            "d32",
+            "d36",
+            "d38",
+            "d44",
+            "d47",
+            "d49",
+            "d59",
+            "d63",
+            "d65",
+            "d75",
+            "d79",
+            "d81",
+            "d91",
+            "d95",
+            "d97",
+            "d103",
+            "d106",
+            "d108",
+            "d119",
+            "d123",
+            "d125",
+            "d135",
+            "d140",
+            "d143",
+            "d145",
+            "d148",
+            "d151",
+            "d182",
+            "d183",
+            "d185",
+            "d201",
+            "d202",
+            "d209",
+            "d219",
+            "d220",
+            "d222",
+            "d240",
+            "d241",
+            "d248",
+            "d253",
+            "d277",
+            "d283",
+            "d285",
+            "d290",
+            "d291",
+            "d298",
+            "d302",
+            "d311",
+            "d313",
+            "d316",
+            "d320",
+            "d322",
+            "d324",
+            "d328",
+            "d330",
+            "d332",
+            "d336",
+            "d338",
+            "d340",
+            "d344",
+            "d346",
+            "d348",
+            "d352",
+            "d354",
+            "d356",
+            "d366",
+            "d367",
+            "d369",
+            "d372",
+            "d373",
+            "d376"
+          ],
+          "summary": "layout configuration differs at n45"
+        },
+        {
+          "id": "def-60a6145ecbac41c01105",
+          "layer": {
+            "design": "n46::n21::n10",
+            "code": "0/0/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d35",
+            "d37",
+            "d39",
+            "d40",
+            "d41",
+            "d42",
+            "d45"
+          ],
+          "summary": "layout configuration differs at n46::n21::n10"
+        },
+        {
+          "id": "def-acfa83cd7f589967afd6",
+          "layer": {
+            "design": "n46::n22#0::n22::n13",
+            "code": "0/0/0/2"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d46",
+            "d48",
+            "d54",
+            "d55",
+            "d56",
+            "d57",
+            "d61"
+          ],
+          "summary": "layout configuration differs at n46::n22#0::n22::n13"
+        },
+        {
+          "id": "def-90c9ed68839470e8fba1",
+          "layer": {
+            "design": "n46::n22#0::n22::n13",
+            "code": "0/0/0/2"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d50",
+            "d51",
+            "d52",
+            "d53"
+          ],
+          "summary": "style surface differs at n46::n22#0::n22::n13"
+        },
+        {
+          "id": "def-1ed44b3b2e14d282793c",
+          "layer": {
+            "design": "n46::n22#1::n22::n13",
+            "code": "0/0/0/3"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d62",
+            "d64",
+            "d70",
+            "d71",
+            "d72",
+            "d73",
+            "d77"
+          ],
+          "summary": "layout configuration differs at n46::n22#1::n22::n13"
+        },
+        {
+          "id": "def-dce005f346dbbc69b9b8",
+          "layer": {
+            "design": "n46::n22#1::n22::n13",
+            "code": "0/0/0/3"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d66",
+            "d67",
+            "d68",
+            "d69"
+          ],
+          "summary": "style surface differs at n46::n22#1::n22::n13"
+        },
+        {
+          "id": "def-ef2ca6440d322c1ba48e",
+          "layer": {
+            "design": "n46::n22#3::n22::n13",
+            "code": "0/0/0/5"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d78",
+            "d80",
+            "d86",
+            "d87",
+            "d88",
+            "d89",
+            "d93"
+          ],
+          "summary": "layout configuration differs at n46::n22#3::n22::n13"
+        },
+        {
+          "id": "def-3264da2a6506fe105dde",
+          "layer": {
+            "design": "n46::n22#3::n22::n13",
+            "code": "0/0/0/5"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d82",
+            "d83",
+            "d84",
+            "d85"
+          ],
+          "summary": "style surface differs at n46::n22#3::n22::n13"
+        },
+        {
+          "id": "def-99d6a32b3eaba5307d93",
+          "layer": {
+            "design": "n46::n23::n10",
+            "code": "0/0/0/6"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d94",
+            "d96",
+            "d98",
+            "d99",
+            "d100",
+            "d101",
+            "d104"
+          ],
+          "summary": "layout configuration differs at n46::n23::n10"
+        },
+        {
+          "id": "def-7033110bcb1ebc5cbb67",
+          "layer": {
+            "design": "n46::n24#0::n24::n13",
+            "code": "0/0/0/7"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d105",
+            "d107",
+            "d114",
+            "d115",
+            "d116",
+            "d117",
+            "d121"
+          ],
+          "summary": "layout configuration differs at n46::n24#0::n24::n13"
+        },
+        {
+          "id": "def-f0ef29e6dfe5a146cc2e",
+          "layer": {
+            "design": "n46::n24#0::n24::n13",
+            "code": "0/0/0/7"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d109",
+            "d110",
+            "d111",
+            "d112",
+            "d113"
+          ],
+          "summary": "style surface differs at n46::n24#0::n24::n13"
+        },
+        {
+          "id": "def-5434cbb5d11622b9edcf",
+          "layer": {
+            "design": "n46::n24#2::n24::n13",
+            "code": "0/0/0/9"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d122",
+            "d124",
+            "d130",
+            "d131",
+            "d132",
+            "d133",
+            "d137"
+          ],
+          "summary": "layout configuration differs at n46::n24#2::n24::n13"
+        },
+        {
+          "id": "def-924b5f6d65a0cc0672bc",
+          "layer": {
+            "design": "n46::n24#2::n24::n13",
+            "code": "0/0/0/9"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d126",
+            "d127",
+            "d128",
+            "d129"
+          ],
+          "summary": "style surface differs at n46::n24#2::n24::n13"
+        },
+        {
+          "id": "def-e052f456b0a14fa376d9",
+          "layer": {
+            "design": "n47",
+            "code": "0/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d138",
+            "d139",
+            "d150",
+            "d152",
+            "d359",
+            "d360"
+          ],
+          "summary": "layout configuration differs at n47"
+        },
+        {
+          "id": "def-f5c5a2a81a8a4dbcc4d9",
+          "layer": {
+            "design": "n52",
+            "code": "0/0/1/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d142",
+            "d144"
+          ],
+          "summary": "layout configuration differs at n52"
+        },
+        {
+          "id": "def-39b0e4417254b210826e",
+          "layer": {
+            "design": "n58#0::n58::n3",
+            "code": "0/0/1/1/0/7/3/0/0/0"
+          },
+          "kind": "style",
+          "cause": "style:white-space",
+          "classification": "product",
+          "findings": [
+            "d190"
+          ],
+          "summary": "style white-space differs at n58#0::n58::n3"
+        },
+        {
+          "id": "def-061a29b1ece90ede7a09",
+          "layer": {
+            "design": "n58#0::n58::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/3/0/1/0/0"
+          },
+          "kind": "style",
+          "cause": "style:color",
+          "classification": "product",
+          "findings": [
+            "d203"
+          ],
+          "summary": "style color differs at n58#0::n58::n7#0::n8::n1"
+        },
+        {
+          "id": "def-5eec4d636e356f7fe9dc",
+          "layer": {
+            "design": "n58#0::n58::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/3/0/1/0/0"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d204",
+            "d205",
+            "d206",
+            "d207"
+          ],
+          "summary": "style surface differs at n58#0::n58::n7#0::n8::n1"
+        },
+        {
+          "id": "def-3d08f6896dd877b7d3ca",
+          "layer": {
+            "design": "n58#0::n58::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/3/0/1/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d211"
+          ],
+          "summary": "layout configuration differs at n58#0::n58::n7#0::n8::n1"
+        },
+        {
+          "id": "def-4b77bbad869939aa81df",
+          "layer": {
+            "design": "n58#1::n58::n2",
+            "code": "0/0/1/1/0/7/6/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d218"
+          ],
+          "summary": "layout configuration differs at n58#1::n58::n2"
+        },
+        {
+          "id": "def-400ce052178a16a9b4ef",
+          "layer": {
+            "design": "n58#1::n58::n3",
+            "code": "0/0/1/1/0/7/6/0/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d225",
+            "d226"
+          ],
+          "summary": "layout configuration differs at n58#1::n58::n3"
+        },
+        {
+          "id": "def-f31688fa50ef27b426f5",
+          "layer": {
+            "design": "n58#1::n58::n3",
+            "code": "0/0/1/1/0/7/6/0/0/0"
+          },
+          "kind": "style",
+          "cause": "style:white-space",
+          "classification": "product",
+          "findings": [
+            "d227"
+          ],
+          "summary": "style white-space differs at n58#1::n58::n3"
+        },
+        {
+          "id": "def-83b917a1416128e936c8",
+          "layer": {
+            "design": "n58#1::n58::n5",
+            "code": "0/0/1/1/0/7/6/0/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d239"
+          ],
+          "summary": "layout configuration differs at n58#1::n58::n5"
+        },
+        {
+          "id": "def-9179754b1acf3427cc4d",
+          "layer": {
+            "design": "n58#1::n58::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/6/0/1/0/0"
+          },
+          "kind": "style",
+          "cause": "style:color",
+          "classification": "product",
+          "findings": [
+            "d242"
+          ],
+          "summary": "style color differs at n58#1::n58::n7#0::n8::n1"
+        },
+        {
+          "id": "def-ed1520c7c11fe0b4ba48",
+          "layer": {
+            "design": "n58#1::n58::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/6/0/1/0/0"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d243",
+            "d244",
+            "d245",
+            "d246"
+          ],
+          "summary": "style surface differs at n58#1::n58::n7#0::n8::n1"
+        },
+        {
+          "id": "def-46c7d1b7a09214d4ce94",
+          "layer": {
+            "design": "n58#1::n58::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/6/0/1/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d250"
+          ],
+          "summary": "layout configuration differs at n58#1::n58::n7#0::n8::n1"
+        },
+        {
+          "id": "def-c30047497b567a8c2d45",
+          "layer": {
+            "design": "n58#3::n58::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/4/0/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d251",
+            "d252",
+            "d261",
+            "d270",
+            "d271",
+            "d272",
+            "d273",
+            "d279",
+            "d281"
+          ],
+          "summary": "layout configuration differs at n58#3::n58::n7#1::n8::n1"
+        },
+        {
+          "id": "def-8214225a0f424f5ad216",
+          "layer": {
+            "design": "n58#3::n58::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/4/0/1/0"
+          },
+          "kind": "style",
+          "cause": "style:color",
+          "classification": "product",
+          "findings": [
+            "d255"
+          ],
+          "summary": "style color differs at n58#3::n58::n7#1::n8::n1"
+        },
+        {
+          "id": "def-db33b3131772e80fac11",
+          "layer": {
+            "design": "n58#3::n58::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/4/0/1/0"
+          },
+          "kind": "style",
+          "cause": "style:font-family",
+          "classification": "product",
+          "findings": [
+            "d274"
+          ],
+          "summary": "style font-family differs at n58#3::n58::n7#1::n8::n1"
+        },
+        {
+          "id": "def-1a361981a41db1ec863b",
+          "layer": {
+            "design": "n58#3::n58::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/4/0/1/0"
+          },
+          "kind": "style",
+          "cause": "style:font-size",
+          "classification": "product",
+          "findings": [
+            "d275"
+          ],
+          "summary": "style font-size differs at n58#3::n58::n7#1::n8::n1"
+        },
+        {
+          "id": "def-c2926df028bf1967fb8e",
+          "layer": {
+            "design": "n58#3::n58::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/4/0/1/0"
+          },
+          "kind": "style",
+          "cause": "style:font-weight",
+          "classification": "product",
+          "findings": [
+            "d276"
+          ],
+          "summary": "style font-weight differs at n58#3::n58::n7#1::n8::n1"
+        },
+        {
+          "id": "def-a2a3fe8f961961632fb7",
+          "layer": {
+            "design": "n58#3::n58::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/4/0/1/0"
+          },
+          "kind": "style",
+          "cause": "style:white-space",
+          "classification": "product",
+          "findings": [
+            "d280"
+          ],
+          "summary": "style white-space differs at n58#3::n58::n7#1::n8::n1"
+        },
+        {
+          "id": "def-44a37b4701eae57e24eb",
+          "layer": {
+            "design": "n60#5::n60::n5",
+            "code": "0/0/1/1/0/7/20/0/1/3"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d282",
+            "d284",
+            "d286",
+            "d288"
+          ],
+          "summary": "layout configuration differs at n60#5::n60::n5"
+        },
+        {
+          "id": "def-e2e95e8692acecc762a4",
+          "layer": {
+            "design": "n60#5::n60::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/20/0/1/3/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d289",
+            "d300"
+          ],
+          "summary": "layout configuration differs at n60#5::n60::n7#0::n8::n1"
+        },
+        {
+          "id": "def-50fb1c565909c42a1a7d",
+          "layer": {
+            "design": "n60#5::n60::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/20/0/1/3/1"
+          },
+          "kind": "style",
+          "cause": "style:color",
+          "classification": "product",
+          "findings": [
+            "d292"
+          ],
+          "summary": "style color differs at n60#5::n60::n7#0::n8::n1"
+        },
+        {
+          "id": "def-197f29af475feacd8d9e",
+          "layer": {
+            "design": "n60#5::n60::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/20/0/1/3/1"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d293",
+            "d294",
+            "d295",
+            "d296"
+          ],
+          "summary": "style surface differs at n60#5::n60::n7#0::n8::n1"
+        },
+        {
+          "id": "def-40b7d9141ea326fa262e",
+          "layer": {
+            "design": "n65",
+            "code": "0/0/1/1/1"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d304"
+          ],
+          "summary": "style surface differs at n65"
+        },
+        {
+          "id": "def-66d6841bd1b9e7a4cd0f",
+          "layer": {
+            "design": "n67::n15",
+            "code": "0/0/1/1/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d312",
+            "d318"
+          ],
+          "summary": "layout configuration differs at n67::n15"
+        },
+        {
+          "id": "def-b0fe371de448cff47395",
+          "layer": {
+            "design": "n68::n15",
+            "code": "0/0/1/1/1/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d321",
+            "d326"
+          ],
+          "summary": "layout configuration differs at n68::n15"
+        },
+        {
+          "id": "def-7fa0fec4d8576e6c981e",
+          "layer": {
+            "design": "n69::n15",
+            "code": "0/0/1/1/1/6"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d329",
+            "d334"
+          ],
+          "summary": "layout configuration differs at n69::n15"
+        },
+        {
+          "id": "def-789cecb13ccc55814ae0",
+          "layer": {
+            "design": "n70::n15",
+            "code": "0/0/1/1/1/10"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d337",
+            "d342"
+          ],
+          "summary": "layout configuration differs at n70::n15"
+        },
+        {
+          "id": "def-57a8dcaf706324420c7e",
+          "layer": {
+            "design": "n71::n15",
+            "code": "0/0/1/1/1/8"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d345",
+            "d350"
+          ],
+          "summary": "layout configuration differs at n71::n15"
+        },
+        {
+          "id": "def-0ad3a47cc036ccec90cf",
+          "layer": {
+            "design": "n74::n15",
+            "code": "0/0/1/1/1/13"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d353",
+            "d358"
+          ],
+          "summary": "layout configuration differs at n74::n15"
+        },
+        {
+          "id": "def-57dbd849b1ae95c7e8d9",
+          "layer": {
+            "design": "n76",
+            "code": "0/0/1/2"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d361",
+            "d362",
+            "d363",
+            "d364"
+          ],
+          "summary": "layout configuration differs at n76"
+        },
+        {
+          "id": "def-4af173dcd8d25a0df3ba",
+          "layer": {
+            "design": "n83",
+            "code": "0/0/1/2/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d365"
+          ],
+          "summary": "layout configuration differs at n83"
+        },
+        {
+          "id": "def-5e857e8c90cced33cd6f",
+          "layer": {
+            "design": "n86",
+            "code": "0/0/1/2/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d371",
+            "d374"
+          ],
+          "summary": "layout configuration differs at n86"
+        },
+        {
+          "id": "def-376ca7effdd362a1f6b1",
+          "layer": {
+            "design": "n46::n22#2::n22::n12"
+          },
+          "kind": "missing",
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d387",
+            "d388"
+          ],
+          "summary": "missing subtree differs at n46::n22#2::n22::n12"
+        },
+        {
+          "id": "def-00525de8235f62d336c0",
+          "layer": {
+            "design": "n46::n24#0::n24::n12"
+          },
+          "kind": "missing",
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d393"
+          ],
+          "summary": "missing subtree differs at n46::n24#0::n24::n12"
+        },
+        {
+          "id": "def-f76c4f204742f3c3d694",
+          "layer": {
+            "design": "n46::n24#1::n24::n12"
+          },
+          "kind": "missing",
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d394",
+            "d395"
+          ],
+          "summary": "missing subtree differs at n46::n24#1::n24::n12"
+        },
+        {
+          "id": "def-120e277cb049f861d0b2",
+          "layer": {
+            "design": "n46::n27::n12"
+          },
+          "kind": "missing",
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d400",
+            "d401"
+          ],
+          "summary": "missing subtree differs at n46::n27::n12"
+        },
+        {
+          "id": "def-6a903a4fcda7a02aa6b4",
+          "layer": {
+            "code": "0"
+          },
+          "kind": "extra",
+          "cause": "extra:subtree",
+          "classification": "product",
+          "findings": [
+            "d518",
+            "d519",
+            "d520"
+          ],
+          "summary": "extra subtree differs at 0"
+        }
+      ],
+      "falseNegatives": [
+        {
+          "id": "H-02",
+          "design_layer": "0/0/1/1/0/0/1/*;0/0/1/1/0/*",
+          "code_layer": "0/0/1/1/0/7/*;0/0/1/1/0/0/*",
+          "kind": "text",
+          "description": "Shortcut rows come from the live command registry: Agent run has about 40 rows (Where this runs, Session actions, Focus composer input, Model effort and speed …) instead of the design's 8 samples; Surface a card and Archive agent are not there, Toggle important / Copy bee id / self-seal are far below, notes are reworded (\"running bee: queued, delivered at turn end\"), and GLOBAL lacks Jump to pane, Jump to most important, Needs me",
+          "severity": "medium",
+          "likely_intentional": "yes",
+          "note": "[catalog-content] design shows sample data; code renders the registry as extracted by the capture fixture (which misses plugin contributions and has no availability predicates), so part of this row may be fixture-only",
+          "properties": "text"
+        },
+        {
+          "id": "H-03",
+          "design_layer": "0/0/1/1/0/0/1/*/0/0",
+          "code_layer": "0/0/1/1/0/7/1/0/0/0;0/0/1/1/0/7/2/0/0/0;0/0/1/1/0/7/7/0/0/0;0/0/1/1/0/7/11/0/0/0;0/0/1/1/0/7/15/0/0/0",
+          "kind": "layout",
+          "description": "Command names are cut off with an ellipsis when the note is long (\"Where this …\", \"Session actio…\", \"Queue until the current turn e…\", \"Work…\", \"Scroll transcript down / up half a …\"); in the design the name always shows in full and only the note gives way",
+          "severity": "high",
+          "likely_intentional": "no",
+          "note": "[label-truncation] label span can shrink as much as the note; long registry notes squeeze it",
+          "properties": "flex-shrink;text-overflow;width"
+        },
+        {
+          "id": "H-04",
+          "design_layer": "0/0/1/1/0/0/0/0/0;0/0/1/1/0/0/0/0/1",
+          "code_layer": "0/0/1/1/0/7/0/0;0/0/1/1/0/7/0/1",
+          "kind": "style",
+          "description": "Section header reads \"THIS PANE · AGENT RUN\" followed by a mono \"· opened from drone-07\" in design; code shows \"AGENT RUN\" with a small grey \"THIS PANE\" pill and no \"opened from\" origin",
+          "severity": "medium",
+          "likely_intentional": "yes",
+          "note": "[this-pane-header] matches the caption's \"neutral this-pane tag\"; origin text dropped",
+          "properties": "text;background-color;font-size;layout"
+        },
+        {
+          "id": "H-07",
+          "design_layer": "0/0/0/0/4/0/0",
+          "code_layer": "0/0/0/4",
+          "kind": "text",
+          "description": "Guide topic \"Yards & quests\" reads \"Yards & products\" in code",
+          "severity": "low",
+          "likely_intentional": "yes",
+          "note": "[guide-topic-rename] product naming moved on",
+          "properties": "text"
+        },
+        {
+          "id": "H-11",
+          "design_layer": "0/0/1/2/0;0/0/1/2/1;0/0/1/2/2;0/0/1/2/3;0/0/1/2/4;0/0/1/2/5;0/0/1/2/7;0/0/1/2/8",
+          "code_layer": "none",
+          "kind": "missing",
+          "description": "Footer hints \"type to search · ↑↓ move · ↵ run command · esc close\" and their separators are missing; only \"click keys to rebind\" and \"live from the command registry\" remain",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[footer-hints]",
+          "properties": "subtree"
+        },
+        {
+          "id": "H-12",
+          "design_layer": "0/0/1/0/1",
+          "code_layer": "0/0/1/0/1",
+          "kind": "text",
+          "description": "Count reads \"183 shortcuts · 14 surfaces\" instead of \"86 bindings · 10 surfaces\"",
+          "severity": "low",
+          "likely_intentional": "yes",
+          "note": "[bindings-count] numbers are live; \"bindings\" → \"shortcuts\" wording",
+          "properties": "text"
+        },
+        {
+          "id": "H-13",
+          "design_layer": "0/0/1/1/1/*",
+          "code_layer": "0/0/1/1/1/*",
+          "kind": "text",
+          "description": "Anchor rail lists the code's 14 surfaces: adds Browser, Terminal, Whiteboard, Tracks, Agent run, Inbox, Sheet; has no This pane, Changes or Sidebar & pickers; Editor is \"Files & editor\"",
+          "severity": "low",
+          "likely_intentional": "yes",
+          "note": "[anchor-list] live registry surfaces",
+          "properties": "text"
+        },
+        {
+          "id": "H-21",
+          "design_layer": "0/0/1/0/0",
+          "code_layer": "0/0/1/0/0",
+          "kind": "style",
+          "description": "The focused search field has a darker border in code (#DAD5CC) than the dialog design shows for it (--color-border #E7E5E0, while the design already paints a caret, i.e. focused)",
+          "severity": "low",
+          "likely_intentional": "yes",
+          "note": "[search-focus-border] code's focus style; the board's own search state (n147) uses #DAD5CC",
+          "properties": "border-color"
+        }
+      ]
+    },
+    "strict": {
+      "tp": 10,
+      "fp": 54,
+      "fn": 11,
+      "precision": 0.15625,
+      "recall": 0.47619047619047616,
+      "predicted": 64,
+      "labelled": 21,
+      "agreement": [
+        {
+          "defect": "def-783a4e2aecc696297c2d",
+          "label": "H-20",
+          "description": "Dialog shadow is lighter and tighter in code: 0 16px 40px rgba(40,35,30,.15) vs --shadow-panel 0 24px 64px rgba(40,35,30,.30); only a 4px strip of it shows inside the card-only capture"
+        },
+        {
+          "defect": "def-5e03bba5d8a08d49ab16",
+          "label": "H-17",
+          "description": "Boxes with borders are smaller in code because the design adds borders outside the authored size and code includes them: key caps 18px vs 21px tall (label sits 1.5px higher), search field 34px vs 36px, footer 34px vs 35px, card 1060×716 vs 1062×718"
+        },
+        {
+          "defect": "def-a5f8b1e9c31763a21eba",
+          "label": "H-01",
+          "description": "Design pins the \"this pane\" section at the top of the catalog, followed by GLOBAL; code keeps Agent run in its normal catalog slot (after Lists) and scrolls the list to it, so the view starts at AGENT RUN and GLOBAL is out of sight"
+        },
+        {
+          "defect": "def-5b3411d334e4fe622568",
+          "label": "H-14",
+          "description": "Active anchor styling differs: design highlights \"This pane\" in primary ink #2E2B27 (600) with \"Global\" in #6F6B63; code highlights \"Agent run\" in #6F6B63 (600) and \"Global\" is faint like the rest"
+        },
+        {
+          "defect": "def-da2c607e558c8e9b7bfc",
+          "label": "H-08",
+          "description": "Guide topic \"Loops\" is missing from the sidebar"
+        },
+        {
+          "defect": "def-7bd55bc2581fdb57b4c5",
+          "label": "H-09",
+          "description": "\"What's new 0.4.2\" and \"About Apiary\" at the bottom of the sidebar are missing"
+        },
+        {
+          "defect": "def-1bb4f1d59ccfe1a42466",
+          "label": "H-06",
+          "description": "Guide sidebar is 216px wide in code vs 253px in design, so the search field, the list and the esc cap all start 37px further left"
+        },
+        {
+          "defect": "def-01bc8df7df738b81602a",
+          "label": "H-16",
+          "description": "When a command has several key groups, code puts a faint \"·\" between the caps (\"⌃. · ⌘.\", \"⇥ · ⌘⌥F\"); design just spaces the caps 3px apart"
+        },
+        {
+          "defect": "def-9e5f2fff78662f2c00f2",
+          "label": "H-15",
+          "description": "Anchor rail is 128px wide vs 163px and its items are spaced 22.7px apart vs 21px"
+        },
+        {
+          "defect": "def-60a6145ecbac41c01105",
+          "label": "H-10",
+          "description": "Sidebar group labels and topics sit about 6px higher (GUIDE text y≈59 vs 66, Getting started y≈86 vs 92); group label blocks are spaced differently"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-4774cb4160dec72560bd",
+          "layer": {
+            "design": "n45",
+            "code": "n45"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d1",
+            "d2",
+            "d4",
+            "d6",
+            "d11",
+            "d18",
+            "d19",
+            "d21",
+            "d24",
+            "d25",
+            "d32",
+            "d36",
+            "d38",
+            "d44",
+            "d47",
+            "d49",
+            "d59",
+            "d63",
+            "d65",
+            "d75",
+            "d79",
+            "d81",
+            "d91",
+            "d95",
+            "d97",
+            "d103",
+            "d106",
+            "d108",
+            "d119",
+            "d123",
+            "d125",
+            "d135",
+            "d140",
+            "d143",
+            "d145",
+            "d148",
+            "d151",
+            "d182",
+            "d183",
+            "d185",
+            "d201",
+            "d202",
+            "d209",
+            "d219",
+            "d220",
+            "d222",
+            "d240",
+            "d241",
+            "d248",
+            "d253",
+            "d277",
+            "d283",
+            "d285",
+            "d290",
+            "d291",
+            "d298",
+            "d302",
+            "d311",
+            "d313",
+            "d316",
+            "d320",
+            "d322",
+            "d324",
+            "d328",
+            "d330",
+            "d332",
+            "d336",
+            "d338",
+            "d340",
+            "d344",
+            "d346",
+            "d348",
+            "d352",
+            "d354",
+            "d356",
+            "d366",
+            "d367",
+            "d369",
+            "d372",
+            "d373",
+            "d376"
+          ],
+          "summary": "layout configuration differs at n45"
+        },
+        {
+          "id": "def-5aae1955e337709eb6dd",
+          "layer": {
+            "design": "n46::n20::n1",
+            "code": "0/0/0/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d23",
+            "d33",
+            "d34"
+          ],
+          "summary": "layout configuration differs at n46::n20::n1"
+        },
+        {
+          "id": "def-7cd58e1a36a0b3c5d91d",
+          "layer": {
+            "design": "n46::n20::n1",
+            "code": "0/0/0/0/1"
+          },
+          "kind": "style",
+          "cause": "style:color",
+          "classification": "product",
+          "findings": [
+            "d26"
+          ],
+          "summary": "style color differs at n46::n20::n1"
+        },
+        {
+          "id": "def-1e5c72bc6fc68b591ade",
+          "layer": {
+            "design": "n46::n20::n1",
+            "code": "0/0/0/0/1"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d27",
+            "d28",
+            "d29",
+            "d30"
+          ],
+          "summary": "style surface differs at n46::n20::n1"
+        },
+        {
+          "id": "def-acfa83cd7f589967afd6",
+          "layer": {
+            "design": "n46::n22#0::n22::n13",
+            "code": "0/0/0/2"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d46",
+            "d48",
+            "d54",
+            "d55",
+            "d56",
+            "d57",
+            "d61"
+          ],
+          "summary": "layout configuration differs at n46::n22#0::n22::n13"
+        },
+        {
+          "id": "def-90c9ed68839470e8fba1",
+          "layer": {
+            "design": "n46::n22#0::n22::n13",
+            "code": "0/0/0/2"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d50",
+            "d51",
+            "d52",
+            "d53"
+          ],
+          "summary": "style surface differs at n46::n22#0::n22::n13"
+        },
+        {
+          "id": "def-1ed44b3b2e14d282793c",
+          "layer": {
+            "design": "n46::n22#1::n22::n13",
+            "code": "0/0/0/3"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d62",
+            "d64",
+            "d70",
+            "d71",
+            "d72",
+            "d73",
+            "d77"
+          ],
+          "summary": "layout configuration differs at n46::n22#1::n22::n13"
+        },
+        {
+          "id": "def-dce005f346dbbc69b9b8",
+          "layer": {
+            "design": "n46::n22#1::n22::n13",
+            "code": "0/0/0/3"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d66",
+            "d67",
+            "d68",
+            "d69"
+          ],
+          "summary": "style surface differs at n46::n22#1::n22::n13"
+        },
+        {
+          "id": "def-ef2ca6440d322c1ba48e",
+          "layer": {
+            "design": "n46::n22#3::n22::n13",
+            "code": "0/0/0/5"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d78",
+            "d80",
+            "d86",
+            "d87",
+            "d88",
+            "d89",
+            "d93"
+          ],
+          "summary": "layout configuration differs at n46::n22#3::n22::n13"
+        },
+        {
+          "id": "def-3264da2a6506fe105dde",
+          "layer": {
+            "design": "n46::n22#3::n22::n13",
+            "code": "0/0/0/5"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d82",
+            "d83",
+            "d84",
+            "d85"
+          ],
+          "summary": "style surface differs at n46::n22#3::n22::n13"
+        },
+        {
+          "id": "def-99d6a32b3eaba5307d93",
+          "layer": {
+            "design": "n46::n23::n10",
+            "code": "0/0/0/6"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d94",
+            "d96",
+            "d98",
+            "d99",
+            "d100",
+            "d101",
+            "d104"
+          ],
+          "summary": "layout configuration differs at n46::n23::n10"
+        },
+        {
+          "id": "def-7033110bcb1ebc5cbb67",
+          "layer": {
+            "design": "n46::n24#0::n24::n13",
+            "code": "0/0/0/7"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d105",
+            "d107",
+            "d114",
+            "d115",
+            "d116",
+            "d117",
+            "d121"
+          ],
+          "summary": "layout configuration differs at n46::n24#0::n24::n13"
+        },
+        {
+          "id": "def-f0ef29e6dfe5a146cc2e",
+          "layer": {
+            "design": "n46::n24#0::n24::n13",
+            "code": "0/0/0/7"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d109",
+            "d110",
+            "d111",
+            "d112",
+            "d113"
+          ],
+          "summary": "style surface differs at n46::n24#0::n24::n13"
+        },
+        {
+          "id": "def-5434cbb5d11622b9edcf",
+          "layer": {
+            "design": "n46::n24#2::n24::n13",
+            "code": "0/0/0/9"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d122",
+            "d124",
+            "d130",
+            "d131",
+            "d132",
+            "d133",
+            "d137"
+          ],
+          "summary": "layout configuration differs at n46::n24#2::n24::n13"
+        },
+        {
+          "id": "def-924b5f6d65a0cc0672bc",
+          "layer": {
+            "design": "n46::n24#2::n24::n13",
+            "code": "0/0/0/9"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d126",
+            "d127",
+            "d128",
+            "d129"
+          ],
+          "summary": "style surface differs at n46::n24#2::n24::n13"
+        },
+        {
+          "id": "def-e052f456b0a14fa376d9",
+          "layer": {
+            "design": "n47",
+            "code": "0/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d138",
+            "d139",
+            "d150",
+            "d152",
+            "d359",
+            "d360"
+          ],
+          "summary": "layout configuration differs at n47"
+        },
+        {
+          "id": "def-f5c5a2a81a8a4dbcc4d9",
+          "layer": {
+            "design": "n52",
+            "code": "0/0/1/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d142",
+            "d144"
+          ],
+          "summary": "layout configuration differs at n52"
+        },
+        {
+          "id": "def-39b0e4417254b210826e",
+          "layer": {
+            "design": "n58#0::n58::n3",
+            "code": "0/0/1/1/0/7/3/0/0/0"
+          },
+          "kind": "style",
+          "cause": "style:white-space",
+          "classification": "product",
+          "findings": [
+            "d190"
+          ],
+          "summary": "style white-space differs at n58#0::n58::n3"
+        },
+        {
+          "id": "def-061a29b1ece90ede7a09",
+          "layer": {
+            "design": "n58#0::n58::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/3/0/1/0/0"
+          },
+          "kind": "style",
+          "cause": "style:color",
+          "classification": "product",
+          "findings": [
+            "d203"
+          ],
+          "summary": "style color differs at n58#0::n58::n7#0::n8::n1"
+        },
+        {
+          "id": "def-5eec4d636e356f7fe9dc",
+          "layer": {
+            "design": "n58#0::n58::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/3/0/1/0/0"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d204",
+            "d205",
+            "d206",
+            "d207"
+          ],
+          "summary": "style surface differs at n58#0::n58::n7#0::n8::n1"
+        },
+        {
+          "id": "def-3d08f6896dd877b7d3ca",
+          "layer": {
+            "design": "n58#0::n58::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/3/0/1/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d211"
+          ],
+          "summary": "layout configuration differs at n58#0::n58::n7#0::n8::n1"
+        },
+        {
+          "id": "def-4b77bbad869939aa81df",
+          "layer": {
+            "design": "n58#1::n58::n2",
+            "code": "0/0/1/1/0/7/6/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d218"
+          ],
+          "summary": "layout configuration differs at n58#1::n58::n2"
+        },
+        {
+          "id": "def-400ce052178a16a9b4ef",
+          "layer": {
+            "design": "n58#1::n58::n3",
+            "code": "0/0/1/1/0/7/6/0/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d225",
+            "d226"
+          ],
+          "summary": "layout configuration differs at n58#1::n58::n3"
+        },
+        {
+          "id": "def-f31688fa50ef27b426f5",
+          "layer": {
+            "design": "n58#1::n58::n3",
+            "code": "0/0/1/1/0/7/6/0/0/0"
+          },
+          "kind": "style",
+          "cause": "style:white-space",
+          "classification": "product",
+          "findings": [
+            "d227"
+          ],
+          "summary": "style white-space differs at n58#1::n58::n3"
+        },
+        {
+          "id": "def-83b917a1416128e936c8",
+          "layer": {
+            "design": "n58#1::n58::n5",
+            "code": "0/0/1/1/0/7/6/0/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d239"
+          ],
+          "summary": "layout configuration differs at n58#1::n58::n5"
+        },
+        {
+          "id": "def-9179754b1acf3427cc4d",
+          "layer": {
+            "design": "n58#1::n58::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/6/0/1/0/0"
+          },
+          "kind": "style",
+          "cause": "style:color",
+          "classification": "product",
+          "findings": [
+            "d242"
+          ],
+          "summary": "style color differs at n58#1::n58::n7#0::n8::n1"
+        },
+        {
+          "id": "def-ed1520c7c11fe0b4ba48",
+          "layer": {
+            "design": "n58#1::n58::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/6/0/1/0/0"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d243",
+            "d244",
+            "d245",
+            "d246"
+          ],
+          "summary": "style surface differs at n58#1::n58::n7#0::n8::n1"
+        },
+        {
+          "id": "def-46c7d1b7a09214d4ce94",
+          "layer": {
+            "design": "n58#1::n58::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/6/0/1/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d250"
+          ],
+          "summary": "layout configuration differs at n58#1::n58::n7#0::n8::n1"
+        },
+        {
+          "id": "def-c30047497b567a8c2d45",
+          "layer": {
+            "design": "n58#3::n58::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/4/0/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d251",
+            "d252",
+            "d261",
+            "d270",
+            "d271",
+            "d272",
+            "d273",
+            "d279",
+            "d281"
+          ],
+          "summary": "layout configuration differs at n58#3::n58::n7#1::n8::n1"
+        },
+        {
+          "id": "def-8214225a0f424f5ad216",
+          "layer": {
+            "design": "n58#3::n58::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/4/0/1/0"
+          },
+          "kind": "style",
+          "cause": "style:color",
+          "classification": "product",
+          "findings": [
+            "d255"
+          ],
+          "summary": "style color differs at n58#3::n58::n7#1::n8::n1"
+        },
+        {
+          "id": "def-ede64b92f8b429def82a",
+          "layer": {
+            "design": "n58#3::n58::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/4/0/1/0"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d256",
+            "d257",
+            "d258",
+            "d259",
+            "d260",
+            "d262",
+            "d263",
+            "d264",
+            "d265",
+            "d266",
+            "d267",
+            "d268",
+            "d269"
+          ],
+          "summary": "style surface differs at n58#3::n58::n7#1::n8::n1"
+        },
+        {
+          "id": "def-db33b3131772e80fac11",
+          "layer": {
+            "design": "n58#3::n58::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/4/0/1/0"
+          },
+          "kind": "style",
+          "cause": "style:font-family",
+          "classification": "product",
+          "findings": [
+            "d274"
+          ],
+          "summary": "style font-family differs at n58#3::n58::n7#1::n8::n1"
+        },
+        {
+          "id": "def-1a361981a41db1ec863b",
+          "layer": {
+            "design": "n58#3::n58::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/4/0/1/0"
+          },
+          "kind": "style",
+          "cause": "style:font-size",
+          "classification": "product",
+          "findings": [
+            "d275"
+          ],
+          "summary": "style font-size differs at n58#3::n58::n7#1::n8::n1"
+        },
+        {
+          "id": "def-c2926df028bf1967fb8e",
+          "layer": {
+            "design": "n58#3::n58::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/4/0/1/0"
+          },
+          "kind": "style",
+          "cause": "style:font-weight",
+          "classification": "product",
+          "findings": [
+            "d276"
+          ],
+          "summary": "style font-weight differs at n58#3::n58::n7#1::n8::n1"
+        },
+        {
+          "id": "def-a2a3fe8f961961632fb7",
+          "layer": {
+            "design": "n58#3::n58::n7#1::n8::n1",
+            "code": "0/0/1/1/0/7/4/0/1/0"
+          },
+          "kind": "style",
+          "cause": "style:white-space",
+          "classification": "product",
+          "findings": [
+            "d280"
+          ],
+          "summary": "style white-space differs at n58#3::n58::n7#1::n8::n1"
+        },
+        {
+          "id": "def-44a37b4701eae57e24eb",
+          "layer": {
+            "design": "n60#5::n60::n5",
+            "code": "0/0/1/1/0/7/20/0/1/3"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d282",
+            "d284",
+            "d286",
+            "d288"
+          ],
+          "summary": "layout configuration differs at n60#5::n60::n5"
+        },
+        {
+          "id": "def-e2e95e8692acecc762a4",
+          "layer": {
+            "design": "n60#5::n60::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/20/0/1/3/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d289",
+            "d300"
+          ],
+          "summary": "layout configuration differs at n60#5::n60::n7#0::n8::n1"
+        },
+        {
+          "id": "def-50fb1c565909c42a1a7d",
+          "layer": {
+            "design": "n60#5::n60::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/20/0/1/3/1"
+          },
+          "kind": "style",
+          "cause": "style:color",
+          "classification": "product",
+          "findings": [
+            "d292"
+          ],
+          "summary": "style color differs at n60#5::n60::n7#0::n8::n1"
+        },
+        {
+          "id": "def-197f29af475feacd8d9e",
+          "layer": {
+            "design": "n60#5::n60::n7#0::n8::n1",
+            "code": "0/0/1/1/0/7/20/0/1/3/1"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d293",
+            "d294",
+            "d295",
+            "d296"
+          ],
+          "summary": "style surface differs at n60#5::n60::n7#0::n8::n1"
+        },
+        {
+          "id": "def-40b7d9141ea326fa262e",
+          "layer": {
+            "design": "n65",
+            "code": "0/0/1/1/1"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d304"
+          ],
+          "summary": "style surface differs at n65"
+        },
+        {
+          "id": "def-66d6841bd1b9e7a4cd0f",
+          "layer": {
+            "design": "n67::n15",
+            "code": "0/0/1/1/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d312",
+            "d318"
+          ],
+          "summary": "layout configuration differs at n67::n15"
+        },
+        {
+          "id": "def-b0fe371de448cff47395",
+          "layer": {
+            "design": "n68::n15",
+            "code": "0/0/1/1/1/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d321",
+            "d326"
+          ],
+          "summary": "layout configuration differs at n68::n15"
+        },
+        {
+          "id": "def-7fa0fec4d8576e6c981e",
+          "layer": {
+            "design": "n69::n15",
+            "code": "0/0/1/1/1/6"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d329",
+            "d334"
+          ],
+          "summary": "layout configuration differs at n69::n15"
+        },
+        {
+          "id": "def-789cecb13ccc55814ae0",
+          "layer": {
+            "design": "n70::n15",
+            "code": "0/0/1/1/1/10"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d337",
+            "d342"
+          ],
+          "summary": "layout configuration differs at n70::n15"
+        },
+        {
+          "id": "def-57a8dcaf706324420c7e",
+          "layer": {
+            "design": "n71::n15",
+            "code": "0/0/1/1/1/8"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d345",
+            "d350"
+          ],
+          "summary": "layout configuration differs at n71::n15"
+        },
+        {
+          "id": "def-0ad3a47cc036ccec90cf",
+          "layer": {
+            "design": "n74::n15",
+            "code": "0/0/1/1/1/13"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d353",
+            "d358"
+          ],
+          "summary": "layout configuration differs at n74::n15"
+        },
+        {
+          "id": "def-57dbd849b1ae95c7e8d9",
+          "layer": {
+            "design": "n76",
+            "code": "0/0/1/2"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d361",
+            "d362",
+            "d363",
+            "d364"
+          ],
+          "summary": "layout configuration differs at n76"
+        },
+        {
+          "id": "def-4af173dcd8d25a0df3ba",
+          "layer": {
+            "design": "n83",
+            "code": "0/0/1/2/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d365"
+          ],
+          "summary": "layout configuration differs at n83"
+        },
+        {
+          "id": "def-5e857e8c90cced33cd6f",
+          "layer": {
+            "design": "n86",
+            "code": "0/0/1/2/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d371",
+            "d374"
+          ],
+          "summary": "layout configuration differs at n86"
+        },
+        {
+          "id": "def-376ca7effdd362a1f6b1",
+          "layer": {
+            "design": "n46::n22#2::n22::n12"
+          },
+          "kind": "missing",
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d387",
+            "d388"
+          ],
+          "summary": "missing subtree differs at n46::n22#2::n22::n12"
+        },
+        {
+          "id": "def-00525de8235f62d336c0",
+          "layer": {
+            "design": "n46::n24#0::n24::n12"
+          },
+          "kind": "missing",
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d393"
+          ],
+          "summary": "missing subtree differs at n46::n24#0::n24::n12"
+        },
+        {
+          "id": "def-f76c4f204742f3c3d694",
+          "layer": {
+            "design": "n46::n24#1::n24::n12"
+          },
+          "kind": "missing",
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d394",
+            "d395"
+          ],
+          "summary": "missing subtree differs at n46::n24#1::n24::n12"
+        },
+        {
+          "id": "def-120e277cb049f861d0b2",
+          "layer": {
+            "design": "n46::n27::n12"
+          },
+          "kind": "missing",
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d400",
+            "d401"
+          ],
+          "summary": "missing subtree differs at n46::n27::n12"
+        },
+        {
+          "id": "def-6a903a4fcda7a02aa6b4",
+          "layer": {
+            "code": "0"
+          },
+          "kind": "extra",
+          "cause": "extra:subtree",
+          "classification": "product",
+          "findings": [
+            "d518",
+            "d519",
+            "d520"
+          ],
+          "summary": "extra subtree differs at 0"
+        }
+      ],
+      "falseNegatives": [
+        {
+          "id": "H-02",
+          "design_layer": "0/0/1/1/0/0/1/*;0/0/1/1/0/*",
+          "code_layer": "0/0/1/1/0/7/*;0/0/1/1/0/0/*",
+          "kind": "text",
+          "description": "Shortcut rows come from the live command registry: Agent run has about 40 rows (Where this runs, Session actions, Focus composer input, Model effort and speed …) instead of the design's 8 samples; Surface a card and Archive agent are not there, Toggle important / Copy bee id / self-seal are far below, notes are reworded (\"running bee: queued, delivered at turn end\"), and GLOBAL lacks Jump to pane, Jump to most important, Needs me",
+          "severity": "medium",
+          "likely_intentional": "yes",
+          "note": "[catalog-content] design shows sample data; code renders the registry as extracted by the capture fixture (which misses plugin contributions and has no availability predicates), so part of this row may be fixture-only",
+          "properties": "text"
+        },
+        {
+          "id": "H-03",
+          "design_layer": "0/0/1/1/0/0/1/*/0/0",
+          "code_layer": "0/0/1/1/0/7/1/0/0/0;0/0/1/1/0/7/2/0/0/0;0/0/1/1/0/7/7/0/0/0;0/0/1/1/0/7/11/0/0/0;0/0/1/1/0/7/15/0/0/0",
+          "kind": "layout",
+          "description": "Command names are cut off with an ellipsis when the note is long (\"Where this …\", \"Session actio…\", \"Queue until the current turn e…\", \"Work…\", \"Scroll transcript down / up half a …\"); in the design the name always shows in full and only the note gives way",
+          "severity": "high",
+          "likely_intentional": "no",
+          "note": "[label-truncation] label span can shrink as much as the note; long registry notes squeeze it",
+          "properties": "flex-shrink;text-overflow;width"
+        },
+        {
+          "id": "H-04",
+          "design_layer": "0/0/1/1/0/0/0/0/0;0/0/1/1/0/0/0/0/1",
+          "code_layer": "0/0/1/1/0/7/0/0;0/0/1/1/0/7/0/1",
+          "kind": "style",
+          "description": "Section header reads \"THIS PANE · AGENT RUN\" followed by a mono \"· opened from drone-07\" in design; code shows \"AGENT RUN\" with a small grey \"THIS PANE\" pill and no \"opened from\" origin",
+          "severity": "medium",
+          "likely_intentional": "yes",
+          "note": "[this-pane-header] matches the caption's \"neutral this-pane tag\"; origin text dropped",
+          "properties": "text;background-color;font-size;layout"
+        },
+        {
+          "id": "H-05",
+          "design_layer": "0/0/1/1/0/0/1",
+          "code_layer": "none",
+          "kind": "missing",
+          "description": "The this-pane rows sit in a bordered rounded card (1px #ECEAE5, 8px radius) in design; code has no card, so the rows are flush with the rest of the list",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[this-pane-card]",
+          "properties": "border;border-radius;subtree"
+        },
+        {
+          "id": "H-07",
+          "design_layer": "0/0/0/0/4/0/0",
+          "code_layer": "0/0/0/4",
+          "kind": "text",
+          "description": "Guide topic \"Yards & quests\" reads \"Yards & products\" in code",
+          "severity": "low",
+          "likely_intentional": "yes",
+          "note": "[guide-topic-rename] product naming moved on",
+          "properties": "text"
+        },
+        {
+          "id": "H-11",
+          "design_layer": "0/0/1/2/0;0/0/1/2/1;0/0/1/2/2;0/0/1/2/3;0/0/1/2/4;0/0/1/2/5;0/0/1/2/7;0/0/1/2/8",
+          "code_layer": "none",
+          "kind": "missing",
+          "description": "Footer hints \"type to search · ↑↓ move · ↵ run command · esc close\" and their separators are missing; only \"click keys to rebind\" and \"live from the command registry\" remain",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[footer-hints]",
+          "properties": "subtree"
+        },
+        {
+          "id": "H-12",
+          "design_layer": "0/0/1/0/1",
+          "code_layer": "0/0/1/0/1",
+          "kind": "text",
+          "description": "Count reads \"183 shortcuts · 14 surfaces\" instead of \"86 bindings · 10 surfaces\"",
+          "severity": "low",
+          "likely_intentional": "yes",
+          "note": "[bindings-count] numbers are live; \"bindings\" → \"shortcuts\" wording",
+          "properties": "text"
+        },
+        {
+          "id": "H-13",
+          "design_layer": "0/0/1/1/1/*",
+          "code_layer": "0/0/1/1/1/*",
+          "kind": "text",
+          "description": "Anchor rail lists the code's 14 surfaces: adds Browser, Terminal, Whiteboard, Tracks, Agent run, Inbox, Sheet; has no This pane, Changes or Sidebar & pickers; Editor is \"Files & editor\"",
+          "severity": "low",
+          "likely_intentional": "yes",
+          "note": "[anchor-list] live registry surfaces",
+          "properties": "text"
+        },
+        {
+          "id": "H-18",
+          "design_layer": "*",
+          "code_layer": "*",
+          "kind": "style",
+          "description": "Key-cap label ink is lighter in code: #6B6862 (inkSoft) vs #5A564E",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[cap-ink] same as Keycap",
+          "properties": "color"
+        },
+        {
+          "id": "H-19",
+          "design_layer": "*",
+          "code_layer": "*",
+          "kind": "token",
+          "description": "Key caps use border #E2E0DB (ghostBorder) instead of --color-border #E7E5E0",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[cap-border] same token swap as Keycap",
+          "properties": "border-color"
+        },
+        {
+          "id": "H-21",
+          "design_layer": "0/0/1/0/0",
+          "code_layer": "0/0/1/0/0",
+          "kind": "style",
+          "description": "The focused search field has a darker border in code (#DAD5CC) than the dialog design shows for it (--color-border #E7E5E0, while the design already paints a caret, i.e. focused)",
+          "severity": "low",
+          "likely_intentional": "yes",
+          "note": "[search-focus-border] code's focus style; the board's own search state (n147) uses #DAD5CC",
+          "properties": "border-color"
+        }
+      ]
+    }
+  },
+  {
+    "component": "tracks-flowview",
+    "state": "track-selected",
+    "optimistic": {
+      "tp": 1,
+      "fp": 19,
+      "fn": 2,
+      "precision": 0.05,
+      "recall": 0.3333333333333333,
+      "predicted": 20,
+      "labelled": 3,
+      "agreement": [
+        {
+          "defect": "def-9fe9539fa89d749e9d83",
+          "label": "TS-03",
+          "description": "Below the visible area: the Ship it? card is 269px wide in code vs 248px, and its title stretches so \"upcoming · blocking ask\" is pushed to the card's right edge instead of following the title"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-17b6211d0c0dbd9536ee",
+          "layer": {
+            "design": "n212::n582",
+            "code": "0/0/0/1/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d10",
+            "d11",
+            "d12",
+            "d13",
+            "d14",
+            "d15",
+            "d16"
+          ],
+          "summary": "layout configuration differs at n212::n582"
+        },
+        {
+          "id": "def-228c7dd792efac243a5e",
+          "layer": {
+            "design": "n212::n588::n38",
+            "code": "0/0/0/1/0/4"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d17",
+            "d18",
+            "d19",
+            "d20",
+            "d33",
+            "d34",
+            "d35",
+            "d36"
+          ],
+          "summary": "layout configuration differs at n212::n588::n38"
+        },
+        {
+          "id": "def-09a3690597aa80275e4c",
+          "layer": {
+            "design": "n212::n588::n38",
+            "code": "0/0/0/1/0/4"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d21",
+            "d22",
+            "d23",
+            "d24",
+            "d25",
+            "d26",
+            "d27",
+            "d28",
+            "d29",
+            "d30",
+            "d31",
+            "d32"
+          ],
+          "summary": "style surface differs at n212::n588::n38"
+        },
+        {
+          "id": "def-e8d82f7dd9e3927f21f4",
+          "layer": {
+            "design": "n212::n590::n438",
+            "code": "0/0/0/1/1/0/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d43"
+          ],
+          "summary": "layout configuration differs at n212::n590::n438"
+        },
+        {
+          "id": "def-a31660b0d40da6f30898",
+          "layer": {
+            "design": "n212::n590::n441",
+            "code": "0/0/0/1/1/0/0/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d45",
+            "d46",
+            "d47",
+            "d48",
+            "d49",
+            "d50",
+            "d51",
+            "d52"
+          ],
+          "summary": "layout configuration differs at n212::n590::n441"
+        },
+        {
+          "id": "def-23061b8f40f6e23c8fa1",
+          "layer": {
+            "design": "n212::n590::n449",
+            "code": "0/0/0/1/1/0/0/0/6/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d57",
+            "d58"
+          ],
+          "summary": "layout configuration differs at n212::n590::n449"
+        },
+        {
+          "id": "def-270a8a0cb5eeecc39105",
+          "layer": {
+            "design": "n212::n590::n459::n402",
+            "code": "0/0/0/1/1/0/0/0/9/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d107",
+            "d108",
+            "d109",
+            "d110",
+            "d112",
+            "d113",
+            "d114",
+            "d115"
+          ],
+          "summary": "layout configuration differs at n212::n590::n459::n402"
+        },
+        {
+          "id": "def-add05281f83303a49277",
+          "layer": {
+            "design": "n212::n590::n459::n402",
+            "code": "0/0/0/1/1/0/0/0/9/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:transform",
+          "classification": "product",
+          "findings": [
+            "d111"
+          ],
+          "summary": "layout transform differs at n212::n590::n459::n402"
+        },
+        {
+          "id": "def-98a1196782cd0c483d62",
+          "layer": {
+            "design": "n212::n590::n459::n401",
+            "code": "0/0/0/1/1/0/0/0/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d116"
+          ],
+          "summary": "layout configuration differs at n212::n590::n459::n401"
+        },
+        {
+          "id": "def-00a3f44e7ac0af8a9ee1",
+          "layer": {
+            "design": "n212::n590::n459::n403",
+            "code": "0/0/0/1/1/0/0/0/0/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d117",
+            "d118",
+            "d119",
+            "d120",
+            "d121"
+          ],
+          "summary": "layout configuration differs at n212::n590::n459::n403"
+        },
+        {
+          "id": "def-1005d9889c749d164145",
+          "layer": {
+            "design": "n212::n596",
+            "code": "0/0/0/1/2/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d123",
+            "d124",
+            "d125",
+            "d126",
+            "d127",
+            "d128",
+            "d129",
+            "d130"
+          ],
+          "summary": "layout configuration differs at n212::n596"
+        },
+        {
+          "id": "def-1fa790ce6260abeb8c22",
+          "layer": {
+            "design": "n212::n590::n465::n405",
+            "code": "0/0/0/1/1/0/0/0/11/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d133",
+            "d134",
+            "d146"
+          ],
+          "summary": "layout configuration differs at n212::n590::n465::n405"
+        },
+        {
+          "id": "def-3a66c43dc2620ffc9091",
+          "layer": {
+            "design": "n212::n590::n467::n410",
+            "code": "0/0/0/1/1/0/0/0/13/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d137"
+          ],
+          "summary": "layout configuration differs at n212::n590::n467::n410"
+        },
+        {
+          "id": "def-9df04c6aa4e81043beef",
+          "layer": {
+            "design": "n212::n590::n467::n411",
+            "code": "0/0/0/1/1/0/0/0/13/0/2"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d138",
+            "d140"
+          ],
+          "summary": "layout configuration differs at n212::n590::n467::n411"
+        },
+        {
+          "id": "def-b3dd612fe82bf97a8cdc",
+          "layer": {
+            "design": "n212::n590::n468",
+            "code": "0/0/0/1/1/0/0/0/14"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d141"
+          ],
+          "summary": "layout configuration differs at n212::n590::n468"
+        },
+        {
+          "id": "def-cc1464f08c93aa144417",
+          "layer": {
+            "design": "n212::n590::n462",
+            "code": "0/0/0/1/1/0/0/0/9/1/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d142",
+            "d143",
+            "d144",
+            "d145"
+          ],
+          "summary": "layout configuration differs at n212::n590::n462"
+        },
+        {
+          "id": "def-274577870d47b8745daf",
+          "layer": {
+            "design": "n212::n590::n465",
+            "code": "0/0/0/1/1/0/0/0/11"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d147",
+            "d148",
+            "d149",
+            "d150"
+          ],
+          "summary": "layout configuration differs at n212::n590::n465"
+        },
+        {
+          "id": "def-7234c0327099aab93889",
+          "layer": {
+            "design": "n212::n590::n467",
+            "code": "0/0/0/1/1/0/0/0/13"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d154",
+            "d155",
+            "d156",
+            "d157"
+          ],
+          "summary": "layout configuration differs at n212::n590::n467"
+        },
+        {
+          "id": "def-f268e2e4ed7007fbf3ee",
+          "layer": {
+            "design": "n212::n590::n437",
+            "code": "0/0/0/1/1/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d158",
+            "d159",
+            "d160"
+          ],
+          "summary": "layout configuration differs at n212::n590::n437"
+        }
+      ],
+      "falseNegatives": [
+        {
+          "id": "TS-01",
+          "design_layer": "0/0/0/1/1/0",
+          "code_layer": "0/0/0/1/1/0/0",
+          "kind": "layout",
+          "description": "The canvas dot grid is offset by about 10px horizontally and 2–3px vertically in code (dots are painted on the inner flow surface, not the canvas), so dots land in different places and touch some labels such as \"approved ↓ continues\"",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[dot-grid-offset] background-image moves from the canvas (design) to the absolutely positioned flow layer (code)",
+          "properties": "background-image;background-position"
+        },
+        {
+          "id": "TS-02",
+          "design_layer": "0/0/0/1/1/0/0/0/8/2;0/0/0/1/1/0/0/0/9/0;0/0/0/1/1/0/0/0/11/0;0/0/0/1/1/0/0/0/12",
+          "code_layer": "0/0/0/1/1/0/0/0/0/0/6;0/0/0/1/1/0/0/0/11/0;0/0/0/1/1/0/0/0/13/0;0/0/0/1/1/0/0/0/14",
+          "kind": "layout",
+          "description": "Below the visible area (seen after scrolling): after the Verdict gate branch rejoins, code adds an extra ~42px connector, so Publish preview and everything after it sits 41–42px lower than in the design",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[merge-gap] code pads the branch join by 42px; design joins straight onto the next card",
+          "properties": "padding;top"
+        }
+      ]
+    },
+    "strict": {
+      "tp": 2,
+      "fp": 18,
+      "fn": 1,
+      "precision": 0.1,
+      "recall": 0.6666666666666666,
+      "predicted": 20,
+      "labelled": 3,
+      "agreement": [
+        {
+          "defect": "def-1fa790ce6260abeb8c22",
+          "label": "TS-02",
+          "description": "Below the visible area (seen after scrolling): after the Verdict gate branch rejoins, code adds an extra ~42px connector, so Publish preview and everything after it sits 41–42px lower than in the design"
+        },
+        {
+          "defect": "def-3a66c43dc2620ffc9091",
+          "label": "TS-03",
+          "description": "Below the visible area: the Ship it? card is 269px wide in code vs 248px, and its title stretches so \"upcoming · blocking ask\" is pushed to the card's right edge instead of following the title"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-17b6211d0c0dbd9536ee",
+          "layer": {
+            "design": "n212::n582",
+            "code": "0/0/0/1/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d10",
+            "d11",
+            "d12",
+            "d13",
+            "d14",
+            "d15",
+            "d16"
+          ],
+          "summary": "layout configuration differs at n212::n582"
+        },
+        {
+          "id": "def-228c7dd792efac243a5e",
+          "layer": {
+            "design": "n212::n588::n38",
+            "code": "0/0/0/1/0/4"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d17",
+            "d18",
+            "d19",
+            "d20",
+            "d33",
+            "d34",
+            "d35",
+            "d36"
+          ],
+          "summary": "layout configuration differs at n212::n588::n38"
+        },
+        {
+          "id": "def-09a3690597aa80275e4c",
+          "layer": {
+            "design": "n212::n588::n38",
+            "code": "0/0/0/1/0/4"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d21",
+            "d22",
+            "d23",
+            "d24",
+            "d25",
+            "d26",
+            "d27",
+            "d28",
+            "d29",
+            "d30",
+            "d31",
+            "d32"
+          ],
+          "summary": "style surface differs at n212::n588::n38"
+        },
+        {
+          "id": "def-e8d82f7dd9e3927f21f4",
+          "layer": {
+            "design": "n212::n590::n438",
+            "code": "0/0/0/1/1/0/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d43"
+          ],
+          "summary": "layout configuration differs at n212::n590::n438"
+        },
+        {
+          "id": "def-a31660b0d40da6f30898",
+          "layer": {
+            "design": "n212::n590::n441",
+            "code": "0/0/0/1/1/0/0/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d45",
+            "d46",
+            "d47",
+            "d48",
+            "d49",
+            "d50",
+            "d51",
+            "d52"
+          ],
+          "summary": "layout configuration differs at n212::n590::n441"
+        },
+        {
+          "id": "def-23061b8f40f6e23c8fa1",
+          "layer": {
+            "design": "n212::n590::n449",
+            "code": "0/0/0/1/1/0/0/0/6/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d57",
+            "d58"
+          ],
+          "summary": "layout configuration differs at n212::n590::n449"
+        },
+        {
+          "id": "def-270a8a0cb5eeecc39105",
+          "layer": {
+            "design": "n212::n590::n459::n402",
+            "code": "0/0/0/1/1/0/0/0/9/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d107",
+            "d108",
+            "d109",
+            "d110",
+            "d112",
+            "d113",
+            "d114",
+            "d115"
+          ],
+          "summary": "layout configuration differs at n212::n590::n459::n402"
+        },
+        {
+          "id": "def-add05281f83303a49277",
+          "layer": {
+            "design": "n212::n590::n459::n402",
+            "code": "0/0/0/1/1/0/0/0/9/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:transform",
+          "classification": "product",
+          "findings": [
+            "d111"
+          ],
+          "summary": "layout transform differs at n212::n590::n459::n402"
+        },
+        {
+          "id": "def-98a1196782cd0c483d62",
+          "layer": {
+            "design": "n212::n590::n459::n401",
+            "code": "0/0/0/1/1/0/0/0/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d116"
+          ],
+          "summary": "layout configuration differs at n212::n590::n459::n401"
+        },
+        {
+          "id": "def-00a3f44e7ac0af8a9ee1",
+          "layer": {
+            "design": "n212::n590::n459::n403",
+            "code": "0/0/0/1/1/0/0/0/0/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d117",
+            "d118",
+            "d119",
+            "d120",
+            "d121"
+          ],
+          "summary": "layout configuration differs at n212::n590::n459::n403"
+        },
+        {
+          "id": "def-1005d9889c749d164145",
+          "layer": {
+            "design": "n212::n596",
+            "code": "0/0/0/1/2/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d123",
+            "d124",
+            "d125",
+            "d126",
+            "d127",
+            "d128",
+            "d129",
+            "d130"
+          ],
+          "summary": "layout configuration differs at n212::n596"
+        },
+        {
+          "id": "def-9fe9539fa89d749e9d83",
+          "layer": {
+            "design": "n212::n590::n467::n405",
+            "code": "0/0/0/1/1/0/0/0/13/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d135",
+            "d136",
+            "d139",
+            "d151",
+            "d152",
+            "d153"
+          ],
+          "summary": "layout configuration differs at n212::n590::n467::n405"
+        },
+        {
+          "id": "def-9df04c6aa4e81043beef",
+          "layer": {
+            "design": "n212::n590::n467::n411",
+            "code": "0/0/0/1/1/0/0/0/13/0/2"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d138",
+            "d140"
+          ],
+          "summary": "layout configuration differs at n212::n590::n467::n411"
+        },
+        {
+          "id": "def-b3dd612fe82bf97a8cdc",
+          "layer": {
+            "design": "n212::n590::n468",
+            "code": "0/0/0/1/1/0/0/0/14"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d141"
+          ],
+          "summary": "layout configuration differs at n212::n590::n468"
+        },
+        {
+          "id": "def-cc1464f08c93aa144417",
+          "layer": {
+            "design": "n212::n590::n462",
+            "code": "0/0/0/1/1/0/0/0/9/1/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d142",
+            "d143",
+            "d144",
+            "d145"
+          ],
+          "summary": "layout configuration differs at n212::n590::n462"
+        },
+        {
+          "id": "def-274577870d47b8745daf",
+          "layer": {
+            "design": "n212::n590::n465",
+            "code": "0/0/0/1/1/0/0/0/11"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d147",
+            "d148",
+            "d149",
+            "d150"
+          ],
+          "summary": "layout configuration differs at n212::n590::n465"
+        },
+        {
+          "id": "def-7234c0327099aab93889",
+          "layer": {
+            "design": "n212::n590::n467",
+            "code": "0/0/0/1/1/0/0/0/13"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d154",
+            "d155",
+            "d156",
+            "d157"
+          ],
+          "summary": "layout configuration differs at n212::n590::n467"
+        },
+        {
+          "id": "def-f268e2e4ed7007fbf3ee",
+          "layer": {
+            "design": "n212::n590::n437",
+            "code": "0/0/0/1/1/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d158",
+            "d159",
+            "d160"
+          ],
+          "summary": "layout configuration differs at n212::n590::n437"
+        }
+      ],
+      "falseNegatives": [
+        {
+          "id": "TS-01",
+          "design_layer": "0/0/0/1/1/0",
+          "code_layer": "0/0/0/1/1/0/0",
+          "kind": "layout",
+          "description": "The canvas dot grid is offset by about 10px horizontally and 2–3px vertically in code (dots are painted on the inner flow surface, not the canvas), so dots land in different places and touch some labels such as \"approved ↓ continues\"",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[dot-grid-offset] background-image moves from the canvas (design) to the absolutely positioned flow layer (code)",
+          "properties": "background-image;background-position"
+        }
+      ]
+    }
+  },
+  {
+    "component": "tracks-flowview",
+    "state": "proposal-pending",
+    "optimistic": {
+      "tp": 1,
+      "fp": 26,
+      "fn": 2,
+      "precision": 0.037037037037037035,
+      "recall": 0.3333333333333333,
+      "predicted": 27,
+      "labelled": 3,
+      "agreement": [
+        {
+          "defect": "def-cd9e18900ba151e5f9b5",
+          "label": "PP-03",
+          "description": "The canvas dot grid is offset by about 10px horizontally and 2–3px vertically in code (dots are painted on the inner flow surface, not the canvas), so dots land in different places and touch some labels such as \"approved ↓ continues\""
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-045852a4e5007fce5af0",
+          "layer": {
+            "design": "n212::n589::n38",
+            "code": "0/0/0/1/0/4"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d11",
+            "d12",
+            "d13",
+            "d14",
+            "d27",
+            "d28",
+            "d30",
+            "d31"
+          ],
+          "summary": "layout configuration differs at n212::n589::n38"
+        },
+        {
+          "id": "def-dc24690a535c961baefa",
+          "layer": {
+            "design": "n212::n589::n38",
+            "code": "0/0/0/1/0/4"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d15",
+            "d16",
+            "d17",
+            "d18",
+            "d19",
+            "d20",
+            "d21",
+            "d22",
+            "d23",
+            "d24",
+            "d25",
+            "d26"
+          ],
+          "summary": "style surface differs at n212::n589::n38"
+        },
+        {
+          "id": "def-14336e58783b7f9d3a11",
+          "layer": {
+            "design": "n212::n589::n38",
+            "code": "0/0/0/1/0/4"
+          },
+          "kind": "style",
+          "cause": "style:opacity",
+          "classification": "product",
+          "findings": [
+            "d29"
+          ],
+          "summary": "style opacity differs at n212::n589::n38"
+        },
+        {
+          "id": "def-86132b284054b9424221",
+          "layer": {
+            "design": "n212::n591::n482",
+            "code": "0/0/0/1/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d32",
+            "d34",
+            "d35",
+            "d36",
+            "d37",
+            "d38"
+          ],
+          "summary": "layout configuration differs at n212::n591::n482"
+        },
+        {
+          "id": "def-51eb6c3d1403d757cf13",
+          "layer": {
+            "design": "n212::n591::n483",
+            "code": "0/0/0/1/1/0/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d39"
+          ],
+          "summary": "layout configuration differs at n212::n591::n483"
+        },
+        {
+          "id": "def-4ef0a287362c41f5b7e2",
+          "layer": {
+            "design": "n212::n591::n484::n410",
+            "code": "0/0/0/1/1/0/0/0/1/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d40"
+          ],
+          "summary": "layout configuration differs at n212::n591::n484::n410"
+        },
+        {
+          "id": "def-8ab77b382246639cb0c5",
+          "layer": {
+            "design": "n212::n591::n491",
+            "code": "0/0/0/1/1/0/0/0/5/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d44",
+            "d45"
+          ],
+          "summary": "layout configuration differs at n212::n591::n491"
+        },
+        {
+          "id": "def-6ef04412b540655293c4",
+          "layer": {
+            "design": "n212::n591::n494::n410",
+            "code": "0/0/0/1/1/0/0/0/5/0/0/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d76"
+          ],
+          "summary": "layout configuration differs at n212::n591::n494::n410"
+        },
+        {
+          "id": "def-f0d751735bad3f0fd238",
+          "layer": {
+            "design": "n212::n591::n497::n410",
+            "code": "0/0/0/1/1/0/0/0/5/0/1/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d108"
+          ],
+          "summary": "layout configuration differs at n212::n591::n497::n410"
+        },
+        {
+          "id": "def-46ad1d9458544412d8bf",
+          "layer": {
+            "design": "n212::n591::n501::n402",
+            "code": "0/0/0/1/1/0/0/0/8/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d122",
+            "d123",
+            "d124",
+            "d125",
+            "d127",
+            "d128",
+            "d129",
+            "d130"
+          ],
+          "summary": "layout configuration differs at n212::n591::n501::n402"
+        },
+        {
+          "id": "def-68b7e5b4cf90260725f3",
+          "layer": {
+            "design": "n212::n591::n501::n402",
+            "code": "0/0/0/1/1/0/0/0/8/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:transform",
+          "classification": "product",
+          "findings": [
+            "d126"
+          ],
+          "summary": "layout transform differs at n212::n591::n501::n402"
+        },
+        {
+          "id": "def-16c33c1bc3577154c1f8",
+          "layer": {
+            "design": "n212::n591::n501::n401",
+            "code": "0/0/0/1/1/0/0/0/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d131"
+          ],
+          "summary": "layout configuration differs at n212::n591::n501::n401"
+        },
+        {
+          "id": "def-35eded7d23ee335656d9",
+          "layer": {
+            "design": "n212::n591::n501::n403",
+            "code": "0/0/0/1/1/0/0/0/0/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d132",
+            "d133",
+            "d134",
+            "d135",
+            "d136"
+          ],
+          "summary": "layout configuration differs at n212::n591::n501::n403"
+        },
+        {
+          "id": "def-b40ca41ad61524496675",
+          "layer": {
+            "design": "n212::n598::n541",
+            "code": "0/0/0/2/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d139",
+            "d140"
+          ],
+          "summary": "layout configuration differs at n212::n598::n541"
+        },
+        {
+          "id": "def-0b002b604b2cc50bbb08",
+          "layer": {
+            "design": "n212::n591::n504::n410",
+            "code": "0/0/0/1/1/0/0/0/8/1/1/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d143"
+          ],
+          "summary": "layout configuration differs at n212::n591::n504::n410"
+        },
+        {
+          "id": "def-8ac52d5070ed97253c57",
+          "layer": {
+            "design": "n212::n591::n507::n405",
+            "code": "0/0/0/1/1/0/0/0/10"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d144",
+            "d145",
+            "d172"
+          ],
+          "summary": "layout configuration differs at n212::n591::n507::n405"
+        },
+        {
+          "id": "def-6bd34f0526a19c3467ca",
+          "layer": {
+            "design": "n212::n591::n509::n519",
+            "code": "0/0/0/1/1/0/0/0/12"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d146",
+            "d147",
+            "d148",
+            "d177"
+          ],
+          "summary": "layout configuration differs at n212::n591::n509::n519"
+        },
+        {
+          "id": "def-8dadb80242a2e57aba33",
+          "layer": {
+            "design": "n212::n591::n511::n519",
+            "code": "0/0/0/1/1/0/0/0/14"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d149",
+            "d150",
+            "d151",
+            "d178"
+          ],
+          "summary": "layout configuration differs at n212::n591::n511::n519"
+        },
+        {
+          "id": "def-2b985206ec1f2703f74c",
+          "layer": {
+            "design": "n212::n591::n513::n405",
+            "code": "0/0/0/1/1/0/0/0/16"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d152",
+            "d153",
+            "d179"
+          ],
+          "summary": "layout configuration differs at n212::n591::n513::n405"
+        },
+        {
+          "id": "def-84100dc61b3c7f58a3ad",
+          "layer": {
+            "design": "n212::n591::n516",
+            "code": "0/0/0/1/1/0/0/0/18"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d154",
+            "d155",
+            "d156"
+          ],
+          "summary": "layout configuration differs at n212::n591::n516"
+        },
+        {
+          "id": "def-2413ec8ca8fe566e9b4a",
+          "layer": {
+            "design": "n212::n591::n518::n471",
+            "code": "0/0/0/1/1/0/0/0/17"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d157",
+            "d162",
+            "d163",
+            "d168",
+            "d180"
+          ],
+          "summary": "layout configuration differs at n212::n591::n518::n471"
+        },
+        {
+          "id": "def-315338ff1d15852082ba",
+          "layer": {
+            "design": "n212::n591::n518::n475",
+            "code": "0/0/0/1/1/0/0/0/17/2"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d158",
+            "d159",
+            "d160",
+            "d161"
+          ],
+          "summary": "layout configuration differs at n212::n591::n518::n475"
+        },
+        {
+          "id": "def-408c7e04275a34beb794",
+          "layer": {
+            "design": "n212::n591::n518::n479",
+            "code": "0/0/0/1/1/0/0/0/17/4"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d164",
+            "d165",
+            "d166",
+            "d167"
+          ],
+          "summary": "layout configuration differs at n212::n591::n518::n479"
+        },
+        {
+          "id": "def-1e020483c81b3543ed08",
+          "layer": {
+            "design": "n212::n591::n481",
+            "code": "0/0/0/1/1/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d169",
+            "d170",
+            "d171"
+          ],
+          "summary": "layout configuration differs at n212::n591::n481"
+        },
+        {
+          "id": "def-4ad51206c9f8e92b71b9",
+          "layer": {
+            "design": "n212::n591",
+            "code": "0/0/0/1/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d173",
+            "d174",
+            "d175",
+            "d176"
+          ],
+          "summary": "layout configuration differs at n212::n591"
+        },
+        {
+          "id": "def-d0719c877112c3fa76e1",
+          "layer": {
+            "design": "n212::n591::n518::n471",
+            "code": "0/0/0/1/1/0/0/0/17"
+          },
+          "kind": "layout",
+          "cause": "offscreen",
+          "classification": "product",
+          "findings": [
+            "d206"
+          ],
+          "summary": "rendered outside the visible pane: 2 change s · +n5a · +n5b · Accept · ⌘↵ · Refine · Discard · ⌘⌫",
+          "offscreen": {
+            "box": [
+              566,
+              1106.25,
+              480,
+              44
+            ],
+            "frame": [
+              0,
+              0,
+              1416,
+              611
+            ],
+            "viewport": [
+              0,
+              0,
+              1416,
+              720
+            ],
+            "elements": [
+              "0/0/0/1/1/0/0/0/17/0",
+              "0/0/0/1/1/0/0/0/17/1",
+              "0/0/0/1/1/0/0/0/17/2",
+              "0/0/0/1/1/0/0/0/17/2/0",
+              "0/0/0/1/1/0/0/0/17/3",
+              "0/0/0/1/1/0/0/0/17/4",
+              "0/0/0/1/1/0/0/0/17/4/0"
+            ],
+            "clips": [
+              {
+                "path": "0/0/0/1/1/0",
+                "box": [
+                  232,
+                  40,
+                  1148,
+                  539
+                ],
+                "x": true,
+                "y": true,
+                "pan": true,
+                "scrollX": false,
+                "scrollY": false
+              },
+              {
+                "path": "0",
+                "box": [
+                  0,
+                  0,
+                  1416,
+                  611
+                ],
+                "x": true,
+                "y": true,
+                "pan": false,
+                "scrollX": false,
+                "scrollY": false
+              }
+            ]
+          }
+        }
+      ],
+      "falseNegatives": [
+        {
+          "id": "PP-01",
+          "design_layer": "0/0/0/1/1/0/1/0/0",
+          "code_layer": "0/0/0/1/1/0/0/0/17",
+          "kind": "layout",
+          "description": "The proposal's Accept / Refine / Discard bar floats at the bottom of the visible canvas in the design (y≈528); in code it sits after the last step at y≈1106, about 580px down, so it is off screen until you scroll to the end and the visible spot shows the Fix findings card instead",
+          "severity": "high",
+          "likely_intentional": "no",
+          "note": "[accept-bar-offscreen] same failure as round 1 P-28; the updated design keeps the bar in view",
+          "properties": "top;position"
+        },
+        {
+          "id": "PP-02",
+          "design_layer": "0/0/0/1/1/0/0/0/7/2;0/0/0/1/1/0/0/0/8/0;0/0/0/1/1/0/0/0/10/0;0/0/0/1/1/0/0/0/12/0;0/0/0/1/1/0/0/0/14/0",
+          "code_layer": "0/0/0/1/1/0/0/0/0/0/6;0/0/0/1/1/0/0/0/10;0/0/0/1/1/0/0/0/12;0/0/0/1/1/0/0/0/14;0/0/0/1/1/0/0/0/16",
+          "kind": "layout",
+          "description": "Below the visible area (seen after scrolling): after the Verdict gate branch rejoins, code adds an extra ~42px connector, so Publish preview and everything after it sits 41–42px lower than in the design",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[merge-gap] code pads the branch join by 42px; design joins straight onto the next card",
+          "properties": "padding;top"
+        }
+      ]
+    },
+    "strict": {
+      "tp": 2,
+      "fp": 25,
+      "fn": 1,
+      "precision": 0.07407407407407407,
+      "recall": 0.6666666666666666,
+      "predicted": 27,
+      "labelled": 3,
+      "agreement": [
+        {
+          "defect": "def-8ac52d5070ed97253c57",
+          "label": "PP-02",
+          "description": "Below the visible area (seen after scrolling): after the Verdict gate branch rejoins, code adds an extra ~42px connector, so Publish preview and everything after it sits 41–42px lower than in the design"
+        },
+        {
+          "defect": "def-2413ec8ca8fe566e9b4a",
+          "label": "PP-01",
+          "description": "The proposal's Accept / Refine / Discard bar floats at the bottom of the visible canvas in the design (y≈528); in code it sits after the last step at y≈1106, about 580px down, so it is off screen until you scroll to the end and the visible spot shows the Fix findings card instead"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-045852a4e5007fce5af0",
+          "layer": {
+            "design": "n212::n589::n38",
+            "code": "0/0/0/1/0/4"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d11",
+            "d12",
+            "d13",
+            "d14",
+            "d27",
+            "d28",
+            "d30",
+            "d31"
+          ],
+          "summary": "layout configuration differs at n212::n589::n38"
+        },
+        {
+          "id": "def-dc24690a535c961baefa",
+          "layer": {
+            "design": "n212::n589::n38",
+            "code": "0/0/0/1/0/4"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d15",
+            "d16",
+            "d17",
+            "d18",
+            "d19",
+            "d20",
+            "d21",
+            "d22",
+            "d23",
+            "d24",
+            "d25",
+            "d26"
+          ],
+          "summary": "style surface differs at n212::n589::n38"
+        },
+        {
+          "id": "def-14336e58783b7f9d3a11",
+          "layer": {
+            "design": "n212::n589::n38",
+            "code": "0/0/0/1/0/4"
+          },
+          "kind": "style",
+          "cause": "style:opacity",
+          "classification": "product",
+          "findings": [
+            "d29"
+          ],
+          "summary": "style opacity differs at n212::n589::n38"
+        },
+        {
+          "id": "def-86132b284054b9424221",
+          "layer": {
+            "design": "n212::n591::n482",
+            "code": "0/0/0/1/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d32",
+            "d34",
+            "d35",
+            "d36",
+            "d37",
+            "d38"
+          ],
+          "summary": "layout configuration differs at n212::n591::n482"
+        },
+        {
+          "id": "def-cd9e18900ba151e5f9b5",
+          "layer": {
+            "design": "n212::n591::n482",
+            "code": "0/0/0/1/1/0"
+          },
+          "kind": "style",
+          "cause": "style:surface",
+          "classification": "product",
+          "findings": [
+            "d33"
+          ],
+          "summary": "style surface differs at n212::n591::n482"
+        },
+        {
+          "id": "def-51eb6c3d1403d757cf13",
+          "layer": {
+            "design": "n212::n591::n483",
+            "code": "0/0/0/1/1/0/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d39"
+          ],
+          "summary": "layout configuration differs at n212::n591::n483"
+        },
+        {
+          "id": "def-4ef0a287362c41f5b7e2",
+          "layer": {
+            "design": "n212::n591::n484::n410",
+            "code": "0/0/0/1/1/0/0/0/1/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d40"
+          ],
+          "summary": "layout configuration differs at n212::n591::n484::n410"
+        },
+        {
+          "id": "def-8ab77b382246639cb0c5",
+          "layer": {
+            "design": "n212::n591::n491",
+            "code": "0/0/0/1/1/0/0/0/5/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d44",
+            "d45"
+          ],
+          "summary": "layout configuration differs at n212::n591::n491"
+        },
+        {
+          "id": "def-6ef04412b540655293c4",
+          "layer": {
+            "design": "n212::n591::n494::n410",
+            "code": "0/0/0/1/1/0/0/0/5/0/0/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d76"
+          ],
+          "summary": "layout configuration differs at n212::n591::n494::n410"
+        },
+        {
+          "id": "def-f0d751735bad3f0fd238",
+          "layer": {
+            "design": "n212::n591::n497::n410",
+            "code": "0/0/0/1/1/0/0/0/5/0/1/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d108"
+          ],
+          "summary": "layout configuration differs at n212::n591::n497::n410"
+        },
+        {
+          "id": "def-46ad1d9458544412d8bf",
+          "layer": {
+            "design": "n212::n591::n501::n402",
+            "code": "0/0/0/1/1/0/0/0/8/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d122",
+            "d123",
+            "d124",
+            "d125",
+            "d127",
+            "d128",
+            "d129",
+            "d130"
+          ],
+          "summary": "layout configuration differs at n212::n591::n501::n402"
+        },
+        {
+          "id": "def-68b7e5b4cf90260725f3",
+          "layer": {
+            "design": "n212::n591::n501::n402",
+            "code": "0/0/0/1/1/0/0/0/8/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:transform",
+          "classification": "product",
+          "findings": [
+            "d126"
+          ],
+          "summary": "layout transform differs at n212::n591::n501::n402"
+        },
+        {
+          "id": "def-16c33c1bc3577154c1f8",
+          "layer": {
+            "design": "n212::n591::n501::n401",
+            "code": "0/0/0/1/1/0/0/0/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d131"
+          ],
+          "summary": "layout configuration differs at n212::n591::n501::n401"
+        },
+        {
+          "id": "def-35eded7d23ee335656d9",
+          "layer": {
+            "design": "n212::n591::n501::n403",
+            "code": "0/0/0/1/1/0/0/0/0/1/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d132",
+            "d133",
+            "d134",
+            "d135",
+            "d136"
+          ],
+          "summary": "layout configuration differs at n212::n591::n501::n403"
+        },
+        {
+          "id": "def-b40ca41ad61524496675",
+          "layer": {
+            "design": "n212::n598::n541",
+            "code": "0/0/0/2/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d139",
+            "d140"
+          ],
+          "summary": "layout configuration differs at n212::n598::n541"
+        },
+        {
+          "id": "def-0b002b604b2cc50bbb08",
+          "layer": {
+            "design": "n212::n591::n504::n410",
+            "code": "0/0/0/1/1/0/0/0/8/1/1/0/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d143"
+          ],
+          "summary": "layout configuration differs at n212::n591::n504::n410"
+        },
+        {
+          "id": "def-6bd34f0526a19c3467ca",
+          "layer": {
+            "design": "n212::n591::n509::n519",
+            "code": "0/0/0/1/1/0/0/0/12"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d146",
+            "d147",
+            "d148",
+            "d177"
+          ],
+          "summary": "layout configuration differs at n212::n591::n509::n519"
+        },
+        {
+          "id": "def-8dadb80242a2e57aba33",
+          "layer": {
+            "design": "n212::n591::n511::n519",
+            "code": "0/0/0/1/1/0/0/0/14"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d149",
+            "d150",
+            "d151",
+            "d178"
+          ],
+          "summary": "layout configuration differs at n212::n591::n511::n519"
+        },
+        {
+          "id": "def-2b985206ec1f2703f74c",
+          "layer": {
+            "design": "n212::n591::n513::n405",
+            "code": "0/0/0/1/1/0/0/0/16"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d152",
+            "d153",
+            "d179"
+          ],
+          "summary": "layout configuration differs at n212::n591::n513::n405"
+        },
+        {
+          "id": "def-84100dc61b3c7f58a3ad",
+          "layer": {
+            "design": "n212::n591::n516",
+            "code": "0/0/0/1/1/0/0/0/18"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d154",
+            "d155",
+            "d156"
+          ],
+          "summary": "layout configuration differs at n212::n591::n516"
+        },
+        {
+          "id": "def-315338ff1d15852082ba",
+          "layer": {
+            "design": "n212::n591::n518::n475",
+            "code": "0/0/0/1/1/0/0/0/17/2"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d158",
+            "d159",
+            "d160",
+            "d161"
+          ],
+          "summary": "layout configuration differs at n212::n591::n518::n475"
+        },
+        {
+          "id": "def-408c7e04275a34beb794",
+          "layer": {
+            "design": "n212::n591::n518::n479",
+            "code": "0/0/0/1/1/0/0/0/17/4"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d164",
+            "d165",
+            "d166",
+            "d167"
+          ],
+          "summary": "layout configuration differs at n212::n591::n518::n479"
+        },
+        {
+          "id": "def-1e020483c81b3543ed08",
+          "layer": {
+            "design": "n212::n591::n481",
+            "code": "0/0/0/1/1/0/0"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d169",
+            "d170",
+            "d171"
+          ],
+          "summary": "layout configuration differs at n212::n591::n481"
+        },
+        {
+          "id": "def-4ad51206c9f8e92b71b9",
+          "layer": {
+            "design": "n212::n591",
+            "code": "0/0/0/1/1"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d173",
+            "d174",
+            "d175",
+            "d176"
+          ],
+          "summary": "layout configuration differs at n212::n591"
+        },
+        {
+          "id": "def-d0719c877112c3fa76e1",
+          "layer": {
+            "design": "n212::n591::n518::n471",
+            "code": "0/0/0/1/1/0/0/0/17"
+          },
+          "kind": "layout",
+          "cause": "offscreen",
+          "classification": "product",
+          "findings": [
+            "d206"
+          ],
+          "summary": "rendered outside the visible pane: 2 change s · +n5a · +n5b · Accept · ⌘↵ · Refine · Discard · ⌘⌫",
+          "offscreen": {
+            "box": [
+              566,
+              1106.25,
+              480,
+              44
+            ],
+            "frame": [
+              0,
+              0,
+              1416,
+              611
+            ],
+            "viewport": [
+              0,
+              0,
+              1416,
+              720
+            ],
+            "elements": [
+              "0/0/0/1/1/0/0/0/17/0",
+              "0/0/0/1/1/0/0/0/17/1",
+              "0/0/0/1/1/0/0/0/17/2",
+              "0/0/0/1/1/0/0/0/17/2/0",
+              "0/0/0/1/1/0/0/0/17/3",
+              "0/0/0/1/1/0/0/0/17/4",
+              "0/0/0/1/1/0/0/0/17/4/0"
+            ],
+            "clips": [
+              {
+                "path": "0/0/0/1/1/0",
+                "box": [
+                  232,
+                  40,
+                  1148,
+                  539
+                ],
+                "x": true,
+                "y": true,
+                "pan": true,
+                "scrollX": false,
+                "scrollY": false
+              },
+              {
+                "path": "0",
+                "box": [
+                  0,
+                  0,
+                  1416,
+                  611
+                ],
+                "x": true,
+                "y": true,
+                "pan": false,
+                "scrollX": false,
+                "scrollY": false
+              }
+            ]
+          }
+        }
+      ],
+      "falseNegatives": [
+        {
+          "id": "PP-03",
+          "design_layer": "0/0/0/1/1/0",
+          "code_layer": "0/0/0/1/1/0/0",
+          "kind": "layout",
+          "description": "The canvas dot grid is offset by about 10px horizontally and 2–3px vertically in code (dots are painted on the inner flow surface, not the canvas), so dots land in different places and touch some labels such as \"approved ↓ continues\"",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[dot-grid-offset] background-image moves from the canvas (design) to the absolutely positioned flow layer (code)",
+          "properties": "background-image;background-position"
+        }
+      ]
+    }
+  },
+  {
+    "component": "tracks-flowview",
+    "state": "empty",
+    "optimistic": {
+      "tp": 0,
+      "fp": 4,
+      "fn": 0,
+      "precision": 0,
+      "recall": null,
+      "predicted": 4,
+      "labelled": 0,
+      "agreement": [],
+      "falsePositives": [
+        {
+          "id": "def-aea252968eb4f8660e79",
+          "layer": {
+            "design": "n284::n276::n40",
+            "code": "n284::n276::n40"
+          },
+          "kind": "text",
+          "cause": "text:text",
+          "classification": "product",
+          "findings": [
+            "d1"
+          ],
+          "summary": "text text differs at n284::n276::n40"
+        },
+        {
+          "id": "def-20a00fc76f833d7c3c13",
+          "layer": {
+            "design": "n284::n276::n40",
+            "code": "n284::n276::n40"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d2"
+          ],
+          "summary": "layout configuration differs at n284::n276::n40"
+        },
+        {
+          "id": "def-7f8b7f1a0d74dac3b82f",
+          "layer": {
+            "design": "n284::n276::n41"
+          },
+          "kind": "missing",
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d7"
+          ],
+          "summary": "missing subtree differs at n284::n276::n41"
+        },
+        {
+          "id": "def-3d53a609c46642f8b814",
+          "layer": {
+            "design": "n284::n609::n539"
+          },
+          "kind": "missing",
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d8"
+          ],
+          "summary": "missing subtree differs at n284::n609::n539"
+        }
+      ],
+      "falseNegatives": []
+    },
+    "strict": {
+      "tp": 0,
+      "fp": 4,
+      "fn": 0,
+      "precision": 0,
+      "recall": null,
+      "predicted": 4,
+      "labelled": 0,
+      "agreement": [],
+      "falsePositives": [
+        {
+          "id": "def-aea252968eb4f8660e79",
+          "layer": {
+            "design": "n284::n276::n40",
+            "code": "n284::n276::n40"
+          },
+          "kind": "text",
+          "cause": "text:text",
+          "classification": "product",
+          "findings": [
+            "d1"
+          ],
+          "summary": "text text differs at n284::n276::n40"
+        },
+        {
+          "id": "def-20a00fc76f833d7c3c13",
+          "layer": {
+            "design": "n284::n276::n40",
+            "code": "n284::n276::n40"
+          },
+          "kind": "layout",
+          "cause": "layout:configuration",
+          "classification": "product",
+          "findings": [
+            "d2"
+          ],
+          "summary": "layout configuration differs at n284::n276::n40"
+        },
+        {
+          "id": "def-7f8b7f1a0d74dac3b82f",
+          "layer": {
+            "design": "n284::n276::n41"
+          },
+          "kind": "missing",
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d7"
+          ],
+          "summary": "missing subtree differs at n284::n276::n41"
+        },
+        {
+          "id": "def-3d53a609c46642f8b814",
+          "layer": {
+            "design": "n284::n609::n539"
+          },
+          "kind": "missing",
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d8"
+          ],
+          "summary": "missing subtree differs at n284::n609::n539"
+        }
+      ],
+      "falseNegatives": []
+    }
+  }
+]

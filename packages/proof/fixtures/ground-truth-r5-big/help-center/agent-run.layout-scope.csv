@@ -1,0 +1,17 @@
+id,in_layout_check,why
+HC-01,yes,geometry: width
+HC-02,yes,order/position of sidebar items
+HC-03,no,type and colour of the version/About label
+HC-04,yes,geometry: vertical position
+HC-05,yes,presence: extra pill element (plus a text difference)
+HC-06,yes,presence: missing card
+HC-07,yes,geometry: heights
+HC-08,yes,presence: extra separator glyphs between caps
+HC-09,no,colour
+HC-10,no,colour token
+HC-11,no,colour
+HC-12,no,shadow
+HC-13,no,text only
+HC-14,yes,presence: missing footer hints
+HC-15,no,colour
+HC-16,yes,geometry: width and spacing

@@ -1,0 +1,18 @@
+{
+  "tolerances": {
+    "pixelRatio": 0.001,
+    "boxPx": 1,
+    "stylePx": 1,
+    "colorDeltaE": 1,
+    "pixelThreshold": 0.1
+  },
+  "required": [
+    {
+      "artboard": "tracks-pane/default",
+      "state": "default",
+      "viewport": { "width": 1280, "height": 800, "dpr": 1 }
+    }
+  ],
+  "designBinding": "chain-head",
+  "requireHtmlSha256": true
+}

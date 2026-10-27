@@ -1,0 +1,1567 @@
+{
+  "result": {
+    "mode": "layout-only",
+    "provable": true,
+    "strict": {
+      "tp": 1,
+      "fp": 10,
+      "fn": 7,
+      "precision": 0.09090909090909091,
+      "recall": 0.125,
+      "predicted": 11,
+      "labelled": 8,
+      "agreement": [
+        {
+          "defect": "def-4dadb505dac5c116812c",
+          "label": "SS-04",
+          "description": "Match count sits outside the search field, to its right, instead of right-aligned inside the field"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-3fb23f88e95477c95dac",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n146",
+            "code": "0/0/1/0"
+          },
+          "findings": [
+            "d1",
+            "d2",
+            "d3"
+          ],
+          "summary": "layout:geometry differs in search"
+        },
+        {
+          "id": "def-bd80e1958310cc08b692",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n153",
+            "code": "0/0/1/1/0"
+          },
+          "findings": [
+            "d7",
+            "d8",
+            "d9",
+            "d10"
+          ],
+          "summary": "layout:geometry differs in results"
+        },
+        {
+          "id": "def-a922b463978ba60b32a4",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:order",
+          "layer": {
+            "design": "n153",
+            "code": "0/0/1/1/0"
+          },
+          "findings": [
+            "d11"
+          ],
+          "summary": "layout:order differs in results"
+        },
+        {
+          "id": "def-d42e2e165c7be38e98d8",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n154::n2",
+            "code": "n154::n2"
+          },
+          "findings": [
+            "d12"
+          ],
+          "summary": "layout:geometry differs in results"
+        },
+        {
+          "id": "def-0187f115809f244acb14",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n155::n2",
+            "code": "n155::n2"
+          },
+          "findings": [
+            "d13",
+            "d14"
+          ],
+          "summary": "layout:geometry differs in results"
+        },
+        {
+          "id": "def-6da670e858fafc0cd7c7",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n156::n2",
+            "code": "n156::n2"
+          },
+          "findings": [
+            "d15",
+            "d16"
+          ],
+          "summary": "layout:geometry differs in results"
+        },
+        {
+          "id": "def-d1885f49c81a1f9021ab",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n157::n2",
+            "code": "n157::n2"
+          },
+          "findings": [
+            "d17",
+            "d18"
+          ],
+          "summary": "layout:geometry differs in results"
+        },
+        {
+          "id": "def-921f20d6d8345132d58e",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n158::n2",
+            "code": "n158::n2"
+          },
+          "findings": [
+            "d19",
+            "d20"
+          ],
+          "summary": "layout:geometry differs in results"
+        },
+        {
+          "id": "def-2d9de852ee4ce45996cc",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n159::n2",
+            "code": "n159::n2"
+          },
+          "findings": [
+            "d21",
+            "d22"
+          ],
+          "summary": "layout:geometry differs in results"
+        },
+        {
+          "id": "def-cbd6bc56fa06a9a5847a",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n163",
+            "code": "0/0/1/2"
+          },
+          "findings": [
+            "d23",
+            "d24"
+          ],
+          "summary": "layout:geometry differs in footer"
+        }
+      ],
+      "falseNegatives": [
+        {
+          "id": "SS-01",
+          "design_layer": "none",
+          "code_layer": "0/0/0",
+          "kind": "layout",
+          "description": "While searching, code keeps the Guide/Reference topic sidebar on the left; the design's search state has no sidebar, so in code the search field and results are about 215px narrower",
+          "severity": "high",
+          "likely_intentional": "unsure",
+          "note": "[rail-in-search] code always renders the topic rail",
+          "properties": "subtree;width",
+          "original_kind": "extra",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "SS-02",
+          "design_layer": "0/0/1/1/0;0/0/1/2/0;0/0/1/3/0;0/0/1/4/0;0/0/1/5/0",
+          "code_layer": "0/0/1/1/0/5/0;0/0/1/1/0/4/0;0/0/1/1/0/2/0;0/0/1/1/0/1/0;0/0/1/1/0/3/0",
+          "kind": "layout",
+          "description": "Results are in a different order: design ranks Split pane, Open files in a split, Preview beside, Inline ⇄ split diff, Move pane in direction, Add pane to group; code ranks Split pane, Move pane in direction, Inline ⇄ split diff, Add pane to group, Preview beside, Open files in a split",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[result-order] code's ranking differs from the design's",
+          "properties": "order",
+          "original_kind": "layout",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "SS-05",
+          "design_layer": "0/0/0/0/2",
+          "code_layer": "none",
+          "kind": "layout",
+          "description": "Clear (✕) button inside the search field is missing",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[clear-button]",
+          "properties": "subtree",
+          "original_kind": "missing",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "SS-06",
+          "design_layer": "0/0/1/6",
+          "code_layer": "none",
+          "kind": "layout",
+          "description": "The \"no match in GUIDE topics · search \"split\" in Search everything /\" hint under the results is missing",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[no-match-hint]",
+          "properties": "subtree",
+          "original_kind": "missing",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "SS-07",
+          "design_layer": "0/0/2/0;0/0/2/1;0/0/2/2;0/0/2/3;0/0/2/4",
+          "code_layer": "none",
+          "kind": "layout",
+          "description": "Footer shows the generic \"click keys to rebind · live from the command registry\" instead of the search hints \"↑↓ move · ↵ run Split pane · esc clear, then close\"",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[footer-hints] footer copy is hard-coded in the app",
+          "properties": "subtree;text",
+          "original_kind": "missing",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "SS-08",
+          "design_layer": "0/0/1/0/0/2;0/0/1/1/0/2;0/0/1/4/0/1",
+          "code_layer": "0/0/1/1/0/0/0/1;0/0/1/1/0/5/0/1",
+          "kind": "layout",
+          "description": "When a command has several key groups, code puts a faint \"·\" between the caps (⌘D · ⌘⇧D, ⌘⌥O · ⌘⌥⇧O); design spaces them 3px apart",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[key-sep]",
+          "properties": "text;layout",
+          "original_kind": "style",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "SS-09",
+          "design_layer": "0/0/0/0;0/0/2;*",
+          "code_layer": "0/0/1/0/0;0/0/1/2;*",
+          "kind": "layout",
+          "description": "Bordered boxes are smaller in code because the design adds borders outside the authored size: key caps 18px vs 21px tall, search field 34px vs 36px, footer 34px vs 35px",
+          "severity": "medium",
+          "likely_intentional": "no",
+          "note": "[box-sizing] same cause as Keycap [cap-height]",
+          "properties": "height;box-sizing",
+          "original_kind": "layout",
+          "in_layout_check": "yes"
+        }
+      ]
+    },
+    "optimistic": {
+      "tp": 2,
+      "fp": 9,
+      "fn": 6,
+      "precision": 0.18181818181818182,
+      "recall": 0.25,
+      "predicted": 11,
+      "labelled": 8,
+      "agreement": [
+        {
+          "defect": "def-3fb23f88e95477c95dac",
+          "label": "SS-09",
+          "description": "Bordered boxes are smaller in code because the design adds borders outside the authored size: key caps 18px vs 21px tall, search field 34px vs 36px, footer 34px vs 35px"
+        },
+        {
+          "defect": "def-4dadb505dac5c116812c",
+          "label": "SS-04",
+          "description": "Match count sits outside the search field, to its right, instead of right-aligned inside the field"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-bd80e1958310cc08b692",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n153",
+            "code": "0/0/1/1/0"
+          },
+          "findings": [
+            "d7",
+            "d8",
+            "d9",
+            "d10"
+          ],
+          "summary": "layout:geometry differs in results"
+        },
+        {
+          "id": "def-a922b463978ba60b32a4",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:order",
+          "layer": {
+            "design": "n153",
+            "code": "0/0/1/1/0"
+          },
+          "findings": [
+            "d11"
+          ],
+          "summary": "layout:order differs in results"
+        },
+        {
+          "id": "def-d42e2e165c7be38e98d8",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n154::n2",
+            "code": "n154::n2"
+          },
+          "findings": [
+            "d12"
+          ],
+          "summary": "layout:geometry differs in results"
+        },
+        {
+          "id": "def-0187f115809f244acb14",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n155::n2",
+            "code": "n155::n2"
+          },
+          "findings": [
+            "d13",
+            "d14"
+          ],
+          "summary": "layout:geometry differs in results"
+        },
+        {
+          "id": "def-6da670e858fafc0cd7c7",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n156::n2",
+            "code": "n156::n2"
+          },
+          "findings": [
+            "d15",
+            "d16"
+          ],
+          "summary": "layout:geometry differs in results"
+        },
+        {
+          "id": "def-d1885f49c81a1f9021ab",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n157::n2",
+            "code": "n157::n2"
+          },
+          "findings": [
+            "d17",
+            "d18"
+          ],
+          "summary": "layout:geometry differs in results"
+        },
+        {
+          "id": "def-921f20d6d8345132d58e",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n158::n2",
+            "code": "n158::n2"
+          },
+          "findings": [
+            "d19",
+            "d20"
+          ],
+          "summary": "layout:geometry differs in results"
+        },
+        {
+          "id": "def-2d9de852ee4ce45996cc",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n159::n2",
+            "code": "n159::n2"
+          },
+          "findings": [
+            "d21",
+            "d22"
+          ],
+          "summary": "layout:geometry differs in results"
+        },
+        {
+          "id": "def-cbd6bc56fa06a9a5847a",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n163",
+            "code": "0/0/1/2"
+          },
+          "findings": [
+            "d23",
+            "d24"
+          ],
+          "summary": "layout:geometry differs in footer"
+        }
+      ],
+      "falseNegatives": [
+        {
+          "id": "SS-01",
+          "design_layer": "none",
+          "code_layer": "0/0/0",
+          "kind": "layout",
+          "description": "While searching, code keeps the Guide/Reference topic sidebar on the left; the design's search state has no sidebar, so in code the search field and results are about 215px narrower",
+          "severity": "high",
+          "likely_intentional": "unsure",
+          "note": "[rail-in-search] code always renders the topic rail",
+          "properties": "subtree;width",
+          "original_kind": "extra",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "SS-02",
+          "design_layer": "0/0/1/1/0;0/0/1/2/0;0/0/1/3/0;0/0/1/4/0;0/0/1/5/0",
+          "code_layer": "0/0/1/1/0/5/0;0/0/1/1/0/4/0;0/0/1/1/0/2/0;0/0/1/1/0/1/0;0/0/1/1/0/3/0",
+          "kind": "layout",
+          "description": "Results are in a different order: design ranks Split pane, Open files in a split, Preview beside, Inline ⇄ split diff, Move pane in direction, Add pane to group; code ranks Split pane, Move pane in direction, Inline ⇄ split diff, Add pane to group, Preview beside, Open files in a split",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[result-order] code's ranking differs from the design's",
+          "properties": "order",
+          "original_kind": "layout",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "SS-05",
+          "design_layer": "0/0/0/0/2",
+          "code_layer": "none",
+          "kind": "layout",
+          "description": "Clear (✕) button inside the search field is missing",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[clear-button]",
+          "properties": "subtree",
+          "original_kind": "missing",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "SS-06",
+          "design_layer": "0/0/1/6",
+          "code_layer": "none",
+          "kind": "layout",
+          "description": "The \"no match in GUIDE topics · search \"split\" in Search everything /\" hint under the results is missing",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[no-match-hint]",
+          "properties": "subtree",
+          "original_kind": "missing",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "SS-07",
+          "design_layer": "0/0/2/0;0/0/2/1;0/0/2/2;0/0/2/3;0/0/2/4",
+          "code_layer": "none",
+          "kind": "layout",
+          "description": "Footer shows the generic \"click keys to rebind · live from the command registry\" instead of the search hints \"↑↓ move · ↵ run Split pane · esc clear, then close\"",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[footer-hints] footer copy is hard-coded in the app",
+          "properties": "subtree;text",
+          "original_kind": "missing",
+          "in_layout_check": "yes"
+        },
+        {
+          "id": "SS-08",
+          "design_layer": "0/0/1/0/0/2;0/0/1/1/0/2;0/0/1/4/0/1",
+          "code_layer": "0/0/1/1/0/0/0/1;0/0/1/1/0/5/0/1",
+          "kind": "layout",
+          "description": "When a command has several key groups, code puts a faint \"·\" between the caps (⌘D · ⌘⇧D, ⌘⌥O · ⌘⌥⇧O); design spaces them 3px apart",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[key-sep]",
+          "properties": "text;layout",
+          "original_kind": "style",
+          "in_layout_check": "yes"
+        }
+      ]
+    }
+  },
+  "report": {
+    "schema": "fdn-drift/0",
+    "comparison": {
+      "mode": "layout-only",
+      "scope": "declared-regions",
+      "ignored": [
+        "text-content",
+        "style",
+        "pixels",
+        "excess-declared-repetition"
+      ],
+      "coverage": [
+        {
+          "id": "dialog",
+          "design": "0/0",
+          "code": "0/0",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "search",
+          "design": "0/0/0",
+          "code": "0/0/1/0",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "count",
+          "design": "0/0/0/0/1",
+          "code": "0/0/1/0/1",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "results",
+          "design": "0/0/1",
+          "code": "0/0/1/1/0",
+          "comparedItems": 6,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "footer",
+          "design": "0/0/2",
+          "code": "0/0/1/2",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        }
+      ]
+    },
+    "artboard": "help-search-split",
+    "state": "split",
+    "viewport": {
+      "width": 980,
+      "height": 638,
+      "dpr": 1
+    },
+    "design": {
+      "file": "boards/system-help-center.fdn.html",
+      "head": "9ecb6cc7215d7d955053117cbfb920c53fc2508afec9ac46e1e0a5f22bae0a9a",
+      "htmlSha256": "5d3cce513cd26d3b0cc8e4ff6118a9fa3666602de1edbe15880cb2ae9cf5dab9",
+      "binding": "chain-head"
+    },
+    "code": {
+      "repo": "honeybeehq/apiary",
+      "commit": "de190984abad4cdfa2bcd7a92717858801fea8ae",
+      "root": "apps/desktop/src/renderer/src/chrome/HelpCenter.tsx#HelpCenter"
+    },
+    "provable": true,
+    "captureEnvironment": {
+      "browserVersion": "151.0.7922.34",
+      "platform": "linux",
+      "fontPolicy": {
+        "sans": "Foundation Design Sans",
+        "mono": "Foundation Design Mono",
+        "serif": "Foundation Design Serif",
+        "fallback": "Foundation Symbols",
+        "requireCustomFonts": true
+      },
+      "fontAssets": [
+        {
+          "family": "Foundation Design Mono",
+          "weight": "400",
+          "format": "truetype",
+          "sha256": "c805f9436dbc268644c1d9584f01a601a653e028e08fd74b9b949f6cf8304d88",
+          "postScriptName": "DejaVuSansMono"
+        },
+        {
+          "family": "Foundation Design Mono",
+          "weight": "700",
+          "format": "truetype",
+          "sha256": "3a3c502eeff669a231549e80df9f7c49de109bafe303170409e905d0b31a38fe",
+          "postScriptName": "DejaVuSansMono-Bold"
+        },
+        {
+          "family": "Foundation Design Sans",
+          "weight": "400",
+          "format": "truetype",
+          "sha256": "4659bc0c58c5028dd488ec928d41d9265db43d9b669fc14ca8b0832daca7b144",
+          "postScriptName": "LiberationSans"
+        },
+        {
+          "family": "Foundation Design Sans",
+          "weight": "700",
+          "format": "truetype",
+          "sha256": "3973aa5054fb467dd5627245d3dc82e37bf16fe075756156a570455871351582",
+          "postScriptName": "LiberationSans-Bold"
+        },
+        {
+          "family": "Foundation Design Serif",
+          "weight": "400",
+          "format": "truetype",
+          "sha256": "705903ae1382f0150f115d6f10a30f5b2f3d6ade649c474afe6366c39174fb65",
+          "postScriptName": "LiberationSerif"
+        },
+        {
+          "family": "Foundation Design Serif",
+          "weight": "700",
+          "format": "truetype",
+          "sha256": "9e66c25e20868756bf12eb24a520a4552727c9cd108f577f7ae33e3c0110e39c",
+          "postScriptName": "LiberationSerif-Bold"
+        },
+        {
+          "family": "Foundation Symbols",
+          "weight": "400",
+          "format": "truetype",
+          "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
+          "postScriptName": "DejaVuSans"
+        },
+        {
+          "family": "Foundation Symbols",
+          "weight": "700",
+          "format": "truetype",
+          "sha256": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895",
+          "postScriptName": "DejaVuSans-Bold"
+        },
+        {
+          "family": "Hanken Grotesk",
+          "weight": "700",
+          "format": "woff2",
+          "sha256": "d85de6e272296d06f8205ad11e27140274e0ef97050232777d146eabb71c312d",
+          "postScriptName": "HankenGrotesk-Bold"
+        },
+        {
+          "family": "Hanken Grotesk",
+          "weight": "500",
+          "format": "woff2",
+          "sha256": "31f666af7bff625900c46aa34a05d8620482ba2db37db7b63749b693ab0c72ec",
+          "postScriptName": "HankenGrotesk-Medium"
+        },
+        {
+          "family": "Hanken Grotesk",
+          "weight": "400",
+          "format": "woff2",
+          "sha256": "787b3fdd0b7e6d59ae7ce14ce7a41d1a44616584b4c919b527da951972d5d87d",
+          "postScriptName": "HankenGrotesk-Regular"
+        },
+        {
+          "family": "Hanken Grotesk",
+          "weight": "600",
+          "format": "woff2",
+          "sha256": "58f23b7ae3e13b21a4dca4c05360be87b3531d60fc1cbff89732cac8fb3019ae",
+          "postScriptName": "HankenGrotesk-SemiBold"
+        },
+        {
+          "family": "IBM Plex Mono",
+          "weight": "500",
+          "format": "woff2",
+          "sha256": "01d285447409c8a588692162439a038b8cbd7871309ee20267b0d2d91c6e8e22",
+          "postScriptName": "IBMPlexMono-Medium"
+        },
+        {
+          "family": "IBM Plex Mono",
+          "weight": "400",
+          "format": "woff2",
+          "sha256": "08949f728dc52d528e69b1667d15c89a5686a4ee9a296ff90983985f99c380f7",
+          "postScriptName": "IBMPlexMono-Regular"
+        }
+      ],
+      "rendererSourceHash": "55e1c9a1aa9c78062f0470e01d73d5a6ef97d5b2e44230e921be6f745829e960"
+    },
+    "styles": {
+      "properties": [
+        "color",
+        "background-color",
+        "background-image",
+        "border-top-color",
+        "border-right-color",
+        "border-bottom-color",
+        "border-left-color",
+        "border-top-width",
+        "border-right-width",
+        "border-bottom-width",
+        "border-left-width",
+        "border-top-style",
+        "border-right-style",
+        "border-bottom-style",
+        "border-left-style",
+        "border-top-left-radius",
+        "border-top-right-radius",
+        "border-bottom-left-radius",
+        "border-bottom-right-radius",
+        "padding-top",
+        "padding-right",
+        "padding-bottom",
+        "padding-left",
+        "margin-top",
+        "margin-right",
+        "margin-bottom",
+        "margin-left",
+        "row-gap",
+        "column-gap",
+        "font-family",
+        "font-size",
+        "font-weight",
+        "line-height",
+        "letter-spacing",
+        "text-align",
+        "text-transform",
+        "opacity",
+        "box-shadow",
+        "text-shadow",
+        "display",
+        "align-items",
+        "justify-content",
+        "flex-direction",
+        "visibility",
+        "position",
+        "box-sizing",
+        "overflow-x",
+        "overflow-y",
+        "font-style",
+        "text-decoration-line",
+        "white-space",
+        "gap",
+        "flex-grow",
+        "flex-shrink"
+      ],
+      "unavailable": []
+    },
+    "matching": {
+      "algorithm": "declared-layout-regions",
+      "repeat": "shared-stable-id-or-ordinal-template"
+    },
+    "offscreen": {
+      "status": "declared-regions-only",
+      "reason": "Only declared geometry is checked; the independent off-screen eligibility scan is not run."
+    },
+    "tolerances": {
+      "pixelRatio": 0.001,
+      "boxPx": 1,
+      "colorDeltaE": 1,
+      "stylePx": 1,
+      "pixelThreshold": 0.1
+    },
+    "pixels": {
+      "diffRatio": 0.01901989635979784,
+      "diffPixels": 11892,
+      "diffImage": "diff.png",
+      "designImage": "design.png",
+      "codeImage": "code.png"
+    },
+    "drifts": [
+      {
+        "id": "d1",
+        "kind": "layout",
+        "property": "x",
+        "designNode": "n146",
+        "codeNode": "0/0/1/0",
+        "design": 1,
+        "code": 217,
+        "designBox": [
+          1,
+          1,
+          900,
+          60
+        ],
+        "codeBox": [
+          217,
+          1,
+          683.59375,
+          58
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d2",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n146",
+        "codeNode": "0/0/1/0",
+        "design": 900,
+        "code": 683.59375,
+        "designBox": [
+          1,
+          1,
+          900,
+          60
+        ],
+        "codeBox": [
+          217,
+          1,
+          683.59375,
+          58
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d3",
+        "kind": "layout",
+        "property": "height",
+        "designNode": "n146",
+        "codeNode": "0/0/1/0",
+        "design": 60,
+        "code": 58,
+        "designBox": [
+          1,
+          1,
+          900,
+          60
+        ],
+        "codeBox": [
+          217,
+          1,
+          683.59375,
+          58
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d4",
+        "kind": "layout",
+        "property": "x",
+        "designNode": "n151",
+        "codeNode": "0/0/1/0/1",
+        "design": 783.296875,
+        "code": 606.890625,
+        "designBox": [
+          784.296875,
+          26,
+          56.703125,
+          14
+        ],
+        "codeBox": [
+          823.890625,
+          24.390625,
+          56.703125,
+          15.21875
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d5",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n151",
+        "codeNode": "0/0/1/0/1",
+        "design": 25,
+        "code": 23.390625,
+        "designBox": [
+          784.296875,
+          26,
+          56.703125,
+          14
+        ],
+        "codeBox": [
+          823.890625,
+          24.390625,
+          56.703125,
+          15.21875
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d6",
+        "kind": "layout",
+        "property": "height",
+        "designNode": "n151",
+        "codeNode": "0/0/1/0/1",
+        "design": 14,
+        "code": 15.21875,
+        "designBox": [
+          784.296875,
+          26,
+          56.703125,
+          14
+        ],
+        "codeBox": [
+          823.890625,
+          24.390625,
+          56.703125,
+          15.21875
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d7",
+        "kind": "layout",
+        "property": "x",
+        "designNode": "n153",
+        "codeNode": "0/0/1/1/0",
+        "design": 1,
+        "code": 217,
+        "designBox": [
+          1,
+          61,
+          900,
+          465
+        ],
+        "codeBox": [
+          217,
+          59,
+          683.59375,
+          467.4375
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d8",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n153",
+        "codeNode": "0/0/1/1/0",
+        "design": 61,
+        "code": 59,
+        "designBox": [
+          1,
+          61,
+          900,
+          465
+        ],
+        "codeBox": [
+          217,
+          59,
+          683.59375,
+          467.4375
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d9",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n153",
+        "codeNode": "0/0/1/1/0",
+        "design": 900,
+        "code": 683.59375,
+        "designBox": [
+          1,
+          61,
+          900,
+          465
+        ],
+        "codeBox": [
+          217,
+          59,
+          683.59375,
+          467.4375
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d10",
+        "kind": "layout",
+        "property": "height",
+        "designNode": "n153",
+        "codeNode": "0/0/1/1/0",
+        "design": 465,
+        "code": 467.4375,
+        "designBox": [
+          1,
+          61,
+          900,
+          465
+        ],
+        "codeBox": [
+          217,
+          59,
+          683.59375,
+          467.4375
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d11",
+        "kind": "layout",
+        "property": "order",
+        "designNode": "n153",
+        "codeNode": "0/0/1/1/0",
+        "design": [
+          "n154::n2",
+          "n155::n2",
+          "n156::n2",
+          "n157::n2",
+          "n158::n2",
+          "n159::n2"
+        ],
+        "code": [
+          0,
+          5,
+          4,
+          2,
+          1,
+          3
+        ],
+        "designBox": [
+          1,
+          61,
+          900,
+          465
+        ],
+        "codeBox": [
+          217,
+          59,
+          683.59375,
+          467.4375
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d12",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n154::n2",
+        "codeNode": "n154::n2",
+        "design": 876,
+        "code": 661.59375,
+        "designBox": [
+          13,
+          63,
+          876,
+          30
+        ],
+        "codeBox": [
+          229,
+          61,
+          661.59375,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d13",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n155::n2",
+        "codeNode": "n155::n2",
+        "design": 32,
+        "code": 152,
+        "designBox": [
+          13,
+          93,
+          876,
+          30
+        ],
+        "codeBox": [
+          229,
+          211,
+          661.59375,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d14",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n155::n2",
+        "codeNode": "n155::n2",
+        "design": 876,
+        "code": 661.59375,
+        "designBox": [
+          13,
+          93,
+          876,
+          30
+        ],
+        "codeBox": [
+          229,
+          211,
+          661.59375,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d15",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n156::n2",
+        "codeNode": "n156::n2",
+        "design": 62,
+        "code": 122,
+        "designBox": [
+          13,
+          123,
+          876,
+          30
+        ],
+        "codeBox": [
+          229,
+          181,
+          661.59375,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d16",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n156::n2",
+        "codeNode": "n156::n2",
+        "design": 876,
+        "code": 661.59375,
+        "designBox": [
+          13,
+          123,
+          876,
+          30
+        ],
+        "codeBox": [
+          229,
+          181,
+          661.59375,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d17",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n157::n2",
+        "codeNode": "n157::n2",
+        "design": 92,
+        "code": 62,
+        "designBox": [
+          13,
+          153,
+          876,
+          30
+        ],
+        "codeBox": [
+          229,
+          121,
+          661.59375,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d18",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n157::n2",
+        "codeNode": "n157::n2",
+        "design": 876,
+        "code": 661.59375,
+        "designBox": [
+          13,
+          153,
+          876,
+          30
+        ],
+        "codeBox": [
+          229,
+          121,
+          661.59375,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d19",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n158::n2",
+        "codeNode": "n158::n2",
+        "design": 122,
+        "code": 32,
+        "designBox": [
+          13,
+          183,
+          876,
+          30
+        ],
+        "codeBox": [
+          229,
+          91,
+          661.59375,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d20",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n158::n2",
+        "codeNode": "n158::n2",
+        "design": 876,
+        "code": 661.59375,
+        "designBox": [
+          13,
+          183,
+          876,
+          30
+        ],
+        "codeBox": [
+          229,
+          91,
+          661.59375,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d21",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n159::n2",
+        "codeNode": "n159::n2",
+        "design": 152,
+        "code": 92,
+        "designBox": [
+          13,
+          213,
+          876,
+          30
+        ],
+        "codeBox": [
+          229,
+          151,
+          661.59375,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d22",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n159::n2",
+        "codeNode": "n159::n2",
+        "design": 876,
+        "code": 661.59375,
+        "designBox": [
+          13,
+          213,
+          876,
+          30
+        ],
+        "codeBox": [
+          229,
+          151,
+          661.59375,
+          30
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d23",
+        "kind": "layout",
+        "property": "x",
+        "designNode": "n163",
+        "codeNode": "0/0/1/2",
+        "design": 1,
+        "code": 217,
+        "designBox": [
+          1,
+          526,
+          900,
+          35
+        ],
+        "codeBox": [
+          217,
+          526.4375,
+          683.59375,
+          34
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d24",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n163",
+        "codeNode": "0/0/1/2",
+        "design": 900,
+        "code": 683.59375,
+        "designBox": [
+          1,
+          526,
+          900,
+          35
+        ],
+        "codeBox": [
+          217,
+          526.4375,
+          683.59375,
+          34
+        ],
+        "confidence": 1
+      }
+    ],
+    "defects": [
+      {
+        "id": "def-3fb23f88e95477c95dac",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n146",
+          "code": "0/0/1/0"
+        },
+        "findings": [
+          "d1",
+          "d2",
+          "d3"
+        ],
+        "summary": "layout:geometry differs in search"
+      },
+      {
+        "id": "def-4dadb505dac5c116812c",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n151",
+          "code": "0/0/1/0/1"
+        },
+        "findings": [
+          "d4",
+          "d5",
+          "d6"
+        ],
+        "summary": "layout:geometry differs in count"
+      },
+      {
+        "id": "def-bd80e1958310cc08b692",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n153",
+          "code": "0/0/1/1/0"
+        },
+        "findings": [
+          "d7",
+          "d8",
+          "d9",
+          "d10"
+        ],
+        "summary": "layout:geometry differs in results"
+      },
+      {
+        "id": "def-a922b463978ba60b32a4",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:order",
+        "layer": {
+          "design": "n153",
+          "code": "0/0/1/1/0"
+        },
+        "findings": [
+          "d11"
+        ],
+        "summary": "layout:order differs in results"
+      },
+      {
+        "id": "def-d42e2e165c7be38e98d8",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n154::n2",
+          "code": "n154::n2"
+        },
+        "findings": [
+          "d12"
+        ],
+        "summary": "layout:geometry differs in results"
+      },
+      {
+        "id": "def-0187f115809f244acb14",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n155::n2",
+          "code": "n155::n2"
+        },
+        "findings": [
+          "d13",
+          "d14"
+        ],
+        "summary": "layout:geometry differs in results"
+      },
+      {
+        "id": "def-6da670e858fafc0cd7c7",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n156::n2",
+          "code": "n156::n2"
+        },
+        "findings": [
+          "d15",
+          "d16"
+        ],
+        "summary": "layout:geometry differs in results"
+      },
+      {
+        "id": "def-d1885f49c81a1f9021ab",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n157::n2",
+          "code": "n157::n2"
+        },
+        "findings": [
+          "d17",
+          "d18"
+        ],
+        "summary": "layout:geometry differs in results"
+      },
+      {
+        "id": "def-921f20d6d8345132d58e",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n158::n2",
+          "code": "n158::n2"
+        },
+        "findings": [
+          "d19",
+          "d20"
+        ],
+        "summary": "layout:geometry differs in results"
+      },
+      {
+        "id": "def-2d9de852ee4ce45996cc",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n159::n2",
+          "code": "n159::n2"
+        },
+        "findings": [
+          "d21",
+          "d22"
+        ],
+        "summary": "layout:geometry differs in results"
+      },
+      {
+        "id": "def-cbd6bc56fa06a9a5847a",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n163",
+          "code": "0/0/1/2"
+        },
+        "findings": [
+          "d23",
+          "d24"
+        ],
+        "summary": "layout:geometry differs in footer"
+      }
+    ],
+    "summary": {
+      "uniqueDefects": 11,
+      "accepted": 0,
+      "raw": 24,
+      "uncertainMatches": 0,
+      "environment": 0,
+      "uncertain": 0
+    },
+    "matches": [
+      {
+        "designNode": "n145",
+        "codeNode": "n145",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n146",
+        "codeNode": "0/0/1/0",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n151",
+        "codeNode": "0/0/1/0/1",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n153",
+        "codeNode": "0/0/1/1/0",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n154::n2",
+        "codeNode": "n154::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n155::n2",
+        "codeNode": "n155::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n156::n2",
+        "codeNode": "n156::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n157::n2",
+        "codeNode": "n157::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n158::n2",
+        "codeNode": "n158::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n159::n2",
+        "codeNode": "n159::n2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n163",
+        "codeNode": "0/0/1/2",
+        "kind": "heuristic",
+        "confidence": 1
+      }
+    ],
+    "verdict": "drift",
+    "timingsMs": {
+      "compare": 86.45194200000014
+    },
+    "reportHash": "7e1856cbc4107e325cbd7cd0be392aafa2fb8ed313e57264da968a9d3f8a1381"
+  }
+}

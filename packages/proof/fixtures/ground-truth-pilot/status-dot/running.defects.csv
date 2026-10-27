@@ -1,0 +1,2 @@
+id,design_layer,code_layer,kind,description,severity,likely_intentional,note,properties
+SD-01,0,0,environment,"Area around the component is white in the design artboard and the warm window background #F5F4F1 in the code harness. Not a product defect",low,no,[harness-bg] capture environment only,background-color(page)

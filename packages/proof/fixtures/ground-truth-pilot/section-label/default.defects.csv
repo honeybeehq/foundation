@@ -1,0 +1,6 @@
+id,design_layer,code_layer,kind,description,severity,likely_intentional,note,properties
+SL-01,0/0,0/0,token,"Label is authored in the system font stack (-apple-system / Helvetica Neue) on the usage board and in Hanken Grotesk in code",medium,unsure,[font-family] authored stacks differ independent of the Linux substitution,font-family
+SL-02,0/0,0/0,style,"Letter spacing is 1.4px (0.14em) in code vs 1.2px (0.12em) in design, so letters are spaced slightly wider (the design label is still 4px wider overall because of the substituted font)",low,unsure,[label-tracking],letter-spacing
+SL-03,0/0,0/0,environment,"Design text renders in the pinned Linux substitute for -apple-system / Helvetica Neue. Not a product defect",low,no,[font-env] capture environment only,font-family(rendered)
+SL-04,0/0,0/0,layout,"Label line box is 14px tall in code (line-height 1.45) vs 11px in design (normal), so the text sits about 1.5px lower",low,unsure,[line-height] code inherits line-height 1.45,line-height
+SL-05,0,0,environment,"Area around the component is white in the design artboard and the warm window background #F5F4F1 in the code harness. Not a product defect",low,no,[harness-bg] capture environment only,background-color(page)

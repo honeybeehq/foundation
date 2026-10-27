@@ -1,0 +1,16 @@
+{
+ "n146": ["0/0/1/0", "sure", "search header row (right of the topic rail in code)"],
+ "n147": ["0/0/1/0/0", "sure", "search field"],
+ "n149": ["0/0/1/0/0/0", "sure", "input value \"split\""],
+ "n150": ["0/0/1/0/0/0", "unsure", "painted caret vs the native input caret (not visible in a still capture)"],
+ "n152": ["none", "sure", "no clear button in code"],
+ "n153": ["0/0/1/1/0", "sure", "results list"],
+ "n154::n6": ["0/0/1/1/0/0/0/0/3", "sure", ""],
+ "n155::n6": ["0/0/1/1/0/5/0/0/3", "sure", "row is 6th in code, 2nd in design"],
+ "n158::n6": ["0/0/1/1/0/1/0/0/2", "sure", "row is 2nd in code, 5th in design"],
+ "n159::n6": ["0/0/1/1/0/3/0/0/3", "sure", "row is 4th in code, 6th in design"],
+ "n160": ["none", "sure", "no cross-topic hint in code"],
+ "n163": ["0/0/1/2", "sure", "footer (content column only in code)"],
+ "n165": ["none", "sure", "footer hint separators absent"],
+ "n167": ["none", "sure", "footer hint separators absent"]
+}

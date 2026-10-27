@@ -1,0 +1,5 @@
+id,design_layer,code_layer,kind,description,severity,likely_intentional,note,properties
+KC-01,0/0,0/0,layout,"Key cap is 18px tall in code but 21px in design (both author 18px; design adds the 1px top and 2px bottom border outside it, code includes them), so the cap looks squatter and ""⌘↵"" sits about 1.5px higher",medium,no,[cap-height] content-box in design vs border-box in code; width identical,height;box-sizing
+KC-02,0/0,0/0,style,"Key label ink is lighter in code: #6B6862 (inkSoft) vs #5A564E",low,unsure,[cap-ink],color
+KC-03,0/0,0/0,token,"Key border is #E2E0DB (ghostBorder) in code vs --color-border #E7E5E0 in design",low,unsure,[cap-border],border-color
+KC-04,0,0,environment,"Area around the component is white in the design artboard and the warm window background #F5F4F1 in the code harness. Not a product defect",low,no,[harness-bg] capture environment only,background-color(page)

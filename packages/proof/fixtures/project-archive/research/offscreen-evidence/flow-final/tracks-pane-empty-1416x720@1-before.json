@@ -1,0 +1,99 @@
+[
+  {
+    "id": "def-aea252968eb4f8660e79",
+    "layer": {
+      "design": "n284::n276::n40",
+      "code": "n284::n276::n40"
+    },
+    "kind": "text",
+    "cause": "text:text",
+    "classification": "product",
+    "findings": [
+      "d1"
+    ],
+    "summary": "text text differs at n284::n276::n40"
+  },
+  {
+    "id": "def-20a00fc76f833d7c3c13",
+    "layer": {
+      "design": "n284::n276::n40",
+      "code": "n284::n276::n40"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d2"
+    ],
+    "summary": "layout configuration differs at n284::n276::n40"
+  },
+  {
+    "id": "def-d508007090203847fc36",
+    "layer": {
+      "design": "n284::n602::n412",
+      "code": "0/0/0/0/0/2/0"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d3"
+    ],
+    "summary": "layout configuration differs at n284::n602::n412"
+  },
+  {
+    "id": "def-f861dffbdb49e3785b6f",
+    "layer": {
+      "design": "n284::n272::n470",
+      "code": "0/0/0/1/0/0/0"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d4"
+    ],
+    "summary": "layout configuration differs at n284::n272::n470"
+  },
+  {
+    "id": "def-480b17de2bf0b51fe954",
+    "layer": {
+      "design": "n284::n606::n537::n412",
+      "code": "0/0/0/2/0/0"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d5",
+      "d6"
+    ],
+    "summary": "layout configuration differs at n284::n606::n537::n412"
+  },
+  {
+    "id": "def-7f8b7f1a0d74dac3b82f",
+    "layer": {
+      "design": "n284::n276::n41"
+    },
+    "kind": "missing",
+    "cause": "missing:subtree",
+    "classification": "product",
+    "findings": [
+      "d7"
+    ],
+    "summary": "missing subtree differs at n284::n276::n41"
+  },
+  {
+    "id": "def-27daee5546dfe4c03add",
+    "layer": {
+      "design": "n284::n606::n536"
+    },
+    "kind": "missing",
+    "cause": "missing:subtree",
+    "classification": "product",
+    "findings": [
+      "d8"
+    ],
+    "summary": "missing subtree differs at n284::n606::n536"
+  }
+]
