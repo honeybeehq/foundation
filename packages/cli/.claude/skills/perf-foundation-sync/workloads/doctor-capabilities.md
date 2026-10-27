@@ -1,0 +1,11 @@
+# Capability command startup
+
+Run `node packages/cli/scripts/capabilities-proof.mjs --out .audit/S6b/built.json` and repeat with `--source --out .audit/S6b/source.json`. Each run uses20fresh processes and a disposable checkout/HOME. It checks unknown/missing/stamped runtimes, working-tree-only and missing designs, non-Git roots, inherited Git environment, symlink escapes, single-line JSON and unchanged fixture hashes. Trash only the fixture path printed by the driver; keep receipts.
+
+Budget: local warm-cache p95<300ms, ruled in S6b2026-10-24T19:08:16Z. Includes fresh process startup, stamp reads and one100ms-limited Git HEAD query. Excludes remote transport, session/edit startup and installation-time bundle compilation. CLI launchers built by install dispatch capabilities to the light bundle; source CLI uses lazy command imports.
+
+Studio Node24.20.0 observed single-process source p95=140.77ms and built p95=39.33ms in the retained S6b proof; shared host load19-22 precludes a stable baseline or fleet-wide guarantee. Initial eager-source p95=354.60ms is retained as the failed same-workload run. Source and built are separate series; do not compare them as one population. The metric stays recipe-only because no quiet reference series was established. Check each receipt with `node packages/cli/scripts/perf-map.mjs check <receipt>`; correctness invariant and300ms budget still apply.
+
+The first metal-3 source invocation through the TSX CLI exceeded the budget (p95=309.42ms). That failed receipt is retained. The portable source shim was then changed to Node --import with the absolute TSX loader, avoiding the extra Node process. The --source recipe follows that actual shim route and uses a distinct source-register series. Both the old source miss and the new route remain explicit; the300ms budget is unchanged.
+
+Satellite rerun: exact2636f6f on metal-3, Node24.18.0, source-register32cases and20samples passed; p95=256.54ms, max=258.50ms. Actual portable shell shim emitted one JSON line with installed=false and correct local file presence. Original source309.42ms failure remains in the attached S6b satellite receipt.

@@ -1,0 +1,157 @@
+{
+  "protocolVersion": 1,
+  "id": "doctor-capabilities",
+  "title": "Read-only node and checkout capabilities",
+  "lane": "startup",
+  "processes": [
+    "helper"
+  ],
+  "owners": [
+    "packages/cli/src/argv.ts@9e5d783b2599969310757a3b2ad7f5e02b1ffe88",
+    "packages/cli/src/capabilities-bin.ts@f9e734a8b73bf3c0a3262ff80ab676dd7027af7b",
+    "packages/cli/src/commands/capabilities.ts@f0b9a518f56247097d9d98eafc9c6136cd61fbf4",
+    "packages/cli/src/commands/doctor.ts@98e50d5fbf5a26aaa10f4162004d3e6bbf61ebb8",
+    "packages/cli/src/commands/install.ts@48c852f11487035b363c4e89e8c2d5abfde22bca",
+    "packages/cli/src/io.ts@f71b8958d5bc793ddf505ff5618161978cedee95",
+    "packages/cli/src/main.ts@25d28fddf3d56bf486a30791087f5764e7ebd095",
+    "packages/cli/src/runtime-inventory.ts@2060ba4dea0d018348bd6fe91e7a40c8345684b6",
+    "scripts/foundation-shim.sh@37f4c699010d4395efcc1ab154ea8e9809824afe"
+  ],
+  "effect": {
+    "user": "Fast-edit routing learns the installed Foundation and whether the selected local design exists.",
+    "assertions": [
+      "One compact JSON line; discovered commands never executed; no files changed",
+      "Missing or unstamped runtime metadata remains unknown",
+      "A working-tree-only design can be present independently of Git HEAD"
+    ],
+    "exclusions": [
+      "remote transport",
+      "session startup or editing",
+      "Git network access",
+      "installation-time bundle build"
+    ]
+  },
+  "accounts": [
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/argv.ts:flagString"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/argv.ts:parseArgs"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/commands/capabilities.ts:runCapabilities"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/commands/doctor.ts:runDoctor"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/commands/install.ts:activateInstall"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/commands/install.ts:runInstall"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/io.ts:captureIo"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/main.ts:runCli"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/runtime-inventory.ts:inspect"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/runtime-inventory.ts:readable"
+    },
+    {
+      "inventory": "resource-owners",
+      "key": "spawn:packages/cli/src/commands/capabilities.ts#1"
+    }
+  ],
+  "states": {
+    "idle": {
+      "matters": false,
+      "why": "Outside the bounded local capability probe measurement"
+    },
+    "first-use": {
+      "matters": false,
+      "why": "Outside the bounded local capability probe measurement"
+    },
+    "repeated": {
+      "matters": true,
+      "why": "20 fresh processes with warmed filesystem/transpile cache"
+    },
+    "scale": {
+      "matters": false,
+      "why": "Outside the bounded local capability probe measurement"
+    },
+    "background": {
+      "matters": false,
+      "why": "Outside the bounded local capability probe measurement"
+    },
+    "release": {
+      "matters": false,
+      "why": "Outside the bounded local capability probe measurement"
+    },
+    "recovery": {
+      "matters": false,
+      "why": "Outside the bounded local capability probe measurement"
+    }
+  },
+  "fixture": {
+    "preset": "owned checkout + readable working-tree design; isolated HOME with stamped or unstamped executable",
+    "isolationPolicy": 1,
+    "scaleAxes": []
+  },
+  "recipe": {
+    "driver": "packages/cli/scripts/capabilities-proof.mjs",
+    "command": "node packages/cli/scripts/capabilities-proof.mjs --out .audit/S6b/receipt.json",
+    "readiness": "Owned Cell with dependencies and fixed fixture; record runtime, host load and command population",
+    "completion": "20 fresh CLI processes return the expected facts with no writes",
+    "reset": "Fresh isolated fixture HOME; no real installation changes",
+    "teardown": "Trash only owned temporary fixture; retain JSON receipt",
+    "serial": true,
+    "requires": [
+      "Node",
+      "Git",
+      "installed workspace dependencies"
+    ]
+  },
+  "metrics": [
+    {
+      "id": "commandP95",
+      "unit": "ms",
+      "scope": "spawn fresh CLI process to complete compact capabilities JSON and exit",
+      "collector": "process.hrtime.bigint in parent; include startup and Git query; no profiler",
+      "aggregation": "p95",
+      "kind": "actual",
+      "status": "stale",
+      "states": [
+        "repeated"
+      ],
+      "betterWhen": "lower",
+      "budget": {
+        "value": 300,
+        "unit": "ms",
+        "comparator": "<",
+        "status": "ruled",
+        "source": "S6b orchestrator brief2026-10-24T19:08:16Z",
+        "ruledAt": "2026-10-24",
+        "condition": "Local read-only probe, warm filesystem and transpile cache; not a network/service or arbitrary filesystem latency guarantee"
+      },
+      "invariant": "Every sampled command returns correct one-line facts and leaves fixture files unchanged.",
+      "noise": "Shared Studio load varied19-40; receipts are observed recipe proof, not a stable baseline."
+    }
+  ],
+  "readiness": "Earlier startup receipts are historical; lazy share dispatch changed main. Startup has not been remeasured for H2.",
+  "updatedAt": "2026-10-24"
+}

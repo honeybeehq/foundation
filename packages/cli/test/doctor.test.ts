@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { runDoctor } from '../src/commands/doctor.js'
@@ -35,7 +35,7 @@ describe('doctor inventory', () => {
     expect(result.readOnly).toBe(true)
     expect(result.entries.map((entry: { source: string }) => entry.source)).toEqual(['PATH', 'local-bin', 'gateway-registry'])
     expect(result.entries.every((entry: { realpath: string; sourceSha: null; artboardWriteSafe: string }) =>
-      entry.realpath === binary && entry.sourceSha === null && entry.artboardWriteSafe === 'unknown')).toBe(true)
+      entry.realpath === realpathSync(binary) && entry.sourceSha === null && entry.artboardWriteSafe === 'unknown')).toBe(true)
     expect(existsSync(marker)).toBe(false)
     expect(io.out.join('')).not.toContain('do-not-print')
     expect(readFileSync(registry, 'utf8')).toBe(raw)
@@ -54,7 +54,7 @@ describe('doctor inventory', () => {
     const io = captureIo()
     await runDoctor(['--inventory', '--json'], io)
     const result = JSON.parse(io.out[0]!)
-    expect(result.entries).toContainEqual(expect.objectContaining({ realpath: binary, sourceSha: sha, artboardWriteSafe: true }))
+    expect(result.entries).toContainEqual(expect.objectContaining({ realpath: realpathSync(binary), sourceSha: sha, artboardWriteSafe: true }))
     expect(result.entries.filter((entry: { sourceSha: string }) => entry.sourceSha === sha)).toHaveLength(2)
     expect(result.coverage.commandsExecuted).toBe(false)
     expect(result.configs.some((config: { path: string }) => config.path.includes('/src/'))).toBe(false)
