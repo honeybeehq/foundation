@@ -84,7 +84,7 @@ export function jobSummary(
     }
     lines.push(
       `Accepted pixel bounds exclude ${((r.acceptedPixels?.excludedRatio ?? 0) * 100).toFixed(3)}% of the image; residual difference outside them: ${((r.acceptedPixels?.residualRatio ?? r.pixels.diffRatio) * 100).toFixed(3)}%. Allowlisted environment groups: ${defectsOf(r).filter((d) => d.classification === "environment" && environmentCauses.includes(d.cause)).length}; unreviewed environment groups: ${defectsOf(r).filter((d) => d.classification === "environment" && !environmentCauses.includes(d.cause)).length}.`,
-      `Images: [Design](${artifactUrl}) (`${cell(r.artboard)}/${cell(r.state)}/${r.viewport.width}x${r.viewport.height}@${r.viewport.dpr}/design.png`), [Code](${artifactUrl}) (`${cell(r.artboard)}/${cell(r.state)}/${r.viewport.width}x${r.viewport.height}@${r.viewport.dpr}/code.png`), [Diff](${artifactUrl}) (`${cell(r.artboard)}/${cell(r.state)}/${r.viewport.width}x${r.viewport.height}@${r.viewport.dpr}/diff.png`). Links download the image artifact.`,
+      `Images: [Design](${artifactUrl}) (\`${cell(r.artboard)}/${cell(r.state)}/${r.viewport.width}x${r.viewport.height}@${r.viewport.dpr}/design.png\`), [Code](${artifactUrl}) (\`${cell(r.artboard)}/${cell(r.state)}/${r.viewport.width}x${r.viewport.height}@${r.viewport.dpr}/code.png\`), [Diff](${artifactUrl}) (\`${cell(r.artboard)}/${cell(r.state)}/${r.viewport.width}x${r.viewport.height}@${r.viewport.dpr}/diff.png\`). Links download the image artifact.`,
       "",
       `<details><summary>Candidate table (${defectsOf(r).length} groups, including uncertain/environment groups)</summary>`,
       "",
@@ -132,7 +132,7 @@ export function jobSummary(
     ...(verification.errors ?? []).map((e: string) => `- ${cell(e)}`),
     "",
     "## Timings",
-    ``${cell(timings)}``,
+    `\`${cell(timings)}\``,
   );
   return lines.join("\n") + "\n";
 }
