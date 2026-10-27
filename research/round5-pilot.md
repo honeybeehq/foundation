@@ -90,3 +90,7 @@ The scorer driver refuses to overwrite an existing score directory. Its input re
 Keep this as a limited, manually reviewed advisory pilot. Fix or explicitly scope the accuracy misses before considering any automated enforcement. Choose matching fixture data, design ownership, reviewer identities and normal code review of baselines/links/fixtures/review log/accepted list. Reviewer names and timings are ordinary repository audit fields, not authenticated signatures. A candidate-controlled workflow can change its policy reference; this prototype is not an adversarial trusted PR gate. No secrets or protection rules were installed.
 
 The independent cross-model reviewer checked source, tests, actual Actions logs/artifacts, hash bindings, carry-forward and timing. It confirmed the workflow observations while retaining the advisory/measurement limitations. Approved older Cell branches/refs were preserved throughout; no reset, branch deletion or git gc was used.
+
+## Preview availability
+
+The exact downloaded job summaries were rendered locally for the proof screenshots, with their source run URL visible; these are not screenshots of GitHub's authenticated chrome. Nectar refused publication with E_QUOTA (12 serving environments) on metal-2, netcup-2, trmd-metal-1 and trmd-metal-3. No existing preview was stopped. The authenticated Actions URLs and saved summary screenshots remain the review evidence.
