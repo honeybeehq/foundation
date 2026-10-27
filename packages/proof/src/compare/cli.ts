@@ -2,7 +2,7 @@ import { compareDirectories } from "./index.ts";
 const [design, code, out] = process.argv.slice(2);
 if (!design || !code || !out)
   throw Error("Usage: tsx packages/proof/src/compare/cli.ts DESIGN CODE OUT");
-const r = await compareDirectories(design, code, out);
+const r = await compareDirectories(design, code, out, {}, {mode:process.argv.includes("--layout-only")?"layout-only":"full"});
 console.log(
   JSON.stringify({
     verdict: r.verdict,

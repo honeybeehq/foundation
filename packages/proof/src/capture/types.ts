@@ -1,4 +1,6 @@
+import type {LayoutRegionLink} from "./layout-regions.js"
 export interface StateLink {
+  layoutOnly?: {regions: LayoutRegionLink[]}
   name: string
   fixture: string
   designState: string
@@ -8,6 +10,7 @@ export interface StateLink {
 }
 
 export interface ArtboardLink {
+  layoutOnly?: {regions: LayoutRegionLink[]}
   id: string
   component: string
   designNode: string

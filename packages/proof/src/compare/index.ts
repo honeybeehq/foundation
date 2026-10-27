@@ -4,6 +4,7 @@ import { readFile, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { PNG } from "pngjs";
 import pixelmatch from "pixelmatch";
+import {layoutOnlyEvidence} from "./layout-only.ts";
 import { belowFoldMatches } from "./below-fold.ts";
 import { offscreenDefects } from "./offscreen.ts";
 import { groupDefects } from "./defects.ts";
@@ -47,6 +48,7 @@ export function compare(
   design: Capture,
   code: Capture,
   tolerances: Partial<Tolerances> = {},
+  options: {mode?: "full" | "layout-only"} = {},
 ) {
   const start = performance.now(),
     t = { ...defaults, ...tolerances },
@@ -211,7 +213,9 @@ export function compare(
       c.meta.blocked?.length,
   );
   const fontIssues = pairEnvironmentIssues(design, code);
-  const reason = failure
+  const layout=options.mode === "layout-only" ? layoutOnlyEvidence(design,code,t) : undefined;
+  if(layout) {drifts.splice(0,drifts.length,...layout.drifts); matches.splice(0,matches.length,...layout.matches);}
+  const reason = layout?.reason || (failure
     ? String(
         failure.meta.reason ||
           (failure.meta.dirty || failure.meta.rendererDirty
@@ -224,10 +228,10 @@ export function compare(
       ? fontIssues.join("; ")
       : unavailable.length
         ? "Capture lacks visual properties: " + unavailable.join(", ")
-        : null;
+        : null);
   const meta = design.meta;
-  const defects = groupDefects(drifts, matches, design, code);
-  for (const defect of offscreenDefects(design, code, matches)) {
+  const defects = layout?.defects ?? groupDefects(drifts, matches, design, code);
+  for (const defect of layout ? [] : offscreenDefects(design, code, matches)) {
     add({kind:'layout', property:'offscreen', ...(defect.layer.design ? {designNode:defect.layer.design}:{}), codeNode:defect.layer.code, confidence:1,
       codeBox:defect.offscreen!.box, code:{...defect.offscreen, summary:defect.summary}});
     defect.findings = [drifts.at(-1)!.id];
@@ -238,6 +242,7 @@ export function compare(
   }
   const report = {
     schema: "fdn-drift/0",
+    ...(layout ? {comparison:{mode:"layout-only",scope:"declared-regions",ignored:["text-content","style","pixels","excess-declared-repetition"],coverage:layout.coverage}} : {}),
     artboard: meta.artboard ?? "unknown",
     state: meta.state ?? "default",
     viewport: meta.viewport ?? { width: a.width, height: a.height, dpr: 1 },
@@ -274,7 +279,7 @@ export function compare(
       ? { captureEnvironment: captureEnvironment(design.meta) }
       : {}),
     styles: { properties, unavailable },
-    matching: {
+    matching: layout ? {algorithm:"declared-layout-regions",repeat:"shared-stable-id-or-ordinal-template"} : {
       algorithm: "hungarian",
       maxCost: 0.48,
       weights: { text: 0.4, tag: 0.15, roleName: 0.15, iou: 0.25, path: 0.05 },
@@ -314,7 +319,7 @@ export function compare(
     })),
     verdict: reason
       ? "not-provable"
-      : defects.length || drifts.length || count / (a.width * a.height) > t.pixelRatio
+      : defects.length || drifts.length || !layout && count / (a.width * a.height) > t.pixelRatio
         ? "drift"
         : "match",
     timingsMs: { compare: performance.now() - start },
@@ -333,12 +338,13 @@ export async function compareDirectories(
   codeDir: string,
   out: string,
   tolerances: Partial<Tolerances> = {},
+  options: {mode?: "full" | "layout-only"} = {},
 ) {
   const [a, b] = await Promise.all([
     readCapture(designDir),
     readCapture(codeDir),
   ]);
-  const result = compare(a, b, tolerances);
+  const result = compare(a, b, tolerances, options);
   const report = seal({
     ...result.report,
     inputs: {
