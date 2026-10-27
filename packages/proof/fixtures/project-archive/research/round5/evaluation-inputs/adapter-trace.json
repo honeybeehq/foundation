@@ -1,0 +1,279 @@
+[
+  {
+    "case": "help-agent",
+    "source": "packages/proof/fixtures/ground-truth-r5-big/help-center/agent-run.defects.csv",
+    "sourceSha256": "ccfefa40881acde1664a4df9f6e44deb8e970798181e19bb39eac8def1c4d157",
+    "scope": "packages/proof/fixtures/ground-truth-r5-big/help-center/agent-run.layout-scope.csv",
+    "scopeSha256": "ec7ff8a8c8ef00bad245bfea56f6ef4789993a6d7dca368dd306519e736e269f",
+    "derived": "research/round5/evaluation-inputs/help-agent-scope.defects.csv",
+    "derivedSha256": "42f23289ffb9935ebe89604668f330015075b27b1587a6e8cd809792117c2c51",
+    "rows": [
+      {
+        "id": "HC-01",
+        "originalKind": "layout",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "HC-02",
+        "originalKind": "layout",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "HC-03",
+        "originalKind": "style",
+        "scope": "no",
+        "evaluationKind": "non-layout"
+      },
+      {
+        "id": "HC-04",
+        "originalKind": "layout",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "HC-05",
+        "originalKind": "text",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "HC-06",
+        "originalKind": "missing",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "HC-07",
+        "originalKind": "layout",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "HC-08",
+        "originalKind": "style",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "HC-09",
+        "originalKind": "style",
+        "scope": "no",
+        "evaluationKind": "non-layout"
+      },
+      {
+        "id": "HC-10",
+        "originalKind": "token",
+        "scope": "no",
+        "evaluationKind": "non-layout"
+      },
+      {
+        "id": "HC-11",
+        "originalKind": "style",
+        "scope": "no",
+        "evaluationKind": "non-layout"
+      },
+      {
+        "id": "HC-12",
+        "originalKind": "token",
+        "scope": "no",
+        "evaluationKind": "non-layout"
+      },
+      {
+        "id": "HC-13",
+        "originalKind": "text",
+        "scope": "no",
+        "evaluationKind": "non-layout"
+      },
+      {
+        "id": "HC-14",
+        "originalKind": "missing",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "HC-15",
+        "originalKind": "style",
+        "scope": "no",
+        "evaluationKind": "non-layout"
+      },
+      {
+        "id": "HC-16",
+        "originalKind": "layout",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      }
+    ]
+  },
+  {
+    "case": "help-split",
+    "source": "packages/proof/fixtures/ground-truth-r5-big/help-search-split/split.defects.csv",
+    "sourceSha256": "6da2931a991a96f045884756251911db8b13487bb92c1871083cb669bfa425ca",
+    "scope": "packages/proof/fixtures/ground-truth-r5-big/help-search-split/split.layout-scope.csv",
+    "scopeSha256": "2a4669bada386532c54fd7c390262bf463d16a6d1a6adfc74916eb6ebf77cf24",
+    "derived": "research/round5/evaluation-inputs/help-split-scope.defects.csv",
+    "derivedSha256": "9d3730c7be3ca9aaa958b57b9fac3f3755766c06c1dd514ca1853de2eb7c5bc6",
+    "rows": [
+      {
+        "id": "SS-01",
+        "originalKind": "extra",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "SS-02",
+        "originalKind": "layout",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "SS-03",
+        "originalKind": "style",
+        "scope": "no",
+        "evaluationKind": "non-layout"
+      },
+      {
+        "id": "SS-04",
+        "originalKind": "layout",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "SS-05",
+        "originalKind": "missing",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "SS-06",
+        "originalKind": "missing",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "SS-07",
+        "originalKind": "missing",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "SS-08",
+        "originalKind": "style",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "SS-09",
+        "originalKind": "layout",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "SS-10",
+        "originalKind": "style",
+        "scope": "no",
+        "evaluationKind": "non-layout"
+      },
+      {
+        "id": "SS-11",
+        "originalKind": "token",
+        "scope": "no",
+        "evaluationKind": "non-layout"
+      },
+      {
+        "id": "SS-12",
+        "originalKind": "environment",
+        "scope": "no",
+        "evaluationKind": "environment"
+      }
+    ]
+  },
+  {
+    "case": "tracks-selected",
+    "source": "packages/proof/fixtures/ground-truth-r5-big/tracks/track-selected.defects.csv",
+    "sourceSha256": "ae5f25d38aa06577183d8c219398ca6c8c81a1eaedb3be68a3c1d890e97c9cff",
+    "scope": "packages/proof/fixtures/ground-truth-r5-big/tracks/track-selected.layout-scope.csv",
+    "scopeSha256": "b33ef8da1a421c3b1ce79ba177bc3b8178df777b3ed9a88f97f2f988e58202a7",
+    "derived": "research/round5/evaluation-inputs/tracks-selected-scope.defects.csv",
+    "derivedSha256": "6ed86d69d194fefc47edcc6ed725a5343c75960919181a5a5e11877e69196791",
+    "rows": [
+      {
+        "id": "TS-01",
+        "originalKind": "layout",
+        "scope": "no",
+        "evaluationKind": "non-layout"
+      },
+      {
+        "id": "TS-02",
+        "originalKind": "layout",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "TS-03",
+        "originalKind": "layout",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "TS-04",
+        "originalKind": "environment",
+        "scope": "no",
+        "evaluationKind": "environment"
+      }
+    ]
+  },
+  {
+    "case": "tracks-proposal",
+    "source": "packages/proof/fixtures/ground-truth-r5-big/tracks/proposal-pending.defects.csv",
+    "sourceSha256": "b1c145da1df1a4436598845a2dcd424064fc1c25cd15ef6175286492bd4fa462",
+    "scope": "packages/proof/fixtures/ground-truth-r5-big/tracks/proposal-pending.layout-scope.csv",
+    "scopeSha256": "3f82248d5856b9474925c98383872630e9741a556b6281b6a7ca27286c85ff5d",
+    "derived": "research/round5/evaluation-inputs/tracks-proposal-scope.defects.csv",
+    "derivedSha256": "667ac4ad3972b9a023961145a5f788fc3a63189d3dd70ba07996bb35a8c9a16d",
+    "rows": [
+      {
+        "id": "PP-01",
+        "originalKind": "layout",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "PP-02",
+        "originalKind": "layout",
+        "scope": "yes",
+        "evaluationKind": "layout"
+      },
+      {
+        "id": "PP-03",
+        "originalKind": "layout",
+        "scope": "no",
+        "evaluationKind": "non-layout"
+      },
+      {
+        "id": "PP-04",
+        "originalKind": "environment",
+        "scope": "no",
+        "evaluationKind": "environment"
+      }
+    ]
+  },
+  {
+    "case": "tracks-empty",
+    "source": "packages/proof/fixtures/ground-truth-r5-big/tracks/empty.defects.csv",
+    "sourceSha256": "5d6a11edb20518d169562f0fcfa9e7a9fac6d757964d080e0f89cc1e5873b85c",
+    "scope": "packages/proof/fixtures/ground-truth-r5-big/tracks/empty.layout-scope.csv",
+    "scopeSha256": "1db5b286a5b3f2ddbb5e1e0a15f82eeabd7cac0099b633050f8d8d4cd4f97030",
+    "derived": "research/round5/evaluation-inputs/tracks-empty-scope.defects.csv",
+    "derivedSha256": "d2e1e16fc2403e279285fb4978a6df14f7d98403d9d58afc5162163cb8adb9ac",
+    "rows": [
+      {
+        "id": "E-01",
+        "originalKind": "environment",
+        "scope": "no",
+        "evaluationKind": "environment"
+      }
+    ]
+  }
+]

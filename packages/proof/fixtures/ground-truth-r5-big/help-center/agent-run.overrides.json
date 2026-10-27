@@ -1,0 +1,247 @@
+{
+ "n46::n22#0::n22::n12": [
+  "0/0/0/2",
+  "sure",
+  "nav row and its label are one <button> in code"
+ ],
+ "n46::n22#1::n22::n12": [
+  "0/0/0/3",
+  "sure",
+  "nav row and its label are one <button> in code"
+ ],
+ "n46::n22#2::n22::n12": [
+  "0/0/0/4",
+  "sure",
+  "nav row and its label are one <button> in code"
+ ],
+ "n46::n22#3::n22::n12": [
+  "0/0/0/5",
+  "sure",
+  "nav row and its label are one <button> in code"
+ ],
+ "n46::n22#4::n22::n12": [
+  "0/0/0/6",
+  "sure",
+  "nav row and its label are one <button> in code"
+ ],
+ "n46::n24#0::n24::n12": [
+  "0/0/0/8",
+  "sure",
+  "nav row and its label are one <button> in code"
+ ],
+ "n46::n24#1::n24::n12": [
+  "0/0/0/9",
+  "sure",
+  "nav row and its label are one <button> in code"
+ ],
+ "n46::n24#2::n24::n12": [
+  "0/0/0/10",
+  "sure",
+  "nav row and its label are one <button> in code"
+ ],
+ "n46::n26::n12": [
+  "0/0/0/11",
+  "sure",
+  "flows after Message delivery instead of being pinned to the bottom"
+ ],
+ "n46::n26::n13": [
+  "0/0/0/11",
+  "sure",
+  "code label reads \"What's new 0.4.2\" in one run"
+ ],
+ "n46::n26::n14": [
+  "0/0/0/11",
+  "unsure",
+  "version is part of the code label, not a right-aligned mono figure"
+ ],
+ "n46::n27::n12": [
+  "0/0/0/12",
+  "sure",
+  "flows after What's new instead of being pinned to the bottom"
+ ],
+ "n46::n27::n13": [
+  "0/0/0/12",
+  "sure",
+  ""
+ ],
+ "n46::n21::n9": [
+  "0/0/0/1",
+  "sure",
+  "label text sits in the block itself in code"
+ ],
+ "n46::n23::n9": [
+  "0/0/0/7",
+  "sure",
+  "label text sits in the block itself in code"
+ ],
+ "n50": [
+  "0/0/1/0/0/0",
+  "sure",
+  "input placeholder"
+ ],
+ "n51": [
+  "0/0/1/0/0/0",
+  "unsure",
+  "painted caret vs the native input caret (not visible in a still capture)"
+ ],
+ "n52": [
+  "0/0/1/0/1",
+  "sure",
+  "\"22 shortcuts · 10 surfaces\""
+ ],
+ "n56::n9": [
+  "0/0/1/1/0/0/0",
+  "sure",
+  ""
+ ],
+ "n56::n10": [
+  "0/0/1/1/0/0/0/0",
+  "sure",
+  "\"THIS PANE · AGENT RUN\" vs \"THIS PANE\" + \"THIS PANE\" pill"
+ ],
+ "n57": [
+  "none",
+  "sure",
+  "code draws no bordered card around the section"
+ ],
+ "n59::n9": [
+  "0/0/1/1/0/1/0",
+  "sure",
+  ""
+ ],
+ "n78": [
+  "none",
+  "sure",
+  "footer hint separators absent"
+ ],
+ "n80": [
+  "none",
+  "sure",
+  "footer hint separators absent"
+ ],
+ "n82": [
+  "none",
+  "sure",
+  "footer hint separators absent"
+ ],
+ "n84": [
+  "none",
+  "sure",
+  "footer hint separators absent"
+ ],
+ "n46::n22#0::n22::n13": [
+  "0/0/0/2",
+  "sure",
+  ""
+ ],
+ "n46::n22#1::n22::n13": [
+  "0/0/0/3",
+  "sure",
+  ""
+ ],
+ "n46::n22#2::n22::n13": [
+  "0/0/0/4",
+  "sure",
+  ""
+ ],
+ "n46::n22#3::n22::n13": [
+  "0/0/0/5",
+  "sure",
+  ""
+ ],
+ "n46::n22#4::n22::n13": [
+  "0/0/0/6",
+  "sure",
+  ""
+ ],
+ "n46::n24#0::n24::n13": [
+  "0/0/0/8",
+  "sure",
+  ""
+ ],
+ "n46::n24#1::n24::n13": [
+  "0/0/0/9",
+  "sure",
+  ""
+ ],
+ "n46::n24#2::n24::n13": [
+  "0/0/0/10",
+  "sure",
+  ""
+ ],
+ "n66::n15": [
+  "0/0/1/1/1/0",
+  "sure",
+  "anchor rail entry"
+ ],
+ "n67::n15": [
+  "0/0/1/1/1/1",
+  "sure",
+  "anchor rail entry"
+ ],
+ "n68::n15": [
+  "0/0/1/1/1/2",
+  "sure",
+  "anchor rail entry"
+ ],
+ "n69::n15": [
+  "0/0/1/1/1/3",
+  "sure",
+  "anchor rail entry"
+ ],
+ "n70::n15": [
+  "0/0/1/1/1/4",
+  "sure",
+  "anchor rail entry"
+ ],
+ "n71::n15": [
+  "0/0/1/1/1/5",
+  "sure",
+  "anchor rail entry"
+ ],
+ "n72::n15": [
+  "0/0/1/1/1/6",
+  "sure",
+  "anchor rail entry"
+ ],
+ "n73::n15": [
+  "0/0/1/1/1/7",
+  "sure",
+  "anchor rail entry"
+ ],
+ "n74::n15": [
+  "0/0/1/1/1/8",
+  "sure",
+  "anchor rail entry"
+ ],
+ "n75::n15": [
+  "0/0/1/1/1/9",
+  "sure",
+  "anchor rail entry"
+ ],
+ "n59::n10": [
+  "0/0/1/1/0/1/0/0",
+  "sure",
+  "\"GLOBAL\" vs \"Global\" uppercased"
+ ],
+ "n46::n16": [
+  "0/0/0",
+  "sure",
+  "guide sidebar; 216px vs 253px wide"
+ ],
+ "n49": [
+  "0/0/1/0/0",
+  "sure",
+  "search field"
+ ],
+ "n65": [
+  "0/0/1/1/1",
+  "sure",
+  "anchor rail"
+ ],
+ "n76": [
+  "0/0/1/2",
+  "sure",
+  "footer"
+ ]
+}

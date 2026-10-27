@@ -1,0 +1,15 @@
+{
+  "extracted": 59,
+  "missed": [
+    {
+      "file": "apps/desktop/src/renderer/src/plugins/commands.ts",
+      "id": "contribution.id",
+      "keys": "contribution.defaultKeys"
+    },
+    {
+      "file": "apps/desktop/src/renderer/src/state/paneCommands.ts",
+      "id": "CommandIds.FocusTabAt",
+      "keys": "[LOCAL_TAB_KEYS[0]!]"
+    }
+  ]
+}

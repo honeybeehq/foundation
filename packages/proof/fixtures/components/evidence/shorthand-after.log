@@ -1,0 +1,9 @@
+
+ RUN  v4.1.10 /home/trmd/.hive/v2/cells/dtc-c-components-36f122de7649/github-com-honeybeehq-foundation-ddad6d63099e-space-36f122de7649
+
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  20:11:57
+   Duration  312ms (transform 71ms, setup 0ms, import 99ms, tests 10ms, environment 0ms)
+

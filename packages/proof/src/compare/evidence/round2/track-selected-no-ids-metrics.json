@@ -1,0 +1,417 @@
+{
+  "correspondence": {
+    "tp": 14,
+    "fp": 0,
+    "fn": 45,
+    "precision": 1,
+    "recall": 0.23728813559322035,
+    "abstained": 17,
+    "excludedUnsure": 21,
+    "errors": []
+  },
+  "defects": {
+    "tp": 6,
+    "fp": 5,
+    "fn": 25,
+    "precision": 0.5454545454545454,
+    "recall": 0.1935483870967742,
+    "predicted": 11,
+    "labelled": 31,
+    "agreement": [
+      {
+        "defect": "def-d527fb3d3fef2877c598",
+        "label": "S-18",
+        "description": "Pane is a white card with 8px corner radius and drop shadow in design; code pane has square corners and no shadow"
+      },
+      {
+        "defect": "def-c1103dc24e98c0161c13",
+        "label": "S-06",
+        "description": "Filter tabs above the track list (All 7 / Attached 5 / Idle 2) are missing"
+      },
+      {
+        "defect": "def-3d269beaeb58d18d9016",
+        "label": "S-08",
+        "description": "Track rows show version, last-activity time and live status counts (2 running · 1 review · 1 exception / no attachments) in design; code shows a static step summary (\"7 steps · action ×3 · orch…\") and no version or time"
+      },
+      {
+        "defect": "def-df819624850fdeefaca7",
+        "label": "S-19",
+        "description": "Code adds a 36px AI sidecar rail on the right edge (hex icon + ⌘⌃B)"
+      },
+      {
+        "defect": "def-56c5ad2ad716c375906b",
+        "label": "S-02",
+        "description": "Attached panel (bees on this track with harness/model, status, age, current step, skipped-step note) is missing"
+      },
+      {
+        "defect": "def-903ade8281ab3522e335",
+        "label": "S-01",
+        "description": "Spine is a compact list of rows (status, kind, title, description) in design; code draws it as a flow graph of node cards on a dotted canvas, so later steps fall below the visible area (Fix findings, Publish preview, Ship it? need scrolling)"
+      }
+    ],
+    "falsePositives": [
+      {
+        "id": "def-9068b5b1cfaf9e4528ee",
+        "layer": {
+          "design": "0/0",
+          "code": "0/0"
+        },
+        "kind": "layout",
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d7",
+          "d8",
+          "d9",
+          "d10",
+          "d11"
+        ],
+        "summary": "layout configuration differs at 0/0"
+      },
+      {
+        "id": "def-1f14bcf4968ed891b7d3",
+        "layer": {
+          "design": "0/0/0"
+        },
+        "kind": "missing",
+        "cause": "missing:subtree",
+        "classification": "product",
+        "findings": [
+          "d456",
+          "d457",
+          "d458",
+          "d459"
+        ],
+        "summary": "missing subtree differs at 0/0/0"
+      },
+      {
+        "id": "def-0a1bd717e956c7f9f40a",
+        "layer": {
+          "design": "0/0/1/1/2"
+        },
+        "kind": "missing",
+        "cause": "missing:subtree",
+        "classification": "product",
+        "findings": [
+          "d678",
+          "d679",
+          "d680",
+          "d681",
+          "d682",
+          "d683"
+        ],
+        "summary": "missing subtree differs at 0/0/1/1/2"
+      },
+      {
+        "id": "def-4aaa87ac3013a95ad50d",
+        "layer": {
+          "code": "0/0/0/0/0"
+        },
+        "kind": "extra",
+        "cause": "extra:subtree",
+        "classification": "product",
+        "findings": [
+          "d684",
+          "d685",
+          "d686",
+          "d687",
+          "d688"
+        ],
+        "summary": "extra subtree differs at 0/0/0/0/0"
+      },
+      {
+        "id": "def-476294cf78aac0664130",
+        "layer": {
+          "code": "0/0/0/1/2"
+        },
+        "kind": "extra",
+        "cause": "extra:subtree",
+        "classification": "product",
+        "findings": [
+          "d732",
+          "d733",
+          "d734",
+          "d735"
+        ],
+        "summary": "extra subtree differs at 0/0/0/1/2"
+      }
+    ],
+    "falseNegatives": [
+      {
+        "id": "S-03",
+        "design_layer": "0/0/1/1/1/0/10",
+        "code_layer": "none",
+        "kind": "missing",
+        "description": "Exceptions section under the spine (bee, step, note, age) is missing; code only shows a \"1 exception\" count in the footer",
+        "severity": "medium",
+        "likely_intentional": "unsure",
+        "note": "[exceptions]",
+        "properties": "subtree"
+      },
+      {
+        "id": "S-04",
+        "design_layer": "0/0/1/1/1/0/11",
+        "code_layer": "0/0/0/1/1/0/0/0/1",
+        "kind": "text",
+        "description": "Help note \"Steps are the agent's own to mark...\" under the spine is missing; code shows a different note above the flow (\"read-only while attached — edits fork the definition for the next run\")",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[help-note]",
+        "properties": "text"
+      },
+      {
+        "id": "S-05",
+        "design_layer": "0/0/0",
+        "code_layer": "0/0/0/0/0",
+        "kind": "layout",
+        "description": "Pane title bar (\"Tracks\" 15px semibold + \"7 defined · 5 attached · 3 queued\" + more menu, full width) is replaced by a rail-only header: \"TRACKS\" 10px spaced caps label, bare count \"7\" and a + button",
+        "severity": "medium",
+        "likely_intentional": "yes",
+        "note": "[pane-header]",
+        "properties": "text;font-size;letter-spacing;color;layout"
+      },
+      {
+        "id": "S-07",
+        "design_layer": "0/0/1/0",
+        "code_layer": "0/0/0/0",
+        "kind": "layout",
+        "description": "Track list column is 317px wide in design, 232px in code",
+        "severity": "medium",
+        "likely_intentional": "unsure",
+        "note": "[rail-width]",
+        "properties": "width"
+      },
+      {
+        "id": "S-09",
+        "design_layer": "0/0/1/0/1/*/0/0/1",
+        "code_layer": "0/0/0/0/1/*/1/0",
+        "kind": "style",
+        "description": "Track row title is 13px (semibold when selected, medium otherwise) in design, 12.5px medium for every row in code; rows are 45px tall in design, 48px in code",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "[row-title]",
+        "properties": "font-size;font-weight;height"
+      },
+      {
+        "id": "S-10",
+        "design_layer": "0/0/1/0/1/0/0",
+        "code_layer": "0/0/0/0/1/0",
+        "kind": "token",
+        "description": "Selected track row background is warm grey #EEEDE9 in design, light blue #DCE8F8 in code",
+        "severity": "medium",
+        "likely_intentional": "unsure",
+        "note": "[row-selected-bg] code uses the app-wide railSelection token",
+        "properties": "background-color"
+      },
+      {
+        "id": "S-11",
+        "design_layer": "0/0/1/0/1/5/0;0/0/1/0/1/6/0",
+        "code_layer": "0/0/0/0/1/5;0/0/0/0/1/6",
+        "kind": "style",
+        "description": "Idle tracks (dep-bump, nectar-preview) are dimmed in design (muted name #8A877F, faint glyph); code shows them like every other row",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "[row-idle-dim]",
+        "properties": "color"
+      },
+      {
+        "id": "S-12",
+        "design_layer": "0/0/1/0/1/*/0/0/0",
+        "code_layer": "0/0/0/0/1/*/0/0",
+        "kind": "style",
+        "description": "Track glyph is a small list/spine icon in design, a vertical chain of rings in code",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[row-glyph]",
+        "properties": "icon"
+      },
+      {
+        "id": "S-13",
+        "design_layer": "0/0/1/1/0/0;0/0/1/1/0/2;0/0/1/1/0/3",
+        "code_layer": "0/0/0/1/0/1",
+        "kind": "text",
+        "description": "Detail header shows track glyph, version badge \"v3\" and the description in design; code shows only the name plus a status line (\"● attached · drone-12 · step 4 of 7\")",
+        "severity": "medium",
+        "likely_intentional": "yes",
+        "note": "[header-meta]",
+        "properties": "text;subtree"
+      },
+      {
+        "id": "S-14",
+        "design_layer": "0/0/1/1/0/4",
+        "code_layer": "none",
+        "kind": "missing",
+        "description": "Header actions \"Attach a bee (a)\", \"Edit spine (e)\" and the more menu are missing",
+        "severity": "medium",
+        "likely_intentional": "yes",
+        "note": "[header-actions-missing] live view is read-only in code",
+        "properties": "subtree"
+      },
+      {
+        "id": "S-15",
+        "design_layer": "none",
+        "code_layer": "0/0/0/1/0/3;0/0/0/1/0/4",
+        "kind": "extra",
+        "description": "Code adds a Flow / Code view toggle and an \"Open agent\" button to the header",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[header-actions-extra]",
+        "properties": "subtree"
+      },
+      {
+        "id": "S-16",
+        "design_layer": "0/0/1/1/0;0/0/1/1/0/1",
+        "code_layer": "0/0/0/1/0;0/0/0/1/0/0",
+        "kind": "style",
+        "description": "Detail header is 45px tall with a 14.5px title in design, 40px with a 14px title in code",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "[header-size]",
+        "properties": "height;font-size"
+      },
+      {
+        "id": "S-17",
+        "design_layer": "0/0/1/1",
+        "code_layer": "0/0/0/1",
+        "kind": "style",
+        "description": "Detail area is white in design; in code it has no surface of its own and shows the warm app background #F5F4F1 with a dot grid",
+        "severity": "medium",
+        "likely_intentional": "yes",
+        "note": "[main-bg] dot grid is part of the flow canvas design",
+        "properties": "background-color;background-image"
+      },
+      {
+        "id": "S-20",
+        "design_layer": "0/0/1/1/2",
+        "code_layer": "0/0/0/1/2",
+        "kind": "text",
+        "description": "Footer shows key hints \"a attach · q queue behind · e edit spine · x exceptions\" and \"defined 4d ago · 3 versions · promoted on edit\" in design; code shows \"hover a step for timestamps · click an exception for the full note\" and \"● 1 exception\"",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[footer-text]",
+        "properties": "text"
+      },
+      {
+        "id": "S-21",
+        "design_layer": "0/0/1/1/1/0/7/0/4",
+        "code_layer": "0/0/0/1/1/0/0/0/0/1/0",
+        "kind": "style",
+        "description": "DENIED marker is an outlined pill on the Fix findings row in brick red #B0512E; code puts \"DENIED ↺\" on the flow connector in orange #BD6B3C",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "[denied]",
+        "properties": "color;border;position"
+      },
+      {
+        "id": "S-22",
+        "design_layer": "0/0/1/1/1/0/*/0/2;0/0/1/1/1/0/*/0/1",
+        "code_layer": "none",
+        "kind": "missing",
+        "description": "Step rows show a kind icon and kind label (ACTION / ORCHESTRATE / BRANCH / REVIEW / DEPLOY / ASK) in design; code cards have neither",
+        "severity": "medium",
+        "likely_intentional": "yes",
+        "note": "[step-kind]",
+        "properties": "subtree;text"
+      },
+      {
+        "id": "S-23",
+        "design_layer": "0/0/1/1/1/0/*/0/4;0/0/1/1/1/0/*/0/5",
+        "code_layer": "none",
+        "kind": "missing",
+        "description": "Step descriptions and LANE A / LANE B tags are missing on the cards (code shows \"done · 11:48\" / \"upcoming\" meta instead)",
+        "severity": "medium",
+        "likely_intentional": "yes",
+        "note": "[step-desc]",
+        "properties": "subtree;text"
+      },
+      {
+        "id": "S-24",
+        "design_layer": "0/0/1/1/1/0/3/0",
+        "code_layer": "0/0/0/1/1/0/0/0/6",
+        "kind": "missing",
+        "description": "Branch step \"Parallel — both lanes must land before the gate\" is a titled row in design; code shows only an untitled frame around the two lanes",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[branch-row]",
+        "properties": "text"
+      },
+      {
+        "id": "S-25",
+        "design_layer": "*",
+        "code_layer": "*",
+        "kind": "token",
+        "description": "UI text is authored in the system font stack (-apple-system / Helvetica Neue, SF Mono) in design and in Hanken Grotesk / IBM Plex Mono in code",
+        "severity": "medium",
+        "likely_intentional": "yes",
+        "note": "[font-family] authored stacks differ, independent of the Linux substitution",
+        "properties": "font-family"
+      },
+      {
+        "id": "S-27",
+        "design_layer": "0/0/1/1/1/1/1",
+        "code_layer": "0/0/0/1/1/0/0/0/14",
+        "kind": "layout",
+        "description": "Queued list (bumble-7 behind pr-triage, mite-3 behind spec-round) sits in the right column in design; code shows it as one \"up next\" line under the flow, below the visible area",
+        "severity": "medium",
+        "likely_intentional": "unsure",
+        "note": "[queue]",
+        "properties": "layout;text"
+      },
+      {
+        "id": "S-28",
+        "design_layer": "0/0/1/1/1/1/2",
+        "code_layer": "none",
+        "kind": "missing",
+        "description": "\"no pending proposal\" indicator is missing",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[no-proposal] code signals proposals via the sidecar rail dot",
+        "properties": "subtree"
+      },
+      {
+        "id": "S-29",
+        "design_layer": "0/0/1/1/1/0/*/0/0",
+        "code_layer": "0/0/0/1/1/0/0/0/*/0/0",
+        "kind": "style",
+        "description": "Step status markers: done is a filled grey disc with white check (15px) in design, an outlined check-circle (14px) in code; current is a green ring with dot (17px) in design, a plain 8px green dot in code",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "[step-status]",
+        "properties": "icon;size;background-color"
+      },
+      {
+        "id": "S-30",
+        "design_layer": "0/0/1/1/1/0/5/0",
+        "code_layer": "0/0/0/1/1/0/0/0/6/0/1/0/0",
+        "kind": "style",
+        "description": "Current step is highlighted by a grey row background in design; code uses a raised white card with semibold title and green \"current\" label",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[current-step]",
+        "properties": "background-color;font-weight;box-shadow"
+      },
+      {
+        "id": "S-31",
+        "design_layer": "0/0/1/1/1/0/6/0/3;0/0/1/1/1/0/7/0/3;0/0/1/1/1/0/8/0/3;0/0/1/1/1/0/9/0/3",
+        "code_layer": "0/0/0/1/1/0/0/0/8/0/1",
+        "kind": "style",
+        "description": "Upcoming step titles are full-ink #2E2B27 in design, muted #8A877F in code",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "[upcoming-title]",
+        "properties": "color"
+      },
+      {
+        "id": "S-32",
+        "design_layer": "0/0/1/1/1/0/0/0",
+        "code_layer": "none",
+        "kind": "missing",
+        "description": "SPINE section header with the summary \"6 items · 1 branch · 9 nodes\" above the steps is missing",
+        "severity": "low",
+        "likely_intentional": "yes",
+        "note": "[spine-header] added after blind comparison: found by the second labeller (their D17), missed in my first pass",
+        "properties": "subtree"
+      }
+    ]
+  }
+}

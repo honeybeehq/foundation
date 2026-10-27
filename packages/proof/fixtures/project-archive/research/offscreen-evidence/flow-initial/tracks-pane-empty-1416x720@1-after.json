@@ -1,0 +1,364 @@
+[
+  {
+    "id": "def-19009fc3468668bf1bc6",
+    "layer": {
+      "design": "n284::n265",
+      "code": "n284::n265"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d1",
+      "d22",
+      "d31"
+    ],
+    "summary": "layout configuration differs at n284::n265"
+  },
+  {
+    "id": "def-e5055ad300715d2ed2f7",
+    "layer": {
+      "design": "n284::n271",
+      "code": "n284::n271"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d2",
+      "d3",
+      "d4",
+      "d5",
+      "d6"
+    ],
+    "summary": "layout configuration differs at n284::n271"
+  },
+  {
+    "id": "def-e1a777144bcb56b2712f",
+    "layer": {
+      "design": "n284::n273",
+      "code": "n284::n273"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d7"
+    ],
+    "summary": "layout configuration differs at n284::n273"
+  },
+  {
+    "id": "def-55c140ffc1f49e3fdf1a",
+    "layer": {
+      "design": "n284::n274",
+      "code": "n284::n274"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d8"
+    ],
+    "summary": "layout configuration differs at n284::n274"
+  },
+  {
+    "id": "def-aea252968eb4f8660e79",
+    "layer": {
+      "design": "n284::n276::n40",
+      "code": "n284::n276::n40"
+    },
+    "kind": "text",
+    "cause": "text:text",
+    "classification": "product",
+    "findings": [
+      "d9"
+    ],
+    "summary": "text text differs at n284::n276::n40"
+  },
+  {
+    "id": "def-20a00fc76f833d7c3c13",
+    "layer": {
+      "design": "n284::n276::n40",
+      "code": "n284::n276::n40"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d10",
+      "d11",
+      "d13",
+      "d15",
+      "d16"
+    ],
+    "summary": "layout configuration differs at n284::n276::n40"
+  },
+  {
+    "id": "def-c57024cd4804fce204d8",
+    "layer": {
+      "design": "n284::n276::n40",
+      "code": "n284::n276::n40"
+    },
+    "kind": "style",
+    "cause": "style:text-align",
+    "classification": "product",
+    "findings": [
+      "d12",
+      "d27"
+    ],
+    "summary": "style text-align differs at n284::n276::n40"
+  },
+  {
+    "id": "def-aaf3ab9e59f534a05856",
+    "layer": {
+      "design": "n284::n276::n40",
+      "code": "n284::n276::n40"
+    },
+    "kind": "style",
+    "cause": "style:white-space",
+    "classification": "product",
+    "findings": [
+      "d14",
+      "d29"
+    ],
+    "summary": "style white-space differs at n284::n276::n40"
+  },
+  {
+    "id": "def-1edf7716327dc8fbe64b",
+    "layer": {
+      "design": "n284::n593",
+      "code": "0/0/0/0/0"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d17",
+      "d18"
+    ],
+    "summary": "layout configuration differs at n284::n593"
+  },
+  {
+    "id": "def-1c346e9a632af50d34f0",
+    "layer": {
+      "design": "n284::n594",
+      "code": "0/0/0/0/0/0"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d19"
+    ],
+    "summary": "layout configuration differs at n284::n594"
+  },
+  {
+    "id": "def-6c3b42f6b898657d0569",
+    "layer": {
+      "design": "n284::n595",
+      "code": "0/0/0/0/0/1"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d20"
+    ],
+    "summary": "layout configuration differs at n284::n595"
+  },
+  {
+    "id": "def-d1f96b6248703608eee0",
+    "layer": {
+      "design": "n284::n265",
+      "code": "n284::n265"
+    },
+    "kind": "style",
+    "cause": "style:font-size",
+    "classification": "product",
+    "findings": [
+      "d21",
+      "d30"
+    ],
+    "summary": "style font-size differs at n284::n265"
+  },
+  {
+    "id": "def-9a27b73bddc8eacfa6ae",
+    "layer": {
+      "design": "n284::n597::n412",
+      "code": "0/0/0/0/0/2/0"
+    },
+    "kind": "style",
+    "cause": "style:text-align",
+    "classification": "product",
+    "findings": [
+      "d23"
+    ],
+    "summary": "style text-align differs at n284::n597::n412"
+  },
+  {
+    "id": "def-51b215934e95773e150c",
+    "layer": {
+      "design": "n284::n597::n412",
+      "code": "0/0/0/0/0/2/0"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d24"
+    ],
+    "summary": "layout configuration differs at n284::n597::n412"
+  },
+  {
+    "id": "def-b171254aefdf7d989732",
+    "layer": {
+      "design": "n284::n272::n468",
+      "code": "0/0/0/1/0/0/0"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d25",
+      "d26"
+    ],
+    "summary": "layout configuration differs at n284::n272::n468"
+  },
+  {
+    "id": "def-ad638b8864cb39a56620",
+    "layer": {
+      "design": "n284::n276::n42",
+      "code": "0/0/0/1/0/3/0"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d28"
+    ],
+    "summary": "layout configuration differs at n284::n276::n42"
+  },
+  {
+    "id": "def-cc38c48843e4a30772bf",
+    "layer": {
+      "design": "n284::n601::n532::n412",
+      "code": "0/0/0/2/0/0"
+    },
+    "kind": "style",
+    "cause": "style:text-align",
+    "classification": "product",
+    "findings": [
+      "d32"
+    ],
+    "summary": "style text-align differs at n284::n601::n532::n412"
+  },
+  {
+    "id": "def-4d0a22233d31c01a6530",
+    "layer": {
+      "design": "n284::n601::n532::n412",
+      "code": "0/0/0/2/0/0"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d33",
+      "d34"
+    ],
+    "summary": "layout configuration differs at n284::n601::n532::n412"
+  },
+  {
+    "id": "def-5f1102b773a495162d5f",
+    "layer": {
+      "design": "n284::n601::n534",
+      "code": "0/0/0/2/1"
+    },
+    "kind": "style",
+    "cause": "style:text-align",
+    "classification": "product",
+    "findings": [
+      "d35"
+    ],
+    "summary": "style text-align differs at n284::n601::n534"
+  },
+  {
+    "id": "def-ba597f221c781331c0ae",
+    "layer": {
+      "design": "n284::n601::n534",
+      "code": "0/0/0/2/1"
+    },
+    "kind": "layout",
+    "cause": "layout:configuration",
+    "classification": "product",
+    "findings": [
+      "d36"
+    ],
+    "summary": "layout configuration differs at n284::n601::n534"
+  },
+  {
+    "id": "def-9b756e96ccfab61e97ec",
+    "layer": {
+      "design": "n284::n596"
+    },
+    "kind": "missing",
+    "cause": "missing:subtree",
+    "classification": "product",
+    "findings": [
+      "d37"
+    ],
+    "summary": "missing subtree differs at n284::n596"
+  },
+  {
+    "id": "def-7f8b7f1a0d74dac3b82f",
+    "layer": {
+      "design": "n284::n276::n41"
+    },
+    "kind": "missing",
+    "cause": "missing:subtree",
+    "classification": "product",
+    "findings": [
+      "d38"
+    ],
+    "summary": "missing subtree differs at n284::n276::n41"
+  },
+  {
+    "id": "def-9488703b454976d61c41",
+    "layer": {
+      "design": "n284::n601::n530"
+    },
+    "kind": "missing",
+    "cause": "missing:subtree",
+    "classification": "product",
+    "findings": [
+      "d39",
+      "d40"
+    ],
+    "summary": "missing subtree differs at n284::n601::n530"
+  },
+  {
+    "id": "def-42fddc3def849b1908c9",
+    "layer": {
+      "code": "0/0/0/0/0/2"
+    },
+    "kind": "extra",
+    "cause": "extra:subtree",
+    "classification": "product",
+    "findings": [
+      "d41"
+    ],
+    "summary": "extra subtree differs at 0/0/0/0/0/2"
+  },
+  {
+    "id": "def-df819624850fdeefaca7",
+    "layer": {
+      "code": "0/0/0/2"
+    },
+    "kind": "extra",
+    "cause": "extra:subtree",
+    "classification": "product",
+    "findings": [
+      "d42"
+    ],
+    "summary": "extra subtree differs at 0/0/0/2"
+  }
+]

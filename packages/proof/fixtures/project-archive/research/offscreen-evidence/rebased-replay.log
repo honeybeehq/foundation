@@ -1,0 +1,29 @@
+[
+  {
+    pair: 'tracks-pane/empty/1416x720@1',
+    state: 'empty',
+    viewport: { width: 1416, height: 720, dpr: 1 },
+    frame: { width: 724, height: 468 },
+    before: 20,
+    after: 20,
+    added: 0
+  },
+  {
+    pair: 'tracks-pane/proposal-pending/1416x720@1',
+    state: 'proposal-pending',
+    viewport: { width: 1416, height: 720, dpr: 1 },
+    frame: { width: 1416, height: 611 },
+    before: 24,
+    after: 30,
+    added: 6
+  },
+  {
+    pair: 'tracks-pane/track-selected/1416x720@1',
+    state: 'track-selected',
+    viewport: { width: 1416, height: 720, dpr: 1 },
+    frame: { width: 1416, height: 525.5 },
+    before: 24,
+    after: 28,
+    added: 4
+  }
+]

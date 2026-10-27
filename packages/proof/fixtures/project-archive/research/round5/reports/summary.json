@@ -1,0 +1,571 @@
+[
+  {
+    "case": "help-help-center-agent-run-1480x830@1",
+    "mode": "full",
+    "provable": true,
+    "reason": null,
+    "summary": {
+      "uniqueDefects": 210,
+      "accepted": 0,
+      "raw": 1235,
+      "uncertainMatches": 31,
+      "environment": 1,
+      "uncertain": 193
+    },
+    "coverage": null,
+    "replayHash": "e59f75a32fb92b4a9627b47b06b8406dd9bc955acb84dc09a60874e5fc19aaaa",
+    "replayEqual": true,
+    "diffEqual": true
+  },
+  {
+    "case": "help-help-center-agent-run-1480x830@1",
+    "mode": "layout-only",
+    "provable": true,
+    "reason": null,
+    "summary": {
+      "uniqueDefects": 11,
+      "accepted": 0,
+      "raw": 71,
+      "uncertainMatches": 0,
+      "environment": 0,
+      "uncertain": 0
+    },
+    "coverage": [
+      {
+        "id": "dialog",
+        "design": "0/0",
+        "code": "0/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "guide",
+        "design": "0/0/0/0",
+        "code": "0/0/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "content",
+        "design": "0/0/1",
+        "code": "0/0/1",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "search",
+        "design": "0/0/1/0",
+        "code": "0/0/1/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "count",
+        "design": "0/0/1/0/1",
+        "code": "0/0/1/0/1",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "catalog",
+        "design": "0/0/1/1/0",
+        "code": "0/0/1/1/0",
+        "comparedItems": 22,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "anchor-rail",
+        "design": "0/0/1/1/1",
+        "code": "0/0/1/1/1",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "footer",
+        "design": "0/0/1/2",
+        "code": "0/0/1/2",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      }
+    ],
+    "replayHash": "ce3ebe52fa0bf6139d11687ff894d959c40194e77ef7a40bd56bde29bc6c89ba",
+    "replayEqual": true,
+    "diffEqual": true
+  },
+  {
+    "case": "search-help-search-split-split-980x638@1",
+    "mode": "full",
+    "provable": true,
+    "reason": null,
+    "summary": {
+      "uniqueDefects": 74,
+      "accepted": 0,
+      "raw": 436,
+      "uncertainMatches": 11,
+      "environment": 1,
+      "uncertain": 84
+    },
+    "coverage": null,
+    "replayHash": "1fb1ed8a1beb17dfe60ee9b35c0a5ee5a8b080bd0ba1bf5cbb5958995f446ef9",
+    "replayEqual": true,
+    "diffEqual": true
+  },
+  {
+    "case": "search-help-search-split-split-980x638@1",
+    "mode": "layout-only",
+    "provable": true,
+    "reason": null,
+    "summary": {
+      "uniqueDefects": 11,
+      "accepted": 0,
+      "raw": 24,
+      "uncertainMatches": 0,
+      "environment": 0,
+      "uncertain": 0
+    },
+    "coverage": [
+      {
+        "id": "dialog",
+        "design": "0/0",
+        "code": "0/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "search",
+        "design": "0/0/0",
+        "code": "0/0/1/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "count",
+        "design": "0/0/0/0/1",
+        "code": "0/0/1/0/1",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "results",
+        "design": "0/0/1",
+        "code": "0/0/1/1/0",
+        "comparedItems": 6,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "footer",
+        "design": "0/0/2",
+        "code": "0/0/1/2",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      }
+    ],
+    "replayHash": "f4dda3a1000dd830fdf306930ed375d89407b2c7a2970c419047280f7db75525",
+    "replayEqual": true,
+    "diffEqual": true
+  },
+  {
+    "case": "tracks-tracks-pane-empty-1416x720@1",
+    "mode": "full",
+    "provable": true,
+    "reason": null,
+    "summary": {
+      "uniqueDefects": 4,
+      "accepted": 0,
+      "raw": 8,
+      "uncertainMatches": 0,
+      "environment": 0,
+      "uncertain": 3
+    },
+    "coverage": null,
+    "replayHash": "861c1d424b1f7e69e983a44c55040b7651db5101d9840b1d05b978685be47625",
+    "replayEqual": true,
+    "diffEqual": true
+  },
+  {
+    "case": "tracks-tracks-pane-empty-1416x720@1",
+    "mode": "layout-only",
+    "provable": true,
+    "reason": null,
+    "summary": {
+      "uniqueDefects": 0,
+      "accepted": 0,
+      "raw": 0,
+      "uncertainMatches": 0,
+      "environment": 0,
+      "uncertain": 0
+    },
+    "coverage": [
+      {
+        "id": "pane",
+        "design": "0/0",
+        "code": "0/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "rail",
+        "design": "0/0/0/0",
+        "code": "0/0/0/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "main",
+        "design": "0/0/0/1",
+        "code": "0/0/0/1",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "sidecar",
+        "design": "0/0/0/2/0",
+        "code": "0/0/0/2",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "empty-content",
+        "design": "0/0/0/1/0",
+        "code": "0/0/0/1/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "empty-action",
+        "design": "0/0/0/1/0/3/0/0",
+        "code": "0/0/0/1/0/3",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      }
+    ],
+    "replayHash": "5ee645e4d5cec7aefcc6687dcba7e530c1ff27d269781b9777cc73e38027ceea",
+    "replayEqual": true,
+    "diffEqual": true
+  },
+  {
+    "case": "tracks-tracks-pane-proposal-pending-1416x720@1",
+    "mode": "full",
+    "provable": true,
+    "reason": null,
+    "summary": {
+      "uniqueDefects": 28,
+      "accepted": 0,
+      "raw": 212,
+      "uncertainMatches": 5,
+      "environment": 0,
+      "uncertain": 58
+    },
+    "coverage": null,
+    "replayHash": "aa6a11efe2a681ad4d0c83d92daac8cdd6ec62a3eefd82cc8ea71c0563bafb76",
+    "replayEqual": true,
+    "diffEqual": true
+  },
+  {
+    "case": "tracks-tracks-pane-proposal-pending-1416x720@1",
+    "mode": "layout-only",
+    "provable": true,
+    "reason": null,
+    "summary": {
+      "uniqueDefects": 5,
+      "accepted": 0,
+      "raw": 5,
+      "uncertainMatches": 0,
+      "environment": 0,
+      "uncertain": 0
+    },
+    "coverage": [
+      {
+        "id": "pane",
+        "design": "0/0",
+        "code": "0/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "rail",
+        "design": "0/0/0/0",
+        "code": "0/0/0/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "main",
+        "design": "0/0/0/1",
+        "code": "0/0/0/1",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "sidecar",
+        "design": "0/0/0/2/0",
+        "code": "0/0/0/2",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "header",
+        "design": "0/0/0/1/0",
+        "code": "0/0/0/1/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "card-0",
+        "design": "0/0/0/1/1/0/0/0/0/0",
+        "code": "0/0/0/1/1/0/0/0/1",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "card-1",
+        "design": "0/0/0/1/1/0/0/0/2/0",
+        "code": "0/0/0/1/1/0/0/0/3",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "card-3",
+        "design": "0/0/0/1/1/0/0/0/4/1/0/0/0/0",
+        "code": "0/0/0/1/1/0/0/0/5/0/0/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "card-4",
+        "design": "0/0/0/1/1/0/0/0/4/1/1/0/0/0",
+        "code": "0/0/0/1/1/0/0/0/5/0/1/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "card-5",
+        "design": "0/0/0/1/1/0/0/0/6/0",
+        "code": "0/0/0/1/1/0/0/0/7",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "card-6",
+        "design": "0/0/0/1/1/0/0/0/7/1/0/0/0",
+        "code": "0/0/0/1/1/0/0/0/8/1/1/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "card-7",
+        "design": "0/0/0/1/1/0/0/0/8/0",
+        "code": "0/0/0/1/1/0/0/0/10",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "card-8",
+        "design": "0/0/0/1/1/0/0/0/14/0",
+        "code": "0/0/0/1/1/0/0/0/16",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "card-9",
+        "design": "0/0/0/1/1/0/0/0/10/0",
+        "code": "0/0/0/1/1/0/0/0/12",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "card-10",
+        "design": "0/0/0/1/1/0/0/0/12/0",
+        "code": "0/0/0/1/1/0/0/0/14",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "proposal-actions",
+        "design": "0/0/0/1/1/0/1/0/0",
+        "code": "0/0/0/1/1/0/0/0/17",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      }
+    ],
+    "replayHash": "0f435b5af948f63ee62e46c0cefb819194bd5520a5684f8fa07463811a7c7584",
+    "replayEqual": true,
+    "diffEqual": true
+  },
+  {
+    "case": "tracks-tracks-pane-track-selected-1416x720@1",
+    "mode": "full",
+    "provable": true,
+    "reason": null,
+    "summary": {
+      "uniqueDefects": 20,
+      "accepted": 0,
+      "raw": 176,
+      "uncertainMatches": 5,
+      "environment": 0,
+      "uncertain": 49
+    },
+    "coverage": null,
+    "replayHash": "7bb1b452349d5ca6d13afc399e7d89887dd732a49bdd6f814797de3605eafe6e",
+    "replayEqual": true,
+    "diffEqual": true
+  },
+  {
+    "case": "tracks-tracks-pane-track-selected-1416x720@1",
+    "mode": "layout-only",
+    "provable": true,
+    "reason": null,
+    "summary": {
+      "uniqueDefects": 2,
+      "accepted": 0,
+      "raw": 4,
+      "uncertainMatches": 0,
+      "environment": 0,
+      "uncertain": 0
+    },
+    "coverage": [
+      {
+        "id": "pane",
+        "design": "0/0",
+        "code": "0/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "rail",
+        "design": "0/0/0/0",
+        "code": "0/0/0/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "main",
+        "design": "0/0/0/1",
+        "code": "0/0/0/1",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "sidecar",
+        "design": "0/0/0/2/0",
+        "code": "0/0/0/2",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "header",
+        "design": "0/0/0/1/0",
+        "code": "0/0/0/1/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "card-0",
+        "design": "0/0/0/1/1/0/0/0/1/0",
+        "code": "0/0/0/1/1/0/0/0/2/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "card-1",
+        "design": "0/0/0/1/1/0/0/0/3/0",
+        "code": "0/0/0/1/1/0/0/0/4/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "card-3",
+        "design": "0/0/0/1/1/0/0/0/5/1/0/0/0/0",
+        "code": "0/0/0/1/1/0/0/0/6/0/0/0/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "card-4",
+        "design": "0/0/0/1/1/0/0/0/5/1/1/0/0/0",
+        "code": "0/0/0/1/1/0/0/0/6/0/1/0/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "card-5",
+        "design": "0/0/0/1/1/0/0/0/7/0",
+        "code": "0/0/0/1/1/0/0/0/8/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "card-6",
+        "design": "0/0/0/1/1/0/0/0/8/1/0/0/0",
+        "code": "0/0/0/1/1/0/0/0/9/1/1/0/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "card-7",
+        "design": "0/0/0/1/1/0/0/0/9/0",
+        "code": "0/0/0/1/1/0/0/0/11/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      },
+      {
+        "id": "card-8",
+        "design": "0/0/0/1/1/0/0/0/11/0",
+        "code": "0/0/0/1/1/0/0/0/13/0",
+        "comparedItems": 0,
+        "ignoredDesignItems": 0,
+        "ignoredCodeItems": 0
+      }
+    ],
+    "replayHash": "7ab8d9243f0722d7d8b117b10fe097060c5106133264136bda00ce68304c4eb0",
+    "replayEqual": true,
+    "diffEqual": true
+  }
+]

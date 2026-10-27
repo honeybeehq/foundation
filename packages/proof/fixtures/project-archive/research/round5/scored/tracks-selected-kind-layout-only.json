@@ -1,0 +1,643 @@
+{
+  "result": {
+    "mode": "layout-only",
+    "provable": true,
+    "strict": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1,
+      "recall": 0.6666666666666666,
+      "predicted": 2,
+      "labelled": 3,
+      "agreement": [
+        {
+          "defect": "def-3cf0abc981eb380f257c",
+          "label": "TS-02",
+          "description": "Below the visible area (seen after scrolling): after the Verdict gate branch rejoins, code adds an extra ~42px connector, so Publish preview and everything after it sits 41–42px lower than in the design"
+        },
+        {
+          "defect": "def-381312b44b5dd4bf7569",
+          "label": "TS-03",
+          "description": "Below the visible area: the Ship it? card is 269px wide in code vs 248px, and its title stretches so \"upcoming · blocking ask\" is pushed to the card's right edge instead of following the title"
+        }
+      ],
+      "falsePositives": [],
+      "falseNegatives": [
+        {
+          "id": "TS-01",
+          "design_layer": "0/0/0/1/1/0",
+          "code_layer": "0/0/0/1/1/0/0",
+          "kind": "layout",
+          "description": "The canvas dot grid is offset by about 10px horizontally and 2–3px vertically in code (dots are painted on the inner flow surface, not the canvas), so dots land in different places and touch some labels such as \"approved ↓ continues\"",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[dot-grid-offset] background-image moves from the canvas (design) to the absolutely positioned flow layer (code)",
+          "properties": "background-image;background-position"
+        }
+      ]
+    },
+    "optimistic": {
+      "tp": 1,
+      "fp": 1,
+      "fn": 2,
+      "precision": 0.5,
+      "recall": 0.3333333333333333,
+      "predicted": 2,
+      "labelled": 3,
+      "agreement": [
+        {
+          "defect": "def-381312b44b5dd4bf7569",
+          "label": "TS-03",
+          "description": "Below the visible area: the Ship it? card is 269px wide in code vs 248px, and its title stretches so \"upcoming · blocking ask\" is pushed to the card's right edge instead of following the title"
+        }
+      ],
+      "falsePositives": [
+        {
+          "id": "def-3cf0abc981eb380f257c",
+          "kind": "layout",
+          "classification": "product",
+          "cause": "layout:geometry",
+          "layer": {
+            "design": "n212::n590::n465::n405",
+            "code": "0/0/0/1/1/0/0/0/11/0"
+          },
+          "findings": [
+            "d1"
+          ],
+          "summary": "layout:geometry differs in card-7"
+        }
+      ],
+      "falseNegatives": [
+        {
+          "id": "TS-01",
+          "design_layer": "0/0/0/1/1/0",
+          "code_layer": "0/0/0/1/1/0/0",
+          "kind": "layout",
+          "description": "The canvas dot grid is offset by about 10px horizontally and 2–3px vertically in code (dots are painted on the inner flow surface, not the canvas), so dots land in different places and touch some labels such as \"approved ↓ continues\"",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[dot-grid-offset] background-image moves from the canvas (design) to the absolutely positioned flow layer (code)",
+          "properties": "background-image;background-position"
+        },
+        {
+          "id": "TS-02",
+          "design_layer": "0/0/0/1/1/0/0/0/8/2;0/0/0/1/1/0/0/0/9/0;0/0/0/1/1/0/0/0/11/0;0/0/0/1/1/0/0/0/12",
+          "code_layer": "0/0/0/1/1/0/0/0/0/0/6;0/0/0/1/1/0/0/0/11/0;0/0/0/1/1/0/0/0/13/0;0/0/0/1/1/0/0/0/14",
+          "kind": "layout",
+          "description": "Below the visible area (seen after scrolling): after the Verdict gate branch rejoins, code adds an extra ~42px connector, so Publish preview and everything after it sits 41–42px lower than in the design",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[merge-gap] code pads the branch join by 42px; design joins straight onto the next card",
+          "properties": "padding;top"
+        }
+      ]
+    }
+  },
+  "report": {
+    "schema": "fdn-drift/0",
+    "comparison": {
+      "mode": "layout-only",
+      "scope": "declared-regions",
+      "ignored": [
+        "text-content",
+        "style",
+        "pixels",
+        "excess-declared-repetition"
+      ],
+      "coverage": [
+        {
+          "id": "pane",
+          "design": "0/0",
+          "code": "0/0",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "rail",
+          "design": "0/0/0/0",
+          "code": "0/0/0/0",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "main",
+          "design": "0/0/0/1",
+          "code": "0/0/0/1",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "sidecar",
+          "design": "0/0/0/2/0",
+          "code": "0/0/0/2",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "header",
+          "design": "0/0/0/1/0",
+          "code": "0/0/0/1/0",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "card-0",
+          "design": "0/0/0/1/1/0/0/0/1/0",
+          "code": "0/0/0/1/1/0/0/0/2/0",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "card-1",
+          "design": "0/0/0/1/1/0/0/0/3/0",
+          "code": "0/0/0/1/1/0/0/0/4/0",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "card-3",
+          "design": "0/0/0/1/1/0/0/0/5/1/0/0/0/0",
+          "code": "0/0/0/1/1/0/0/0/6/0/0/0/0",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "card-4",
+          "design": "0/0/0/1/1/0/0/0/5/1/1/0/0/0",
+          "code": "0/0/0/1/1/0/0/0/6/0/1/0/0",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "card-5",
+          "design": "0/0/0/1/1/0/0/0/7/0",
+          "code": "0/0/0/1/1/0/0/0/8/0",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "card-6",
+          "design": "0/0/0/1/1/0/0/0/8/1/0/0/0",
+          "code": "0/0/0/1/1/0/0/0/9/1/1/0/0",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "card-7",
+          "design": "0/0/0/1/1/0/0/0/9/0",
+          "code": "0/0/0/1/1/0/0/0/11/0",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        },
+        {
+          "id": "card-8",
+          "design": "0/0/0/1/1/0/0/0/11/0",
+          "code": "0/0/0/1/1/0/0/0/13/0",
+          "comparedItems": 0,
+          "ignoredDesignItems": 0,
+          "ignoredCodeItems": 0
+        }
+      ]
+    },
+    "artboard": "tracks-pane",
+    "state": "track-selected",
+    "viewport": {
+      "width": 1416,
+      "height": 720,
+      "dpr": 1
+    },
+    "design": {
+      "file": "packages/proof/fixtures/design/tracks-pane-flowview.fdn.html",
+      "head": "d8faa40f8d53863ef54c82fdf16bfb0742fbe343aaa4be10f53d173820fa00bc",
+      "htmlSha256": "4504a820d773034f3f269e278acf4a8375bc756478a2e1525f6b77d5a9a46c10",
+      "binding": "chain-head"
+    },
+    "code": {
+      "repo": "honeybeehq/apiary",
+      "commit": "de190984abad4cdfa2bcd7a92717858801fea8ae",
+      "root": "apps/desktop/src/renderer/src/panes/TracksPane.tsx#TracksPane"
+    },
+    "provable": true,
+    "captureEnvironment": {
+      "browserVersion": "151.0.7922.34",
+      "platform": "linux",
+      "fontPolicy": {
+        "sans": "Foundation Design Sans",
+        "mono": "Foundation Design Mono",
+        "serif": "Foundation Design Serif",
+        "fallback": "Foundation Symbols",
+        "requireCustomFonts": true
+      },
+      "fontAssets": [
+        {
+          "family": "Foundation Design Mono",
+          "weight": "400",
+          "format": "truetype",
+          "sha256": "c805f9436dbc268644c1d9584f01a601a653e028e08fd74b9b949f6cf8304d88",
+          "postScriptName": "DejaVuSansMono"
+        },
+        {
+          "family": "Foundation Design Mono",
+          "weight": "700",
+          "format": "truetype",
+          "sha256": "3a3c502eeff669a231549e80df9f7c49de109bafe303170409e905d0b31a38fe",
+          "postScriptName": "DejaVuSansMono-Bold"
+        },
+        {
+          "family": "Foundation Design Sans",
+          "weight": "400",
+          "format": "truetype",
+          "sha256": "4659bc0c58c5028dd488ec928d41d9265db43d9b669fc14ca8b0832daca7b144",
+          "postScriptName": "LiberationSans"
+        },
+        {
+          "family": "Foundation Design Sans",
+          "weight": "700",
+          "format": "truetype",
+          "sha256": "3973aa5054fb467dd5627245d3dc82e37bf16fe075756156a570455871351582",
+          "postScriptName": "LiberationSans-Bold"
+        },
+        {
+          "family": "Foundation Design Serif",
+          "weight": "400",
+          "format": "truetype",
+          "sha256": "705903ae1382f0150f115d6f10a30f5b2f3d6ade649c474afe6366c39174fb65",
+          "postScriptName": "LiberationSerif"
+        },
+        {
+          "family": "Foundation Design Serif",
+          "weight": "700",
+          "format": "truetype",
+          "sha256": "9e66c25e20868756bf12eb24a520a4552727c9cd108f577f7ae33e3c0110e39c",
+          "postScriptName": "LiberationSerif-Bold"
+        },
+        {
+          "family": "Foundation Symbols",
+          "weight": "400",
+          "format": "truetype",
+          "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
+          "postScriptName": "DejaVuSans"
+        },
+        {
+          "family": "Foundation Symbols",
+          "weight": "700",
+          "format": "truetype",
+          "sha256": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895",
+          "postScriptName": "DejaVuSans-Bold"
+        },
+        {
+          "family": "Hanken Grotesk",
+          "weight": "700",
+          "format": "woff2",
+          "sha256": "d85de6e272296d06f8205ad11e27140274e0ef97050232777d146eabb71c312d",
+          "postScriptName": "HankenGrotesk-Bold"
+        },
+        {
+          "family": "Hanken Grotesk",
+          "weight": "500",
+          "format": "woff2",
+          "sha256": "31f666af7bff625900c46aa34a05d8620482ba2db37db7b63749b693ab0c72ec",
+          "postScriptName": "HankenGrotesk-Medium"
+        },
+        {
+          "family": "Hanken Grotesk",
+          "weight": "400",
+          "format": "woff2",
+          "sha256": "787b3fdd0b7e6d59ae7ce14ce7a41d1a44616584b4c919b527da951972d5d87d",
+          "postScriptName": "HankenGrotesk-Regular"
+        },
+        {
+          "family": "Hanken Grotesk",
+          "weight": "600",
+          "format": "woff2",
+          "sha256": "58f23b7ae3e13b21a4dca4c05360be87b3531d60fc1cbff89732cac8fb3019ae",
+          "postScriptName": "HankenGrotesk-SemiBold"
+        },
+        {
+          "family": "IBM Plex Mono",
+          "weight": "500",
+          "format": "woff2",
+          "sha256": "01d285447409c8a588692162439a038b8cbd7871309ee20267b0d2d91c6e8e22",
+          "postScriptName": "IBMPlexMono-Medium"
+        },
+        {
+          "family": "IBM Plex Mono",
+          "weight": "400",
+          "format": "woff2",
+          "sha256": "08949f728dc52d528e69b1667d15c89a5686a4ee9a296ff90983985f99c380f7",
+          "postScriptName": "IBMPlexMono-Regular"
+        }
+      ],
+      "rendererSourceHash": "55e1c9a1aa9c78062f0470e01d73d5a6ef97d5b2e44230e921be6f745829e960"
+    },
+    "styles": {
+      "properties": [
+        "color",
+        "background-color",
+        "background-image",
+        "border-top-color",
+        "border-right-color",
+        "border-bottom-color",
+        "border-left-color",
+        "border-top-width",
+        "border-right-width",
+        "border-bottom-width",
+        "border-left-width",
+        "border-top-style",
+        "border-right-style",
+        "border-bottom-style",
+        "border-left-style",
+        "border-top-left-radius",
+        "border-top-right-radius",
+        "border-bottom-left-radius",
+        "border-bottom-right-radius",
+        "padding-top",
+        "padding-right",
+        "padding-bottom",
+        "padding-left",
+        "margin-top",
+        "margin-right",
+        "margin-bottom",
+        "margin-left",
+        "row-gap",
+        "column-gap",
+        "font-family",
+        "font-size",
+        "font-weight",
+        "line-height",
+        "letter-spacing",
+        "text-align",
+        "text-transform",
+        "opacity",
+        "box-shadow",
+        "text-shadow",
+        "display",
+        "align-items",
+        "justify-content",
+        "flex-direction",
+        "visibility",
+        "position",
+        "box-sizing",
+        "overflow-x",
+        "overflow-y",
+        "font-style",
+        "text-decoration-line",
+        "white-space",
+        "gap",
+        "flex-grow",
+        "flex-shrink"
+      ],
+      "unavailable": []
+    },
+    "matching": {
+      "algorithm": "declared-layout-regions",
+      "repeat": "shared-stable-id-or-ordinal-template"
+    },
+    "offscreen": {
+      "status": "declared-regions-only",
+      "reason": "Only declared geometry is checked; the independent off-screen eligibility scan is not run."
+    },
+    "tolerances": {
+      "pixelRatio": 0.001,
+      "boxPx": 1,
+      "colorDeltaE": 1,
+      "stylePx": 1,
+      "pixelThreshold": 0.1
+    },
+    "pixels": {
+      "diffRatio": 0.0042824074074074075,
+      "diffPixels": 4366,
+      "diffImage": "diff.png",
+      "designImage": "design.png",
+      "codeImage": "code.png"
+    },
+    "drifts": [
+      {
+        "id": "d1",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n212::n590::n465::n405",
+        "codeNode": "0/0/0/1/1/0/0/0/11/0",
+        "design": 617.9375,
+        "code": 659.4375,
+        "designBox": [
+          676.796875,
+          617.9375,
+          258.390625,
+          40.84375
+        ],
+        "codeBox": [
+          676.796875,
+          659.4375,
+          258.390625,
+          40.84375
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d2",
+        "kind": "layout",
+        "property": "x",
+        "designNode": "n212::n590::n467::n405",
+        "codeNode": "0/0/0/1/1/0/0/0/13/0",
+        "design": 450.109375,
+        "code": 439.546875,
+        "designBox": [
+          682.109375,
+          700.78125,
+          247.78125,
+          40.84375
+        ],
+        "codeBox": [
+          671.546875,
+          742.28125,
+          268.90625,
+          40.84375
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d3",
+        "kind": "layout",
+        "property": "y",
+        "designNode": "n212::n590::n467::n405",
+        "codeNode": "0/0/0/1/1/0/0/0/13/0",
+        "design": 700.78125,
+        "code": 742.28125,
+        "designBox": [
+          682.109375,
+          700.78125,
+          247.78125,
+          40.84375
+        ],
+        "codeBox": [
+          671.546875,
+          742.28125,
+          268.90625,
+          40.84375
+        ],
+        "confidence": 1
+      },
+      {
+        "id": "d4",
+        "kind": "layout",
+        "property": "width",
+        "designNode": "n212::n590::n467::n405",
+        "codeNode": "0/0/0/1/1/0/0/0/13/0",
+        "design": 247.78125,
+        "code": 268.90625,
+        "designBox": [
+          682.109375,
+          700.78125,
+          247.78125,
+          40.84375
+        ],
+        "codeBox": [
+          671.546875,
+          742.28125,
+          268.90625,
+          40.84375
+        ],
+        "confidence": 1
+      }
+    ],
+    "defects": [
+      {
+        "id": "def-3cf0abc981eb380f257c",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n212::n590::n465::n405",
+          "code": "0/0/0/1/1/0/0/0/11/0"
+        },
+        "findings": [
+          "d1"
+        ],
+        "summary": "layout:geometry differs in card-7"
+      },
+      {
+        "id": "def-381312b44b5dd4bf7569",
+        "kind": "layout",
+        "classification": "product",
+        "cause": "layout:geometry",
+        "layer": {
+          "design": "n212::n590::n467::n405",
+          "code": "0/0/0/1/1/0/0/0/13/0"
+        },
+        "findings": [
+          "d2",
+          "d3",
+          "d4"
+        ],
+        "summary": "layout:geometry differs in card-8"
+      }
+    ],
+    "summary": {
+      "uniqueDefects": 2,
+      "accepted": 0,
+      "raw": 4,
+      "uncertainMatches": 0,
+      "environment": 0,
+      "uncertain": 0
+    },
+    "matches": [
+      {
+        "designNode": "n212::n136",
+        "codeNode": "n212::n136",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n212::n143",
+        "codeNode": "n212::n143",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n212::n150",
+        "codeNode": "n212::n150",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n212::n598::n538",
+        "codeNode": "0/0/0/2",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n212::n151",
+        "codeNode": "n212::n151",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n212::n590::n442::n405",
+        "codeNode": "0/0/0/1/1/0/0/0/2/0",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n212::n590::n444::n405",
+        "codeNode": "0/0/0/1/1/0/0/0/4/0",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n212::n590::n452::n405",
+        "codeNode": "0/0/0/1/1/0/0/0/6/0/0/0/0",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n212::n590::n455::n405",
+        "codeNode": "0/0/0/1/1/0/0/0/6/0/1/0/0",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n212::n590::n457::n405",
+        "codeNode": "0/0/0/1/1/0/0/0/8/0",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n212::n590::n462::n405",
+        "codeNode": "0/0/0/1/1/0/0/0/9/1/1/0/0",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n212::n590::n465::n405",
+        "codeNode": "0/0/0/1/1/0/0/0/11/0",
+        "kind": "heuristic",
+        "confidence": 1
+      },
+      {
+        "designNode": "n212::n590::n467::n405",
+        "codeNode": "0/0/0/1/1/0/0/0/13/0",
+        "kind": "heuristic",
+        "confidence": 1
+      }
+    ],
+    "verdict": "drift",
+    "timingsMs": {
+      "compare": 174.11971500000027
+    },
+    "reportHash": "e34fbb2bcdfc1f7b1d4b8904fdfd183a88d2627128c345751cc62949ef493782"
+  }
+}

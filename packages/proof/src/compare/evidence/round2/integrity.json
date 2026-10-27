@@ -1,0 +1,50 @@
+[
+  {
+    "state": "track-selected",
+    "mode": "ids",
+    "hash": true,
+    "rawPartition": true,
+    "uniqueIds": true,
+    "tamperRejected": true
+  },
+  {
+    "state": "track-selected",
+    "mode": "no-ids",
+    "hash": true,
+    "rawPartition": true,
+    "uniqueIds": true,
+    "tamperRejected": true
+  },
+  {
+    "state": "proposal-pending",
+    "mode": "ids",
+    "hash": true,
+    "rawPartition": true,
+    "uniqueIds": true,
+    "tamperRejected": true
+  },
+  {
+    "state": "proposal-pending",
+    "mode": "no-ids",
+    "hash": true,
+    "rawPartition": true,
+    "uniqueIds": true,
+    "tamperRejected": true
+  },
+  {
+    "state": "empty",
+    "mode": "ids",
+    "hash": true,
+    "rawPartition": true,
+    "uniqueIds": true,
+    "tamperRejected": true
+  },
+  {
+    "state": "empty",
+    "mode": "no-ids",
+    "hash": true,
+    "rawPartition": true,
+    "uniqueIds": true,
+    "tamperRejected": true
+  }
+]

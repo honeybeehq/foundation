@@ -1,0 +1,20 @@
+{
+  "accepted": [
+    {
+      "state": "empty",
+      "id": "def-70fa105a918ce9890316",
+      "reason": "Keep Classic’s shorter explanation: it describes the same track steps in one sentence and fits the existing empty pane. Prototype acceptance; product review required before adoption."
+    }
+  ],
+  "passed": false,
+  "errors": [
+    "at-rest/drift-report.json: not-provable: Classic TracksPane always selects a track; dedicated at-rest view is unavailable",
+    "track-selected/drift-report.json: replay found drift or incomplete captures",
+    "track-selected/drift-report.json: drift exceeds tolerance",
+    "proposal-pending/drift-report.json: replay found drift or incomplete captures",
+    "proposal-pending/drift-report.json: drift exceeds tolerance",
+    "empty/drift-report.json: replay found drift or incomplete captures",
+    "empty/drift-report.json: drift exceeds tolerance"
+  ],
+  "reports": 4
+}

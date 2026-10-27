@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Tracks · Flow View design — old design, new design, code</title>
+<style>
+  :root { color-scheme: light; }
+  body { margin: 0; background: #ECEAE5; font: 14px/1.45 -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif; color: #2E2B27; }
+  header { padding: 28px 32px 8px; max-width: 1100px; }
+  h1 { font-size: 20px; margin: 0 0 6px; }
+  header p { margin: 0 0 6px; color: #6B6862; }
+  nav { padding: 4px 32px 16px; display: flex; gap: 14px; font-size: 13px; }
+  nav a { color: #4A463F; }
+  section { padding: 18px 32px 28px; border-top: 1px solid #DCD9D2; }
+  section h2 { font-size: 16px; margin: 0 0 4px; }
+  section > p { margin: 0 0 14px; color: #6B6862; max-width: 1100px; }
+  .row { margin: 0 0 14px; }
+  .label { font: 600 11px/1 ui-monospace, Menlo, monospace; letter-spacing: .08em; color: #8A877F; margin: 0 0 6px; }
+  .label b { color: #2E2B27; }
+  .frame { overflow: hidden; outline: 1px solid #D6D3CD; background: #fff; display: inline-block; }
+  .frame img { display: block; }
+  .note { font-size: 12.5px; color: #B0512E; margin: 6px 0 0; }
+</style></head>
+<body>
+<header>
+  <h1>Tracks pane — design brought up to the Flow View</h1>
+  <p>Each state shows three pictures at real size: Tormod’s current design, the new Flow View design (tracks-pane-flowview.fdn.html), and what the app renders (Classic TracksPane, apiary proto/design-to-code-tracks ab8ab87d1). All three are captured by the same pinned browser and fonts.</p>
+  <p>The white versus paper backdrop behind the pane comes from the capture page, not from the design: the app’s base stylesheet paints the page paper.</p>
+</header>
+<nav><a href="#track-selected">Track selected</a><a href="#proposal-pending">Proposal pending</a><a href="#empty">Empty</a><a href="#at-rest">At rest</a></nav>
+<section id="track-selected"><h2>Track selected</h2><p>The rail of definitions plus the selected track drawn as a flow: done steps faded with a check, the current step lifted, upcoming steps as hollow rings, the denied arm to the right. Remaining differences are implementation detail (see the change list).</p><div class="row"><div class="label">OLD DESIGN <b>tracks-pane.fdn.html</b></div><div class="frame" style="width:1416px;height:525.5px"><img src="img/track-selected-old.png" width="1416" height="720" alt="Track selected — old"></div></div><div class="row"><div class="label">NEW DESIGN <b>tracks-pane-flowview.fdn.html</b></div><div class="frame" style="width:1416px;height:525.5px"><img src="img/track-selected-new.png" width="1416" height="720" alt="Track selected — new"></div></div><div class="row"><div class="label">CODE <b>Classic TracksPane</b></div><div class="frame" style="width:1416px;height:525.5px"><img src="img/track-selected-code.png" width="1416" height="720" alt="Track selected — code"></div></div></section>
+<section id="proposal-pending"><h2>Proposal pending</h2><p>The same canvas becomes the diff. The design docks Accept / Refine / Discard at the bottom of the canvas so the decision is always visible; the app draws that bar about 1023px down, below the visible pane — kept as a code bug, not adopted.</p><div class="row"><div class="label">OLD DESIGN <b>tracks-pane.fdn.html</b></div><div class="frame" style="width:1416px;height:611px"><img src="img/proposal-pending-old.png" width="1416" height="720" alt="Proposal pending — old"></div></div><div class="row"><div class="label">NEW DESIGN <b>tracks-pane-flowview.fdn.html</b></div><div class="frame" style="width:1416px;height:611px"><img src="img/proposal-pending-new.png" width="1416" height="720" alt="Proposal pending — new"></div></div><div class="row"><div class="label">CODE <b>Classic TracksPane</b></div><div class="frame" style="width:1416px;height:611px"><img src="img/proposal-pending-code.png" width="1416" height="720" alt="Proposal pending — code"></div><p class="note">Code: the Accept / Refine / Discard bar is rendered off-screen (y ≈ 1023 in a 611px pane) — the one difference deliberately not adopted.</p></div></section>
+<section id="empty"><h2>Empty</h2><p>No tracks: the rail stays, the canvas explains a track in one sentence, honey goes to New track, with the new pixel bee.</p><div class="row"><div class="label">OLD DESIGN <b>tracks-pane.fdn.html</b></div><div class="frame" style="width:724px;height:468px"><img src="img/empty-old.png" width="1416" height="720" alt="Empty — old"></div></div><div class="row"><div class="label">NEW DESIGN <b>tracks-pane-flowview.fdn.html</b></div><div class="frame" style="width:724px;height:468px"><img src="img/empty-new.png" width="1416" height="720" alt="Empty — new"></div></div><div class="row"><div class="label">CODE <b>Classic TracksPane</b></div><div class="frame" style="width:724px;height:468px"><img src="img/empty-code.png" width="1416" height="720" alt="Empty — code"></div></div></section>
+<section id="at-rest"><h2>At rest</h2><p>The app has no unselected view: it always selects the first track. The new design says so — at rest is the first track selected. (The app’s at-rest capture is not provable in the link file; it is shown for reference and now renders the same as Track selected.)</p><div class="row"><div class="label">OLD DESIGN <b>tracks-pane.fdn.html</b></div><div class="frame" style="width:724px;height:468px"><img src="img/at-rest-old.png" width="1416" height="720" alt="At rest — old"></div></div><div class="row"><div class="label">NEW DESIGN <b>tracks-pane-flowview.fdn.html</b></div><div class="frame" style="width:1416px;height:525.5px"><img src="img/at-rest-new.png" width="1416" height="720" alt="At rest — new"></div></div><div class="row"><div class="label">CODE <b>Classic TracksPane</b></div><div class="frame" style="width:1416px;height:525.5px"><img src="img/at-rest-code.png" width="1416" height="720" alt="At rest — code"></div></div></section>
+</body></html>

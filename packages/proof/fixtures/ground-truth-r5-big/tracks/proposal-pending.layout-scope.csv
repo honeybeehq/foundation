@@ -1,0 +1,5 @@
+id,in_layout_check,why
+PP-01,yes,position: accept bar off screen
+PP-02,yes,geometry: steps 42px lower below the fold
+PP-03,no,background dot pattern only; no element moves
+PP-04,no,environment

@@ -1,0 +1,1096 @@
+diff --git a/.foundation/component-fixtures.ts b/.foundation/component-fixtures.ts
+new file mode 100644
+index 000000000..e3803e6da
+--- /dev/null
++++ b/.foundation/component-fixtures.ts
+@@ -0,0 +1,42 @@
++import helpCommands from './help-commands.json'
++export const keycap = { props: { children: '⌘T' }, anchors: { kbd: 'n203::n1' }, expected: '⌘T', rootAlign: 'flex-start' }
++
++const noop = () => undefined
++const makeInbox = (selected: boolean) => {
++  const id = selected ? 'checkout-guest-cart' : 'pay-webhooks'
++  const prefix = `n249#${selected ? 1 : 0}::n249::`
++  return {
++    props: {
++      row: {
++        key: id,
++        entry: {
++          key: id,
++          session: { id, name: selected ? 'Checkout — guest cart merge' : id, agent: 'codex', model: 'gpt-6.1-sol', status: selected ? 'idle' : 'crashed', lastObservedState: 'dead' },
++          state: selected ? 'completed' : 'failed', failed: !selected,
++          blockingMinutes: selected ? 56 : 104, orderAt: 1785495600000,
++          priority: { band: selected ? 'completed' : 'immediate', score: 1, bottomed: false, reasons: [] },
++        },
++        dim: false, running: false, snoozed: false, bottomed: false, productLabel: null,
++      },
++      selected, entering: false, age: selected ? '56m' : '1h44',
++      finalMessage: selected ? 'drone-12 · +412 −96 · preview live' : undefined,
++      openQuestion: undefined, setRowRef: noop, onSelect: noop, onOpen: noop,
++    },
++    anchors: {
++      '[data-inbox-row]': prefix + 'n17',
++      '[data-inbox-row] > span:first-child > span:nth-child(2)': prefix + 'n20',
++      '[data-inbox-row] > span:first-child > span:nth-child(3)': prefix + 'n21',
++    },
++    expected: selected ? 'Checkout — guest cart merge' : id,
++    rootAlign: 'flex-start',
++  }
++}
++export const inboxSelected = makeInbox(true)
++export const inboxFailed = makeInbox(false)
++
++export const helpCenter = {
++  props: { contextViewType: 'hive.agent-run', onClose: noop },
++  commands: helpCommands,
++  anchors: { '[data-help-center]': 'n45' },
++  expected: 'Keyboard shortcuts',
++}
+diff --git a/.foundation/components.vite.config.ts b/.foundation/components.vite.config.ts
+new file mode 100644
+index 000000000..7c958123c
+--- /dev/null
++++ b/.foundation/components.vite.config.ts
+@@ -0,0 +1,17 @@
++import base from '../apps/next-desktop-beta/foundation.vite.config'
++import { resolve, dirname } from 'node:path'
++import { fileURLToPath } from 'node:url'
++const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
++const state = resolve(root, 'apps/desktop/src/renderer/src/state')
++export default {
++  ...base,
++  resolve: { ...base.resolve, alias: base.resolve.alias.filter(entry => !String(entry.replacement).endsWith('/.foundation/environment.ts')) },
++  plugins: [...base.plugins.filter(plugin => plugin?.name !== 'foundation-boundaries'), {
++    name: 'foundation-component-state', enforce: 'pre' as const,
++    resolveId(source: string, importer?: string) {
++      if (!importer || !source.startsWith('.')) return
++      const full = resolve(dirname(importer.split('?')[0]!), source).replace(/\.tsx?$/, '')
++      if (full === state) return resolve(root, '.foundation/help-environment.ts')
++    },
++  }],
++}
+diff --git a/.foundation/extract-help-commands.mjs b/.foundation/extract-help-commands.mjs
+new file mode 100644
+index 000000000..eea2aebf0
+--- /dev/null
++++ b/.foundation/extract-help-commands.mjs
+@@ -0,0 +1,13 @@
++import ts from 'typescript'
++import fs from 'node:fs'
++import path from 'node:path'
++const root=process.cwd(), defs=new Map(), nodes=[]
++function files(dir) {return fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?files(path.join(dir,e.name)):/\.tsx?$/.test(e.name)?[path.join(dir,e.name)]:[])}
++for(const file of [...files(root+'/apps/desktop/src/renderer/src'),root+'/packages/core/src/commands.ts']) {
++ const text=fs.readFileSync(file,'utf8'), tree=ts.createSourceFile(file,text,ts.ScriptTarget.Latest,true)
++ function walk(n){if(ts.isVariableDeclaration(n)&&ts.isIdentifier(n.name)&&n.initializer)defs.set(n.name.text,n.initializer);if(ts.isObjectLiteralExpression(n))nodes.push({file,node:n});ts.forEachChild(n,walk)}walk(tree)
++}
++function val(n,depth=0){if(!n||depth>15)return; if(ts.isStringLiteral(n)||ts.isNumericLiteral(n))return n.text;if(ts.isAsExpression(n)||ts.isParenthesizedExpression(n)||ts.isSatisfiesExpression(n))return val(n.expression,depth+1);if(ts.isIdentifier(n))return val(defs.get(n.text),depth+1);if(ts.isPropertyAccessExpression(n)){return val(n.expression,depth+1)?.[n.name.text]}if(ts.isArrayLiteralExpression(n)){const a=n.elements.flatMap(e=>ts.isSpreadElement(e)?val(e.expression,depth+1):[val(e,depth+1)]);return a.every(v=>v!==undefined)?a:undefined}if(ts.isObjectLiteralExpression(n)){return Object.fromEntries(n.properties.filter(ts.isPropertyAssignment).map(p=>[p.name.getText().replace(/['"]/g,''),val(p.initializer,depth+1)]))}}
++const found=new Map(), missed=[]
++for(const {file,node} of nodes){const p=Object.fromEntries(node.properties.filter(ts.isPropertyAssignment).map(p=>[p.name.getText().replace(/['"]/g,''),p.initializer]));if(!p.id||!p.defaultKeys)continue;const id=val(p.id),keys=val(p.defaultKeys);if(typeof id==='string'&&Array.isArray(keys)){found.set(id,{id,defaultKeys:keys,source:file.replace(root+'/','')})}else missed.push({file:file.replace(root+'/',''),id:p.id.getText(),keys:p.defaultKeys.getText()})}
++fs.writeFileSync(root+'/.foundation/help-commands.json',JSON.stringify([...found.values()].sort((a,b)=>a.id.localeCompare(b.id)),null,2)+'\n');fs.writeFileSync(root+'/.foundation/help-command-extraction.json',JSON.stringify({extracted:found.size,missed},null,2));console.log({extracted:found.size,missed})
+diff --git a/.foundation/help-command-extraction.json b/.foundation/help-command-extraction.json
+new file mode 100644
+index 000000000..979c0508e
+--- /dev/null
++++ b/.foundation/help-command-extraction.json
+@@ -0,0 +1,15 @@
++{
++  "extracted": 59,
++  "missed": [
++    {
++      "file": "apps/desktop/src/renderer/src/plugins/commands.ts",
++      "id": "contribution.id",
++      "keys": "contribution.defaultKeys"
++    },
++    {
++      "file": "apps/desktop/src/renderer/src/state/paneCommands.ts",
++      "id": "CommandIds.FocusTabAt",
++      "keys": "[LOCAL_TAB_KEYS[0]!]"
++    }
++  ]
++}
+\ No newline at end of file
+diff --git a/.foundation/help-commands.json b/.foundation/help-commands.json
+new file mode 100644
+index 000000000..70eb4afcb
+--- /dev/null
++++ b/.foundation/help-commands.json
+@@ -0,0 +1,438 @@
++[
++  {
++    "id": "agent.copyBeeId",
++    "defaultKeys": [
++      "Meta+Shift+c"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/agentViewCommands.ts"
++  },
++  {
++    "id": "agent.important.toggle",
++    "defaultKeys": [
++      "Meta+Alt+j"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/agentViewCommands.ts"
++  },
++  {
++    "id": "agent.kill.request",
++    "defaultKeys": [
++      "Meta+Shift+k"
++    ],
++    "source": "apps/desktop/src/renderer/src/App.tsx"
++  },
++  {
++    "id": "agent.new",
++    "defaultKeys": [
++      "Meta+n"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/agentViewCommands.ts"
++  },
++  {
++    "id": "agent.new.dialog",
++    "defaultKeys": [
++      "Meta+Shift+n"
++    ],
++    "source": "apps/desktop/src/renderer/src/App.tsx"
++  },
++  {
++    "id": "agent.rename.request",
++    "defaultKeys": [
++      "Meta+Shift+r"
++    ],
++    "source": "apps/desktop/src/renderer/src/App.tsx"
++  },
++  {
++    "id": "agent.retire.request",
++    "defaultKeys": [
++      "Meta+Shift+e"
++    ],
++    "source": "apps/desktop/src/renderer/src/App.tsx"
++  },
++  {
++    "id": "agent.selfSeal",
++    "defaultKeys": [
++      "Meta+Alt+Shift+e"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/agentCommands.ts"
++  },
++  {
++    "id": "agent.spawn",
++    "defaultKeys": [
++      "Meta+Shift+s"
++    ],
++    "source": "apps/desktop/src/renderer/src/App.tsx"
++  },
++  {
++    "id": "agent.subagents.expansion.toggleAll",
++    "defaultKeys": [
++      "Alt+Shift+z"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/agentViewCommands.ts"
++  },
++  {
++    "id": "agent.transcript.conversationEnd",
++    "defaultKeys": [
++      "Meta+ArrowDown"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/agentViewCommands.ts"
++  },
++  {
++    "id": "agent.transcript.conversationStart",
++    "defaultKeys": [
++      "Meta+ArrowUp"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/agentViewCommands.ts"
++  },
++  {
++    "id": "agent.transcript.nextUserMessage",
++    "defaultKeys": [
++      "Meta+Shift+ArrowDown"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/agentViewCommands.ts"
++  },
++  {
++    "id": "agent.transcript.previousUserMessage",
++    "defaultKeys": [
++      "Meta+Shift+ArrowUp"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/agentViewCommands.ts"
++  },
++  {
++    "id": "agent.work.actions",
++    "defaultKeys": [
++      "Control+x",
++      "Meta+Shift+x"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/agentViewCommands.ts"
++  },
++  {
++    "id": "agent.work.land",
++    "defaultKeys": [
++      "Control+Alt+Meta+l"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/agentViewCommands.ts"
++  },
++  {
++    "id": "agent.work.landAndArchive",
++    "defaultKeys": [
++      "Control+Alt+Meta+Shift+l"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/agentViewCommands.ts"
++  },
++  {
++    "id": "app.openNextWindow",
++    "defaultKeys": [
++      "Meta+Alt+n"
++    ],
++    "source": "apps/desktop/src/renderer/src/next/NextWindowCommand.tsx"
++  },
++  {
++    "id": "app.pickLocalElement",
++    "defaultKeys": [
++      "Meta+Alt+x"
++    ],
++    "source": "apps/desktop/src/renderer/src/localElementPicker/LocalElementPicker.tsx"
++  },
++  {
++    "id": "browser.commentElement",
++    "defaultKeys": [
++      "Alt+c"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/browserTerminalCommands.ts"
++  },
++  {
++    "id": "browser.find",
++    "defaultKeys": [
++      "Meta+f"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/browserTerminalCommands.ts"
++  },
++  {
++    "id": "browser.new",
++    "defaultKeys": [
++      "Meta+Shift+g"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/contentPaneCommands.ts"
++  },
++  {
++    "id": "browser.referenceElement",
++    "defaultKeys": [
++      "Meta+Shift+x"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/browserTerminalCommands.ts"
++  },
++  {
++    "id": "edit.redo",
++    "defaultKeys": [
++      "Meta+Shift+z",
++      "Control+Shift+z"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/paneCommands.ts"
++  },
++  {
++    "id": "edit.undo",
++    "defaultKeys": [
++      "Meta+z",
++      "Control+z"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/paneCommands.ts"
++  },
++  {
++    "id": "files.browse",
++    "defaultKeys": [
++      "Meta+o",
++      "Meta+Alt+o",
++      "Meta+Alt+Shift+o"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/editorCommands.ts"
++  },
++  {
++    "id": "files.changes",
++    "defaultKeys": [
++      "Meta+Shift+i",
++      "Meta+Alt+i",
++      "Meta+Alt+Shift+i"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/editorCommands.ts"
++  },
++  {
++    "id": "list.toggleCollapseExpand",
++    "defaultKeys": [
++      "space"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/agentViewCommands.ts"
++  },
++  {
++    "id": "list.toggleCollapseExpandAll",
++    "defaultKeys": [
++      "Shift+z"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/agentViewCommands.ts"
++  },
++  {
++    "id": "palette.toggle",
++    "defaultKeys": [
++      "Meta+k"
++    ],
++    "source": "apps/desktop/src/renderer/src/App.tsx"
++  },
++  {
++    "id": "pane.add",
++    "defaultKeys": [
++      "Meta+t"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/paneCommands.ts"
++  },
++  {
++    "id": "pane.back",
++    "defaultKeys": [
++      "Meta+ArrowLeft"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/paneCommands.ts"
++  },
++  {
++    "id": "pane.close",
++    "defaultKeys": [
++      "Meta+w"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/paneCommands.ts"
++  },
++  {
++    "id": "pane.focusDirection",
++    "defaultKeys": [
++      "Alt+ArrowLeft",
++      "Alt+ArrowRight",
++      "Alt+ArrowUp",
++      "Alt+ArrowDown",
++      "Alt+h",
++      "Alt+j",
++      "Alt+k",
++      "Alt+l"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/paneCommands.ts"
++  },
++  {
++    "id": "pane.jumpImportant",
++    "defaultKeys": [
++      "Meta+j"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/agentViewCommands.ts"
++  },
++  {
++    "id": "pane.jumpPicker",
++    "defaultKeys": [
++      "Meta+p"
++    ],
++    "source": "apps/desktop/src/renderer/src/App.tsx"
++  },
++  {
++    "id": "pane.move",
++    "defaultKeys": [
++      "Meta+Alt+Shift+ArrowLeft",
++      "Meta+Alt+Shift+ArrowRight",
++      "Meta+Alt+Shift+ArrowUp",
++      "Meta+Alt+Shift+ArrowDown"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/paneCommands.ts"
++  },
++  {
++    "id": "pane.nextTab",
++    "defaultKeys": [
++      "Control+Tab",
++      "Meta+Alt+ArrowRight"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/paneCommands.ts"
++  },
++  {
++    "id": "pane.placeAll",
++    "defaultKeys": [
++      "Meta+Alt+u"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/paneCommands.ts"
++  },
++  {
++    "id": "pane.prevTab",
++    "defaultKeys": [
++      "Control+Shift+Tab",
++      "Meta+Alt+ArrowLeft"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/paneCommands.ts"
++  },
++  {
++    "id": "pane.resize",
++    "defaultKeys": [
++      "Control+Meta+ArrowLeft",
++      "Control+Meta+ArrowRight",
++      "Control+Meta+ArrowUp",
++      "Control+Meta+ArrowDown"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/paneCommands.ts"
++  },
++  {
++    "id": "pane.split",
++    "defaultKeys": [
++      "Meta+d",
++      "Meta+Shift+d"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/paneCommands.ts"
++  },
++  {
++    "id": "pane.zoom",
++    "defaultKeys": [
++      "Meta+Shift+f"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/paneCommands.ts"
++  },
++  {
++    "id": "search.open",
++    "defaultKeys": [
++      "/"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/agentViewCommands.ts"
++  },
++  {
++    "id": "settings.open",
++    "defaultKeys": [
++      "Meta+,"
++    ],
++    "source": "apps/desktop/src/renderer/src/App.tsx"
++  },
++  {
++    "id": "sidebar.toggle",
++    "defaultKeys": [
++      "Meta+b"
++    ],
++    "source": "apps/desktop/src/renderer/src/chrome/Sidebar.tsx"
++  },
++  {
++    "id": "tab.close",
++    "defaultKeys": [
++      "Meta+Control+w"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/paneCommands.ts"
++  },
++  {
++    "id": "tab.new",
++    "defaultKeys": [
++      "Meta+Control+t"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/paneCommands.ts"
++  },
++  {
++    "id": "tab.rename.request",
++    "defaultKeys": [
++      "Meta+Control+r"
++    ],
++    "source": "apps/desktop/src/renderer/src/App.tsx"
++  },
++  {
++    "id": "tab.toggleMode",
++    "defaultKeys": [
++      "Meta+Alt+c"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/paneCommands.ts"
++  },
++  {
++    "id": "tab.togglePin",
++    "defaultKeys": [
++      "Meta+Alt+y"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/paneCommands.ts"
++  },
++  {
++    "id": "terminal.find",
++    "defaultKeys": [
++      "Meta+f"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/browserTerminalCommands.ts"
++  },
++  {
++    "id": "terminal.nextCommand",
++    "defaultKeys": [
++      "Meta+ArrowDown"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/browserTerminalCommands.ts"
++  },
++  {
++    "id": "terminal.previousCommand",
++    "defaultKeys": [
++      "Meta+ArrowUp"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/browserTerminalCommands.ts"
++  },
++  {
++    "id": "terminal.zoomIn",
++    "defaultKeys": [
++      "Meta+Alt+="
++    ],
++    "source": "apps/desktop/src/renderer/src/state/browserTerminalCommands.ts"
++  },
++  {
++    "id": "terminal.zoomOut",
++    "defaultKeys": [
++      "Meta+Alt+-"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/browserTerminalCommands.ts"
++  },
++  {
++    "id": "terminal.zoomReset",
++    "defaultKeys": [
++      "Meta+Alt+0"
++    ],
++    "source": "apps/desktop/src/renderer/src/state/browserTerminalCommands.ts"
++  },
++  {
++    "id": "workspace.switch",
++    "defaultKeys": [
++      "o w"
++    ],
++    "source": "apps/desktop/src/renderer/src/chrome/Sidebar.tsx"
++  },
++  {
++    "id": "yard.pick",
++    "defaultKeys": [
++      "o y"
++    ],
++    "source": "apps/desktop/src/renderer/src/chrome/Sidebar.tsx"
++  }
++]
+diff --git a/.foundation/help-environment.ts b/.foundation/help-environment.ts
+new file mode 100644
+index 000000000..701251566
+--- /dev/null
++++ b/.foundation/help-environment.ts
+@@ -0,0 +1,10 @@
++import { CommandRegistry } from '../packages/core/src/commands'
++import { WorkspaceStore } from '../packages/store/src/kv'
++let app: any
++export function seedHelp(commandsFixture: { id: string; defaultKeys: string[] }[]): void {
++  const commands = new CommandRegistry()
++  for (const command of commandsFixture) commands.register({ ...command, title: command.id, category: 'Fixture', run: () => undefined })
++  const store = new WorkspaceStore()
++  app = { commands, roots: { settings: store.getMap('settings') } }
++}
++export const useApp = () => app
+diff --git a/.foundation/links-help-center.json b/.foundation/links-help-center.json
+new file mode 100644
+index 000000000..f2a247b2b
+--- /dev/null
++++ b/.foundation/links-help-center.json
+@@ -0,0 +1,148 @@
++{
++  "schema": "fdn-links/0",
++  "designFile": "boards/system-help-center.fdn.html",
++  "designHead": "9ecb6cc7215d7d955053117cbfb920c53fc2508afec9ac46e1e0a5f22bae0a9a",
++  "viteConfig": ".foundation/components.vite.config.ts",
++  "harness": "foundation.harness.tsx",
++  "artboards": [
++    {
++      "id": "help-center",
++      "component": "apps/desktop/src/renderer/src/chrome/HelpCenter.tsx#HelpCenter",
++      "designNode": "n45",
++      "viewport": {
++        "width": 1480,
++        "height": 830,
++        "dpr": 1
++      },
++      "states": [
++        {
++          "name": "agent-run",
++          "fixture": ".foundation/component-fixtures.ts#helpCenter",
++          "designState": "dialog-agent-run"
++        }
++      ],
++      "components": []
++    }
++  ],
++  "fonts": [
++    {
++      "family": "Hanken Grotesk",
++      "weight": "400",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-400-normal.woff2",
++      "sha256": "787b3fdd0b7e6d59ae7ce14ce7a41d1a44616584b4c919b527da951972d5d87d",
++      "postScriptName": "HankenGrotesk-Regular"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "500",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-500-normal.woff2",
++      "sha256": "31f666af7bff625900c46aa34a05d8620482ba2db37db7b63749b693ab0c72ec",
++      "postScriptName": "HankenGrotesk-Medium"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "600",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-600-normal.woff2",
++      "sha256": "58f23b7ae3e13b21a4dca4c05360be87b3531d60fc1cbff89732cac8fb3019ae",
++      "postScriptName": "HankenGrotesk-SemiBold"
++    },
++    {
++      "family": "IBM Plex Mono",
++      "weight": "400",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2",
++      "sha256": "08949f728dc52d528e69b1667d15c89a5686a4ee9a296ff90983985f99c380f7",
++      "postScriptName": "IBMPlexMono-Regular"
++    },
++    {
++      "family": "Foundation Design Sans",
++      "weight": "400",
++      "path": ".foundation/fonts/LiberationSans-Regular.ttf",
++      "format": "truetype",
++      "sha256": "4659bc0c58c5028dd488ec928d41d9265db43d9b669fc14ca8b0832daca7b144",
++      "postScriptName": "LiberationSans"
++    },
++    {
++      "family": "Foundation Design Sans",
++      "weight": "700",
++      "path": ".foundation/fonts/LiberationSans-Bold.ttf",
++      "format": "truetype",
++      "sha256": "3973aa5054fb467dd5627245d3dc82e37bf16fe075756156a570455871351582",
++      "postScriptName": "LiberationSans-Bold"
++    },
++    {
++      "family": "Foundation Design Mono",
++      "weight": "400",
++      "path": ".foundation/fonts/DejaVuSansMono.ttf",
++      "format": "truetype",
++      "sha256": "c805f9436dbc268644c1d9584f01a601a653e028e08fd74b9b949f6cf8304d88",
++      "postScriptName": "DejaVuSansMono"
++    },
++    {
++      "family": "Foundation Design Mono",
++      "weight": "700",
++      "path": ".foundation/fonts/DejaVuSansMono-Bold.ttf",
++      "format": "truetype",
++      "sha256": "3a3c502eeff669a231549e80df9f7c49de109bafe303170409e905d0b31a38fe",
++      "postScriptName": "DejaVuSansMono-Bold"
++    },
++    {
++      "family": "Foundation Design Serif",
++      "weight": "400",
++      "path": ".foundation/fonts/LiberationSerif-Regular.ttf",
++      "format": "truetype",
++      "sha256": "705903ae1382f0150f115d6f10a30f5b2f3d6ade649c474afe6366c39174fb65",
++      "postScriptName": "LiberationSerif"
++    },
++    {
++      "family": "Foundation Design Serif",
++      "weight": "700",
++      "path": ".foundation/fonts/LiberationSerif-Bold.ttf",
++      "format": "truetype",
++      "sha256": "9e66c25e20868756bf12eb24a520a4552727c9cd108f577f7ae33e3c0110e39c",
++      "postScriptName": "LiberationSerif-Bold"
++    },
++    {
++      "family": "Foundation Symbols",
++      "weight": "400",
++      "path": ".foundation/fonts/DejaVuSans.ttf",
++      "format": "truetype",
++      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
++      "postScriptName": "DejaVuSans"
++    },
++    {
++      "family": "Foundation Symbols",
++      "weight": "700",
++      "path": ".foundation/fonts/DejaVuSans-Bold.ttf",
++      "format": "truetype",
++      "sha256": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895",
++      "postScriptName": "DejaVuSans-Bold"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "700",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-700-normal.woff2",
++      "format": "woff2",
++      "sha256": "d85de6e272296d06f8205ad11e27140274e0ef97050232777d146eabb71c312d",
++      "postScriptName": "HankenGrotesk-Bold"
++    },
++    {
++      "family": "IBM Plex Mono",
++      "weight": "500",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2",
++      "format": "woff2",
++      "sha256": "01d285447409c8a588692162439a038b8cbd7871309ee20267b0d2d91c6e8e22",
++      "postScriptName": "IBMPlexMono-Medium"
++    }
++  ],
++  "binding": "chain-head",
++  "fontPolicy": {
++    "sans": "Foundation Design Sans",
++    "mono": "Foundation Design Mono",
++    "serif": "Foundation Design Serif",
++    "fallback": "Foundation Symbols",
++    "requireCustomFonts": true
++  },
++  "browserVersion": "151.0.7922.34",
++  "platform": "linux",
++  "designHtmlSha256": "5fd37f92bb3d214b73a36786dce7ae89d9552db29efd262cc88699de01694431"
++}
+diff --git a/.foundation/links-inbox-row.json b/.foundation/links-inbox-row.json
+new file mode 100644
+index 000000000..3899bfb4c
+--- /dev/null
++++ b/.foundation/links-inbox-row.json
+@@ -0,0 +1,154 @@
++{
++  "schema": "fdn-links/0",
++  "designFile": "boards/inbox-unified.fdn.html",
++  "designHead": "1c290036c2a26ad4884d480ddf5aa15cc9258bb736a8fc8c5b873ebfd9abe29a",
++  "viteConfig": "apps/next-desktop-beta/foundation.vite.config.ts",
++  "harness": "foundation.harness.tsx",
++  "artboards": [
++    {
++      "id": "inbox-row",
++      "component": "apps/desktop/src/renderer/src/panes/inbox/InboxRow.tsx#InboxRow",
++      "designNode": "n249#1::n249::n17",
++      "viewport": {
++        "width": 340,
++        "height": 100,
++        "dpr": 1
++      },
++      "states": [
++        {
++          "name": "selected",
++          "fixture": ".foundation/component-fixtures.ts#inboxSelected",
++          "designState": "narrow-queue"
++        },
++        {
++          "name": "failed",
++          "fixture": ".foundation/component-fixtures.ts#inboxFailed",
++          "designState": "narrow-queue",
++          "designNode": "n249#0::n249::n17"
++        }
++      ],
++      "components": []
++    }
++  ],
++  "fonts": [
++    {
++      "family": "Hanken Grotesk",
++      "weight": "400",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-400-normal.woff2",
++      "sha256": "787b3fdd0b7e6d59ae7ce14ce7a41d1a44616584b4c919b527da951972d5d87d",
++      "postScriptName": "HankenGrotesk-Regular"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "500",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-500-normal.woff2",
++      "sha256": "31f666af7bff625900c46aa34a05d8620482ba2db37db7b63749b693ab0c72ec",
++      "postScriptName": "HankenGrotesk-Medium"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "600",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-600-normal.woff2",
++      "sha256": "58f23b7ae3e13b21a4dca4c05360be87b3531d60fc1cbff89732cac8fb3019ae",
++      "postScriptName": "HankenGrotesk-SemiBold"
++    },
++    {
++      "family": "IBM Plex Mono",
++      "weight": "400",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2",
++      "sha256": "08949f728dc52d528e69b1667d15c89a5686a4ee9a296ff90983985f99c380f7",
++      "postScriptName": "IBMPlexMono-Regular"
++    },
++    {
++      "family": "Foundation Design Sans",
++      "weight": "400",
++      "path": ".foundation/fonts/LiberationSans-Regular.ttf",
++      "format": "truetype",
++      "sha256": "4659bc0c58c5028dd488ec928d41d9265db43d9b669fc14ca8b0832daca7b144",
++      "postScriptName": "LiberationSans"
++    },
++    {
++      "family": "Foundation Design Sans",
++      "weight": "700",
++      "path": ".foundation/fonts/LiberationSans-Bold.ttf",
++      "format": "truetype",
++      "sha256": "3973aa5054fb467dd5627245d3dc82e37bf16fe075756156a570455871351582",
++      "postScriptName": "LiberationSans-Bold"
++    },
++    {
++      "family": "Foundation Design Mono",
++      "weight": "400",
++      "path": ".foundation/fonts/DejaVuSansMono.ttf",
++      "format": "truetype",
++      "sha256": "c805f9436dbc268644c1d9584f01a601a653e028e08fd74b9b949f6cf8304d88",
++      "postScriptName": "DejaVuSansMono"
++    },
++    {
++      "family": "Foundation Design Mono",
++      "weight": "700",
++      "path": ".foundation/fonts/DejaVuSansMono-Bold.ttf",
++      "format": "truetype",
++      "sha256": "3a3c502eeff669a231549e80df9f7c49de109bafe303170409e905d0b31a38fe",
++      "postScriptName": "DejaVuSansMono-Bold"
++    },
++    {
++      "family": "Foundation Design Serif",
++      "weight": "400",
++      "path": ".foundation/fonts/LiberationSerif-Regular.ttf",
++      "format": "truetype",
++      "sha256": "705903ae1382f0150f115d6f10a30f5b2f3d6ade649c474afe6366c39174fb65",
++      "postScriptName": "LiberationSerif"
++    },
++    {
++      "family": "Foundation Design Serif",
++      "weight": "700",
++      "path": ".foundation/fonts/LiberationSerif-Bold.ttf",
++      "format": "truetype",
++      "sha256": "9e66c25e20868756bf12eb24a520a4552727c9cd108f577f7ae33e3c0110e39c",
++      "postScriptName": "LiberationSerif-Bold"
++    },
++    {
++      "family": "Foundation Symbols",
++      "weight": "400",
++      "path": ".foundation/fonts/DejaVuSans.ttf",
++      "format": "truetype",
++      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
++      "postScriptName": "DejaVuSans"
++    },
++    {
++      "family": "Foundation Symbols",
++      "weight": "700",
++      "path": ".foundation/fonts/DejaVuSans-Bold.ttf",
++      "format": "truetype",
++      "sha256": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895",
++      "postScriptName": "DejaVuSans-Bold"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "700",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-700-normal.woff2",
++      "format": "woff2",
++      "sha256": "d85de6e272296d06f8205ad11e27140274e0ef97050232777d146eabb71c312d",
++      "postScriptName": "HankenGrotesk-Bold"
++    },
++    {
++      "family": "IBM Plex Mono",
++      "weight": "500",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2",
++      "format": "woff2",
++      "sha256": "01d285447409c8a588692162439a038b8cbd7871309ee20267b0d2d91c6e8e22",
++      "postScriptName": "IBMPlexMono-Medium"
++    }
++  ],
++  "binding": "chain-head",
++  "fontPolicy": {
++    "sans": "Foundation Design Sans",
++    "mono": "Foundation Design Mono",
++    "serif": "Foundation Design Serif",
++    "fallback": "Foundation Symbols",
++    "requireCustomFonts": true
++  },
++  "browserVersion": "151.0.7922.34",
++  "platform": "linux",
++  "designHtmlSha256": "5fd37f92bb3d214b73a36786dce7ae89d9552db29efd262cc88699de01694431"
++}
+diff --git a/.foundation/links-keycap.json b/.foundation/links-keycap.json
+new file mode 100644
+index 000000000..a131fbe34
+--- /dev/null
++++ b/.foundation/links-keycap.json
+@@ -0,0 +1,148 @@
++{
++  "schema": "fdn-links/0",
++  "designFile": "boards/system-help-center.fdn.html",
++  "designHead": "9ecb6cc7215d7d955053117cbfb920c53fc2508afec9ac46e1e0a5f22bae0a9a",
++  "viteConfig": "apps/next-desktop-beta/foundation.vite.config.ts",
++  "harness": "foundation.harness.tsx",
++  "artboards": [
++    {
++      "id": "keycap",
++      "component": "packages/ui/src/bits.tsx#Keycap",
++      "designNode": "n203::n1",
++      "viewport": {
++        "width": 160,
++        "height": 60,
++        "dpr": 1
++      },
++      "states": [
++        {
++          "name": "default",
++          "fixture": ".foundation/component-fixtures.ts#keycap",
++          "designState": "row-grammar"
++        }
++      ],
++      "components": []
++    }
++  ],
++  "fonts": [
++    {
++      "family": "Hanken Grotesk",
++      "weight": "400",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-400-normal.woff2",
++      "sha256": "787b3fdd0b7e6d59ae7ce14ce7a41d1a44616584b4c919b527da951972d5d87d",
++      "postScriptName": "HankenGrotesk-Regular"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "500",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-500-normal.woff2",
++      "sha256": "31f666af7bff625900c46aa34a05d8620482ba2db37db7b63749b693ab0c72ec",
++      "postScriptName": "HankenGrotesk-Medium"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "600",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-600-normal.woff2",
++      "sha256": "58f23b7ae3e13b21a4dca4c05360be87b3531d60fc1cbff89732cac8fb3019ae",
++      "postScriptName": "HankenGrotesk-SemiBold"
++    },
++    {
++      "family": "IBM Plex Mono",
++      "weight": "400",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2",
++      "sha256": "08949f728dc52d528e69b1667d15c89a5686a4ee9a296ff90983985f99c380f7",
++      "postScriptName": "IBMPlexMono-Regular"
++    },
++    {
++      "family": "Foundation Design Sans",
++      "weight": "400",
++      "path": ".foundation/fonts/LiberationSans-Regular.ttf",
++      "format": "truetype",
++      "sha256": "4659bc0c58c5028dd488ec928d41d9265db43d9b669fc14ca8b0832daca7b144",
++      "postScriptName": "LiberationSans"
++    },
++    {
++      "family": "Foundation Design Sans",
++      "weight": "700",
++      "path": ".foundation/fonts/LiberationSans-Bold.ttf",
++      "format": "truetype",
++      "sha256": "3973aa5054fb467dd5627245d3dc82e37bf16fe075756156a570455871351582",
++      "postScriptName": "LiberationSans-Bold"
++    },
++    {
++      "family": "Foundation Design Mono",
++      "weight": "400",
++      "path": ".foundation/fonts/DejaVuSansMono.ttf",
++      "format": "truetype",
++      "sha256": "c805f9436dbc268644c1d9584f01a601a653e028e08fd74b9b949f6cf8304d88",
++      "postScriptName": "DejaVuSansMono"
++    },
++    {
++      "family": "Foundation Design Mono",
++      "weight": "700",
++      "path": ".foundation/fonts/DejaVuSansMono-Bold.ttf",
++      "format": "truetype",
++      "sha256": "3a3c502eeff669a231549e80df9f7c49de109bafe303170409e905d0b31a38fe",
++      "postScriptName": "DejaVuSansMono-Bold"
++    },
++    {
++      "family": "Foundation Design Serif",
++      "weight": "400",
++      "path": ".foundation/fonts/LiberationSerif-Regular.ttf",
++      "format": "truetype",
++      "sha256": "705903ae1382f0150f115d6f10a30f5b2f3d6ade649c474afe6366c39174fb65",
++      "postScriptName": "LiberationSerif"
++    },
++    {
++      "family": "Foundation Design Serif",
++      "weight": "700",
++      "path": ".foundation/fonts/LiberationSerif-Bold.ttf",
++      "format": "truetype",
++      "sha256": "9e66c25e20868756bf12eb24a520a4552727c9cd108f577f7ae33e3c0110e39c",
++      "postScriptName": "LiberationSerif-Bold"
++    },
++    {
++      "family": "Foundation Symbols",
++      "weight": "400",
++      "path": ".foundation/fonts/DejaVuSans.ttf",
++      "format": "truetype",
++      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
++      "postScriptName": "DejaVuSans"
++    },
++    {
++      "family": "Foundation Symbols",
++      "weight": "700",
++      "path": ".foundation/fonts/DejaVuSans-Bold.ttf",
++      "format": "truetype",
++      "sha256": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895",
++      "postScriptName": "DejaVuSans-Bold"
++    },
++    {
++      "family": "Hanken Grotesk",
++      "weight": "700",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/hanken-grotesk/files/hanken-grotesk-latin-700-normal.woff2",
++      "format": "woff2",
++      "sha256": "d85de6e272296d06f8205ad11e27140274e0ef97050232777d146eabb71c312d",
++      "postScriptName": "HankenGrotesk-Bold"
++    },
++    {
++      "family": "IBM Plex Mono",
++      "weight": "500",
++      "path": "apps/next-desktop-beta/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2",
++      "format": "woff2",
++      "sha256": "01d285447409c8a588692162439a038b8cbd7871309ee20267b0d2d91c6e8e22",
++      "postScriptName": "IBMPlexMono-Medium"
++    }
++  ],
++  "binding": "chain-head",
++  "fontPolicy": {
++    "sans": "Foundation Design Sans",
++    "mono": "Foundation Design Mono",
++    "serif": "Foundation Design Serif",
++    "fallback": "Foundation Symbols",
++    "requireCustomFonts": true
++  },
++  "browserVersion": "151.0.7922.34",
++  "platform": "linux",
++  "designHtmlSha256": "5fd37f92bb3d214b73a36786dce7ae89d9552db29efd262cc88699de01694431"
++}
+diff --git a/.foundation/links.json b/.foundation/links.json
+index fe109b290..ccd7e6ce6 100644
+--- a/.foundation/links.json
++++ b/.foundation/links.json
+@@ -171,5 +171,25 @@
+   },
+   "browserVersion": "151.0.7922.34",
+   "platform": "linux",
+-  "designHtmlSha256": "5fd37f92bb3d214b73a36786dce7ae89d9552db29efd262cc88699de01694431"
++  "designHtmlSha256": "5fd37f92bb3d214b73a36786dce7ae89d9552db29efd262cc88699de01694431",
++  "componentManifests": [
++    {
++      "id": "keycap",
++      "manifest": ".foundation/links-keycap.json",
++      "designFile": "boards/system-help-center.fdn.html",
++      "component": "packages/ui/src/bits.tsx#Keycap"
++    },
++    {
++      "id": "inbox-row",
++      "manifest": ".foundation/links-inbox-row.json",
++      "designFile": "boards/inbox-unified.fdn.html",
++      "component": "apps/desktop/src/renderer/src/panes/inbox/InboxRow.tsx#InboxRow"
++    },
++    {
++      "id": "help-center",
++      "manifest": ".foundation/links-help-center.json",
++      "designFile": "boards/system-help-center.fdn.html",
++      "component": "apps/desktop/src/renderer/src/chrome/HelpCenter.tsx#HelpCenter"
++    }
++  ]
+ }
+diff --git a/foundation.harness.tsx b/foundation.harness.tsx
+index 00c12fc0b..f4c65f25e 100644
+--- a/foundation.harness.tsx
++++ b/foundation.harness.tsx
+@@ -13,8 +13,20 @@ export function prepare(): void {
+ 
+ export async function mount({ Component, fixture, root }: { Component: ComponentType<any>; fixture: any; root: HTMLElement; state: string }): Promise<() => void> {
+   setFixture(fixture)
++  if (fixture.commands) {
++    const { seedHelp } = await import('./.foundation/help-environment')
++    seedHelp(fixture.commands)
++  }
+   root.style.display = 'flex'
++  root.style.alignItems = fixture.rootAlign ?? 'stretch'
+   const renderer = createRoot(root)
+   renderer.render(createElement(Component, fixture.props))
++  await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
++  for (const [selector, id] of Object.entries(fixture.anchors ?? {})) {
++    const node = root.querySelector(selector)
++    if (!node) throw new Error(`Missing anchor: ${selector}`)
++    node.setAttribute('data-fdn-id', String(id))
++  }
++  if (fixture.expected && !root.textContent?.includes(fixture.expected)) throw new Error(`Missing fixture content: ${fixture.expected}`)
+   return () => renderer.unmount()
+ }

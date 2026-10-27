@@ -1,0 +1,87 @@
+{
+  "design": {
+    "codeSelector": "[data-help-center]",
+    "originNormalized": true,
+    "bothRootsNormalized": true,
+    "sizePreserved": true,
+    "audit": {
+      "nodes": 281,
+      "properties": 54,
+      "differences": [
+        {
+          "node": 0,
+          "property": "position",
+          "before": "absolute",
+          "after": "relative"
+        }
+      ],
+      "unexpected": [],
+      "scrolls": [],
+      "designExtraction": {
+        "nodes": 281,
+        "properties": 54,
+        "differences": []
+      },
+      "finalScrolls": []
+    }
+  },
+  "code": {
+    "codeSelector": "[data-help-center]",
+    "originNormalized": true,
+    "bothRootsNormalized": true,
+    "sizePreserved": true,
+    "audit": {
+      "nodes": 1801,
+      "properties": 54,
+      "differences": [
+        {
+          "node": 0,
+          "property": "margin-top",
+          "before": "57px",
+          "after": "0px"
+        },
+        {
+          "node": 0,
+          "property": "margin-right",
+          "before": "210px",
+          "after": "0px"
+        },
+        {
+          "node": 0,
+          "property": "margin-bottom",
+          "before": "57px",
+          "after": "0px"
+        },
+        {
+          "node": 0,
+          "property": "margin-left",
+          "before": "210px",
+          "after": "0px"
+        },
+        {
+          "node": 0,
+          "property": "position",
+          "before": "fixed",
+          "after": "relative"
+        }
+      ],
+      "unexpected": [],
+      "scrolls": [
+        {
+          "node": 20,
+          "x": 0,
+          "y": 2655
+        }
+      ],
+      "finalScrolls": [
+        {
+          "node": 20,
+          "x": 0,
+          "y": 2655,
+          "finalX": 0,
+          "finalY": 2655
+        }
+      ]
+    }
+  }
+}

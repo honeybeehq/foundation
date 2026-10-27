@@ -1,0 +1,22 @@
+[
+  {
+    "case": "keycap-command-enter",
+    "pair": "packages/proof/fixtures/heldout/keycap-command-enter/captures/keycap-command-enter/command-enter/160x60@1",
+    "labels": "packages/proof/fixtures/ground-truth-heldout/keycap-command-enter/command-enter.defects.csv"
+  },
+  {
+    "case": "inbox-login",
+    "pair": "packages/proof/fixtures/heldout/inbox-login/captures/inbox-login/login/340x100@1",
+    "labels": "packages/proof/fixtures/ground-truth-heldout/inbox-login/login.defects.csv"
+  },
+  {
+    "case": "inbox-waiting",
+    "pair": "packages/proof/fixtures/heldout/inbox-waiting/captures/inbox-waiting/waiting/340x100@1",
+    "labels": "packages/proof/fixtures/ground-truth-heldout/inbox-waiting/waiting.defects.csv"
+  },
+  {
+    "case": "help-search-split",
+    "pair": "packages/proof/fixtures/heldout/help-search-split/captures/help-search-split/split/980x638@1",
+    "labels": "packages/proof/fixtures/ground-truth-heldout/help-search-split/split.defects.csv"
+  }
+]

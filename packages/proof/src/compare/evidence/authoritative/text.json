@@ -1,0 +1,141 @@
+{
+  "schema": "fdn-drift/0",
+  "artboard": "tracks-pane/default",
+  "state": "default",
+  "viewport": {
+    "width": 1280,
+    "height": 800,
+    "dpr": 1
+  },
+  "design": {
+    "file": "packages/proof/fixtures/design/tracks-pane.fdn.html",
+    "head": "da6f965fcc33d4ac33d47ffd1cc04da2d288cd113b5ed263501dc50b2bac189d",
+    "htmlSha256": "5fd37f92bb3d214b73a36786dce7ae89d9552db29efd262cc88699de01694431",
+    "binding": "chain-head"
+  },
+  "code": {
+    "repo": null,
+    "commit": null,
+    "root": null
+  },
+  "provable": true,
+  "styles": {
+    "properties": [
+      "color",
+      "background-color",
+      "background-image",
+      "border-top-color",
+      "border-right-color",
+      "border-bottom-color",
+      "border-left-color",
+      "border-top-width",
+      "border-right-width",
+      "border-bottom-width",
+      "border-left-width",
+      "border-top-style",
+      "border-right-style",
+      "border-bottom-style",
+      "border-left-style",
+      "border-top-left-radius",
+      "border-top-right-radius",
+      "border-bottom-left-radius",
+      "border-bottom-right-radius",
+      "padding-top",
+      "padding-right",
+      "padding-bottom",
+      "padding-left",
+      "margin-top",
+      "margin-right",
+      "margin-bottom",
+      "margin-left",
+      "row-gap",
+      "column-gap",
+      "font-family",
+      "font-size",
+      "font-weight",
+      "line-height",
+      "letter-spacing",
+      "text-align",
+      "text-transform",
+      "opacity",
+      "box-shadow",
+      "text-shadow",
+      "display",
+      "align-items",
+      "justify-content",
+      "flex-direction",
+      "visibility",
+      "position",
+      "box-sizing",
+      "overflow-x",
+      "overflow-y",
+      "font-style",
+      "text-decoration-line",
+      "white-space",
+      "gap",
+      "flex-grow",
+      "flex-shrink"
+    ],
+    "unavailable": []
+  },
+  "matching": {
+    "algorithm": "hungarian",
+    "maxCost": 0.48,
+    "weights": {
+      "text": 0.4,
+      "tag": 0.15,
+      "roleName": 0.15,
+      "iou": 0.25,
+      "path": 0.05
+    },
+    "containerText": "descendant-Dice",
+    "confidence": "1-cost; uncalibrated"
+  },
+  "tolerances": {
+    "pixelRatio": 0.001,
+    "boxPx": 1,
+    "colorDeltaE": 1,
+    "stylePx": 1,
+    "pixelThreshold": 0.1
+  },
+  "pixels": {
+    "diffRatio": 0.0001015625,
+    "diffPixels": 104,
+    "diffImage": "diff.png",
+    "designImage": "design.png",
+    "codeImage": "code.png"
+  },
+  "drifts": [
+    {
+      "id": "d1",
+      "designNode": "probe-padding",
+      "codeNode": "probe-padding",
+      "match": "id",
+      "confidence": 1,
+      "designBox": [
+        1000,
+        30,
+        80,
+        30
+      ],
+      "codeBox": [
+        1000,
+        30,
+        80,
+        30
+      ],
+      "kind": "text",
+      "property": "text",
+      "design": "",
+      "code": "Injected"
+    }
+  ],
+  "verdict": "drift",
+  "timingsMs": {
+    "compare": 100.22359099999994
+  },
+  "matchCounts": {
+    "id": 160,
+    "heuristic": 0
+  }
+}

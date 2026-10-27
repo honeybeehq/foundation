@@ -1,0 +1,11 @@
+id	category	rule	design	code	properties	rawFindings	summary
+def-19009fc3468668bf1bc6	geometry or layout consequence	layout:configuration	n284::n265	n284::n265	position;box-sizing;overflow-x;overflow-y;flex-grow	d7;d8;d9;d10;d11	layout configuration differs at n284::n265
+def-e1a777144bcb56b2712f	geometry or layout consequence	layout:configuration	n284::n273	n284::n273	x;y;width;height;margin-top;line-height;box-sizing	d21;d22;d23;d24;d26;d28;d29	layout configuration differs at n284::n273
+def-55c140ffc1f49e3fdf1a	geometry or layout consequence	layout:configuration	n284::n274	n284::n274	x;y;width;height;margin-top;line-height;box-sizing	d30;d31;d32;d33;d36;d38;d39	layout configuration differs at n284::n274
+def-20a00fc76f833d7c3c13	geometry or layout consequence	layout:configuration	n284::n276::n40	n284::n276::n40	x;y;width;margin-top;row-gap;line-height;box-sizing;gap;flex-shrink	d40;d41;d42;d45;d46;d49;d51;d52;d53	layout configuration differs at n284::n276::n40
+def-cb56b813059b1af509b3	inherited or text styling	token:font-weight	n284::n276::n40	n284::n276::n40	font-weight	d48	token font-weight differs at n284::n276::n40
+def-c57024cd4804fce204d8	inherited or text styling	style:text-align	n284::n276::n40	n284::n276::n40	text-align	d50	style text-align differs at n284::n276::n40
+def-2df5460f62e257dd1302	missing structure not folded	missing:subtree	n284::n266		node	d54;d55;d56;d57	missing subtree differs at n284::n266
+def-fd556e1f9bf9fdc709da	missing structure not folded	missing:subtree	n284::n272::n303		node	d58;d59;d60;d61;d62;d63;d64;d65;d66;d67;d68;d69;d70;d71;d72;d73;d74;d75;d76;d77;d78;d79;d80;d81;d82;d83;d84;d85;d86;d87;d88;d89;d90;d91;d92;d93;d94	missing subtree differs at n284::n272::n303
+def-7f8b7f1a0d74dac3b82f	missing structure not folded	missing:subtree	n284::n276::n41		node	d95	missing subtree differs at n284::n276::n41
+def-144943ebaa071be572ce	missing structure not folded	missing:subtree	n284::n276::n42		node	d96	missing subtree differs at n284::n276::n42

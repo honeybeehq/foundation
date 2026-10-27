@@ -1,0 +1,392 @@
+[
+  {
+    "case": "button-retry",
+    "reportHash": "14a711d567aec830b9f38644922d4d003ca4286b585785847036aeb732417b11",
+    "optimistic": {
+      "tp": 4,
+      "fp": 4,
+      "fn": 1,
+      "precision": 0.5,
+      "recall": 0.8,
+      "predicted": 8,
+      "labelled": 5,
+      "agreement": [
+        {
+          "defect": "def-e6705bf2a08c3b6929aa",
+          "label": "BR-05",
+          "description": "Button is 28px tall in code vs 30px in design (both author 28px; design adds the 1px borders outside it)"
+        },
+        {
+          "defect": "def-a37113b7b3c61385303a",
+          "label": "BR-03",
+          "description": "Label ink is lighter in code: #8A877F (inkMuted) vs --color-text-tertiary #6B6862"
+        },
+        {
+          "defect": "def-3dd1a1b996df5399b7dc",
+          "label": "BR-04",
+          "description": "Border is #E2E0DB (ghostBorder) in code vs --color-border-subtle #ECEAE5 in design, slightly darker"
+        },
+        {
+          "defect": "def-cd8b354fb6267cd5c97d",
+          "label": "BR-01",
+          "description": "Label renders in a serif face in the design but in Hanken Grotesk in code: the inbox board uses var(--font-sans) but never defines it; this also makes the code button 86px wide vs 76px"
+        }
+      ],
+      "falsePositives": [
+        {
+          "cause": "text:text",
+          "classification": "product",
+          "findings": [
+            "d3"
+          ],
+          "id": "def-8c8cc96a4cbacd375761",
+          "kind": "text",
+          "layer": {
+            "code": "n228::n216::n29",
+            "design": "n228::n216::n29"
+          },
+          "summary": "text text differs at n228::n216::n29"
+        },
+        {
+          "cause": "style:text-align",
+          "classification": "product",
+          "findings": [
+            "d11"
+          ],
+          "id": "def-44e6ea38b6dcf0f601b2",
+          "kind": "style",
+          "layer": {
+            "code": "n228::n216::n29",
+            "design": "n228::n216::n29"
+          },
+          "summary": "style text-align differs at n228::n216::n29"
+        },
+        {
+          "cause": "style:white-space",
+          "classification": "product",
+          "findings": [
+            "d14"
+          ],
+          "id": "def-dc05e39da5d34805ecf6",
+          "kind": "style",
+          "layer": {
+            "code": "n228::n216::n29",
+            "design": "n228::n216::n29"
+          },
+          "summary": "style white-space differs at n228::n216::n29"
+        },
+        {
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d16"
+          ],
+          "id": "def-d06cee91a09c9c090a5c",
+          "kind": "missing",
+          "layer": {
+            "design": "n228::n216::n30"
+          },
+          "summary": "missing subtree differs at n228::n216::n30"
+        }
+      ],
+      "falseNegatives": [
+        {
+          "id": "BR-02",
+          "design_layer": "0/0/0",
+          "code_layer": "0/0",
+          "kind": "style",
+          "description": "Label is 12.5px in code vs 12px in design",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[button-font-size]",
+          "properties": "font-size"
+        }
+      ]
+    },
+    "strict": {
+      "tp": 2,
+      "fp": 6,
+      "fn": 3,
+      "precision": 0.25,
+      "recall": 0.4,
+      "predicted": 8,
+      "labelled": 5,
+      "agreement": [
+        {
+          "defect": "def-e6705bf2a08c3b6929aa",
+          "label": "BR-05",
+          "description": "Button is 28px tall in code vs 30px in design (both author 28px; design adds the 1px borders outside it)"
+        },
+        {
+          "defect": "def-3dd1a1b996df5399b7dc",
+          "label": "BR-04",
+          "description": "Border is #E2E0DB (ghostBorder) in code vs --color-border-subtle #ECEAE5 in design, slightly darker"
+        }
+      ],
+      "falsePositives": [
+        {
+          "cause": "text:text",
+          "classification": "product",
+          "findings": [
+            "d3"
+          ],
+          "id": "def-8c8cc96a4cbacd375761",
+          "kind": "text",
+          "layer": {
+            "code": "n228::n216::n29",
+            "design": "n228::n216::n29"
+          },
+          "summary": "text text differs at n228::n216::n29"
+        },
+        {
+          "cause": "token:color",
+          "classification": "product",
+          "findings": [
+            "d4"
+          ],
+          "id": "def-a37113b7b3c61385303a",
+          "kind": "token",
+          "layer": {
+            "code": "n228::n216::n29",
+            "design": "n228::n216::n29"
+          },
+          "summary": "token color differs at n228::n216::n29"
+        },
+        {
+          "cause": "style:font-family",
+          "classification": "product",
+          "findings": [
+            "d9"
+          ],
+          "id": "def-cd8b354fb6267cd5c97d",
+          "kind": "style",
+          "layer": {
+            "code": "n228::n216::n29",
+            "design": "n228::n216::n29"
+          },
+          "summary": "style font-family differs at n228::n216::n29"
+        },
+        {
+          "cause": "style:text-align",
+          "classification": "product",
+          "findings": [
+            "d11"
+          ],
+          "id": "def-44e6ea38b6dcf0f601b2",
+          "kind": "style",
+          "layer": {
+            "code": "n228::n216::n29",
+            "design": "n228::n216::n29"
+          },
+          "summary": "style text-align differs at n228::n216::n29"
+        },
+        {
+          "cause": "style:white-space",
+          "classification": "product",
+          "findings": [
+            "d14"
+          ],
+          "id": "def-dc05e39da5d34805ecf6",
+          "kind": "style",
+          "layer": {
+            "code": "n228::n216::n29",
+            "design": "n228::n216::n29"
+          },
+          "summary": "style white-space differs at n228::n216::n29"
+        },
+        {
+          "cause": "missing:subtree",
+          "classification": "product",
+          "findings": [
+            "d16"
+          ],
+          "id": "def-d06cee91a09c9c090a5c",
+          "kind": "missing",
+          "layer": {
+            "design": "n228::n216::n30"
+          },
+          "summary": "missing subtree differs at n228::n216::n30"
+        }
+      ],
+      "falseNegatives": [
+        {
+          "id": "BR-01",
+          "design_layer": "0/0/0",
+          "code_layer": "0/0",
+          "kind": "token",
+          "description": "Label renders in a serif face in the design but in Hanken Grotesk in code: the inbox board uses var(--font-sans) but never defines it; this also makes the code button 86px wide vs 76px",
+          "severity": "high",
+          "likely_intentional": "no",
+          "note": "[sans-font-undefined] design-file bug (same as round-3 InboxRow)",
+          "properties": "font-family"
+        },
+        {
+          "id": "BR-02",
+          "design_layer": "0/0/0",
+          "code_layer": "0/0",
+          "kind": "style",
+          "description": "Label is 12.5px in code vs 12px in design",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[button-font-size]",
+          "properties": "font-size"
+        },
+        {
+          "id": "BR-03",
+          "design_layer": "0/0/0",
+          "code_layer": "0/0",
+          "kind": "style",
+          "description": "Label ink is lighter in code: #8A877F (inkMuted) vs --color-text-tertiary #6B6862",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[button-ink]",
+          "properties": "color"
+        }
+      ]
+    }
+  },
+  {
+    "case": "section-label",
+    "reportHash": "66df19d2c9b155a8a3fa4b66476a848a6d4ba0ffe9f6bf39379409bc43dfaaaa",
+    "optimistic": {
+      "tp": 1,
+      "fp": 1,
+      "fn": 2,
+      "precision": 0.5,
+      "recall": 0.3333333333333333,
+      "predicted": 2,
+      "labelled": 3,
+      "agreement": [
+        {
+          "defect": "def-ac127b73c6780b2ba8c2",
+          "label": "SL-04",
+          "description": "Label line box is 14px tall in code (line-height 1.45) vs 11px in design (normal), so the text sits about 1.5px lower"
+        }
+      ],
+      "falsePositives": [
+        {
+          "cause": "style:text-transform",
+          "classification": "product",
+          "findings": [
+            "d5"
+          ],
+          "id": "def-67b18a903b843019fb3b",
+          "kind": "style",
+          "layer": {
+            "code": "n125::n17",
+            "design": "n125::n17"
+          },
+          "summary": "style text-transform differs at n125::n17"
+        }
+      ],
+      "falseNegatives": [
+        {
+          "id": "SL-01",
+          "design_layer": "0/0",
+          "code_layer": "0/0",
+          "kind": "token",
+          "description": "Label is authored in the system font stack (-apple-system / Helvetica Neue) on the usage board and in Hanken Grotesk in code",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[font-family] authored stacks differ independent of the Linux substitution",
+          "properties": "font-family"
+        },
+        {
+          "id": "SL-02",
+          "design_layer": "0/0",
+          "code_layer": "0/0",
+          "kind": "style",
+          "description": "Letter spacing is 1.4px (0.14em) in code vs 1.2px (0.12em) in design, so letters are spaced slightly wider (the design label is still 4px wider overall because of the substituted font)",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[label-tracking]",
+          "properties": "letter-spacing"
+        }
+      ]
+    },
+    "strict": {
+      "tp": 1,
+      "fp": 1,
+      "fn": 2,
+      "precision": 0.5,
+      "recall": 0.3333333333333333,
+      "predicted": 2,
+      "labelled": 3,
+      "agreement": [
+        {
+          "defect": "def-ac127b73c6780b2ba8c2",
+          "label": "SL-04",
+          "description": "Label line box is 14px tall in code (line-height 1.45) vs 11px in design (normal), so the text sits about 1.5px lower"
+        }
+      ],
+      "falsePositives": [
+        {
+          "cause": "style:text-transform",
+          "classification": "product",
+          "findings": [
+            "d5"
+          ],
+          "id": "def-67b18a903b843019fb3b",
+          "kind": "style",
+          "layer": {
+            "code": "n125::n17",
+            "design": "n125::n17"
+          },
+          "summary": "style text-transform differs at n125::n17"
+        }
+      ],
+      "falseNegatives": [
+        {
+          "id": "SL-01",
+          "design_layer": "0/0",
+          "code_layer": "0/0",
+          "kind": "token",
+          "description": "Label is authored in the system font stack (-apple-system / Helvetica Neue) on the usage board and in Hanken Grotesk in code",
+          "severity": "medium",
+          "likely_intentional": "unsure",
+          "note": "[font-family] authored stacks differ independent of the Linux substitution",
+          "properties": "font-family"
+        },
+        {
+          "id": "SL-02",
+          "design_layer": "0/0",
+          "code_layer": "0/0",
+          "kind": "style",
+          "description": "Letter spacing is 1.4px (0.14em) in code vs 1.2px (0.12em) in design, so letters are spaced slightly wider (the design label is still 4px wider overall because of the substituted font)",
+          "severity": "low",
+          "likely_intentional": "unsure",
+          "note": "[label-tracking]",
+          "properties": "letter-spacing"
+        }
+      ]
+    }
+  },
+  {
+    "case": "status-dot",
+    "reportHash": "5926f71a98bcf22fcaa67041461216b11fa66770ac8bf77ef90e6cf690547b72",
+    "optimistic": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": null,
+      "recall": null,
+      "predicted": 0,
+      "labelled": 0,
+      "agreement": [],
+      "falsePositives": [],
+      "falseNegatives": []
+    },
+    "strict": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": null,
+      "recall": null,
+      "predicted": 0,
+      "labelled": 0,
+      "agreement": [],
+      "falsePositives": [],
+      "falseNegatives": []
+    }
+  }
+]

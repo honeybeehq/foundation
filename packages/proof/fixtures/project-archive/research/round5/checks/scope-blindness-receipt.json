@@ -1,0 +1,14 @@
+{
+  "labelsAndScopeCommit": "ee3d91f84f9cb65a8d1230abcbeca1511bd6a011",
+  "authorDateUTC": "2026-10-27T08:01:37Z",
+  "commitAuthor": "Tormod Haugland; Co-Authored-By Claude Opus 5.5",
+  "scopeRequestedByOrchestrator": "2026-10-27 about 07:57Z, message 26865 to P3 f764521f",
+  "labelRelease": "2026-10-27T08:01:54Z",
+  "scopeAdapterProposedBy": "B1, after reading scope flags/why text and label ids/kind fields; before new scores",
+  "scopeAdapterApprovedByOrchestrator": "2026-10-27T08:04:05Z",
+  "singleInvocationStarted": "2026-10-27T08:05:15.285Z",
+  "orchestratorBlindnessStatement": "Scope was requested before learning the frozen kind filter; P3 was instructed not to open reports, compare output or pilot CI artifacts and states it never read checker output or counts.",
+  "methodProjectFile": "research/round5-ground-truth.md v2",
+  "limitation": "Procedural blindness, not access control or independent attestation. Scope-based primary population was selected after release; original frozen-kind results and separate target verdicts are also reported. This receipt was written retrospectively.",
+  "chronologyDispute": "Freeze message26863 named kind filter before briefing26865; blind-to-filter claim unresolved. P3 states output/count blindness."
+}

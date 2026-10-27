@@ -1,0 +1,2 @@
+design_path,design_fdn_id,design_desc,code_path,code_desc,confidence,note
+0/0,n203::n1,"key cap ""⌘T"" (off-white face, 1px border, 2px bottom lip, 4px radius)",0/0,"<kbd> key cap ""⌘T""",sure,the only visual layer on either side; root 0 is the capture wrapper and is skipped

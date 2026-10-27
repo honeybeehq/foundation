@@ -1,0 +1,169 @@
+{
+  "correspondence": {
+    "tp": 1,
+    "fp": 0,
+    "fn": 9,
+    "precision": 1,
+    "recall": 0.1,
+    "abstained": 0,
+    "excludedUnsure": 1,
+    "errors": []
+  },
+  "defects": {
+    "tp": 5,
+    "fp": 1,
+    "fn": 9,
+    "precision": 0.8333333333333334,
+    "recall": 0.35714285714285715,
+    "predicted": 6,
+    "labelled": 14,
+    "agreement": [
+      {
+        "defect": "def-d527fb3d3fef2877c598",
+        "label": "E-11",
+        "description": "Pane is a white card (8px radius, shadow) in design; code main column has no surface and shows the warm app background #F5F4F1 (rail stays white)"
+      },
+      {
+        "defect": "def-1f14bcf4968ed891b7d3",
+        "label": "E-01",
+        "description": "Empty state is a single full-width pane (title bar, centred message, footer) in design; code keeps the 232px track rail and the 36px sidecar rail, so the message is centred in the middle column only"
+      },
+      {
+        "defect": "def-5839b35b3ed8b7e05f7a",
+        "label": "E-09",
+        "description": "Secondary hint \"or ask a sidecar agent to draft one — it arrives as a proposal you accept, refine, or discard\" is missing"
+      },
+      {
+        "defect": "def-3b004bb8e7f3382b8443",
+        "label": "E-10",
+        "description": "Footer (\"n define\" · \"hive track define · schema v2\") is missing"
+      },
+      {
+        "defect": "def-be2f5a39bd50d8db8e1f",
+        "label": "E-12",
+        "description": "Code adds the 36px AI sidecar rail (hex icon + ⌘⌃B) on the right"
+      }
+    ],
+    "falsePositives": [
+      {
+        "id": "def-9068b5b1cfaf9e4528ee",
+        "layer": {
+          "design": "0/0",
+          "code": "0/0"
+        },
+        "kind": "layout",
+        "cause": "layout:configuration",
+        "classification": "product",
+        "findings": [
+          "d7",
+          "d8",
+          "d9",
+          "d10",
+          "d11"
+        ],
+        "summary": "layout configuration differs at 0/0"
+      }
+    ],
+    "falseNegatives": [
+      {
+        "id": "E-02",
+        "design_layer": "0/0/0",
+        "code_layer": "0/0/0/0/0",
+        "kind": "layout",
+        "description": "Title bar \"Tracks\" (15px semibold) + \"none defined\" + more menu is replaced by the rail header \"TRACKS\" (10px spaced caps) + \"0\" + a + button",
+        "severity": "medium",
+        "likely_intentional": "yes",
+        "note": "",
+        "properties": "text;font-size;letter-spacing;color;layout"
+      },
+      {
+        "id": "E-03",
+        "design_layer": "0/0/1/0/0",
+        "code_layer": "0/0/0/1/0/0",
+        "kind": "style",
+        "description": "Illustration is a 60×40 sideways flying bee (5px pixels, honey/brown with pale wings) in design; code draws a 44×56 upright bee with antennae (4px pixels, dark body with honey stripes)",
+        "severity": "medium",
+        "likely_intentional": "unsure",
+        "note": "both are called PixelBee; the sprite grid differs",
+        "properties": "icon;size"
+      },
+      {
+        "id": "E-04",
+        "design_layer": "0/0/1/1",
+        "code_layer": "0/0/0/1/0/1",
+        "kind": "text",
+        "description": "Heading reads \"No tracks yet\" in design, \"Write down how you’d want it done.\" in code",
+        "severity": "medium",
+        "likely_intentional": "yes",
+        "note": "",
+        "properties": "text"
+      },
+      {
+        "id": "E-05",
+        "design_layer": "0/0/1/2",
+        "code_layer": "0/0/0/1/0/2",
+        "kind": "text",
+        "description": "Explanation copy differs: design \"A track is an expected sequence of steps you clip onto one agent. Attaching it injects a standing prompt…\" (4 lines, 420px); code \"A track is a short list of steps an agent follows and checks off as it works.\" (2 lines, 380px)",
+        "severity": "medium",
+        "likely_intentional": "yes",
+        "note": "",
+        "properties": "text;width"
+      },
+      {
+        "id": "E-06",
+        "design_layer": "0/0/1/2",
+        "code_layer": "0/0/0/1/0/2",
+        "kind": "token",
+        "description": "Explanation copy colour is text-muted #8A877F in design, darker #6F6B63 (chipInk) in code",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "",
+        "properties": "color"
+      },
+      {
+        "id": "E-07",
+        "design_layer": "0/0/1/3/0/0",
+        "code_layer": "0/0/0/1/0/3",
+        "kind": "text",
+        "description": "Primary button reads \"Define a track\" with shortcut \"n\" in design, \"New track\" with shortcut \"c\" in code",
+        "severity": "medium",
+        "likely_intentional": "unsure",
+        "note": "shortcut letter differs too",
+        "properties": "text"
+      },
+      {
+        "id": "E-08",
+        "design_layer": "0/0/1/3/0/0",
+        "code_layer": "0/0/0/1/0/3",
+        "kind": "style",
+        "description": "Primary button label is 12px medium white in design, 12.5px semibold cream #FFFDF8 in code; shortcut hint 9.5px at 62% white vs 10px at 80%",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "",
+        "properties": "font-size;font-weight;color;opacity"
+      },
+      {
+        "id": "E-13",
+        "design_layer": "0/0/1/1;0/0/1/2;0/0/1/3",
+        "code_layer": "0/0/0/1/0/1;0/0/0/1/0/2;0/0/0/1/0/3",
+        "kind": "layout",
+        "description": "Vertical rhythm differs: heading-to-copy gap 16px in design vs 5px in code; illustration-to-heading 20px vs 18px; block sits 39px lower in code",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "",
+        "properties": "margin"
+      },
+      {
+        "id": "E-14",
+        "design_layer": "*",
+        "code_layer": "*",
+        "kind": "token",
+        "description": "UI text is authored in the system font stack (-apple-system / Helvetica Neue, SF Mono) in design and in Hanken Grotesk / IBM Plex Mono in code",
+        "severity": "medium",
+        "likely_intentional": "yes",
+        "note": "authored stacks differ, independent of the Linux substitution",
+        "properties": "font-family"
+      }
+    ]
+  }
+}

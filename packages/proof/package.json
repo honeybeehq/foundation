@@ -1,0 +1,6 @@
+{
+  "name": "proof",
+  "private": true,
+  "type": "module",
+  "scripts": { "capture": "tsx src/capture/cli.ts" }
+}

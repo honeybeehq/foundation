@@ -1,0 +1,420 @@
+diff --git a/packages/proof/scripts/component-gallery.ts b/packages/proof/scripts/component-gallery.ts
+new file mode 100644
+index 0000000..3a2ce51
+--- /dev/null
++++ b/packages/proof/scripts/component-gallery.ts
+@@ -0,0 +1,18 @@
++import {readFile,writeFile} from 'node:fs/promises'
++const root='packages/proof/fixtures/components'
++const cases=[['keycap','default','keycap/reports'],['inbox-row','selected','inbox-row/reports/selected'],['inbox-row','failed','inbox-row/reports/failed'],['help-center','agent-run','help-center/reports']]
++const rows=[]
++for(const [component,state,folder] of cases){
++ let metrics:any
++ try{metrics=JSON.parse(await readFile(`${root}/${folder}/ids-accuracy.json`,'utf8'))}catch{}
++ const counts=JSON.parse(await readFile(`${root}/${folder}/counts.json`,'utf8'))
++ const format=(a:any)=>`<tr><td>${a.mode}</td><td>${a.defects.predicted}</td><td>${a.defects.labelled}</td><td>${a.defects.tp}</td><td>${(a.strictDefects.precision*100).toFixed(1)}% / ${(a.strictDefects.recall*100).toFixed(1)}%</td><td>${(a.defects.precision*100).toFixed(1)}% / ${(a.defects.recall*100).toFixed(1)}%</td></tr>`
++ let accuracy='Independent labels pending.'
++ if(metrics) {
++  const noIds=JSON.parse(await readFile(`${root}/${folder}/no-ids-accuracy.json`,'utf8'))
++  accuracy=`<table><tr><th>Mode</th><th>Candidates</th><th>Labels</th><th>Supported</th><th>Strict precision / recall</th><th>Corrected precision / recall</th></tr>${format(metrics)}${format(noIds)}</table>`
++ }
++ const m=metrics?.defects
++ rows.push(`<section><h2>${component} · ${state}</h2>${accuracy}<p>Counts are candidate defects, not confirmed bugs.</p><p>Design | real code | pixel difference</p><a href="${folder}/design-code-diff.png"><img src="${folder}/design-code-diff.png" alt="${component} ${state}: design, code and pixel difference"></a><p><a href="${folder}/ids.json">Report with ids</a> · <a href="${folder}/no-ids.json">Report without ids</a> · <a href="${folder}/counts.json">Counts</a>${metrics?` · <a href="${folder}/ids-accuracy.json">Accuracy and misses with ids</a> · <a href="${folder}/no-ids-accuracy.json">Accuracy without ids</a>`:''}</p></section>`)
++}
++await writeFile(`${root}/index.html`,`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Three components, four cases: design-to-code count accuracy</title><style>body{max-width:1500px;margin:32px auto;padding:0 20px;background:#f5f4f1;color:#2e2b27;font:16px/1.5 system-ui}h1{font-size:28px}section{border-top:1px solid #d6d3cb;margin-top:32px}img{display:block;width:100%;background:white;border:1px solid #dedbd3}a{color:#68501e}table{border-collapse:collapse}td,th{text-align:left;padding:6px 12px;border-bottom:1px solid #d6d3cb}p{max-width:90ch}</style><h1>How accurate was the count on each component?</h1><p>Three components and four captured cases. Frozen matching and grouping, pinned Chromium and fonts, real production exports. Each completed score uses an independent hand-labelled baseline. The scorer credits compatible layer/property evidence once per labelled difference; support is optimistic and does not prove equal rendering.</p>${rows.join('')}<p><a href="round3-components.md">Full report and reproduction</a></p>`)
+diff --git a/packages/proof/scripts/components.ts b/packages/proof/scripts/components.ts
+new file mode 100644
+index 0000000..77b1814
+--- /dev/null
++++ b/packages/proof/scripts/components.ts
+@@ -0,0 +1,26 @@
++import {readFile,writeFile,mkdir} from 'node:fs/promises'
++import {join} from 'node:path'
++import {PNG} from 'pngjs'
++import {compare,readCapture} from '../src/compare/index.ts'
++import {canonical} from '../src/compare/canonical.ts'
++const [pair,out]=process.argv.slice(2)
++if(!pair||!out) throw Error('Usage: tsx components.ts PAIR OUT')
++await mkdir(out,{recursive:true})
++const a=await readCapture(join(pair,'design')), b=await readCapture(join(pair,'code'))
++const rows=[]
++for(const ids of [true,false]) {
++ const strip=(c:typeof a)=>({...c,nodes:c.nodes.map(n=>({...n,fdnId:null}))})
++ const result=compare(ids?a:strip(a),ids?b:strip(b))
++ const name=ids?'ids':'no-ids'
++ await writeFile(join(out,`${name}.json`),canonical(result.report)+'\n')
++ if(ids) {
++  await writeFile(join(out,'diff.png'),result.diff)
++  const d=PNG.sync.read(a.screenshot), c=PNG.sync.read(b.screenshot), f=PNG.sync.read(result.diff)
++  const image=new PNG({width:d.width*3,height:d.height})
++  for(const [i,p] of [d,c,f].entries()) PNG.bitblt(p,image,0,0,p.width,p.height,i*d.width,0)
++  await writeFile(join(out,'design-code-diff.png'),PNG.sync.write(image))
++ }
++ rows.push({ids,...result.report.summary,matches:result.report.matches.length,compareMs:result.report.timingsMs.compare})
++}
++await writeFile(join(out,'counts.json'),JSON.stringify(rows,null,2)+'\n')
++console.table(rows)
+diff --git a/packages/proof/scripts/score-components.ts b/packages/proof/scripts/score-components.ts
+new file mode 100644
+index 0000000..4c61f04
+--- /dev/null
++++ b/packages/proof/scripts/score-components.ts
+@@ -0,0 +1,18 @@
++import {readFile,writeFile} from 'node:fs/promises'
++import {join} from 'node:path'
++import {readCapture} from '../src/compare/index.ts'
++import {csv,correspondenceMetrics,defectMetrics} from '../src/compare/ground-truth.ts'
++const [component,state,pair,reports]=process.argv.slice(2)
++if(!component||!state||!pair||!reports) throw Error('Usage: score-components.ts COMPONENT STATE PAIR REPORTS')
++const d=await readCapture(join(pair,'design')),c=await readCapture(join(pair,'code'))
++const labels=join('packages/proof/fixtures/ground-truth',component,state)
++const correspondence=csv(await readFile(labels+'.correspondence.csv','utf8'))
++const defects=csv(await readFile(labels+'.defects.csv','utf8'))
++for(const name of ['ids','no-ids']) {
++ const report=JSON.parse(await readFile(join(reports,name+'.json'),'utf8'))
++ const strip=(nodes:typeof d.nodes)=>nodes.map(n=>({...n,fdnId:null}))
++ const dn=name==='ids'?d.nodes:strip(d.nodes),cn=name==='ids'?c.nodes:strip(c.nodes)
++ const result={component,state,mode:name,correspondence:correspondenceMetrics(report,correspondence,dn,cn),defects:defectMetrics(report.defects,report.drifts,defects,dn,cn),strictDefects:defectMetrics(report.defects,report.drifts,defects,dn,cn,{expandShorthands:false}),compareMs:report.timingsMs.compare}
++ await writeFile(join(reports,name+'-accuracy.json'),JSON.stringify(result,null,2)+'\n')
++ console.log(component,state,name,JSON.stringify({correspondence:result.correspondence,defects:{...result.defects,agreement:undefined,falsePositives:undefined,falseNegatives:undefined}}))
++}
+diff --git a/packages/proof/scripts/score-tracks-shorthands.ts b/packages/proof/scripts/score-tracks-shorthands.ts
+new file mode 100644
+index 0000000..1f6ee3f
+--- /dev/null
++++ b/packages/proof/scripts/score-tracks-shorthands.ts
+@@ -0,0 +1,22 @@
++import {readFile,writeFile} from 'node:fs/promises'
++import {join} from 'node:path'
++import {readCapture} from '../src/compare/index.ts'
++import {csv,defectMetrics} from '../src/compare/ground-truth.ts'
++const rows=[]
++for(const state of ['track-selected','proposal-pending','empty']) {
++ const pair=join('packages/proof/fixtures/sample-captures/tracks-pane',state,'1416x720@1')
++ const d=await readCapture(join(pair,'design')),c=await readCapture(join(pair,'code'))
++ const labels=csv(await readFile(`packages/proof/fixtures/ground-truth/${state}.defects.csv`,'utf8'))
++ for(const mode of ['ids','no-ids']) {
++  const source=`packages/proof/src/compare/evidence/round2/${state}-${mode}.json`
++  const report=JSON.parse(await readFile(source,'utf8'))
++  const strip=(ns:typeof d.nodes)=>ns.map(n=>({...n,fdnId:null}))
++  const dn=mode==='ids'?d.nodes:strip(d.nodes),cn=mode==='ids'?c.nodes:strip(c.nodes)
++  const strict=defectMetrics(report.defects,report.drifts,labels,dn,cn,{expandShorthands:false})
++  const expanded=defectMetrics(report.defects,report.drifts,labels,dn,cn)
++  const compact=(m:typeof strict)=>({tp:m.tp,fp:m.fp,fn:m.fn,precision:m.precision,recall:m.recall,predicted:m.predicted,labelled:m.labelled})
++  rows.push({state,mode,source,strict:compact(strict),expanded:compact(expanded)})
++ }
++}
++await writeFile('packages/proof/fixtures/components/evidence/tracks-shorthand-scores.json',JSON.stringify(rows,null,2)+'\n')
++console.log(rows)
+diff --git a/packages/proof/scripts/verify-component-replay.ts b/packages/proof/scripts/verify-component-replay.ts
+new file mode 100644
+index 0000000..3f997a4
+--- /dev/null
++++ b/packages/proof/scripts/verify-component-replay.ts
+@@ -0,0 +1,21 @@
++import {readFile,writeFile} from 'node:fs/promises'
++import {join} from 'node:path'
++import {createHash} from 'node:crypto'
++const rows=[]
++for(const [component,state,size,replay] of [
++ ['keycap','default','160x60@1','.work/replay/keycap'],
++ ['inbox-row','selected','340x100@1','.work/replay/inbox-row'],
++ ['inbox-row','failed','340x100@1','.work/replay/inbox-row'],
++ ['help-center','agent-run','1480x830@1','.work/replay/help-final-repeat'],
++]) for(const side of ['design','code']) {
++ const relative=join(component!,state!,size!,side!)
++ const committed=join('packages/proof/fixtures/components',component!,'captures',relative)
++ const repeated=join(replay!,relative)
++ const a=await readFile(join(committed,'screenshot.png')),b=await readFile(join(repeated,'screenshot.png'))
++ const d=JSON.parse(await readFile(join(committed,'dom.json'),'utf8')),c=JSON.parse(await readFile(join(repeated,'dom.json'),'utf8'))
++ const row={component,state,side,pngEqual:a.equals(b),nodeArraysEqual:JSON.stringify(d.nodes)===JSON.stringify(c.nodes),sha256:createHash('sha256').update(a).digest('hex')}
++ rows.push(row)
++ if(!row.pngEqual||!row.nodeArraysEqual) throw Error('Replay differs: '+JSON.stringify(row))
++}
++await writeFile('packages/proof/fixtures/components/evidence/replay.json',JSON.stringify(rows,null,2)+'\n')
++console.log(`${rows.length}/${rows.length} PNGs and node arrays equal`)
+diff --git a/packages/proof/src/capture/cli.ts b/packages/proof/src/capture/cli.ts
+index c17fd67..2feb092 100644
+--- a/packages/proof/src/capture/cli.ts
++++ b/packages/proof/src/capture/cli.ts
+@@ -20,6 +20,7 @@ const repo = resolve(option('--code', '.')!)
+ const linksPath = resolve(repo, option('--links', '.foundation/links.json')!)
+ const out = resolve(option('--out', 'captures')!)
+ const designPath = resolve(option('--design', resolve(import.meta.dirname, '../../fixtures/design/tracks-pane.fdn.html'))!)
++const codeBoundary = option('--code-boundary')
+ const started = performance.now()
+ const links = JSON.parse(await readFile(linksPath, 'utf8')) as Links
+ if (links.schema !== 'fdn-links/0' || !links.artboards?.length) throw new Error('Expected fdn-links/0 with artboards')
+@@ -100,16 +101,46 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
+         } else {
+           const baked = bakeDocument(doc, { state: state.designState, includeNodeIds: true })
+           await page.setContent(baked.html)
+-          await page.evaluate(id => {
++          await page.evaluate(({id,properties,audit}) => {
+             const selected = document.querySelector(`[data-fdn-id="${id}"]`)
+             if (!selected) throw new Error(`Design node missing: ${id}`)
++            const elements = [selected, ...selected.querySelectorAll('*')]
++            const before = audit ? elements.map(el => properties.map(p => getComputedStyle(el).getPropertyValue(p))) : []
+             const root = document.createElement('div')
+             root.id = 'foundation-root'
+             root.append(selected)
+             document.body.replaceChildren(root)
+             document.body.style.margin = '0'
+-          }, state.designNode ?? board.designNode)
++            if (audit) {
++              const differences = elements.flatMap((el,i) => properties.flatMap((property,j) => { const after=getComputedStyle(el).getPropertyValue(property); return before[i]![j] === after ? [] : [{node:i,property,before:before[i]![j],after}] }))
++              ;(window as any).__foundationDesignExtraction = {nodes:elements.length,properties:properties.length,differences}
++            }
++          }, {id:state.designNode ?? board.designNode,properties:[...STYLE_PROPERTIES],audit:Boolean(codeBoundary)})
+         }
++        if (codeBoundary) await page.evaluate(({side, selector, properties}) => {
++          const root = document.querySelector('#foundation-root')!
++          const selected = side === 'code' ? root.querySelector(selector) : root.firstElementChild
++          if (!(selected instanceof HTMLElement)) throw new Error(`Missing capture boundary: ${selector}`)
++          const elements = [selected, ...selected.querySelectorAll('*')]
++          const before = elements.map(el => properties.map(p => getComputedStyle(el).getPropertyValue(p)))
++          const {width, height} = selected.getBoundingClientRect()
++          const css = getComputedStyle(selected)
++          const horizontal = css.boxSizing === 'border-box' ? 0 : ['paddingLeft','paddingRight','borderLeftWidth','borderRightWidth'].reduce((sum,key) => sum + parseFloat(css[key as keyof CSSStyleDeclaration] as string || '0'), 0)
++          const vertical = css.boxSizing === 'border-box' ? 0 : ['paddingTop','paddingBottom','borderTopWidth','borderBottomWidth'].reduce((sum,key) => sum + parseFloat(css[key as keyof CSSStyleDeclaration] as string || '0'), 0)
++          const focused = selected.contains(document.activeElement) ? document.activeElement as HTMLElement : null
++          const scrolls = [selected, ...selected.querySelectorAll('*')].map(el => ({el, x:el.scrollLeft, y:el.scrollTop}))
++          root.replaceChildren(selected)
++          Object.assign(selected.style, {position:'relative', inset:'auto', left:'0px', top:'0px', margin:'0px', width:`${width-horizontal}px`, height:`${height-vertical}px`})
++          focused?.focus({preventScroll:true})
++          for (const {el,x,y} of scrolls) { el.scrollLeft=x; el.scrollTop=y }
++          const after = selected.getBoundingClientRect()
++          if (Math.abs(after.width-width)>0.05 || Math.abs(after.height-height)>0.05) throw new Error('Capture boundary size changed during extraction')
++                  const differences = elements.flatMap((el,i) => properties.flatMap((property,j) => { const after=getComputedStyle(el).getPropertyValue(property); return before[i]![j] === after ? [] : [{node:i,property,before:before[i]![j],after}] }))
++          const allowed = new Set(['position','margin-top','margin-right','margin-bottom','margin-left'])
++          const unexpected = differences.filter(d => d.node !== 0 || !allowed.has(d.property))
++          ;(window as any).__foundationBoundaryAudit = {nodes:elements.length,properties:properties.length,differences,unexpected,scrolls:scrolls.flatMap(({el,x,y},i) => x || y ? [{node:i,x,y}] : []),designExtraction:(window as any).__foundationDesignExtraction}
++          if (unexpected.length || (window as any).__foundationDesignExtraction?.differences.length) throw new Error('Computed styles changed during boundary extraction: '+JSON.stringify(unexpected))
++        }, {side, selector:codeBoundary,properties:[...STYLE_PROPERTIES]})
+         await page.addStyleTag({ content: fontAssets.map(font => font.css).join('\n') + '\n*{animation:none!important;transition:none!important;caret-color:transparent!important} #foundation-root{width:100vw;height:100vh;overflow:hidden}' })
+         await page.evaluate(() => document.fonts.ready)
+         const fontSubstitutions = await pinFontStacks(page, links.fontPolicy)
+@@ -122,6 +153,11 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
+         await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
+         await settleRoot(page)
+         const platformFonts = await usedFonts(page, links.fontPolicy?.requireCustomFonts ?? false, fontAssets.map(font => font.postScriptName).filter((name): name is string => Boolean(name)))
++        const boundaryAudit = codeBoundary ? await page.evaluate(() => {
++          const audit = (window as any).__foundationBoundaryAudit
++          const elements = [document.querySelector('#foundation-root')!.firstElementChild!, ...document.querySelector('#foundation-root')!.firstElementChild!.querySelectorAll('*')]
++          return {...audit, finalScrolls:audit.scrolls.map((s:any) => ({...s,finalX:elements[s.node]!.scrollLeft,finalY:elements[s.node]!.scrollTop}))}
++        }) : undefined
+         const dom = await collectDom(page, '#foundation-root')
+         if (errors.length || blocked.length) throw new Error(JSON.stringify({ errors, blocked }))
+         const fonts = await page.evaluate(() => [...new Set(Array.from(document.querySelectorAll('#foundation-root *')).map(el => getComputedStyle(el).fontFamily))].sort())
+@@ -129,9 +165,9 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
+         const destination = join(folder, side)
+         await mkdir(destination, { recursive: true })
+         await page.screenshot({ path: join(destination, 'screenshot.png'), animations: 'disabled' })
+-        await captureFullExtent(page, '#foundation-root', join(destination, 'full-extent.png'))
++        const fullExtent = await captureFullExtent(page, '#foundation-root', join(destination, 'full-extent.png'))
+         await writeFile(join(destination, 'dom.json'), JSON.stringify(dom, null, 2) + '\n')
+-        const meta = { schema: 'fdn-capture/0', ...provenance, rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, extent: dom.extent, frame, url, fonts, fontPolicy: links.fontPolicy, fontSubstitutions, platformFonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
++        const meta = { schema: 'fdn-capture/0', ...provenance, rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, extent: dom.extent, fullExtent, frame, ...(codeBoundary ? {boundary:{codeSelector:codeBoundary, originNormalized:true, bothRootsNormalized:true, sizePreserved:true,audit:boundaryAudit}} : {}), url, fonts, fontPolicy: links.fontPolicy, fontSubstitutions, platformFonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
+         await writeFile(join(destination, 'meta.json'), JSON.stringify(meta, null, 2) + '\n')
+         console.log(`${board.id}/${state.name} ${side}: ${dom.nodes.length} nodes, ${meta.timingsMs.capture} ms`)
+       } finally { await context.close() }
+diff --git a/packages/proof/src/compare/ground-truth.test.ts b/packages/proof/src/compare/ground-truth.test.ts
+new file mode 100644
+index 0000000..7254f1b
+--- /dev/null
++++ b/packages/proof/src/compare/ground-truth.test.ts
+@@ -0,0 +1,22 @@
++import {expect,it} from 'vitest'
++import {defectMetrics} from './ground-truth.ts'
++import type {Defect,Drift} from './types.ts'
++it.each([
++ ['border-color','border-top-color'],['border-width','border-left-width'],
++ ['border-style','border-bottom-style'],['padding','padding-right'],
++ ['margin','margin-top'],['inset','left'],['gap','column-gap'],
++ ['border-radius','border-top-right-radius'],['font','font-family'],
++])('credits %s labels for %s evidence', (label,property)=>{
++ const drift={id:'d1',kind:'style',property,designNode:'0/0',codeNode:'0/0'} as Drift
++ const defect:Defect={id:'candidate',kind:'style',cause:'style',classification:'product',layer:{design:'0/0',code:'0/0'},findings:['d1'],summary:'difference'}
++ const labels=[{id:'truth',kind:'style',design_layer:'0/0',code_layer:'0/0',properties:label}]
++ const result=defectMetrics([defect],[drift],labels,[],[])
++ expect(result.tp).toBe(1)
++ expect(result.fp).toBe(0)
++ expect(result.fn).toBe(0)
++})
++it('does not credit unrelated properties on a labelled layer',()=>{
++ const drift={id:'d1',kind:'style',property:'color',designNode:'0/0'} as Drift
++ const defect:Defect={id:'candidate',kind:'style',cause:'style',classification:'product',layer:{design:'0/0'},findings:['d1'],summary:'difference'}
++ expect(defectMetrics([defect],[drift],[{id:'truth',kind:'style',design_layer:'0/0',properties:'border-color'}],[],[]).tp).toBe(0)
++})
+diff --git a/packages/proof/src/compare/ground-truth.ts b/packages/proof/src/compare/ground-truth.ts
+index e91a65b..527d7af 100644
+--- a/packages/proof/src/compare/ground-truth.ts
++++ b/packages/proof/src/compare/ground-truth.ts
+@@ -134,6 +134,19 @@ function inScope(actual: string | undefined, scope: string | undefined) {
+     return a.length >= p.length && p.every((s, i) => s === "*" || s === a[i]);
+   });
+ }
++const sides = ['top', 'right', 'bottom', 'left'];
++const shorthandProperties: Record<string, string[]> = {
++  ...Object.fromEntries(['color', 'width', 'style'].map(p => [`border-${p}`, sides.map(side => `border-${side}-${p}`)])),
++  padding: sides.map(side => `padding-${side}`),
++  margin: sides.map(side => `margin-${side}`),
++  inset: sides,
++  gap: ['row-gap', 'column-gap'],
++  'border-radius': ['top-left', 'top-right', 'bottom-right', 'bottom-left'].map(corner => `border-${corner}-radius`),
++  font: ['font-family', 'font-size', 'font-style', 'font-weight', 'font-stretch', 'font-variant', 'line-height'],
++};
++export function expandLabelProperties(properties: string[]): string[] {
++  return [...new Set(properties.flatMap(property => [property, ...(shorthandProperties[property] ?? [])]))];
++}
+ /** One-to-one assignment prevents many checker rows claiming one labelled cause. */
+ export function defectMetrics(
+   defects: Defect[],
+@@ -141,6 +154,7 @@ export function defectMetrics(
+   labels: Record<string, string>[],
+   design: CaptureNode[],
+   code: CaptureNode[],
++  options: { expandShorthands?: boolean } = {},
+ ) {
+   const truth = labels.filter((l) => l.kind !== "environment");
+   const predicted = defects.filter((d) => d.classification === "product");
+@@ -150,7 +164,8 @@ export function defectMetrics(
+   const candidates = predicted.map((d) =>
+     truth
+       .map((l, i) => {
+-        const properties = l.properties?.split(";") ?? [];
++        const original = l.properties?.split(";").map(p => p.trim()) ?? [];
++        const properties = options.expandShorthands === false ? original : expandLabelProperties(original);
+         const support = d.findings
+           .map((id) => raw.get(id)!)
+           .filter(Boolean)
+diff --git a/research/round3-components.md b/research/round3-components.md
+new file mode 100644
+index 0000000..b674951
+--- /dev/null
++++ b/research/round3-components.md
+@@ -0,0 +1,124 @@
++# How accurate was the count on each component?
++
++**Keycap finds all three labelled differences after a scoring correction but adds one false candidate. InboxRow and HelpCenter substantially over-count: HelpCenter reports 124 candidates against 21 hand-labelled causes, with only 13 supported.** These are candidate differences against the design, not confirmed implementation bugs. Real production exports were rendered, with independent hand labels made blind to reports. No matcher or grouping rule was tuned to these components.
++
++## Count accuracy
++
++One compatible raw drift is enough to support a multi-finding group. Scope matching is prefix-based: a label on 0/0 covers every descendant in that row. Either design OR code scope can earn credit; `layout` accepts any layout-kind drift. A second true candidate for the same labelled cause counts as false under one-to-one assignment. “Supported” means maximum one-to-one assignment of candidates to hand-labelled causes with compatible raw properties and a matching design **or** code path scope. This is optimistic evidence support, not a second visual adjudication of each candidate. Uncertain groups are excluded from product precision; their missing labelled causes still count against recall. Environment labels are excluded.
++
++| Component · state | Mode | Candidates | Hand labels | Supported | False candidates | Misses | Precision | Recall |
++|---|---|---:|---:|---:|---:|---:|---:|---:|
++| Keycap · default | ids | 4 | 3 | 3 | 1 | 0 | 75.0% | 100.0% |
++| Keycap · default | no-ids | 4 | 3 | 3 | 1 | 0 | 75.0% | 100.0% |
++| InboxRow · selected | ids | 16 | 7 | 5 | 11 | 2 | 31.2% | 71.4% |
++| InboxRow · selected | no-ids | 16 | 7 | 5 | 11 | 2 | 31.2% | 71.4% |
++| InboxRow · failed | ids | 17 | 6 | 4 | 13 | 2 | 23.5% | 66.7% |
++| InboxRow · failed | no-ids | 18 | 6 | 4 | 14 | 2 | 22.2% | 66.7% |
++| HelpCenter · agent-run | ids | 124 | 21 | 13 | 111 | 8 | 10.5% | 61.9% |
++| HelpCenter · agent-run | no-ids | 119 | 21 | 12 | 107 | 9 | 10.1% | 57.1% |
++
++Keycap has only three labelled differences, so its percentages have little statistical weight. InboxRow's two states share markup and do not count as independent components. HelpCenter has one fixture: agent-run context, initial shortcuts topic, no query.
++
++## Layer correspondence
++
++Only sure hand labels are scored. An abstention is a recall miss; precision excludes abstentions. “None” labels penalize a spurious pair. Correct correspondence does not imply correct independent-cause grouping.
++
++| Component · state | Mode | Correct | Wrong | Missed | Precision | Recall | Unsure excluded |
++|---|---|---:|---:|---:|---:|---:|---:|
++| Keycap · default | ids | 1 | 0 | 0 | 100.0% | 100.0% | 0 |
++| Keycap · default | no-ids | 1 | 0 | 0 | 100.0% | 100.0% | 0 |
++| InboxRow · selected | ids | 6 | 0 | 1 | 100.0% | 85.7% | 0 |
++| InboxRow · selected | no-ids | 5 | 1 | 2 | 83.3% | 71.4% | 0 |
++| InboxRow · failed | ids | 8 | 0 | 1 | 100.0% | 88.9% | 0 |
++| InboxRow · failed | no-ids | 7 | 1 | 2 | 87.5% | 77.8% | 0 |
++| HelpCenter · agent-run | ids | 17 | 0 | 35 | 100.0% | 32.7% | 77 |
++| HelpCenter · agent-run | no-ids | 16 | 0 | 36 | 100.0% | 30.8% | 77 |
++
++Without ids, the InboxRow outer design row pairs with the capture wrapper instead of the real button (0 instead of 0/0). Three cheap fixture anchors per row improve correspondence partly by construction: they manually declare the known mapping. They do not repair the defect count; no-ids results are shown alongside.
++
++## Scoring correction, kept separate from matching
++
++The original frozen scorer required literal property equality: a `border-color` hand label did not credit `border-top-color` evidence. After the Keycap labels were seen, the orchestrator explicitly authorized a generic scorer correction, expanding border color/width/style, padding, margin, inset, gap, border-radius and font into their longhands. The matcher, tolerances, report candidates and grouping are unchanged. Original and corrected metrics are both saved in each `*-accuracy.json` as `strictDefects` and `defects`.
++
++| Component · state | Mode | Supported before → after | Precision before → after | Recall before → after |
++|---|---|---:|---:|---:|
++| Keycap · default | ids | 2 → 3 | 50.0% → 75.0% | 66.7% → 100.0% |
++| Keycap · default | no-ids | 2 → 3 | 50.0% → 75.0% | 66.7% → 100.0% |
++| InboxRow · selected | ids | 5 → 5 | 31.2% → 31.2% | 71.4% → 71.4% |
++| InboxRow · selected | no-ids | 5 → 5 | 31.2% → 31.2% | 71.4% → 71.4% |
++| InboxRow · failed | ids | 4 → 4 | 23.5% → 23.5% | 66.7% → 66.7% |
++| InboxRow · failed | no-ids | 4 → 4 | 22.2% → 22.2% | 66.7% → 66.7% |
++| HelpCenter · agent-run | ids | 11 → 13 | 8.9% → 10.5% | 52.4% → 61.9% |
++| HelpCenter · agent-run | no-ids | 10 → 12 | 8.4% → 10.1% | 47.6% → 57.1% |
++
++Nine shorthand regressions failed before the fix; all ten cases pass after it, including a negative control. The same scorer was applied to all six frozen Tracks R2 reports. Only anchored empty changes: 10→11 supported out of 20, precision 50→55%, recall 71.4→78.6%. Anchored selected stays 10/24, proposal 11/24. Unanchored selected/proposal/empty stay 6/11, 6/11, 5/6. This replay uses saved R2 reports, not a claim that unanchored legacy captures equal current anchored captures. Full strict/corrected results: `evidence/tracks-shorthand-scores.json`.
++
++## Runtime and uncertain groups
++
++One measured run on netcup-2; milliseconds. Capture columns are per-side work after Vite startup, including diagnostic full-extent capture. Compare excludes Vite/browser startup. The full cold CLI took about 4.2 seconds for Keycap, 8.6 seconds for both Inbox states, 16.3 seconds for HelpCenter. These are observed runs, not budgets or statistical benchmarks.
++
++| Component · state | Design capture ms | Code capture ms | Compare ms ids / no-ids | Uncertain groups ids / no-ids |
++|---|---:|---:|---:|---:|
++| Keycap · default | 1046 | 1466 | 17.3 / 11.7 | 0 / 0 |
++| InboxRow · selected | 999 | 3540 | 32.2 / 16.0 | 1 / 2 |
++| InboxRow · failed | 745 | 1170 | 40.0 / 14.1 | 1 / 2 |
++| HelpCenter · agent-run | 2178 | 12059 | 848.6 / 885.6 | 31 / 39 |
++
++## What was missed and what was over-counted
++
++- **Keycap:** all three hand causes—height/box sizing, ink and border colour—have support after correction. The fourth candidate is authored font-family syntax despite identical pinned rendered mono faces. The initial score's missed border was a scorer vocabulary bug, not failed detection.
++- **InboxRow selected:** the model-logo replacement and lower glyph alignment have no supported candidate. The checker produces many layout/configuration and authored font-stack groups without independent labelled causes. With ids, 11 of 16 candidates remain unsupported.
++- **InboxRow failed:** the changed recovery note and lower glyph alignment are missed by one-to-one support. Thirteen of 17 anchored candidates are unsupported. These include repeated layout/configuration groups and authored mono-font syntax. The note can leave structural missing/extra evidence without satisfying a text cause; this is a grouping/evidence limitation, not proof that the code lacks the new note.
++
++- **HelpCenter:** anchored support is 13/124 (10.5% precision, 61.9% recall); without ids it is 12/119 (10.1%, 57.1%). Misses include truncated command names, changed section header, changed topic copy, shortcut totals, anchor catalogue and focused-search border. Repeated layout and font-stack groups, plus 37 clipped-catalogue subtrees, inflate the candidate count. The hand baseline groups many changed catalogue rows into one cause, while the checker reports many local consequences. Label H-02 is explicitly partly fixture-derived because the fixture lacks production availability and plugin commands. Thus even the 21 product-labelled causes are not a pure production-app bug list. Of correspondence labels, 77 are unsure and excluded: sure-pair recall 32.7% with ids and 30.8% without is the useful warning beside 100% certain-pair precision.
++
++See each accuracy JSON for exact candidate ids, assignments, false candidates and missed labels. The hand list includes likely intentional evolution; it is not a bug oracle.
++
++## Harness effort and mocks
++
++Apiary branch **`proto/design-to-code-components`**, final SHA **`4ece46a89966d9b4d3dedc585541ac2ca3d23e1c`**, from `ab8ab87d15f90af37caa6f28cb2a0253603e1d1f`. Production JSX/CSS changed **0 lines**. The fixture harness applies optional ids to real DOM after mount, reusing production rendering. Counts below are incremental source/fixture/config lines before the final shared manifest cleanup; JSON manifest/font-policy duplication is included, binary font assets reused unchanged.
++
++| Component | Ladder rung | Added / removed | What is supplied or mocked |
++|---|---:|---:|---|
++| Keycap | 1 | 175 / 0 | children ⌘T; top alignment; 1 id; no service/provider/IO mock |
++| InboxRow | 1 | 211 / 0 | selected completed and failed props; fixed age, name, message, priority/session records; entering=false; no-op ref/select/open callbacks; 3 ids per row; real model and activity helpers |
++| HelpCenter | 2 | 671 / 0 | state import seam; real CommandRegistry with 59 source-derived defaults/no-op actions; real fresh WorkspaceStore settings and useRootVersion hook; context hive.agent-run; no-op close; 1 card id; real Popover/atlas/keybinding helpers |
++
++The final shared manifest cleanup adds21/removes61 lines: primary `.foundation/links.json` keeps its valid Tracks artboard and indexes `componentManifests`; each executable per-board manifest binds its own design head. This is an unversioned inert index added under fdn-links/0, not an implemented schema feature. CI, policy and doctor do not discover these cases. Existing tools ignore the inventory metadata; use the explicit `--links` argument. Automatic multi-manifest discovery is not implemented. The final Apiary diff is `evidence/apiary.patch`.
++
++HelpCenter does not reproduce production availability predicates or plugin contributions. The static extraction leaves two unresolved registrations (plugin forwarding and FocusTabAt indexed key); source locations and extraction result are committed. It is a finite registry fixture, not a complete shell command registry. No blanket undefined bridge is used; unexpected native accesses throw. Default-deny browser routes allow only local assets; committed capture metadata has no blocked requests or page errors.
++
++## Capture bugs and boundary
++
++Keycap uses design n203::n1 in row-grammar; InboxRow uses n249#1::n249::n17 and n249#0::n249::n17 in narrow-queue. HelpCenter uses n45 in dialog-agent-run. It is explicitly **card-only**: surrounding fake app chrome and the real Popover scrim are excluded. Its source auto-scroll to Agent run is preserved.
++
++Both design and code roots are rewritten for boundary origins. A generic capture issue required an opt-in `--code-boundary` option: absolute design roots kept their original board offset when extracted. Moving a live card also reset its scroll, and initially assigning measured border-box width to a content-box root double-added borders. These were reported separately and corrected in capture code only: origins are normalized; focus is restored; existing box-sizing, measured dimensions and nested scroll offsets are preserved; an invariant rejects changed dimensions. Earlier HelpCenter capture commits are historical/superseded, not the final labelling target. The audited final receipt is `evidence/boundary-audit.json`: 281 design and 1801 code elements  × 54 properties, zero unexpected computed-style changes (only declared root position/margins); design extraction from its original ancestors changes zero properties. The code body scrollTop remains 2655 before extraction and after fonts/settling. This proves sampled style/scroll preservation, not arbitrary React reparenting safety. No design file or matcher was changed.
++
++Pinned Chromium **151.0.7922.34**, Linux, DPR1, fixed Date/seed/UTC/en-US/light theme, frozen motion and bundled hashed font faces are shared. This deterministic Linux rendering does not establish Mac font fidelity or shipped Electron styling. Full-extent PNGs are diagnostic paint with overflow revealed and may reflow; normal screenshots/DOM are authoritative.
++
++Fresh replay reproduced all eight design/code PNGs byte-for-byte and their node arrays exactly across all four cases, including corrected HelpCenter (`evidence/replay.json`); the earlier O1 refresh changed extent/provenance metadata. Small-case captures bind Apiary 5850046fe; final branch 4ece46a89 adds only the extraction helper/results and inert manifest index. Render fixtures/harness are byte-identical between them. Their pre-rebase rendererCommit 44174b7 is not a reachable Project ref, but the 54-file rendererSources hash binds their exact implementation; final Help capture binds 4b192f7 and Apiary 4ece46a89. After the Keycap/Inbox labels existed, O1 reviewed changes added one raw offscreen evidence row per Inbox state: anchored selected42→43 and failed44→45; no-ids51→52 and52→53. Candidate totals16/17(18no-idsfailed) are unchanged. The pre-label reports remain in commits48009b4/7e6f966. Current reports are post-label replays, not the original frozen raw output. O1 is included without component-specific exclusions. Its off-screen candidates are included in product totals; unsupported clipped extra catalog rows are not silently ignored. Inbox overflow (54px content in49px frame) is detected but is counted as an unsupported candidate because one-to-one support already assigns the broader height and line-height cause to another group. Many layout false candidates are duplicated consequences of that single cause, not imaginary independent defects.
++
++## Reproduce
++
++Install both frozen lockfiles and Foundation's pinned Playwright Chromium. Clone the Apiary prototype branch above under any scratch directory. From Foundation:
++
++```sh
++pnpm exec tsx packages/proof/src/capture/cli.ts --code /path/to/apiary --links .foundation/links-keycap.json --design boards/system-help-center.fdn.html --out /tmp/keycap
++pnpm exec tsx packages/proof/src/capture/cli.ts --code /path/to/apiary --links .foundation/links-inbox-row.json --design boards/inbox-unified.fdn.html --out /tmp/inbox-row
++pnpm exec tsx packages/proof/src/capture/cli.ts --code /path/to/apiary --links .foundation/links-help-center.json --design boards/system-help-center.fdn.html --code-boundary '[data-help-center]' --out /tmp/help-center
++pnpm exec tsx packages/proof/scripts/components.ts PAIR_DIRECTORY REPORT_DIRECTORY
++pnpm exec tsx packages/proof/scripts/score-components.ts COMPONENT STATE PAIR_DIRECTORY REPORT_DIRECTORY
++pnpm exec tsx packages/proof/scripts/score-tracks-shorthands.ts
++```
++
++The first script writes candidate reports/diff without loading labels; the second reads only committed reports and labels. Every pair directory contains design/code PNG, DOM and metadata. Each reports directory has `design-code-diff.png` in design | code | diff order. The standalone gallery is `index.html`.
++
++Verification: 53 comparison/acceptance tests pass; Foundation typecheck passes; Apiary TS7 harness check passes through `node scripts/tsc7.cjs --noEmit -p .foundation/tsconfig.json`. Electron was not launched. No repository verification skill is installed in Foundation; Apiary core-work and verify-apiary were read, but no Electron integration claim is made.
++
++The labeller session is f764521f-44e4-4b1d-9137-7d9c15700459, instructed to see capture directories only and no reports/counts. Capture commits preceded each received label. L1 explicitly confirmed it never opened reports/, drift-report.json, captures/index.html, candidate counts or code-repo links manifests; it used only capture PNG/DOM/meta, the design and Apiary source. Final Help labels are cae0e28ab9dde59564d2f6b9aec52dc6f8f3a517, checked against 50b24cf.
++
++Studio Apiary collection failed (Landing Project T49). The orchestrator explicitly authorized the new Foundation prototype branch `proto/dtc-r3-components`; it contains the committed captures/report and will be collected onto the Project branch when service recovers. No force push or main push was made. The labeller branch diverged from the current source, so only its final ground-truth/help-center files were imported; the divergent old captures were not merged. Partial Project inputs/help-* base64 copies were an unused evidence-only fallback before the branch workaround, not authoritative captures.
++
++Preview publication attempted with Nectar on netcup-2; failed `E_QUOTA`: serving web environment quota 12 reached. No live URL is claimed; the standalone gallery and primary screenshots remain committed.
++
++Cross-family decision-trail review: pending claude-opus-5-5, session07ea5440-d019-4977-87b5-1a2577907658.

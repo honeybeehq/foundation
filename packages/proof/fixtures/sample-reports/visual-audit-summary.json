@@ -1,0 +1,38 @@
+[
+  {
+    "state": "at-rest",
+    "reportHash": "7f81f7f19b5d72e4504670b1b0ab9fbcc8dadf88b4096ea6772fe8d576873082",
+    "rawFindings": 250,
+    "correspondenceGroups": 182,
+    "knownFalseCorrespondences": 0,
+    "knownFalsePropertyFindings": 0,
+    "qualification": "All findings diagnostic; state unavailable"
+  },
+  {
+    "state": "track-selected",
+    "reportHash": "bb7bc9870e9246968d5a71d37526c69e54ac434e8cc6e0e2d4ca61008c158f13",
+    "rawFindings": 513,
+    "correspondenceGroups": 327,
+    "knownFalseCorrespondences": 3,
+    "knownFalsePropertyFindings": 17,
+    "qualification": "Known false findings are a lower bound. Structural findings and repeated inherited properties are not independent defects."
+  },
+  {
+    "state": "proposal-pending",
+    "reportHash": "eb31936f853f89c7805e127ec24b30c7d4bb5a72473bb34a0a04fb3368962b7b",
+    "rawFindings": 581,
+    "correspondenceGroups": 355,
+    "knownFalseCorrespondences": 3,
+    "knownFalsePropertyFindings": 17,
+    "qualification": "Known false findings are a lower bound. Structural findings and repeated inherited properties are not independent defects."
+  },
+  {
+    "state": "empty",
+    "reportHash": "d1425507cb03877bf8b42c10ca7b0d486c7cb1bd3c6e4dafb7bb64d320d80d88",
+    "rawFindings": 83,
+    "correspondenceGroups": 69,
+    "knownFalseCorrespondences": 1,
+    "knownFalsePropertyFindings": 5,
+    "qualification": "Known false findings are a lower bound. Structural findings and repeated inherited properties are not independent defects."
+  }
+]

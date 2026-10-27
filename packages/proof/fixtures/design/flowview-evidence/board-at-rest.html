@@ -1,0 +1,894 @@
+<!-- baked by foundation-engine — derived artifact, do not edit -->
+<style>
+:root {
+  --art-bee-body: #D2982F;
+  --art-bee-dark: #6E4F1C;
+  --art-honey: #CFA04A;
+  --art-ink-deep: #3E3529;
+  --art-pale: #E8E2D2;
+  --art-wing: #DCD6C8;
+  --color-accent: #B8842E;
+  --color-bg: #F5F4F1;
+  --color-border: #E7E5E0;
+  --color-border-faint: #F0EDE7;
+  --color-border-input: #E2E0DB;
+  --color-canvas-dot: rgba(46,43,39,.16);
+  --color-chip-bg: #EFEEEA;
+  --color-chip-ink: #6F6B63;
+  --color-divider: #ECEAE5;
+  --color-hover: #F6F5F2;
+  --color-icon-muted: #6B645B;
+  --color-label-track: #9A968D;
+  --color-meta-faint: #C5BEB3;
+  --color-mono-meta: #A7A096;
+  --color-on-honey: #FFFDF8;
+  --color-proposal-wash: rgba(139,123,184,.05);
+  --color-rail-selection: #DCE8F8;
+  --color-segment-on: #FAFAF8;
+  --color-selected-bg: #EEEDE9;
+  --color-status-blocked: #B0512E;
+  --color-status-done: #9B978F;
+  --color-status-merged: #8B7BB8;
+  --color-status-review: #BD6B3C;
+  --color-status-running: #2F8738;
+  --color-status-waiting: #D4A72C;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #FAFAF8;
+  --color-surface-sunken: #F7F6F3;
+  --color-tab-active: #FAFAF8;
+  --color-text-disabled: #B5B1A9;
+  --color-text-faint: #A8A59E;
+  --color-text-ghost: #C4BFB6;
+  --color-text-muted: #8A877F;
+  --color-text-primary: #2E2B27;
+  --color-text-secondary: #4A463F;
+  --color-text-tertiary: #6B6862;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --font-sans: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-size-2xs: 9.5px;
+  --font-size-base: 12px;
+  --font-size-lg: 14.5px;
+  --font-size-md: 13px;
+  --font-size-meta: 10px;
+  --font-size-row: 12.5px;
+  --font-size-sm: 11px;
+  --font-size-title: 14px;
+  --font-size-xl: 15px;
+  --font-size-xs: 10.5px;
+  --font-weight-medium: 500;
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --line-height-ui: 1.45;
+  --radius-lg: 8px;
+  --radius-md: 6px;
+  --radius-sm: 4px;
+  --radius-xl: 12px;
+  --shadow-card: 0 1px 2px rgba(40,35,30,.07);
+  --shadow-card-current: 0 6px 18px rgba(40,35,30,.1);
+  --shadow-dock: 0 4px 12px rgba(0,0,0,.08);
+  --shadow-pane: 0 2px 8px rgba(0,0,0,.06);
+  --shadow-segment: 0 1px 2px rgba(40,35,30,.08);
+}
+</style>
+<title>Apiary — Tracks pane · Flow View</title>
+<div data-fdn-style="page" style="background:var(--color-bg);display:flex;flex-direction:column;margin-bottom:-8px;margin-left:-8px;margin-right:-8px;margin-top:-8px;padding-bottom:48px;padding-left:32px;padding-right:32px;padding-top:40px;row-gap:46px">
+  <header style="display:flex;flex-direction:column;row-gap:8px">
+    <h1 style="color:var(--color-text-primary);font-family:var(--font-sans);font-size:19px;font-weight:var(--font-weight-semibold);margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">Apiary — Tracks pane · Flow View</h1>
+    <div style="color:var(--color-text-muted);font-family:var(--font-sans);font-size:13px;line-height:1.55;max-width:760px">A track is an expected sequence of steps clipped onto one agent. The pane is a rail of definitions on the left and the selected definition drawn as a flow on a canvas — live while an agent is attached, and as a diff while a sidecar proposal is pending.</div>
+    <div data-fdn-style="meta-mono" style="font-family:var(--font-mono);font-size:var(--font-size-xs);font-weight:var(--font-weight-regular);color:var(--color-text-disabled)">Flow View · brought up to date with Classic TracksPane (apiary proto/design-to-code-tracks) · supersedes the list-based spine layout</div>
+  </header>
+  <section style="display:flex;flex-direction:column">
+    <fdn-use component="BoardCaption" data-fdn-prop-body="There is no unselected pane: opening Tracks selects the first definition and draws it. The rail lists definitions — name, step count and type mix — and a green dot marks the one with a live attachment. Selection is the soft rail blue, never honey." data-fdn-prop-index="BOARD 1" data-fdn-prop-title="TRACKS AT REST" style="display:contents">
+      <div style="display:flex;flex-direction:column;margin-bottom:14px;row-gap:6px">
+        <div style="align-items:baseline;column-gap:10px;display:flex">
+          <span style="color:var(--color-text-disabled);font-family:var(--font-mono);font-size:var(--font-size-xs);font-weight:var(--font-weight-medium);letter-spacing:.08em">BOARD 1</span>
+          <span data-fdn-style="section-label" style="font-family:var(--font-sans);font-size:10px;font-weight:var(--font-weight-semibold);letter-spacing:.12em;color:var(--color-text-tertiary)">TRACKS AT REST</span>
+        </div>
+        <div style="color:var(--color-text-muted);font-family:var(--font-sans);font-size:12.5px;line-height:1.5;max-width:660px">There is no unselected pane: opening Tracks selects the first definition and draws it. The rail lists definitions — name, step count and type mix — and a green dot marks the one with a live attachment. Selection is the soft rail blue, never honey.</div>
+      </div>
+    </fdn-use>
+    <div style="display:flex;flex-direction:column;row-gap:22px">
+      <fdn-use component="TracksPane" data-fdn-prop-mode="rest" style="display:contents">
+        <div data-fdn-style="flow-pane" style="box-sizing:border-box;color:var(--color-text-primary);display:flex;flex-direction:column;flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);line-height:var(--line-height-ui);position:relative;text-align:start;height:525.5px;width:1416px">
+          <div data-fdn-style="fill-row" style="box-sizing:border-box;display:flex;flex:1;min-height:0">
+            <aside data-fdn-style="rail" style="background:var(--color-surface);border-right:1px solid var(--color-divider);box-sizing:border-box;display:flex;flex:none;flex-direction:column;width:232px">
+              <div data-fdn-style="rail-header" style="align-items:center;border-bottom:1px solid var(--color-divider);box-sizing:border-box;column-gap:8px;display:flex;flex:none;height:40px;padding-bottom:0;padding-left:14px;padding-right:10px;padding-top:0;row-gap:8px">
+                <span data-fdn-style="rail-label" style="color:var(--color-label-track);font-family:var(--font-sans);font-size:var(--font-size-meta);font-weight:var(--font-weight-semibold);letter-spacing:.14em;box-sizing:border-box">TRACKS</span>
+                <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box">7</span>
+                <button data-fdn-style="icon-btn" style-hover="background:var(--color-hover)" style="align-items:center;border-bottom-left-radius:5px;border-bottom-right-radius:5px;border-top-left-radius:5px;border-top-right-radius:5px;display:flex;height:24px;justify-content:center;margin-left:auto;width:24px;background-color:transparent;border-width:0;box-sizing:border-box;color:var(--color-icon-muted);cursor:pointer;font-family:inherit;font-size:inherit;line-height:inherit;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0">
+                  <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-icon-muted)" data-fdn-prop-name="plus" data-fdn-prop-size="12" style="display:contents">
+                    <svg fill="none" height="12" viewBox="0 0 16 16" width="12" style="box-sizing:border-box;color:var(--color-icon-muted)">
+                      <path d="M8 3.4v9.2M3.4 8h9.2" stroke="currentColor" stroke-linecap="round" stroke-width="1.4"></path>
+                    </svg>
+                  </fdn-use>
+                </button>
+              </div>
+              <div data-fdn-style="rail-list" style="box-sizing:border-box;flex:1;min-height:0;overflow:hidden;padding-bottom:8px;padding-left:6px;padding-right:6px;padding-top:8px">
+                <fdn-use component="RailRow" data-fdn-prop-attached="yes" data-fdn-prop-meta="7 steps · action ×3 · orchestrate · review · deploy · ask" data-fdn-prop-name="review-and-ship" data-fdn-prop-selected="yes" style="display:contents">
+                  <button data-fdn-style="rail-row" style-hover="background:var(--color-hover)" style="align-items:center;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;column-gap:9px;cursor:pointer;display:flex;padding-bottom:7px;padding-left:8px;padding-right:8px;padding-top:7px;row-gap:9px;text-align:left;width:100%;background-color:var(--color-rail-selection);border-width:0;color:inherit;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
+                    <span style="box-sizing:border-box;display:block;flex-shrink:0;height:14px;width:14px">
+                      <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-chip-ink)" data-fdn-prop-name="track" data-fdn-prop-size="14" style="display:contents">
+                        <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-chip-ink)">
+                          <g>
+                            <circle cx="8" cy="3.1" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <circle cx="8" cy="8" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <circle cx="8" cy="12.9" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <path d="M8 4.7v1.7M8 9.6v1.7" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+                          </g>
+                        </svg>
+                      </fdn-use>
+                    </span>
+                    <span style="box-sizing:border-box;display:block;flex-grow:1;min-width:0">
+                      <span style="box-sizing:border-box;color:var(--color-text-primary);display:block;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">review-and-ship</span>
+                      <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box;display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">7 steps · action ×3 · orchestrate · review · deploy · ask</span>
+                    </span>
+                    <fdn-use component="StatusDot" data-fdn-prop-size="7px" data-fdn-prop-state="running" style="display:contents">
+                      <span style="background:var(--color-status-running);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex-shrink:0;height:7px;width:7px"></span>
+                    </fdn-use>
+                  </button>
+                </fdn-use>
+                <fdn-use component="RailRow" data-fdn-prop-attached="no" data-fdn-prop-meta="5 steps · action ×3 · orchestrate · review" data-fdn-prop-name="pr-triage" data-fdn-prop-selected="no" style="display:contents">
+                  <button data-fdn-style="rail-row" style-hover="background:var(--color-hover)" style="align-items:center;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;column-gap:9px;cursor:pointer;display:flex;padding-bottom:7px;padding-left:8px;padding-right:8px;padding-top:7px;row-gap:9px;text-align:left;width:100%;background-color:transparent;border-width:0;color:inherit;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
+                    <span style="box-sizing:border-box;display:block;flex-shrink:0;height:14px;width:14px">
+                      <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-chip-ink)" data-fdn-prop-name="track" data-fdn-prop-size="14" style="display:contents">
+                        <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-chip-ink)">
+                          <g>
+                            <circle cx="8" cy="3.1" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <circle cx="8" cy="8" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <circle cx="8" cy="12.9" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <path d="M8 4.7v1.7M8 9.6v1.7" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+                          </g>
+                        </svg>
+                      </fdn-use>
+                    </span>
+                    <span style="box-sizing:border-box;display:block;flex-grow:1;min-width:0">
+                      <span style="box-sizing:border-box;color:var(--color-text-primary);display:block;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">pr-triage</span>
+                      <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box;display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">5 steps · action ×3 · orchestrate · review</span>
+                    </span>
+                  </button>
+                </fdn-use>
+                <fdn-use component="RailRow" data-fdn-prop-attached="no" data-fdn-prop-meta="5 steps · action ×3 · orchestrate · review" data-fdn-prop-name="spec-round" data-fdn-prop-selected="no" style="display:contents">
+                  <button data-fdn-style="rail-row" style-hover="background:var(--color-hover)" style="align-items:center;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;column-gap:9px;cursor:pointer;display:flex;padding-bottom:7px;padding-left:8px;padding-right:8px;padding-top:7px;row-gap:9px;text-align:left;width:100%;background-color:transparent;border-width:0;color:inherit;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
+                    <span style="box-sizing:border-box;display:block;flex-shrink:0;height:14px;width:14px">
+                      <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-chip-ink)" data-fdn-prop-name="track" data-fdn-prop-size="14" style="display:contents">
+                        <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-chip-ink)">
+                          <g>
+                            <circle cx="8" cy="3.1" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <circle cx="8" cy="8" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <circle cx="8" cy="12.9" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <path d="M8 4.7v1.7M8 9.6v1.7" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+                          </g>
+                        </svg>
+                      </fdn-use>
+                    </span>
+                    <span style="box-sizing:border-box;display:block;flex-grow:1;min-width:0">
+                      <span style="box-sizing:border-box;color:var(--color-text-primary);display:block;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">spec-round</span>
+                      <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box;display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">5 steps · action ×3 · orchestrate · review</span>
+                    </span>
+                  </button>
+                </fdn-use>
+                <fdn-use component="RailRow" data-fdn-prop-attached="no" data-fdn-prop-meta="5 steps · action ×3 · orchestrate · review" data-fdn-prop-name="board-draw" data-fdn-prop-selected="no" style="display:contents">
+                  <button data-fdn-style="rail-row" style-hover="background:var(--color-hover)" style="align-items:center;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;column-gap:9px;cursor:pointer;display:flex;padding-bottom:7px;padding-left:8px;padding-right:8px;padding-top:7px;row-gap:9px;text-align:left;width:100%;background-color:transparent;border-width:0;color:inherit;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
+                    <span style="box-sizing:border-box;display:block;flex-shrink:0;height:14px;width:14px">
+                      <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-chip-ink)" data-fdn-prop-name="track" data-fdn-prop-size="14" style="display:contents">
+                        <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-chip-ink)">
+                          <g>
+                            <circle cx="8" cy="3.1" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <circle cx="8" cy="8" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <circle cx="8" cy="12.9" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <path d="M8 4.7v1.7M8 9.6v1.7" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+                          </g>
+                        </svg>
+                      </fdn-use>
+                    </span>
+                    <span style="box-sizing:border-box;display:block;flex-grow:1;min-width:0">
+                      <span style="box-sizing:border-box;color:var(--color-text-primary);display:block;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">board-draw</span>
+                      <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box;display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">5 steps · action ×3 · orchestrate · review</span>
+                    </span>
+                  </button>
+                </fdn-use>
+                <fdn-use component="RailRow" data-fdn-prop-attached="no" data-fdn-prop-meta="5 steps · action ×3 · orchestrate · review" data-fdn-prop-name="flaky-hunt" data-fdn-prop-selected="no" style="display:contents">
+                  <button data-fdn-style="rail-row" style-hover="background:var(--color-hover)" style="align-items:center;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;column-gap:9px;cursor:pointer;display:flex;padding-bottom:7px;padding-left:8px;padding-right:8px;padding-top:7px;row-gap:9px;text-align:left;width:100%;background-color:transparent;border-width:0;color:inherit;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
+                    <span style="box-sizing:border-box;display:block;flex-shrink:0;height:14px;width:14px">
+                      <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-chip-ink)" data-fdn-prop-name="track" data-fdn-prop-size="14" style="display:contents">
+                        <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-chip-ink)">
+                          <g>
+                            <circle cx="8" cy="3.1" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <circle cx="8" cy="8" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <circle cx="8" cy="12.9" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <path d="M8 4.7v1.7M8 9.6v1.7" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+                          </g>
+                        </svg>
+                      </fdn-use>
+                    </span>
+                    <span style="box-sizing:border-box;display:block;flex-grow:1;min-width:0">
+                      <span style="box-sizing:border-box;color:var(--color-text-primary);display:block;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">flaky-hunt</span>
+                      <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box;display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">5 steps · action ×3 · orchestrate · review</span>
+                    </span>
+                  </button>
+                </fdn-use>
+                <fdn-use component="RailRow" data-fdn-prop-attached="no" data-fdn-prop-meta="4 steps · action ×3 · orchestrate" data-fdn-prop-name="dep-bump" data-fdn-prop-selected="no" style="display:contents">
+                  <button data-fdn-style="rail-row" style-hover="background:var(--color-hover)" style="align-items:center;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;column-gap:9px;cursor:pointer;display:flex;padding-bottom:7px;padding-left:8px;padding-right:8px;padding-top:7px;row-gap:9px;text-align:left;width:100%;background-color:transparent;border-width:0;color:inherit;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
+                    <span style="box-sizing:border-box;display:block;flex-shrink:0;height:14px;width:14px">
+                      <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-chip-ink)" data-fdn-prop-name="track" data-fdn-prop-size="14" style="display:contents">
+                        <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-chip-ink)">
+                          <g>
+                            <circle cx="8" cy="3.1" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <circle cx="8" cy="8" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <circle cx="8" cy="12.9" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <path d="M8 4.7v1.7M8 9.6v1.7" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+                          </g>
+                        </svg>
+                      </fdn-use>
+                    </span>
+                    <span style="box-sizing:border-box;display:block;flex-grow:1;min-width:0">
+                      <span style="box-sizing:border-box;color:var(--color-text-primary);display:block;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">dep-bump</span>
+                      <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box;display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">4 steps · action ×3 · orchestrate</span>
+                    </span>
+                  </button>
+                </fdn-use>
+                <fdn-use component="RailRow" data-fdn-prop-attached="no" data-fdn-prop-meta="5 steps · action ×3 · orchestrate · review" data-fdn-prop-name="nectar-preview" data-fdn-prop-selected="no" style="display:contents">
+                  <button data-fdn-style="rail-row" style-hover="background:var(--color-hover)" style="align-items:center;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;column-gap:9px;cursor:pointer;display:flex;padding-bottom:7px;padding-left:8px;padding-right:8px;padding-top:7px;row-gap:9px;text-align:left;width:100%;background-color:transparent;border-width:0;color:inherit;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
+                    <span style="box-sizing:border-box;display:block;flex-shrink:0;height:14px;width:14px">
+                      <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-chip-ink)" data-fdn-prop-name="track" data-fdn-prop-size="14" style="display:contents">
+                        <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-chip-ink)">
+                          <g>
+                            <circle cx="8" cy="3.1" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <circle cx="8" cy="8" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <circle cx="8" cy="12.9" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                            <path d="M8 4.7v1.7M8 9.6v1.7" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+                          </g>
+                        </svg>
+                      </fdn-use>
+                    </span>
+                    <span style="box-sizing:border-box;display:block;flex-grow:1;min-width:0">
+                      <span style="box-sizing:border-box;color:var(--color-text-primary);display:block;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">nectar-preview</span>
+                      <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box;display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">5 steps · action ×3 · orchestrate · review</span>
+                    </span>
+                  </button>
+                </fdn-use>
+              </div>
+            </aside>
+            <main data-fdn-style="fill-column" style="box-sizing:border-box;display:flex;flex:1;flex-direction:column;min-width:0">
+              <div data-fdn-style="flow-header" style="align-items:center;border-bottom:1px solid var(--color-divider);box-sizing:border-box;column-gap:10px;display:flex;flex:none;height:40px;padding-bottom:0;padding-left:16px;padding-right:12px;padding-top:0;row-gap:10px">
+                <span data-fdn-style="flow-header-name" style="color:var(--color-text-primary);flex:none;font-family:var(--font-sans);font-size:var(--font-size-title);font-weight:var(--font-weight-semibold);max-width:32%;min-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box">review-and-ship</span>
+                <span data-fdn-style="flow-header-status" style="align-items:center;column-gap:6px;display:flex;font-family:var(--font-mono);font-size:var(--font-size-sm);row-gap:6px;white-space:nowrap;box-sizing:border-box;color:var(--color-mono-meta)">
+                  <fdn-use component="StatusDot" data-fdn-prop-size="7px" data-fdn-prop-state="running" style="display:contents">
+                    <span style="background:var(--color-status-running);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex-shrink:0;height:7px;width:7px"></span>
+                  </fdn-use>
+                  <span style="box-sizing:border-box">attached · drone-12 · step 4 of 7</span>
+                </span>
+                <span style="box-sizing:border-box;flex-grow:1;min-width:0"></span>
+                <fdn-use component="SegmentedView" data-fdn-prop-code="enabled" style="display:contents">
+                  <span style="align-items:center;background-color:var(--color-chip-bg);border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;column-gap:2px;display:flex;flex:none;padding-bottom:2px;padding-left:2px;padding-right:2px;padding-top:2px;row-gap:2px">
+                    <button data-fdn-style="segment" style="border-bottom-left-radius:5px;border-bottom-right-radius:5px;border-top-left-radius:5px;border-top-right-radius:5px;display:block;font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);padding-bottom:3px;padding-left:10px;padding-right:10px;padding-top:3px;white-space:nowrap;background-color:var(--color-segment-on);border-width:0;box-shadow:var(--shadow-segment);box-sizing:border-box;color:var(--color-text-primary);cursor:pointer;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">Flow</button>
+                    <button data-fdn-style="segment" style="border-bottom-left-radius:5px;border-bottom-right-radius:5px;border-top-left-radius:5px;border-top-right-radius:5px;display:block;font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);padding-bottom:3px;padding-left:10px;padding-right:10px;padding-top:3px;white-space:nowrap;background-color:transparent;border-width:0;box-sizing:border-box;color:var(--color-text-muted);cursor:pointer;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0;opacity:1">Code</button>
+                  </span>
+                </fdn-use>
+                <fdn-use component="ActionButton" data-fdn-prop-disabled="no" data-fdn-prop-hint="" data-fdn-prop-label="Open agent" data-fdn-prop-variant="default" style="display:contents">
+                  <button data-fdn-style="pill-btn" style-hover="background:var(--color-hover)" style="align-items:center;border:1px solid var(--color-border-input);border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;color:var(--color-text-primary);column-gap:6px;cursor:pointer;display:flex;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);height:28px;padding-bottom:0;padding-left:14px;padding-right:14px;padding-top:0;row-gap:6px;white-space:nowrap;background-color:transparent;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0;opacity:1">
+                    <span style="box-sizing:border-box">Open agent</span>
+                  </button>
+                </fdn-use>
+              </div>
+              <fdn-use component="LiveFlow" style="display:contents">
+                <div data-fdn-style="flow-canvas" style="background-image:radial-gradient(circle at 1px 1px, var(--color-canvas-dot) 1px, transparent 0);background-size:20px 20px;box-sizing:border-box;display:flex;flex:1;flex-direction:column;min-height:0">
+                  <div data-fdn-style="flow-viewport" style="align-items:center;box-sizing:border-box;display:flex;flex:1;flex-direction:column;min-height:0;overflow:hidden">
+                    <div data-fdn-style="flow-graph" style="align-items:center;box-sizing:border-box;display:flex;flex-direction:column;padding-bottom:28px;padding-left:24px;padding-right:24px;padding-top:24px;position:relative;width:728px">
+                      <div style="align-items:center;box-sizing:border-box;color:var(--color-meta-faint);column-gap:6px;display:flex;font-family:var(--font-mono);font-size:var(--font-size-xs);margin-bottom:14px;row-gap:6px;width:480px">
+                        <span style="border:1px solid var(--color-meta-faint);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:6px;width:6px"></span>
+                        <span style="box-sizing:border-box">read-only while attached — edits fork the definition for the next run</span>
+                      </div>
+                      <fdn-use component="FlowCard" data-fdn-prop-fit="spine" data-fdn-prop-glyph="lines" data-fdn-prop-meta="done · 11:48" data-fdn-prop-state="done" data-fdn-prop-title="Read the diff" style="display:contents">
+                        <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:9px;opacity:0.62;padding-bottom:10px;padding-left:14px;padding-right:14px;padding-top:10px;row-gap:9px;width:auto">
+                          <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-status-running)" data-fdn-prop-name="done" data-fdn-prop-size="14" style="display:contents">
+                            <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-status-running)">
+                              <g>
+                                <circle cx="8" cy="8" r="6.3" stroke="currentColor" stroke-width="1.3"></circle>
+                                <path d="M5.5 8.2l1.8 1.8 3.2-3.6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
+                              </g>
+                            </svg>
+                          </fdn-use>
+                          <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-primary);font-weight:var(--font-weight-medium);text-decoration-line:none;white-space:normal">Read the diff</span>
+                          <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-text-faint);font-size:var(--font-size-xs)">done · 11:48</span>
+                        </div>
+                      </fdn-use>
+                      <span data-fdn-style="spine-link" style="background:var(--color-border-input);display:block;flex:none;height:42px;width:1px;box-sizing:border-box"></span>
+                      <fdn-use component="FlowCard" data-fdn-prop-fit="spine" data-fdn-prop-glyph="lines" data-fdn-prop-meta="done · 11:48" data-fdn-prop-state="done" data-fdn-prop-title="Fan out reviewers" style="display:contents">
+                        <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:9px;opacity:0.62;padding-bottom:10px;padding-left:14px;padding-right:14px;padding-top:10px;row-gap:9px;width:auto">
+                          <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-status-running)" data-fdn-prop-name="done" data-fdn-prop-size="14" style="display:contents">
+                            <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-status-running)">
+                              <g>
+                                <circle cx="8" cy="8" r="6.3" stroke="currentColor" stroke-width="1.3"></circle>
+                                <path d="M5.5 8.2l1.8 1.8 3.2-3.6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
+                              </g>
+                            </svg>
+                          </fdn-use>
+                          <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-primary);font-weight:var(--font-weight-medium);text-decoration-line:none;white-space:normal">Fan out reviewers</span>
+                          <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-text-faint);font-size:var(--font-size-xs)">done · 11:48</span>
+                        </div>
+                      </fdn-use>
+                      <span data-fdn-style="spine-link" style="background:var(--color-border-input);display:block;flex:none;height:42px;width:1px;box-sizing:border-box"></span>
+                      <div data-fdn-style="branch" style="box-sizing:border-box;display:flex;flex:none;flex-direction:column;width:680px">
+                        <div data-fdn-style="branch-frame" style="align-items:center;border:1px solid var(--color-border-input);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;flex:none;flex-direction:column;justify-content:flex-end;margin-left:164px;width:353px;height:129.5px">
+                          <span data-fdn-style="junction" style="background:var(--color-border-input);border:1px solid var(--color-surface);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;display:block;flex:none;height:6px;margin-bottom:-3.5px;width:6px"></span>
+                        </div>
+                        <div data-fdn-style="lanes" style="column-gap:24px;display:flex;row-gap:24px;box-sizing:border-box;margin-bottom:42.5px;margin-top:-87.5px">
+                          <div data-fdn-style="lane" style="display:flex;flex:1 1 0;flex-direction:column;min-width:0;box-sizing:border-box">
+                            <div style="box-sizing:border-box;display:flex;flex-direction:column">
+                              <fdn-use component="FlowCard" data-fdn-prop-fit="lane" data-fdn-prop-glyph="lines" data-fdn-prop-meta="done · 11:48" data-fdn-prop-state="done" data-fdn-prop-title="Typecheck &amp; lint" style="display:contents">
+                                <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:8px;opacity:0.62;padding-bottom:10px;padding-left:13px;padding-right:13px;padding-top:10px;row-gap:8px;width:100%">
+                                  <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-status-running)" data-fdn-prop-name="done" data-fdn-prop-size="14" style="display:contents">
+                                    <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-status-running)">
+                                      <g>
+                                        <circle cx="8" cy="8" r="6.3" stroke="currentColor" stroke-width="1.3"></circle>
+                                        <path d="M5.5 8.2l1.8 1.8 3.2-3.6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
+                                      </g>
+                                    </svg>
+                                  </fdn-use>
+                                  <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-primary);font-weight:var(--font-weight-medium);text-decoration-line:none;white-space:normal">Typecheck &amp; lint</span>
+                                  <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-text-faint);font-size:var(--font-size-xs)">done · 11:48</span>
+                                </div>
+                              </fdn-use>
+                            </div>
+                          </div>
+                          <div data-fdn-style="lane" style="display:flex;flex:1 1 0;flex-direction:column;min-width:0;box-sizing:border-box">
+                            <div style="box-sizing:border-box;display:flex;flex-direction:column">
+                              <fdn-use component="FlowCard" data-fdn-prop-fit="lane" data-fdn-prop-glyph="lines" data-fdn-prop-meta="current" data-fdn-prop-state="current" data-fdn-prop-title="Run the suite" style="display:contents">
+                                <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card-current);column-gap:8px;opacity:1;padding-bottom:12px;padding-left:14px;padding-right:14px;padding-top:12px;row-gap:8px;width:100%">
+                                  <span style="background-color:var(--color-status-running);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:8px;width:8px"></span>
+                                  <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-primary);font-weight:var(--font-weight-semibold);text-decoration-line:none;white-space:normal">Run the suite</span>
+                                  <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-status-running);font-size:var(--font-size-xs)">current</span>
+                                </div>
+                              </fdn-use>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <span data-fdn-style="spine-link" style="background:var(--color-border-input);display:block;flex:none;height:42px;width:1px;box-sizing:border-box"></span>
+                      <fdn-use component="FlowCard" data-fdn-prop-fit="spine" data-fdn-prop-glyph="lines" data-fdn-prop-meta="upcoming · gate" data-fdn-prop-state="upcoming" data-fdn-prop-title="Verdict gate" style="display:contents">
+                        <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:9px;opacity:1;padding-bottom:10px;padding-left:14px;padding-right:14px;padding-top:10px;row-gap:9px;width:auto">
+                          <span style="border:1px solid var(--color-border-input);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:12px;width:12px"></span>
+                          <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-muted);font-weight:var(--font-weight-medium);text-decoration-line:none;white-space:normal">Verdict gate</span>
+                          <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-text-faint);font-size:var(--font-size-xs)">upcoming · gate</span>
+                        </div>
+                      </fdn-use>
+                      <div style="box-sizing:border-box;display:flex;flex:none;flex-direction:column;width:480px">
+                        <fdn-use component="ArmLabels" style="display:contents">
+                          <div style="align-items:flex-start;box-sizing:border-box;display:flex;flex:none;height:64px;width:480px">
+                            <span style="box-sizing:border-box;color:var(--color-meta-faint);flex:none;font-family:var(--font-mono);font-size:var(--font-size-2xs);letter-spacing:0.08em;padding-left:51px;padding-top:5px;white-space:nowrap;width:302px">approved ↓ continues</span>
+                            <span style="box-sizing:border-box;color:var(--color-status-review);flex:none;font-family:var(--font-mono);font-size:var(--font-size-2xs);font-weight:var(--font-weight-semibold);letter-spacing:0.13em;padding-top:5px;white-space:nowrap;width:56px">DENIED ↺</span>
+                            <span style="background-color:var(--color-border-input);box-sizing:border-box;flex:none;height:64px;margin-left:6px;width:1px"></span>
+                          </div>
+                        </fdn-use>
+                        <div style="box-sizing:border-box;display:flex;justify-content:flex-end">
+                          <div style="box-sizing:border-box;width:232px">
+                            <fdn-use component="FlowCard" data-fdn-prop-fit="lane" data-fdn-prop-glyph="lines" data-fdn-prop-meta="upcoming" data-fdn-prop-state="upcoming" data-fdn-prop-title="Fix findings" style="display:contents">
+                              <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:8px;opacity:1;padding-bottom:10px;padding-left:13px;padding-right:13px;padding-top:10px;row-gap:8px;width:100%">
+                                <span style="border:1px solid var(--color-border-input);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:12px;width:12px"></span>
+                                <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-muted);font-weight:var(--font-weight-medium);text-decoration-line:none;white-space:normal">Fix findings</span>
+                                <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-text-faint);font-size:var(--font-size-xs)">upcoming</span>
+                              </div>
+                            </fdn-use>
+                          </div>
+                        </div>
+                        <div data-fdn-style="arm-join" style="align-items:flex-end;border-bottom:1px solid var(--color-border-input);border-bottom-right-radius:var(--radius-lg);border-right:1px solid var(--color-border-input);box-sizing:border-box;display:flex;flex:none;height:42px;margin-left:240px;width:125px">
+                          <span data-fdn-style="junction" style="background:var(--color-border-input);border:1px solid var(--color-surface);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;display:block;flex:none;height:6px;margin-bottom:-3.5px;width:6px;margin-left:-3px"></span>
+                        </div>
+                      </div>
+                      <fdn-use component="FlowCard" data-fdn-prop-fit="spine" data-fdn-prop-glyph="lines" data-fdn-prop-meta="upcoming · nectar" data-fdn-prop-state="upcoming" data-fdn-prop-title="Publish preview" style="display:contents">
+                        <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:9px;opacity:1;padding-bottom:10px;padding-left:14px;padding-right:14px;padding-top:10px;row-gap:9px;width:auto">
+                          <span style="border:1px solid var(--color-border-input);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:12px;width:12px"></span>
+                          <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-muted);font-weight:var(--font-weight-medium);text-decoration-line:none;white-space:normal">Publish preview</span>
+                          <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-text-faint);font-size:var(--font-size-xs)">upcoming · nectar</span>
+                        </div>
+                      </fdn-use>
+                      <span data-fdn-style="spine-link" style="background:var(--color-border-input);display:block;flex:none;height:42px;width:1px;box-sizing:border-box"></span>
+                      <fdn-use component="FlowCard" data-fdn-prop-fit="spine" data-fdn-prop-glyph="lines" data-fdn-prop-meta="upcoming · blocking ask" data-fdn-prop-state="upcoming" data-fdn-prop-title="Ship it?" style="display:contents">
+                        <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:9px;opacity:1;padding-bottom:10px;padding-left:14px;padding-right:14px;padding-top:10px;row-gap:9px;width:auto">
+                          <span style="border:1px solid var(--color-border-input);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:12px;width:12px"></span>
+                          <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-muted);font-weight:var(--font-weight-medium);text-decoration-line:none;white-space:normal">Ship it?</span>
+                          <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-text-faint);font-size:var(--font-size-xs)">upcoming · blocking ask</span>
+                        </div>
+                      </fdn-use>
+                      <div style="box-sizing:border-box;color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-xs);margin-top:18px;width:480px">up next · pr-triage · queued by bumble-7 · 11:58 — spec-round · queued by mite-3 · 11:58</div>
+                    </div>
+                  </div>
+                </div>
+              </fdn-use>
+              <div data-fdn-style="flow-footer" style="align-items:center;border-top:1px solid var(--color-divider);box-sizing:border-box;color:var(--color-meta-faint);column-gap:14px;display:flex;flex:none;font-family:var(--font-mono);font-size:var(--font-size-xs);height:32px;padding-bottom:0;padding-left:16px;padding-right:16px;padding-top:0;row-gap:14px">
+                <span style="box-sizing:border-box">hover a step for timestamps · click an exception for the full note</span>
+                <span style="align-items:center;box-sizing:border-box;column-gap:6px;display:flex;margin-left:auto;white-space:nowrap">
+                  <fdn-use component="StatusDot" data-fdn-prop-size="6px" data-fdn-prop-state="waiting" style="display:contents">
+                    <span style="background:var(--color-status-waiting);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex-shrink:0;height:6px;width:6px"></span>
+                  </fdn-use>
+                  <span style="box-sizing:border-box">1 exception</span>
+                </span>
+              </div>
+            </main>
+            <fdn-use component="SidecarRail" data-fdn-prop-pending="none" style="display:contents">
+              <button style="align-items:center;background-color:transparent;border-bottom-width:0;border-left:1px solid var(--color-divider);border-right-width:0;border-top-width:0;box-sizing:border-box;color:var(--color-text-muted);cursor:pointer;display:flex;flex:none;flex-direction:column;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0;padding-bottom:12px;padding-left:0;padding-right:0;padding-top:12px;width:36px">
+                <span style="align-items:flex-end;box-sizing:border-box;display:flex;flex-direction:column;height:15px;width:15px">
+                  <fdn-use component="FlowGlyph" data-fdn-prop-color="currentColor" data-fdn-prop-name="sidecar" data-fdn-prop-size="15" style="display:contents">
+                    <svg fill="none" height="15" viewBox="0 0 16 16" width="15" style="box-sizing:border-box;color:currentColor">
+                      <path d="M8 1.6l5.2 3v6L8 13.6l-5.2-3v-6z" stroke="currentColor" stroke-linejoin="round" stroke-width="1.3"></path>
+                    </svg>
+                  </fdn-use>
+                </span>
+                <span style="box-sizing:border-box;color:var(--color-meta-faint);font-family:var(--font-mono);font-size:var(--font-size-2xs);margin-top:10px;writing-mode:vertical-rl">⌘⌃B</span>
+              </button>
+            </fdn-use>
+          </div>
+        </div>
+      </fdn-use>
+      <aside style="display:flex;flex-direction:column;max-width:1080px;row-gap:18px">
+        <div>
+          <fdn-use component="SectionLabel" data-fdn-prop-text="HOW TO READ THE FLOW" data-fdn-prop-trailing="" style="display:contents">
+            <div style="align-items:baseline;column-gap:8px;display:flex;margin-bottom:7px">
+              <span data-fdn-style="section-label" style="color:var(--color-text-faint);font-family:var(--font-sans);font-size:10px;font-weight:var(--font-weight-semibold);letter-spacing:.12em">HOW TO READ THE FLOW</span>
+            </div>
+          </fdn-use>
+          <div style="column-gap:28px;display:grid;grid-template-columns:1fr 1fr;row-gap:16px">
+            <div style="display:flex;flex-direction:column;row-gap:5px">
+              <span style="color:var(--color-text-tertiary);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);letter-spacing:.08em">THE RAIL — DEFINITIONS</span>
+              <span style="color:var(--color-text-secondary);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">One row per definition. The second line is its shape: step count, then the type mix. Live state does not live on the row — only a running dot for the track an agent is on.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;row-gap:5px">
+              <span style="color:var(--color-text-tertiary);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);letter-spacing:.08em">THE CANVAS — ONE FLOW</span>
+              <span style="color:var(--color-text-secondary);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">Steps are cards on a dot grid, joined by hairlines. Parallel lanes sit side by side inside a branch frame; a review gate's denied arm drops to the right and rejoins the spine.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;row-gap:5px">
+              <span style="color:var(--color-text-tertiary);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);letter-spacing:.08em">LIVE REGISTER</span>
+              <span style="color:var(--color-text-secondary);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">While attached, the flow is read-only: done steps fade back with a check, the current step lifts with a running dot, upcoming steps wait as hollow rings. The canvas pans; steps past the fold are still there.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;row-gap:5px">
+              <span style="color:var(--color-status-blocked);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);letter-spacing:.08em">EXCEPTIONS</span>
+              <span style="color:var(--color-text-secondary);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">Deviation is counted quietly in the footer — a waiting dot and “1 exception” — and opens on click. It is visible, never punished.</span>
+            </div>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--color-border);display:flex;flex-direction:column;padding-top:14px;row-gap:5px">
+          <span style="color:var(--color-text-muted);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">No honey in the live register: it is spent once per pane, on accepting a proposal or on New track.</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+  <section style="display:flex;flex-direction:column">
+    <fdn-use component="BoardCaption" data-fdn-prop-body="The selected track, live: the header says who is attached and how far along, the canvas draws the flow, the footer carries hints and the exception count. With a proposal pending, the same canvas becomes the diff — proposed new steps dashed in violet (here Smoke-test the preview and Write release notes) — and the accept / refine / discard bar is docked at the bottom of the canvas so the one decision is always in view. Honey moves to Accept." data-fdn-prop-index="BOARD 2" data-fdn-prop-title="ONE TRACK SELECTED" style="display:contents">
+      <div style="display:flex;flex-direction:column;margin-bottom:14px;row-gap:6px">
+        <div style="align-items:baseline;column-gap:10px;display:flex">
+          <span style="color:var(--color-text-disabled);font-family:var(--font-mono);font-size:var(--font-size-xs);font-weight:var(--font-weight-medium);letter-spacing:.08em">BOARD 2</span>
+          <span data-fdn-style="section-label" style="font-family:var(--font-sans);font-size:10px;font-weight:var(--font-weight-semibold);letter-spacing:.12em;color:var(--color-text-tertiary)">ONE TRACK SELECTED</span>
+        </div>
+        <div style="color:var(--color-text-muted);font-family:var(--font-sans);font-size:12.5px;line-height:1.5;max-width:660px">The selected track, live: the header says who is attached and how far along, the canvas draws the flow, the footer carries hints and the exception count. With a proposal pending, the same canvas becomes the diff — proposed new steps dashed in violet (here Smoke-test the preview and Write release notes) — and the accept / refine / discard bar is docked at the bottom of the canvas so the one decision is always in view. Honey moves to Accept.</div>
+      </div>
+    </fdn-use>
+    <fdn-use component="TracksPane" data-fdn-prop-mode="selected" style="display:contents">
+      <div data-fdn-style="flow-pane" style="box-sizing:border-box;color:var(--color-text-primary);display:flex;flex-direction:column;flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);line-height:var(--line-height-ui);position:relative;text-align:start;height:525.5px;width:1416px">
+        <div data-fdn-style="fill-row" style="box-sizing:border-box;display:flex;flex:1;min-height:0">
+          <aside data-fdn-style="rail" style="background:var(--color-surface);border-right:1px solid var(--color-divider);box-sizing:border-box;display:flex;flex:none;flex-direction:column;width:232px">
+            <div data-fdn-style="rail-header" style="align-items:center;border-bottom:1px solid var(--color-divider);box-sizing:border-box;column-gap:8px;display:flex;flex:none;height:40px;padding-bottom:0;padding-left:14px;padding-right:10px;padding-top:0;row-gap:8px">
+              <span data-fdn-style="rail-label" style="color:var(--color-label-track);font-family:var(--font-sans);font-size:var(--font-size-meta);font-weight:var(--font-weight-semibold);letter-spacing:.14em;box-sizing:border-box">TRACKS</span>
+              <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box">7</span>
+              <button data-fdn-style="icon-btn" style-hover="background:var(--color-hover)" style="align-items:center;border-bottom-left-radius:5px;border-bottom-right-radius:5px;border-top-left-radius:5px;border-top-right-radius:5px;display:flex;height:24px;justify-content:center;margin-left:auto;width:24px;background-color:transparent;border-width:0;box-sizing:border-box;color:var(--color-icon-muted);cursor:pointer;font-family:inherit;font-size:inherit;line-height:inherit;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0">
+                <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-icon-muted)" data-fdn-prop-name="plus" data-fdn-prop-size="12" style="display:contents">
+                  <svg fill="none" height="12" viewBox="0 0 16 16" width="12" style="box-sizing:border-box;color:var(--color-icon-muted)">
+                    <path d="M8 3.4v9.2M3.4 8h9.2" stroke="currentColor" stroke-linecap="round" stroke-width="1.4"></path>
+                  </svg>
+                </fdn-use>
+              </button>
+            </div>
+            <div data-fdn-style="rail-list" style="box-sizing:border-box;flex:1;min-height:0;overflow:hidden;padding-bottom:8px;padding-left:6px;padding-right:6px;padding-top:8px">
+              <fdn-use component="RailRow" data-fdn-prop-attached="yes" data-fdn-prop-meta="7 steps · action ×3 · orchestrate · review · deploy · ask" data-fdn-prop-name="review-and-ship" data-fdn-prop-selected="yes" style="display:contents">
+                <button data-fdn-style="rail-row" style-hover="background:var(--color-hover)" style="align-items:center;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;column-gap:9px;cursor:pointer;display:flex;padding-bottom:7px;padding-left:8px;padding-right:8px;padding-top:7px;row-gap:9px;text-align:left;width:100%;background-color:var(--color-rail-selection);border-width:0;color:inherit;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
+                  <span style="box-sizing:border-box;display:block;flex-shrink:0;height:14px;width:14px">
+                    <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-chip-ink)" data-fdn-prop-name="track" data-fdn-prop-size="14" style="display:contents">
+                      <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-chip-ink)">
+                        <g>
+                          <circle cx="8" cy="3.1" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <circle cx="8" cy="8" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <circle cx="8" cy="12.9" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <path d="M8 4.7v1.7M8 9.6v1.7" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+                        </g>
+                      </svg>
+                    </fdn-use>
+                  </span>
+                  <span style="box-sizing:border-box;display:block;flex-grow:1;min-width:0">
+                    <span style="box-sizing:border-box;color:var(--color-text-primary);display:block;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">review-and-ship</span>
+                    <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box;display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">7 steps · action ×3 · orchestrate · review · deploy · ask</span>
+                  </span>
+                  <fdn-use component="StatusDot" data-fdn-prop-size="7px" data-fdn-prop-state="running" style="display:contents">
+                    <span style="background:var(--color-status-running);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex-shrink:0;height:7px;width:7px"></span>
+                  </fdn-use>
+                </button>
+              </fdn-use>
+              <fdn-use component="RailRow" data-fdn-prop-attached="no" data-fdn-prop-meta="5 steps · action ×3 · orchestrate · review" data-fdn-prop-name="pr-triage" data-fdn-prop-selected="no" style="display:contents">
+                <button data-fdn-style="rail-row" style-hover="background:var(--color-hover)" style="align-items:center;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;column-gap:9px;cursor:pointer;display:flex;padding-bottom:7px;padding-left:8px;padding-right:8px;padding-top:7px;row-gap:9px;text-align:left;width:100%;background-color:transparent;border-width:0;color:inherit;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
+                  <span style="box-sizing:border-box;display:block;flex-shrink:0;height:14px;width:14px">
+                    <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-chip-ink)" data-fdn-prop-name="track" data-fdn-prop-size="14" style="display:contents">
+                      <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-chip-ink)">
+                        <g>
+                          <circle cx="8" cy="3.1" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <circle cx="8" cy="8" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <circle cx="8" cy="12.9" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <path d="M8 4.7v1.7M8 9.6v1.7" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+                        </g>
+                      </svg>
+                    </fdn-use>
+                  </span>
+                  <span style="box-sizing:border-box;display:block;flex-grow:1;min-width:0">
+                    <span style="box-sizing:border-box;color:var(--color-text-primary);display:block;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">pr-triage</span>
+                    <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box;display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">5 steps · action ×3 · orchestrate · review</span>
+                  </span>
+                </button>
+              </fdn-use>
+              <fdn-use component="RailRow" data-fdn-prop-attached="no" data-fdn-prop-meta="5 steps · action ×3 · orchestrate · review" data-fdn-prop-name="spec-round" data-fdn-prop-selected="no" style="display:contents">
+                <button data-fdn-style="rail-row" style-hover="background:var(--color-hover)" style="align-items:center;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;column-gap:9px;cursor:pointer;display:flex;padding-bottom:7px;padding-left:8px;padding-right:8px;padding-top:7px;row-gap:9px;text-align:left;width:100%;background-color:transparent;border-width:0;color:inherit;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
+                  <span style="box-sizing:border-box;display:block;flex-shrink:0;height:14px;width:14px">
+                    <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-chip-ink)" data-fdn-prop-name="track" data-fdn-prop-size="14" style="display:contents">
+                      <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-chip-ink)">
+                        <g>
+                          <circle cx="8" cy="3.1" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <circle cx="8" cy="8" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <circle cx="8" cy="12.9" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <path d="M8 4.7v1.7M8 9.6v1.7" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+                        </g>
+                      </svg>
+                    </fdn-use>
+                  </span>
+                  <span style="box-sizing:border-box;display:block;flex-grow:1;min-width:0">
+                    <span style="box-sizing:border-box;color:var(--color-text-primary);display:block;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">spec-round</span>
+                    <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box;display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">5 steps · action ×3 · orchestrate · review</span>
+                  </span>
+                </button>
+              </fdn-use>
+              <fdn-use component="RailRow" data-fdn-prop-attached="no" data-fdn-prop-meta="5 steps · action ×3 · orchestrate · review" data-fdn-prop-name="board-draw" data-fdn-prop-selected="no" style="display:contents">
+                <button data-fdn-style="rail-row" style-hover="background:var(--color-hover)" style="align-items:center;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;column-gap:9px;cursor:pointer;display:flex;padding-bottom:7px;padding-left:8px;padding-right:8px;padding-top:7px;row-gap:9px;text-align:left;width:100%;background-color:transparent;border-width:0;color:inherit;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
+                  <span style="box-sizing:border-box;display:block;flex-shrink:0;height:14px;width:14px">
+                    <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-chip-ink)" data-fdn-prop-name="track" data-fdn-prop-size="14" style="display:contents">
+                      <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-chip-ink)">
+                        <g>
+                          <circle cx="8" cy="3.1" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <circle cx="8" cy="8" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <circle cx="8" cy="12.9" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <path d="M8 4.7v1.7M8 9.6v1.7" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+                        </g>
+                      </svg>
+                    </fdn-use>
+                  </span>
+                  <span style="box-sizing:border-box;display:block;flex-grow:1;min-width:0">
+                    <span style="box-sizing:border-box;color:var(--color-text-primary);display:block;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">board-draw</span>
+                    <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box;display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">5 steps · action ×3 · orchestrate · review</span>
+                  </span>
+                </button>
+              </fdn-use>
+              <fdn-use component="RailRow" data-fdn-prop-attached="no" data-fdn-prop-meta="5 steps · action ×3 · orchestrate · review" data-fdn-prop-name="flaky-hunt" data-fdn-prop-selected="no" style="display:contents">
+                <button data-fdn-style="rail-row" style-hover="background:var(--color-hover)" style="align-items:center;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;column-gap:9px;cursor:pointer;display:flex;padding-bottom:7px;padding-left:8px;padding-right:8px;padding-top:7px;row-gap:9px;text-align:left;width:100%;background-color:transparent;border-width:0;color:inherit;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
+                  <span style="box-sizing:border-box;display:block;flex-shrink:0;height:14px;width:14px">
+                    <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-chip-ink)" data-fdn-prop-name="track" data-fdn-prop-size="14" style="display:contents">
+                      <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-chip-ink)">
+                        <g>
+                          <circle cx="8" cy="3.1" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <circle cx="8" cy="8" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <circle cx="8" cy="12.9" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <path d="M8 4.7v1.7M8 9.6v1.7" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+                        </g>
+                      </svg>
+                    </fdn-use>
+                  </span>
+                  <span style="box-sizing:border-box;display:block;flex-grow:1;min-width:0">
+                    <span style="box-sizing:border-box;color:var(--color-text-primary);display:block;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">flaky-hunt</span>
+                    <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box;display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">5 steps · action ×3 · orchestrate · review</span>
+                  </span>
+                </button>
+              </fdn-use>
+              <fdn-use component="RailRow" data-fdn-prop-attached="no" data-fdn-prop-meta="4 steps · action ×3 · orchestrate" data-fdn-prop-name="dep-bump" data-fdn-prop-selected="no" style="display:contents">
+                <button data-fdn-style="rail-row" style-hover="background:var(--color-hover)" style="align-items:center;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;column-gap:9px;cursor:pointer;display:flex;padding-bottom:7px;padding-left:8px;padding-right:8px;padding-top:7px;row-gap:9px;text-align:left;width:100%;background-color:transparent;border-width:0;color:inherit;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
+                  <span style="box-sizing:border-box;display:block;flex-shrink:0;height:14px;width:14px">
+                    <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-chip-ink)" data-fdn-prop-name="track" data-fdn-prop-size="14" style="display:contents">
+                      <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-chip-ink)">
+                        <g>
+                          <circle cx="8" cy="3.1" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <circle cx="8" cy="8" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <circle cx="8" cy="12.9" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <path d="M8 4.7v1.7M8 9.6v1.7" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+                        </g>
+                      </svg>
+                    </fdn-use>
+                  </span>
+                  <span style="box-sizing:border-box;display:block;flex-grow:1;min-width:0">
+                    <span style="box-sizing:border-box;color:var(--color-text-primary);display:block;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">dep-bump</span>
+                    <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box;display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">4 steps · action ×3 · orchestrate</span>
+                  </span>
+                </button>
+              </fdn-use>
+              <fdn-use component="RailRow" data-fdn-prop-attached="no" data-fdn-prop-meta="5 steps · action ×3 · orchestrate · review" data-fdn-prop-name="nectar-preview" data-fdn-prop-selected="no" style="display:contents">
+                <button data-fdn-style="rail-row" style-hover="background:var(--color-hover)" style="align-items:center;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;column-gap:9px;cursor:pointer;display:flex;padding-bottom:7px;padding-left:8px;padding-right:8px;padding-top:7px;row-gap:9px;text-align:left;width:100%;background-color:transparent;border-width:0;color:inherit;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
+                  <span style="box-sizing:border-box;display:block;flex-shrink:0;height:14px;width:14px">
+                    <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-chip-ink)" data-fdn-prop-name="track" data-fdn-prop-size="14" style="display:contents">
+                      <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-chip-ink)">
+                        <g>
+                          <circle cx="8" cy="3.1" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <circle cx="8" cy="8" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <circle cx="8" cy="12.9" r="1.6" stroke="currentColor" stroke-width="1.3"></circle>
+                          <path d="M8 4.7v1.7M8 9.6v1.7" stroke="currentColor" stroke-linecap="round" stroke-width="1.3"></path>
+                        </g>
+                      </svg>
+                    </fdn-use>
+                  </span>
+                  <span style="box-sizing:border-box;display:block;flex-grow:1;min-width:0">
+                    <span style="box-sizing:border-box;color:var(--color-text-primary);display:block;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">nectar-preview</span>
+                    <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box;display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">5 steps · action ×3 · orchestrate · review</span>
+                  </span>
+                </button>
+              </fdn-use>
+            </div>
+          </aside>
+          <main data-fdn-style="fill-column" style="box-sizing:border-box;display:flex;flex:1;flex-direction:column;min-width:0">
+            <div data-fdn-style="flow-header" style="align-items:center;border-bottom:1px solid var(--color-divider);box-sizing:border-box;column-gap:10px;display:flex;flex:none;height:40px;padding-bottom:0;padding-left:16px;padding-right:12px;padding-top:0;row-gap:10px">
+              <span data-fdn-style="flow-header-name" style="color:var(--color-text-primary);flex:none;font-family:var(--font-sans);font-size:var(--font-size-title);font-weight:var(--font-weight-semibold);max-width:32%;min-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box">review-and-ship</span>
+              <span data-fdn-style="flow-header-status" style="align-items:center;column-gap:6px;display:flex;font-family:var(--font-mono);font-size:var(--font-size-sm);row-gap:6px;white-space:nowrap;box-sizing:border-box;color:var(--color-mono-meta)">
+                <fdn-use component="StatusDot" data-fdn-prop-size="7px" data-fdn-prop-state="running" style="display:contents">
+                  <span style="background:var(--color-status-running);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex-shrink:0;height:7px;width:7px"></span>
+                </fdn-use>
+                <span style="box-sizing:border-box">attached · drone-12 · step 4 of 7</span>
+              </span>
+              <span style="box-sizing:border-box;flex-grow:1;min-width:0"></span>
+              <fdn-use component="SegmentedView" data-fdn-prop-code="enabled" style="display:contents">
+                <span style="align-items:center;background-color:var(--color-chip-bg);border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;column-gap:2px;display:flex;flex:none;padding-bottom:2px;padding-left:2px;padding-right:2px;padding-top:2px;row-gap:2px">
+                  <button data-fdn-style="segment" style="border-bottom-left-radius:5px;border-bottom-right-radius:5px;border-top-left-radius:5px;border-top-right-radius:5px;display:block;font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);padding-bottom:3px;padding-left:10px;padding-right:10px;padding-top:3px;white-space:nowrap;background-color:var(--color-segment-on);border-width:0;box-shadow:var(--shadow-segment);box-sizing:border-box;color:var(--color-text-primary);cursor:pointer;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">Flow</button>
+                  <button data-fdn-style="segment" style="border-bottom-left-radius:5px;border-bottom-right-radius:5px;border-top-left-radius:5px;border-top-right-radius:5px;display:block;font-family:var(--font-sans);font-size:var(--font-size-base);font-weight:var(--font-weight-medium);padding-bottom:3px;padding-left:10px;padding-right:10px;padding-top:3px;white-space:nowrap;background-color:transparent;border-width:0;box-sizing:border-box;color:var(--color-text-muted);cursor:pointer;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0;opacity:1">Code</button>
+                </span>
+              </fdn-use>
+              <fdn-use component="ActionButton" data-fdn-prop-disabled="no" data-fdn-prop-hint="" data-fdn-prop-label="Open agent" data-fdn-prop-variant="default" style="display:contents">
+                <button data-fdn-style="pill-btn" style-hover="background:var(--color-hover)" style="align-items:center;border:1px solid var(--color-border-input);border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);box-sizing:border-box;color:var(--color-text-primary);column-gap:6px;cursor:pointer;display:flex;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-medium);height:28px;padding-bottom:0;padding-left:14px;padding-right:14px;padding-top:0;row-gap:6px;white-space:nowrap;background-color:transparent;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0;opacity:1">
+                  <span style="box-sizing:border-box">Open agent</span>
+                </button>
+              </fdn-use>
+            </div>
+            <fdn-use component="LiveFlow" style="display:contents">
+              <div data-fdn-style="flow-canvas" style="background-image:radial-gradient(circle at 1px 1px, var(--color-canvas-dot) 1px, transparent 0);background-size:20px 20px;box-sizing:border-box;display:flex;flex:1;flex-direction:column;min-height:0">
+                <div data-fdn-style="flow-viewport" style="align-items:center;box-sizing:border-box;display:flex;flex:1;flex-direction:column;min-height:0;overflow:hidden">
+                  <div data-fdn-style="flow-graph" style="align-items:center;box-sizing:border-box;display:flex;flex-direction:column;padding-bottom:28px;padding-left:24px;padding-right:24px;padding-top:24px;position:relative;width:728px">
+                    <div style="align-items:center;box-sizing:border-box;color:var(--color-meta-faint);column-gap:6px;display:flex;font-family:var(--font-mono);font-size:var(--font-size-xs);margin-bottom:14px;row-gap:6px;width:480px">
+                      <span style="border:1px solid var(--color-meta-faint);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:6px;width:6px"></span>
+                      <span style="box-sizing:border-box">read-only while attached — edits fork the definition for the next run</span>
+                    </div>
+                    <fdn-use component="FlowCard" data-fdn-prop-fit="spine" data-fdn-prop-glyph="lines" data-fdn-prop-meta="done · 11:48" data-fdn-prop-state="done" data-fdn-prop-title="Read the diff" style="display:contents">
+                      <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:9px;opacity:0.62;padding-bottom:10px;padding-left:14px;padding-right:14px;padding-top:10px;row-gap:9px;width:auto">
+                        <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-status-running)" data-fdn-prop-name="done" data-fdn-prop-size="14" style="display:contents">
+                          <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-status-running)">
+                            <g>
+                              <circle cx="8" cy="8" r="6.3" stroke="currentColor" stroke-width="1.3"></circle>
+                              <path d="M5.5 8.2l1.8 1.8 3.2-3.6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
+                            </g>
+                          </svg>
+                        </fdn-use>
+                        <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-primary);font-weight:var(--font-weight-medium);text-decoration-line:none;white-space:normal">Read the diff</span>
+                        <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-text-faint);font-size:var(--font-size-xs)">done · 11:48</span>
+                      </div>
+                    </fdn-use>
+                    <span data-fdn-style="spine-link" style="background:var(--color-border-input);display:block;flex:none;height:42px;width:1px;box-sizing:border-box"></span>
+                    <fdn-use component="FlowCard" data-fdn-prop-fit="spine" data-fdn-prop-glyph="lines" data-fdn-prop-meta="done · 11:48" data-fdn-prop-state="done" data-fdn-prop-title="Fan out reviewers" style="display:contents">
+                      <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:9px;opacity:0.62;padding-bottom:10px;padding-left:14px;padding-right:14px;padding-top:10px;row-gap:9px;width:auto">
+                        <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-status-running)" data-fdn-prop-name="done" data-fdn-prop-size="14" style="display:contents">
+                          <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-status-running)">
+                            <g>
+                              <circle cx="8" cy="8" r="6.3" stroke="currentColor" stroke-width="1.3"></circle>
+                              <path d="M5.5 8.2l1.8 1.8 3.2-3.6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
+                            </g>
+                          </svg>
+                        </fdn-use>
+                        <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-primary);font-weight:var(--font-weight-medium);text-decoration-line:none;white-space:normal">Fan out reviewers</span>
+                        <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-text-faint);font-size:var(--font-size-xs)">done · 11:48</span>
+                      </div>
+                    </fdn-use>
+                    <span data-fdn-style="spine-link" style="background:var(--color-border-input);display:block;flex:none;height:42px;width:1px;box-sizing:border-box"></span>
+                    <div data-fdn-style="branch" style="box-sizing:border-box;display:flex;flex:none;flex-direction:column;width:680px">
+                      <div data-fdn-style="branch-frame" style="align-items:center;border:1px solid var(--color-border-input);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;flex:none;flex-direction:column;justify-content:flex-end;margin-left:164px;width:353px;height:129.5px">
+                        <span data-fdn-style="junction" style="background:var(--color-border-input);border:1px solid var(--color-surface);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;display:block;flex:none;height:6px;margin-bottom:-3.5px;width:6px"></span>
+                      </div>
+                      <div data-fdn-style="lanes" style="column-gap:24px;display:flex;row-gap:24px;box-sizing:border-box;margin-bottom:42.5px;margin-top:-87.5px">
+                        <div data-fdn-style="lane" style="display:flex;flex:1 1 0;flex-direction:column;min-width:0;box-sizing:border-box">
+                          <div style="box-sizing:border-box;display:flex;flex-direction:column">
+                            <fdn-use component="FlowCard" data-fdn-prop-fit="lane" data-fdn-prop-glyph="lines" data-fdn-prop-meta="done · 11:48" data-fdn-prop-state="done" data-fdn-prop-title="Typecheck &amp; lint" style="display:contents">
+                              <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:8px;opacity:0.62;padding-bottom:10px;padding-left:13px;padding-right:13px;padding-top:10px;row-gap:8px;width:100%">
+                                <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-status-running)" data-fdn-prop-name="done" data-fdn-prop-size="14" style="display:contents">
+                                  <svg fill="none" height="14" viewBox="0 0 16 16" width="14" style="box-sizing:border-box;color:var(--color-status-running)">
+                                    <g>
+                                      <circle cx="8" cy="8" r="6.3" stroke="currentColor" stroke-width="1.3"></circle>
+                                      <path d="M5.5 8.2l1.8 1.8 3.2-3.6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"></path>
+                                    </g>
+                                  </svg>
+                                </fdn-use>
+                                <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-primary);font-weight:var(--font-weight-medium);text-decoration-line:none;white-space:normal">Typecheck &amp; lint</span>
+                                <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-text-faint);font-size:var(--font-size-xs)">done · 11:48</span>
+                              </div>
+                            </fdn-use>
+                          </div>
+                        </div>
+                        <div data-fdn-style="lane" style="display:flex;flex:1 1 0;flex-direction:column;min-width:0;box-sizing:border-box">
+                          <div style="box-sizing:border-box;display:flex;flex-direction:column">
+                            <fdn-use component="FlowCard" data-fdn-prop-fit="lane" data-fdn-prop-glyph="lines" data-fdn-prop-meta="current" data-fdn-prop-state="current" data-fdn-prop-title="Run the suite" style="display:contents">
+                              <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card-current);column-gap:8px;opacity:1;padding-bottom:12px;padding-left:14px;padding-right:14px;padding-top:12px;row-gap:8px;width:100%">
+                                <span style="background-color:var(--color-status-running);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:8px;width:8px"></span>
+                                <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-primary);font-weight:var(--font-weight-semibold);text-decoration-line:none;white-space:normal">Run the suite</span>
+                                <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-status-running);font-size:var(--font-size-xs)">current</span>
+                              </div>
+                            </fdn-use>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <span data-fdn-style="spine-link" style="background:var(--color-border-input);display:block;flex:none;height:42px;width:1px;box-sizing:border-box"></span>
+                    <fdn-use component="FlowCard" data-fdn-prop-fit="spine" data-fdn-prop-glyph="lines" data-fdn-prop-meta="upcoming · gate" data-fdn-prop-state="upcoming" data-fdn-prop-title="Verdict gate" style="display:contents">
+                      <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:9px;opacity:1;padding-bottom:10px;padding-left:14px;padding-right:14px;padding-top:10px;row-gap:9px;width:auto">
+                        <span style="border:1px solid var(--color-border-input);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:12px;width:12px"></span>
+                        <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-muted);font-weight:var(--font-weight-medium);text-decoration-line:none;white-space:normal">Verdict gate</span>
+                        <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-text-faint);font-size:var(--font-size-xs)">upcoming · gate</span>
+                      </div>
+                    </fdn-use>
+                    <div style="box-sizing:border-box;display:flex;flex:none;flex-direction:column;width:480px">
+                      <fdn-use component="ArmLabels" style="display:contents">
+                        <div style="align-items:flex-start;box-sizing:border-box;display:flex;flex:none;height:64px;width:480px">
+                          <span style="box-sizing:border-box;color:var(--color-meta-faint);flex:none;font-family:var(--font-mono);font-size:var(--font-size-2xs);letter-spacing:0.08em;padding-left:51px;padding-top:5px;white-space:nowrap;width:302px">approved ↓ continues</span>
+                          <span style="box-sizing:border-box;color:var(--color-status-review);flex:none;font-family:var(--font-mono);font-size:var(--font-size-2xs);font-weight:var(--font-weight-semibold);letter-spacing:0.13em;padding-top:5px;white-space:nowrap;width:56px">DENIED ↺</span>
+                          <span style="background-color:var(--color-border-input);box-sizing:border-box;flex:none;height:64px;margin-left:6px;width:1px"></span>
+                        </div>
+                      </fdn-use>
+                      <div style="box-sizing:border-box;display:flex;justify-content:flex-end">
+                        <div style="box-sizing:border-box;width:232px">
+                          <fdn-use component="FlowCard" data-fdn-prop-fit="lane" data-fdn-prop-glyph="lines" data-fdn-prop-meta="upcoming" data-fdn-prop-state="upcoming" data-fdn-prop-title="Fix findings" style="display:contents">
+                            <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:8px;opacity:1;padding-bottom:10px;padding-left:13px;padding-right:13px;padding-top:10px;row-gap:8px;width:100%">
+                              <span style="border:1px solid var(--color-border-input);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:12px;width:12px"></span>
+                              <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-muted);font-weight:var(--font-weight-medium);text-decoration-line:none;white-space:normal">Fix findings</span>
+                              <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-text-faint);font-size:var(--font-size-xs)">upcoming</span>
+                            </div>
+                          </fdn-use>
+                        </div>
+                      </div>
+                      <div data-fdn-style="arm-join" style="align-items:flex-end;border-bottom:1px solid var(--color-border-input);border-bottom-right-radius:var(--radius-lg);border-right:1px solid var(--color-border-input);box-sizing:border-box;display:flex;flex:none;height:42px;margin-left:240px;width:125px">
+                        <span data-fdn-style="junction" style="background:var(--color-border-input);border:1px solid var(--color-surface);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;display:block;flex:none;height:6px;margin-bottom:-3.5px;width:6px;margin-left:-3px"></span>
+                      </div>
+                    </div>
+                    <fdn-use component="FlowCard" data-fdn-prop-fit="spine" data-fdn-prop-glyph="lines" data-fdn-prop-meta="upcoming · nectar" data-fdn-prop-state="upcoming" data-fdn-prop-title="Publish preview" style="display:contents">
+                      <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:9px;opacity:1;padding-bottom:10px;padding-left:14px;padding-right:14px;padding-top:10px;row-gap:9px;width:auto">
+                        <span style="border:1px solid var(--color-border-input);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:12px;width:12px"></span>
+                        <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-muted);font-weight:var(--font-weight-medium);text-decoration-line:none;white-space:normal">Publish preview</span>
+                        <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-text-faint);font-size:var(--font-size-xs)">upcoming · nectar</span>
+                      </div>
+                    </fdn-use>
+                    <span data-fdn-style="spine-link" style="background:var(--color-border-input);display:block;flex:none;height:42px;width:1px;box-sizing:border-box"></span>
+                    <fdn-use component="FlowCard" data-fdn-prop-fit="spine" data-fdn-prop-glyph="lines" data-fdn-prop-meta="upcoming · blocking ask" data-fdn-prop-state="upcoming" data-fdn-prop-title="Ship it?" style="display:contents">
+                      <div data-fdn-style="flow-card" style="align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg);box-sizing:border-box;display:flex;position:relative;box-shadow:var(--shadow-card);column-gap:9px;opacity:1;padding-bottom:10px;padding-left:14px;padding-right:14px;padding-top:10px;row-gap:9px;width:auto">
+                        <span style="border:1px solid var(--color-border-input);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex:none;height:12px;width:12px"></span>
+                        <span data-fdn-style="card-title" style="flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);min-width:0;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;color:var(--color-text-muted);font-weight:var(--font-weight-medium);text-decoration-line:none;white-space:normal">Ship it?</span>
+                        <span data-fdn-style="card-meta" style="flex-shrink:1;font-family:var(--font-mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;color:var(--color-text-faint);font-size:var(--font-size-xs)">upcoming · blocking ask</span>
+                      </div>
+                    </fdn-use>
+                    <div style="box-sizing:border-box;color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-xs);margin-top:18px;width:480px">up next · pr-triage · queued by bumble-7 · 11:58 — spec-round · queued by mite-3 · 11:58</div>
+                  </div>
+                </div>
+              </div>
+            </fdn-use>
+            <div data-fdn-style="flow-footer" style="align-items:center;border-top:1px solid var(--color-divider);box-sizing:border-box;color:var(--color-meta-faint);column-gap:14px;display:flex;flex:none;font-family:var(--font-mono);font-size:var(--font-size-xs);height:32px;padding-bottom:0;padding-left:16px;padding-right:16px;padding-top:0;row-gap:14px">
+              <span style="box-sizing:border-box">hover a step for timestamps · click an exception for the full note</span>
+              <span style="align-items:center;box-sizing:border-box;column-gap:6px;display:flex;margin-left:auto;white-space:nowrap">
+                <fdn-use component="StatusDot" data-fdn-prop-size="6px" data-fdn-prop-state="waiting" style="display:contents">
+                  <span style="background:var(--color-status-waiting);border-bottom-left-radius:50%;border-bottom-right-radius:50%;border-top-left-radius:50%;border-top-right-radius:50%;box-sizing:border-box;flex-shrink:0;height:6px;width:6px"></span>
+                </fdn-use>
+                <span style="box-sizing:border-box">1 exception</span>
+              </span>
+            </div>
+          </main>
+          <fdn-use component="SidecarRail" data-fdn-prop-pending="none" style="display:contents">
+            <button style="align-items:center;background-color:transparent;border-bottom-width:0;border-left:1px solid var(--color-divider);border-right-width:0;border-top-width:0;box-sizing:border-box;color:var(--color-text-muted);cursor:pointer;display:flex;flex:none;flex-direction:column;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0;padding-bottom:12px;padding-left:0;padding-right:0;padding-top:12px;width:36px">
+              <span style="align-items:flex-end;box-sizing:border-box;display:flex;flex-direction:column;height:15px;width:15px">
+                <fdn-use component="FlowGlyph" data-fdn-prop-color="currentColor" data-fdn-prop-name="sidecar" data-fdn-prop-size="15" style="display:contents">
+                  <svg fill="none" height="15" viewBox="0 0 16 16" width="15" style="box-sizing:border-box;color:currentColor">
+                    <path d="M8 1.6l5.2 3v6L8 13.6l-5.2-3v-6z" stroke="currentColor" stroke-linejoin="round" stroke-width="1.3"></path>
+                  </svg>
+                </fdn-use>
+              </span>
+              <span style="box-sizing:border-box;color:var(--color-meta-faint);font-family:var(--font-mono);font-size:var(--font-size-2xs);margin-top:10px;writing-mode:vertical-rl">⌘⌃B</span>
+            </button>
+          </fdn-use>
+        </div>
+      </div>
+    </fdn-use>
+  </section>
+  <section style="display:flex;flex-direction:column">
+    <fdn-use component="BoardCaption" data-fdn-prop-body="Nothing defined yet. The rail stays, empty, so the pane keeps its shape. The canvas says what a track is in one sentence and spends its one honey moment on New track. One small pixel-art moment, per the personality budget; never wallpaper." data-fdn-prop-index="BOARD 3" data-fdn-prop-title="EMPTY — NO TRACKS DEFINED" style="display:contents">
+      <div style="display:flex;flex-direction:column;margin-bottom:14px;row-gap:6px">
+        <div style="align-items:baseline;column-gap:10px;display:flex">
+          <span style="color:var(--color-text-disabled);font-family:var(--font-mono);font-size:var(--font-size-xs);font-weight:var(--font-weight-medium);letter-spacing:.08em">BOARD 3</span>
+          <span data-fdn-style="section-label" style="font-family:var(--font-sans);font-size:10px;font-weight:var(--font-weight-semibold);letter-spacing:.12em;color:var(--color-text-tertiary)">EMPTY — NO TRACKS DEFINED</span>
+        </div>
+        <div style="color:var(--color-text-muted);font-family:var(--font-sans);font-size:12.5px;line-height:1.5;max-width:660px">Nothing defined yet. The rail stays, empty, so the pane keeps its shape. The canvas says what a track is in one sentence and spends its one honey moment on New track. One small pixel-art moment, per the personality budget; never wallpaper.</div>
+      </div>
+    </fdn-use>
+    <div style="align-items:flex-start;column-gap:32px;display:flex">
+      <fdn-use component="TracksPane" data-fdn-prop-mode="empty" style="display:contents">
+        <div data-fdn-style="flow-pane" style="box-sizing:border-box;color:var(--color-text-primary);display:flex;flex-direction:column;flex-grow:1;font-family:var(--font-sans);font-size:var(--font-size-md);line-height:var(--line-height-ui);position:relative;text-align:start;height:468px;width:724px">
+          <div data-fdn-style="fill-row" style="box-sizing:border-box;display:flex;flex:1;min-height:0">
+            <aside data-fdn-style="rail" style="background:var(--color-surface);border-right:1px solid var(--color-divider);box-sizing:border-box;display:flex;flex:none;flex-direction:column;width:232px">
+              <div data-fdn-style="rail-header" style="align-items:center;border-bottom:1px solid var(--color-divider);box-sizing:border-box;column-gap:8px;display:flex;flex:none;height:40px;padding-bottom:0;padding-left:14px;padding-right:10px;padding-top:0;row-gap:8px">
+                <span data-fdn-style="rail-label" style="color:var(--color-label-track);font-family:var(--font-sans);font-size:var(--font-size-meta);font-weight:var(--font-weight-semibold);letter-spacing:.14em;box-sizing:border-box">TRACKS</span>
+                <span data-fdn-style="meta-10" style="color:var(--color-text-faint);font-family:var(--font-mono);font-size:var(--font-size-meta);font-weight:var(--font-weight-regular);box-sizing:border-box">0</span>
+                <button data-fdn-style="icon-btn" style-hover="background:var(--color-hover)" style="align-items:center;border-bottom-left-radius:5px;border-bottom-right-radius:5px;border-top-left-radius:5px;border-top-right-radius:5px;display:flex;height:24px;justify-content:center;margin-left:auto;width:24px;background-color:transparent;border-width:0;box-sizing:border-box;color:var(--color-icon-muted);cursor:pointer;font-family:inherit;font-size:inherit;line-height:inherit;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0">
+                  <fdn-use component="FlowGlyph" data-fdn-prop-color="var(--color-icon-muted)" data-fdn-prop-name="plus" data-fdn-prop-size="12" style="display:contents">
+                    <svg fill="none" height="12" viewBox="0 0 16 16" width="12" style="box-sizing:border-box;color:var(--color-icon-muted)">
+                      <path d="M8 3.4v9.2M3.4 8h9.2" stroke="currentColor" stroke-linecap="round" stroke-width="1.4"></path>
+                    </svg>
+                  </fdn-use>
+                </button>
+              </div>
+              <div data-fdn-style="rail-list" style="box-sizing:border-box;flex:1;min-height:0;overflow:hidden;padding-bottom:8px;padding-left:6px;padding-right:6px;padding-top:8px"></div>
+            </aside>
+            <main data-fdn-style="fill-column" style="box-sizing:border-box;display:flex;flex:1;flex-direction:column;min-width:0">
+              <div style="align-items:center;box-sizing:border-box;display:flex;flex:1;flex-direction:column;justify-content:center">
+                <fdn-use component="PixelBee" style="display:contents">
+                  <div style="box-sizing:border-box;flex:none;height:56px;width:44px">
+                    <span style="box-shadow:var(--art-ink-deep) 12px 0 0 0, var(--art-ink-deep) 28px 0 0 0, var(--art-ink-deep) 16px 4px 0 0, var(--art-ink-deep) 24px 4px 0 0, var(--art-ink-deep) 12px 8px 0 0, var(--art-ink-deep) 16px 8px 0 0, var(--art-ink-deep) 20px 8px 0 0, var(--art-ink-deep) 24px 8px 0 0, var(--art-ink-deep) 28px 8px 0 0, var(--art-ink-deep) 8px 12px 0 0, var(--art-ink-deep) 12px 12px 0 0, var(--art-ink-deep) 16px 12px 0 0, var(--art-ink-deep) 20px 12px 0 0, var(--art-ink-deep) 24px 12px 0 0, var(--art-ink-deep) 28px 12px 0 0, var(--art-ink-deep) 32px 12px 0 0, var(--art-ink-deep) 8px 16px 0 0, var(--art-pale) 12px 16px 0 0, var(--art-ink-deep) 16px 16px 0 0, var(--art-ink-deep) 20px 16px 0 0, var(--art-ink-deep) 24px 16px 0 0, var(--art-pale) 28px 16px 0 0, var(--art-ink-deep) 32px 16px 0 0, var(--art-ink-deep) 8px 20px 0 0, var(--art-ink-deep) 12px 20px 0 0, var(--art-ink-deep) 16px 20px 0 0, var(--art-ink-deep) 20px 20px 0 0, var(--art-ink-deep) 24px 20px 0 0, var(--art-ink-deep) 28px 20px 0 0, var(--art-ink-deep) 32px 20px 0 0, var(--art-pale) 0 24px 0 0, var(--art-pale) 4px 24px 0 0, var(--art-honey) 12px 24px 0 0, var(--art-honey) 16px 24px 0 0, var(--art-honey) 20px 24px 0 0, var(--art-honey) 24px 24px 0 0, var(--art-honey) 28px 24px 0 0, var(--art-pale) 36px 24px 0 0, var(--art-pale) 40px 24px 0 0, var(--art-pale) 0 28px 0 0, var(--art-pale) 4px 28px 0 0, var(--art-pale) 8px 28px 0 0, var(--art-ink-deep) 12px 28px 0 0, var(--art-ink-deep) 16px 28px 0 0, var(--art-ink-deep) 20px 28px 0 0, var(--art-ink-deep) 24px 28px 0 0, var(--art-ink-deep) 28px 28px 0 0, var(--art-pale) 32px 28px 0 0, var(--art-pale) 36px 28px 0 0, var(--art-pale) 40px 28px 0 0, var(--art-pale) 0 32px 0 0, var(--art-pale) 4px 32px 0 0, var(--art-honey) 12px 32px 0 0, var(--art-honey) 16px 32px 0 0, var(--art-honey) 20px 32px 0 0, var(--art-honey) 24px 32px 0 0, var(--art-honey) 28px 32px 0 0, var(--art-pale) 36px 32px 0 0, var(--art-pale) 40px 32px 0 0, var(--art-ink-deep) 8px 36px 0 0, var(--art-ink-deep) 12px 36px 0 0, var(--art-ink-deep) 16px 36px 0 0, var(--art-ink-deep) 20px 36px 0 0, var(--art-ink-deep) 24px 36px 0 0, var(--art-ink-deep) 28px 36px 0 0, var(--art-ink-deep) 32px 36px 0 0, var(--art-honey) 12px 40px 0 0, var(--art-honey) 16px 40px 0 0, var(--art-honey) 20px 40px 0 0, var(--art-honey) 24px 40px 0 0, var(--art-honey) 28px 40px 0 0, var(--art-ink-deep) 12px 44px 0 0, var(--art-ink-deep) 16px 44px 0 0, var(--art-ink-deep) 20px 44px 0 0, var(--art-ink-deep) 24px 44px 0 0, var(--art-ink-deep) 28px 44px 0 0, var(--art-honey) 16px 48px 0 0, var(--art-honey) 20px 48px 0 0, var(--art-honey) 24px 48px 0 0, var(--art-ink-deep) 20px 52px 0 0;box-sizing:border-box;display:block;height:4px;width:4px"></span>
+                  </div>
+                </fdn-use>
+                <div style="box-sizing:border-box;color:var(--color-text-primary);font-family:var(--font-sans);font-size:var(--font-size-xl);font-weight:var(--font-weight-semibold);margin-top:18px">Write down how you’d want it done.</div>
+                <div style="box-sizing:border-box;color:var(--color-chip-ink);font-family:var(--font-sans);font-size:var(--font-size-md);line-height:1.5;margin-top:6px;max-width:380px;text-align:center">A track is a short list of steps an agent follows and checks off as it works.</div>
+                <div style="box-sizing:border-box;margin-top:18px">
+                  <fdn-use component="ActionButton" data-fdn-prop-disabled="no" data-fdn-prop-hint="c" data-fdn-prop-label="New track" data-fdn-prop-variant="accent" style="display:contents">
+                    <button data-fdn-style="pill-btn-accent" style-hover="background:#A87826" style="align-items:center;background:var(--color-accent);border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);border-top-left-radius:var(--radius-md);border-top-right-radius:var(--radius-md);color:var(--color-on-honey);column-gap:7px;cursor:pointer;display:flex;font-family:var(--font-sans);font-size:var(--font-size-row);font-weight:var(--font-weight-semibold);height:28px;padding-bottom:0;padding-left:14px;padding-right:14px;padding-top:0;row-gap:7px;border-width:0;box-sizing:border-box;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0">
+                      <span style="box-sizing:border-box">New track</span>
+                      <span style="box-sizing:border-box;font-family:var(--font-mono);font-size:var(--font-size-meta);opacity:0.8">c</span>
+                    </button>
+                  </fdn-use>
+                </div>
+              </div>
+            </main>
+            <fdn-use component="SidecarRail" data-fdn-prop-pending="none" style="display:contents">
+              <button style="align-items:center;background-color:transparent;border-bottom-width:0;border-left:1px solid var(--color-divider);border-right-width:0;border-top-width:0;box-sizing:border-box;color:var(--color-text-muted);cursor:pointer;display:flex;flex:none;flex-direction:column;font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:0;margin-left:0;margin-right:0;margin-top:0;padding-bottom:12px;padding-left:0;padding-right:0;padding-top:12px;width:36px">
+                <span style="align-items:flex-end;box-sizing:border-box;display:flex;flex-direction:column;height:15px;width:15px">
+                  <fdn-use component="FlowGlyph" data-fdn-prop-color="currentColor" data-fdn-prop-name="sidecar" data-fdn-prop-size="15" style="display:contents">
+                    <svg fill="none" height="15" viewBox="0 0 16 16" width="15" style="box-sizing:border-box;color:currentColor">
+                      <path d="M8 1.6l5.2 3v6L8 13.6l-5.2-3v-6z" stroke="currentColor" stroke-linejoin="round" stroke-width="1.3"></path>
+                    </svg>
+                  </fdn-use>
+                </span>
+                <span style="box-sizing:border-box;color:var(--color-meta-faint);font-family:var(--font-mono);font-size:var(--font-size-2xs);margin-top:10px;writing-mode:vertical-rl">⌘⌃B</span>
+              </button>
+            </fdn-use>
+          </div>
+        </div>
+      </fdn-use>
+      <aside style="display:flex;flex:1;flex-direction:column;min-width:0;padding-top:4px;row-gap:18px">
+        <div>
+          <fdn-use component="SectionLabel" data-fdn-prop-text="WHY THIS EMPTY STATE IS NOT A GALLERY" data-fdn-prop-trailing="" style="display:contents">
+            <div style="align-items:baseline;column-gap:8px;display:flex;margin-bottom:7px">
+              <span data-fdn-style="section-label" style="color:var(--color-text-faint);font-family:var(--font-sans);font-size:10px;font-weight:var(--font-weight-semibold);letter-spacing:.12em">WHY THIS EMPTY STATE IS NOT A GALLERY</span>
+            </div>
+          </fdn-use>
+          <div style="column-gap:28px;display:grid;grid-template-columns:1fr 1fr;row-gap:16px">
+            <div style="display:flex;flex-direction:column;row-gap:5px">
+              <span style="color:var(--color-text-tertiary);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);letter-spacing:.08em">NO BLUEPRINT LAYER</span>
+              <span style="color:var(--color-text-secondary);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">A starter-template grid is the obvious empty state and the wrong one: a template layer is an explicit non-goal. So the affordance is the real verb — write one down.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;row-gap:5px">
+              <span style="color:var(--color-text-tertiary);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);letter-spacing:.08em">TRACK ≠ MACHINE</span>
+              <span style="color:var(--color-text-secondary);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">A machine is a canvas with triggers built in, holding many jobs, alive for years. A track is the small thing: one agent, one expected sequence. Tracks work on agents inside machines, but neither feature needs the other.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;row-gap:5px">
+              <span style="color:var(--color-text-tertiary);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);letter-spacing:.08em">THE SAME FRAME</span>
+              <span style="color:var(--color-text-secondary);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">Rail, canvas and sidecar rail are all still there with zero tracks, so the first definition appears in place rather than replacing a splash screen.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;row-gap:5px">
+              <span style="color:var(--color-text-tertiary);font-family:var(--font-sans);font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);letter-spacing:.08em">ONE PIXEL MOMENT</span>
+              <span style="color:var(--color-text-secondary);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">Art tokens are declared separately from chrome tokens on purpose: the bee may be vivid, the UI palette stays restrained, and the two never bleed into each other.</span>
+            </div>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--color-border);display:flex;flex-direction:column;padding-top:14px;row-gap:5px">
+          <span style="color:var(--color-text-muted);font-family:var(--font-sans);font-size:12.5px;line-height:1.5">Honey once per pane: New track here, Accept on a proposal. Never two at once.</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+</div>

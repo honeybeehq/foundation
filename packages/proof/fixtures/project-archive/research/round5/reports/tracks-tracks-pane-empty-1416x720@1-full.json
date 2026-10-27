@@ -1,0 +1,637 @@
+{
+  "schema": "fdn-drift/0",
+  "artboard": "tracks-pane",
+  "state": "empty",
+  "viewport": {
+    "width": 1416,
+    "height": 720,
+    "dpr": 1
+  },
+  "design": {
+    "file": "packages/proof/fixtures/design/tracks-pane-flowview.fdn.html",
+    "head": "d8faa40f8d53863ef54c82fdf16bfb0742fbe343aaa4be10f53d173820fa00bc",
+    "htmlSha256": "4504a820d773034f3f269e278acf4a8375bc756478a2e1525f6b77d5a9a46c10",
+    "binding": "chain-head"
+  },
+  "code": {
+    "repo": "honeybeehq/apiary",
+    "commit": "de190984abad4cdfa2bcd7a92717858801fea8ae",
+    "root": "apps/desktop/src/renderer/src/panes/TracksPane.tsx#TracksPane"
+  },
+  "provable": true,
+  "captureEnvironment": {
+    "browserVersion": "151.0.7922.34",
+    "platform": "linux",
+    "fontPolicy": {
+      "sans": "Foundation Design Sans",
+      "mono": "Foundation Design Mono",
+      "serif": "Foundation Design Serif",
+      "fallback": "Foundation Symbols",
+      "requireCustomFonts": true
+    },
+    "fontAssets": [
+      {
+        "family": "Foundation Design Mono",
+        "weight": "400",
+        "format": "truetype",
+        "sha256": "c805f9436dbc268644c1d9584f01a601a653e028e08fd74b9b949f6cf8304d88",
+        "postScriptName": "DejaVuSansMono"
+      },
+      {
+        "family": "Foundation Design Mono",
+        "weight": "700",
+        "format": "truetype",
+        "sha256": "3a3c502eeff669a231549e80df9f7c49de109bafe303170409e905d0b31a38fe",
+        "postScriptName": "DejaVuSansMono-Bold"
+      },
+      {
+        "family": "Foundation Design Sans",
+        "weight": "400",
+        "format": "truetype",
+        "sha256": "4659bc0c58c5028dd488ec928d41d9265db43d9b669fc14ca8b0832daca7b144",
+        "postScriptName": "LiberationSans"
+      },
+      {
+        "family": "Foundation Design Sans",
+        "weight": "700",
+        "format": "truetype",
+        "sha256": "3973aa5054fb467dd5627245d3dc82e37bf16fe075756156a570455871351582",
+        "postScriptName": "LiberationSans-Bold"
+      },
+      {
+        "family": "Foundation Design Serif",
+        "weight": "400",
+        "format": "truetype",
+        "sha256": "705903ae1382f0150f115d6f10a30f5b2f3d6ade649c474afe6366c39174fb65",
+        "postScriptName": "LiberationSerif"
+      },
+      {
+        "family": "Foundation Design Serif",
+        "weight": "700",
+        "format": "truetype",
+        "sha256": "9e66c25e20868756bf12eb24a520a4552727c9cd108f577f7ae33e3c0110e39c",
+        "postScriptName": "LiberationSerif-Bold"
+      },
+      {
+        "family": "Foundation Symbols",
+        "weight": "400",
+        "format": "truetype",
+        "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
+        "postScriptName": "DejaVuSans"
+      },
+      {
+        "family": "Foundation Symbols",
+        "weight": "700",
+        "format": "truetype",
+        "sha256": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895",
+        "postScriptName": "DejaVuSans-Bold"
+      },
+      {
+        "family": "Hanken Grotesk",
+        "weight": "700",
+        "format": "woff2",
+        "sha256": "d85de6e272296d06f8205ad11e27140274e0ef97050232777d146eabb71c312d",
+        "postScriptName": "HankenGrotesk-Bold"
+      },
+      {
+        "family": "Hanken Grotesk",
+        "weight": "500",
+        "format": "woff2",
+        "sha256": "31f666af7bff625900c46aa34a05d8620482ba2db37db7b63749b693ab0c72ec",
+        "postScriptName": "HankenGrotesk-Medium"
+      },
+      {
+        "family": "Hanken Grotesk",
+        "weight": "400",
+        "format": "woff2",
+        "sha256": "787b3fdd0b7e6d59ae7ce14ce7a41d1a44616584b4c919b527da951972d5d87d",
+        "postScriptName": "HankenGrotesk-Regular"
+      },
+      {
+        "family": "Hanken Grotesk",
+        "weight": "600",
+        "format": "woff2",
+        "sha256": "58f23b7ae3e13b21a4dca4c05360be87b3531d60fc1cbff89732cac8fb3019ae",
+        "postScriptName": "HankenGrotesk-SemiBold"
+      },
+      {
+        "family": "IBM Plex Mono",
+        "weight": "500",
+        "format": "woff2",
+        "sha256": "01d285447409c8a588692162439a038b8cbd7871309ee20267b0d2d91c6e8e22",
+        "postScriptName": "IBMPlexMono-Medium"
+      },
+      {
+        "family": "IBM Plex Mono",
+        "weight": "400",
+        "format": "woff2",
+        "sha256": "08949f728dc52d528e69b1667d15c89a5686a4ee9a296ff90983985f99c380f7",
+        "postScriptName": "IBMPlexMono-Regular"
+      }
+    ],
+    "rendererSourceHash": "55e1c9a1aa9c78062f0470e01d73d5a6ef97d5b2e44230e921be6f745829e960"
+  },
+  "styles": {
+    "properties": [
+      "color",
+      "background-color",
+      "background-image",
+      "border-top-color",
+      "border-right-color",
+      "border-bottom-color",
+      "border-left-color",
+      "border-top-width",
+      "border-right-width",
+      "border-bottom-width",
+      "border-left-width",
+      "border-top-style",
+      "border-right-style",
+      "border-bottom-style",
+      "border-left-style",
+      "border-top-left-radius",
+      "border-top-right-radius",
+      "border-bottom-left-radius",
+      "border-bottom-right-radius",
+      "padding-top",
+      "padding-right",
+      "padding-bottom",
+      "padding-left",
+      "margin-top",
+      "margin-right",
+      "margin-bottom",
+      "margin-left",
+      "row-gap",
+      "column-gap",
+      "font-family",
+      "font-size",
+      "font-weight",
+      "line-height",
+      "letter-spacing",
+      "text-align",
+      "text-transform",
+      "opacity",
+      "box-shadow",
+      "text-shadow",
+      "display",
+      "align-items",
+      "justify-content",
+      "flex-direction",
+      "visibility",
+      "position",
+      "box-sizing",
+      "overflow-x",
+      "overflow-y",
+      "font-style",
+      "text-decoration-line",
+      "white-space",
+      "gap",
+      "flex-grow",
+      "flex-shrink"
+    ],
+    "unavailable": []
+  },
+  "matching": {
+    "algorithm": "hungarian",
+    "maxCost": 0.48,
+    "weights": {
+      "text": 0.4,
+      "tag": 0.15,
+      "roleName": 0.15,
+      "iou": 0.25,
+      "path": 0.05
+    },
+    "containerText": "descendant-Dice",
+    "confidence": "1-cost; uncalibrated"
+  },
+  "offscreen": {
+    "status": "measured"
+  },
+  "tolerances": {
+    "pixelRatio": 0.001,
+    "boxPx": 1,
+    "colorDeltaE": 1,
+    "stylePx": 1,
+    "pixelThreshold": 0.1
+  },
+  "pixels": {
+    "diffRatio": 0.0009631983678593848,
+    "diffPixels": 982,
+    "diffImage": "diff.png",
+    "designImage": "design.png",
+    "codeImage": "code.png"
+  },
+  "drifts": [
+    {
+      "id": "d1",
+      "designNode": "n284::n276::n40",
+      "codeNode": "n284::n276::n40",
+      "match": "id",
+      "confidence": 1,
+      "designBox": [
+        605.625,
+        299.375,
+        98.734375,
+        28
+      ],
+      "codeBox": [
+        605.625,
+        299.375,
+        98.734375,
+        28
+      ],
+      "kind": "text",
+      "property": "text",
+      "design": "",
+      "code": "New track"
+    },
+    {
+      "id": "d2",
+      "designNode": "n284::n276::n40",
+      "codeNode": "n284::n276::n40",
+      "match": "id",
+      "confidence": 1,
+      "designBox": [
+        605.625,
+        299.375,
+        98.734375,
+        28
+      ],
+      "codeBox": [
+        605.625,
+        299.375,
+        98.734375,
+        28
+      ],
+      "kind": "style",
+      "property": "margin-top",
+      "design": "0px",
+      "code": "18px",
+      "token": {
+        "design": null,
+        "code": null
+      }
+    },
+    {
+      "id": "d3",
+      "designNode": "n284::n605::n412",
+      "codeNode": "0/0/0/0/0/2/0",
+      "match": "heuristic",
+      "confidence": 0.75,
+      "designBox": [
+        203,
+        13.5,
+        12,
+        12
+      ],
+      "codeBox": [
+        203,
+        13.5,
+        12,
+        12
+      ],
+      "kind": "style",
+      "property": "flex-shrink",
+      "design": "1",
+      "code": "0",
+      "token": {
+        "design": null,
+        "code": null
+      }
+    },
+    {
+      "id": "d4",
+      "designNode": "n284::n272::n470",
+      "codeNode": "0/0/0/1/0/0/0",
+      "match": "heuristic",
+      "confidence": 0.75,
+      "designBox": [
+        633,
+        140.625,
+        4,
+        4
+      ],
+      "codeBox": [
+        633,
+        140.625,
+        4,
+        4
+      ],
+      "kind": "style",
+      "property": "position",
+      "design": "static",
+      "code": "absolute",
+      "token": {
+        "design": null,
+        "code": null
+      }
+    },
+    {
+      "id": "d5",
+      "designNode": "n284::n609::n540::n412",
+      "codeNode": "0/0/0/2/0/0",
+      "match": "heuristic",
+      "confidence": 0.75,
+      "designBox": [
+        1089,
+        12,
+        15,
+        15
+      ],
+      "codeBox": [
+        1089,
+        12,
+        15,
+        15
+      ],
+      "kind": "style",
+      "property": "display",
+      "design": "block",
+      "code": "inline",
+      "token": {
+        "design": null,
+        "code": null
+      }
+    },
+    {
+      "id": "d6",
+      "designNode": "n284::n609::n540::n412",
+      "codeNode": "0/0/0/2/0/0",
+      "match": "heuristic",
+      "confidence": 0.75,
+      "designBox": [
+        1089,
+        12,
+        15,
+        15
+      ],
+      "codeBox": [
+        1089,
+        12,
+        15,
+        15
+      ],
+      "kind": "style",
+      "property": "flex-shrink",
+      "design": "1",
+      "code": "0",
+      "token": {
+        "design": null,
+        "code": null
+      }
+    },
+    {
+      "id": "d7",
+      "kind": "missing",
+      "designNode": "n284::n276::n41",
+      "confidence": 0,
+      "property": "node",
+      "designBox": [
+        619.625,
+        304.3125,
+        57.734375,
+        18.125
+      ]
+    },
+    {
+      "id": "d8",
+      "kind": "missing",
+      "designNode": "n284::n609::n539",
+      "confidence": 0,
+      "property": "node",
+      "designBox": [
+        1089,
+        12,
+        15,
+        15
+      ]
+    }
+  ],
+  "defects": [
+    {
+      "id": "def-aea252968eb4f8660e79",
+      "layer": {
+        "design": "n284::n276::n40",
+        "code": "n284::n276::n40"
+      },
+      "kind": "text",
+      "cause": "text:text",
+      "classification": "product",
+      "findings": [
+        "d1"
+      ],
+      "summary": "text text differs at n284::n276::n40"
+    },
+    {
+      "id": "def-20a00fc76f833d7c3c13",
+      "layer": {
+        "design": "n284::n276::n40",
+        "code": "n284::n276::n40"
+      },
+      "kind": "layout",
+      "cause": "layout:configuration",
+      "classification": "product",
+      "findings": [
+        "d2"
+      ],
+      "summary": "layout configuration differs at n284::n276::n40"
+    },
+    {
+      "id": "def-003b08c1227ade766968",
+      "layer": {
+        "design": "n284::n605::n412",
+        "code": "0/0/0/0/0/2/0"
+      },
+      "kind": "style",
+      "cause": "unproven-layout-configuration",
+      "classification": "uncertain",
+      "findings": [
+        "d3"
+      ],
+      "summary": "unproven-layout-configuration differs at n284::n605::n412"
+    },
+    {
+      "id": "def-344b6124f513b148ad92",
+      "layer": {
+        "design": "n284::n272::n470",
+        "code": "0/0/0/1/0/0/0"
+      },
+      "kind": "style",
+      "cause": "unproven-layout-configuration",
+      "classification": "uncertain",
+      "findings": [
+        "d4"
+      ],
+      "summary": "unproven-layout-configuration differs at n284::n272::n470"
+    },
+    {
+      "id": "def-5f55c2ddb6c023abee35",
+      "layer": {
+        "design": "n284::n609::n540::n412",
+        "code": "0/0/0/2/0/0"
+      },
+      "kind": "style",
+      "cause": "unproven-layout-configuration",
+      "classification": "uncertain",
+      "findings": [
+        "d5",
+        "d6"
+      ],
+      "summary": "unproven-layout-configuration differs at n284::n609::n540::n412"
+    },
+    {
+      "id": "def-7f8b7f1a0d74dac3b82f",
+      "layer": {
+        "design": "n284::n276::n41"
+      },
+      "kind": "missing",
+      "cause": "missing:subtree",
+      "classification": "product",
+      "findings": [
+        "d7"
+      ],
+      "summary": "missing subtree differs at n284::n276::n41"
+    },
+    {
+      "id": "def-3d53a609c46642f8b814",
+      "layer": {
+        "design": "n284::n609::n539"
+      },
+      "kind": "missing",
+      "cause": "missing:subtree",
+      "classification": "product",
+      "findings": [
+        "d8"
+      ],
+      "summary": "missing subtree differs at n284::n609::n539"
+    }
+  ],
+  "summary": {
+    "uniqueDefects": 4,
+    "accepted": 0,
+    "raw": 8,
+    "uncertainMatches": 0,
+    "environment": 0,
+    "uncertain": 3
+  },
+  "matches": [
+    {
+      "designNode": "n284::n265",
+      "codeNode": "n284::n265",
+      "kind": "id",
+      "confidence": 1,
+      "wrappers": {
+        "design": [],
+        "code": [
+          "0"
+        ]
+      }
+    },
+    {
+      "designNode": "n284::n271",
+      "codeNode": "n284::n271",
+      "kind": "id",
+      "confidence": 1
+    },
+    {
+      "designNode": "n284::n273",
+      "codeNode": "n284::n273",
+      "kind": "id",
+      "confidence": 1
+    },
+    {
+      "designNode": "n284::n274",
+      "codeNode": "n284::n274",
+      "kind": "id",
+      "confidence": 1
+    },
+    {
+      "designNode": "n284::n276::n40",
+      "codeNode": "n284::n276::n40",
+      "kind": "id",
+      "confidence": 1
+    },
+    {
+      "designNode": "n284::n599",
+      "codeNode": "0/0/0",
+      "kind": "heuristic",
+      "confidence": 1
+    },
+    {
+      "designNode": "n284::n600",
+      "codeNode": "0/0/0/0",
+      "kind": "heuristic",
+      "confidence": 1
+    },
+    {
+      "designNode": "n284::n601",
+      "codeNode": "0/0/0/0/0",
+      "kind": "heuristic",
+      "confidence": 1
+    },
+    {
+      "designNode": "n284::n602",
+      "codeNode": "0/0/0/0/0/0",
+      "kind": "heuristic",
+      "confidence": 1
+    },
+    {
+      "designNode": "n284::n603",
+      "codeNode": "0/0/0/0/0/1",
+      "kind": "heuristic",
+      "confidence": 1
+    },
+    {
+      "designNode": "n284::n604",
+      "codeNode": "0/0/0/0/0/2",
+      "kind": "heuristic",
+      "confidence": 0.57
+    },
+    {
+      "designNode": "n284::n605::n412",
+      "codeNode": "0/0/0/0/0/2/0",
+      "kind": "heuristic",
+      "confidence": 0.75
+    },
+    {
+      "designNode": "n284::n607",
+      "codeNode": "0/0/0/1",
+      "kind": "heuristic",
+      "confidence": 1
+    },
+    {
+      "designNode": "n284::n272::n470",
+      "codeNode": "0/0/0/1/0/0/0",
+      "kind": "heuristic",
+      "confidence": 0.75
+    },
+    {
+      "designNode": "n284::n276::n42",
+      "codeNode": "0/0/0/1/0/3/0",
+      "kind": "heuristic",
+      "confidence": 0.95
+    },
+    {
+      "designNode": "n284::n609::n538",
+      "codeNode": "0/0/0/2",
+      "kind": "heuristic",
+      "confidence": 0.52
+    },
+    {
+      "designNode": "n284::n609::n540::n412",
+      "codeNode": "0/0/0/2/0/0",
+      "kind": "heuristic",
+      "confidence": 0.75
+    },
+    {
+      "designNode": "n284::n609::n542",
+      "codeNode": "0/0/0/2/1",
+      "kind": "heuristic",
+      "confidence": 0.95
+    }
+  ],
+  "verdict": "drift",
+  "timingsMs": {
+    "compare": 104.7912739999997
+  },
+  "reportHash": "dd1654d7611483ba1404cd87c1d06b477468f597965679a6a90164c9a05426ed"
+}

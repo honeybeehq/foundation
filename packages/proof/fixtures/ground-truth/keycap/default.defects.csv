@@ -1,0 +1,5 @@
+id,design_layer,code_layer,kind,description,severity,likely_intentional,note,properties
+K-01,0/0,0/0,layout,"Key cap is 18px tall in code but 21px in design (both author height 18px; design adds the 1px top and 2px bottom border outside it, code's border-box puts them inside), so the cap looks squatter and the ""⌘T"" sits about 1.5px higher",medium,no,"[cap-height] box-sizing content-box in design vs border-box in code; width is identical (24.6px)",height;box-sizing
+K-02,0/0,0/0,style,"Key label ink is lighter in code: #6B6862 (inkSoft token) vs the design's #5A564E",low,unsure,[cap-ink] design hardcodes #5A564E; code uses the nearest palette token,color
+K-03,0/0,0/0,token,"Key border is #E2E0DB (ghostBorder) in code vs --color-border #E7E5E0 in design, a barely visible shade darker",low,unsure,[cap-border] different border token,border-color
+K-04,0,0,environment,"Area around the cap is white in the design artboard and the warm window background #F5F4F1 in the code harness. Not a product defect",low,no,[harness-bg] capture environment only; the cap face itself is the same #FAFAF8 on both sides,background-color(page)
