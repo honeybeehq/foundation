@@ -1,0 +1,116 @@
+{
+  "case": "section-label",
+  "reportHash": "66df19d2c9b155a8a3fa4b66476a848a6d4ba0ffe9f6bf39379409bc43dfaaaa",
+  "optimistic": {
+    "tp": 1,
+    "fp": 1,
+    "fn": 2,
+    "precision": 0.5,
+    "recall": 0.3333333333333333,
+    "predicted": 2,
+    "labelled": 3,
+    "agreement": [
+      {
+        "defect": "def-ac127b73c6780b2ba8c2",
+        "label": "SL-04",
+        "description": "Label line box is 14px tall in code (line-height 1.45) vs 11px in design (normal), so the text sits about 1.5px lower"
+      }
+    ],
+    "falsePositives": [
+      {
+        "cause": "style:text-transform",
+        "classification": "product",
+        "findings": [
+          "d5"
+        ],
+        "id": "def-67b18a903b843019fb3b",
+        "kind": "style",
+        "layer": {
+          "code": "n125::n17",
+          "design": "n125::n17"
+        },
+        "summary": "style text-transform differs at n125::n17"
+      }
+    ],
+    "falseNegatives": [
+      {
+        "id": "SL-01",
+        "design_layer": "0/0",
+        "code_layer": "0/0",
+        "kind": "token",
+        "description": "Label is authored in the system font stack (-apple-system / Helvetica Neue) on the usage board and in Hanken Grotesk in code",
+        "severity": "medium",
+        "likely_intentional": "unsure",
+        "note": "[font-family] authored stacks differ independent of the Linux substitution",
+        "properties": "font-family"
+      },
+      {
+        "id": "SL-02",
+        "design_layer": "0/0",
+        "code_layer": "0/0",
+        "kind": "style",
+        "description": "Letter spacing is 1.4px (0.14em) in code vs 1.2px (0.12em) in design, so letters are spaced slightly wider (the design label is still 4px wider overall because of the substituted font)",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "[label-tracking]",
+        "properties": "letter-spacing"
+      }
+    ]
+  },
+  "strict": {
+    "tp": 1,
+    "fp": 1,
+    "fn": 2,
+    "precision": 0.5,
+    "recall": 0.3333333333333333,
+    "predicted": 2,
+    "labelled": 3,
+    "agreement": [
+      {
+        "defect": "def-ac127b73c6780b2ba8c2",
+        "label": "SL-04",
+        "description": "Label line box is 14px tall in code (line-height 1.45) vs 11px in design (normal), so the text sits about 1.5px lower"
+      }
+    ],
+    "falsePositives": [
+      {
+        "cause": "style:text-transform",
+        "classification": "product",
+        "findings": [
+          "d5"
+        ],
+        "id": "def-67b18a903b843019fb3b",
+        "kind": "style",
+        "layer": {
+          "code": "n125::n17",
+          "design": "n125::n17"
+        },
+        "summary": "style text-transform differs at n125::n17"
+      }
+    ],
+    "falseNegatives": [
+      {
+        "id": "SL-01",
+        "design_layer": "0/0",
+        "code_layer": "0/0",
+        "kind": "token",
+        "description": "Label is authored in the system font stack (-apple-system / Helvetica Neue) on the usage board and in Hanken Grotesk in code",
+        "severity": "medium",
+        "likely_intentional": "unsure",
+        "note": "[font-family] authored stacks differ independent of the Linux substitution",
+        "properties": "font-family"
+      },
+      {
+        "id": "SL-02",
+        "design_layer": "0/0",
+        "code_layer": "0/0",
+        "kind": "style",
+        "description": "Letter spacing is 1.4px (0.14em) in code vs 1.2px (0.12em) in design, so letters are spaced slightly wider (the design label is still 4px wider overall because of the substituted font)",
+        "severity": "low",
+        "likely_intentional": "unsure",
+        "note": "[label-tracking]",
+        "properties": "letter-spacing"
+      }
+    ]
+  }
+}

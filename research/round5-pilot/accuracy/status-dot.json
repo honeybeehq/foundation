@@ -1,0 +1,28 @@
+{
+  "case": "status-dot",
+  "reportHash": "5926f71a98bcf22fcaa67041461216b11fa66770ac8bf77ef90e6cf690547b72",
+  "optimistic": {
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "precision": null,
+    "recall": null,
+    "predicted": 0,
+    "labelled": 0,
+    "agreement": [],
+    "falsePositives": [],
+    "falseNegatives": []
+  },
+  "strict": {
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "precision": null,
+    "recall": null,
+    "predicted": 0,
+    "labelled": 0,
+    "agreement": [],
+    "falsePositives": [],
+    "falseNegatives": []
+  }
+}

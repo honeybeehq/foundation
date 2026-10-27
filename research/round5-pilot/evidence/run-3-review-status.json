@@ -1,0 +1,33 @@
+{
+  "run": "40470779019.1",
+  "unreviewed": 0,
+  "reviewed": 31,
+  "counts": {
+    "unreviewed": 0,
+    "real": 25,
+    "accept": 1,
+    "false": 5
+  },
+  "preAccepted": 0,
+  "unreviewedItems": [],
+  "reviewTimes": [
+    {
+      "durationMs": 213999,
+      "endedAt": "2026-10-27T07:55:23.990Z",
+      "id": "e2dfa35f850543d27fa3",
+      "lastAt": "2026-10-27T07:55:23.378Z",
+      "reviewer": "P1 agent-assisted demo (Codex)",
+      "run": "40469303506.1",
+      "startedAt": "2026-10-27T07:51:49.991Z"
+    },
+    {
+      "durationMs": 52290,
+      "endedAt": "2026-10-27T08:01:28.422Z",
+      "id": "44a7c966d5a86e1998bb",
+      "lastAt": "2026-10-27T08:01:27.824Z",
+      "reviewer": "P1 agent-assisted demo (Codex)",
+      "run": "40470241574.1",
+      "startedAt": "2026-10-27T08:00:36.132Z"
+    }
+  ]
+}
