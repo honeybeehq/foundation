@@ -1,0 +1,46 @@
+design_path,design_fdn_id,design_desc,code_path,code_desc,confidence,note
+0/0,n145,div bg+bd+sh,0/0,div bg+bd+sh,sure,
+0/0/0/0,n147,div bd,0/0/1/0/0,div bd,sure,search field
+0/0/0/0/0/0,n149,"text ""split""",0/0/1/0/0/0,input ,sure,"input value ""split"""
+0/0/0/0/0/1,n150,span bg,0/0/1/0/0/0,input ,unsure,painted caret vs the native input caret (not visible in a still capture)
+0/0/0/0/1,n151,"text ""6 matches""",0/0/1/0/1,"text ""6 matches""",sure,same unique text; box shifted by 40px
+0/0/0/0/2,n152,"text ""✕""",none,,sure,no clear button in code
+0/0/1/0/0,n154::n2,div bg,0/0/1/1/0/0/0,div bg,sure,
+0/0/1/0/0/0,n154::n3,"text ""Split pane""",0/0/1/1/0/0/0/0/0,"text ""Split pane""",sure,
+0/0/1/0/0/1,n154::n4,"text ""row · column""",0/0/1/1/0/0/0/0/1,"text ""row · column""",sure,
+0/0/1/0/0/2/0,n154::n6,"text ""Panes & tabs""",0/0/1/1/0/0/0/0/3,"text ""Panes & tabs""",sure,
+0/0/1/0/0/2/1/0/0,n154::n7#0::n8::n1,"text ""⌘D""",0/0/1/1/0/0/0/1/0/0,"text ""⌘D""",sure,same unique text; box shifted by 9px
+0/0/1/0/0/2/2/0/0,n154::n7#1::n8::n1,"text ""⌘⇧D""",0/0/1/1/0/0/0/1/1/1,"text ""⌘⇧D""",sure,
+0/0/1/1/0,n155::n2,div,0/0/1/1/0/5/0,div ,sure,
+0/0/1/1/0/0,n155::n3,"text ""Open files in a split""",0/0/1/1/0/5/0/0/0,"text ""Open files in a split""",sure,
+0/0/1/1/0/1,n155::n4,"text ""vertical · horizontal""",0/0/1/1/0/5/0/0/1,"text ""vertical · horizontal""",sure,
+0/0/1/1/0/2/0,n155::n6,"text ""Panes & tabs""",0/0/1/1/0/5/0/0/3,"text ""Panes & tabs""",sure,"row is 6th in code, 2nd in design"
+0/0/1/1/0/2/1/0/0,n155::n7#0::n8::n1,"text ""⌘⌥O""",0/0/1/1/0/5/0/1/0/0,"text ""⌘⌥O""",sure,same unique text; box shifted by 120px
+0/0/1/1/0/2/2/0/0,n155::n7#1::n8::n1,"text ""⌘⌥⇧O""",0/0/1/1/0/5/0/1/1/1,"text ""⌘⌥⇧O""",sure,same unique text; box shifted by 120px
+0/0/1/2/0,n156::n2,div,0/0/1/1/0/4/0,div ,sure,
+0/0/1/2/0/0,n156::n3,"text ""Preview beside — split stays""",0/0/1/1/0/4/0/0/0,"text ""Preview beside — split stays""",sure,
+0/0/1/2/0/1/0,n156::n6,"text ""Lists""",0/0/1/1/0/4/0/0/2,"text ""Lists""",sure,same unique text; box shifted by 57px
+0/0/1/2/0/1/1/0/0,n156::n7#0::n8::n1,"text ""⇥""",0/0/1/1/0/4/0/1/0/0,"text ""⇥""",sure,same unique text; box shifted by 60px
+0/0/1/3/0,n157::n2,div,0/0/1/1/0/2/0,div ,sure,
+0/0/1/3/0/0,n157::n3,"text ""Inline ⇄ split diff""",0/0/1/1/0/2/0/0/0,"text ""Inline ⇄ split diff""",sure,
+0/0/1/3/0/1,n157::n4,"text ""auto by pane width""",0/0/1/1/0/2/0/0/1,"text ""auto by pane width""",sure,
+0/0/1/3/0/2/0,n157::n6,"text ""Changes""",0/0/1/1/0/2/0/0/3,"text ""Changes""",sure,same unique text; box shifted by 33px
+0/0/1/3/0/2/1/0/0,n157::n7#0::n8::n1,"text ""i""",0/0/1/1/0/2/0/1/0/0,"text ""i""",sure,same unique text; box shifted by 30px
+0/0/1/4/0,n158::n2,div,0/0/1/1/0/1/0,div ,sure,
+0/0/1/4/0/0,n158::n3,"text ""Move pane in direction — splits off at an edge""",0/0/1/1/0/1/0/0/0,"text ""Move pane in direction — splits off at an edge""",sure,
+0/0/1/4/0/1/0,n158::n6,"text ""Panes & tabs""",0/0/1/1/0/1/0/0/2,"text ""Panes & tabs""",sure,"row is 2nd in code, 5th in design"
+0/0/1/4/0/1/1/0/0,n158::n7#0::n8::n1,"text ""⌘⌥⇧←↑↓→""",0/0/1/1/0/1/0/1/0/0,"text ""⌘⌥⇧←↑↓→""",sure,same unique text; box shifted by 90px
+0/0/1/5/0,n159::n2,div,0/0/1/1/0/3/0,div ,sure,
+0/0/1/5/0/0,n159::n3,"text ""Add pane to group — unsplit a tab""",0/0/1/1/0/3/0/0/0,"text ""Add pane to group — unsplit a tab""",sure,
+0/0/1/5/0/1,n159::n4,"text ""not available in this pane""",0/0/1/1/0/3/0/0/1,"text ""not available in this pane""",sure,
+0/0/1/5/0/2/0,n159::n6,"text ""Panes & tabs""",0/0/1/1/0/3/0/0/3,"text ""Panes & tabs""",sure,"row is 4th in code, 6th in design"
+0/0/1/5/0/2/1/0/0,n159::n7#0::n8::n1,"text ""⌘⇧T""",0/0/1/1/0/3/0/1/0/0,"text ""⌘⇧T""",sure,same unique text; box shifted by 60px
+0/0/1/6,n160,div bd,none,,sure,no cross-topic hint in code
+0/0/1/6/0,n161,"text ""no match in GUIDE topics ·""",none,,sure,no code layer renders this
+0/0/1/6/1,n162,"text ""search ""split"" in Search everything /""",none,,sure,no code layer renders this
+0/0/2,n163,div bd,0/0/1/2,div bd,sure,footer (content column only in code)
+0/0/2/0,n164,"text ""↑↓ move""",none,,sure,no code layer renders this
+0/0/2/1,n165,"text ""·""",none,,sure,footer hint separators absent
+0/0/2/2,n166,"text ""↵ run Split pane""",none,,sure,no code layer renders this
+0/0/2/3,n167,"text ""·""",none,,sure,footer hint separators absent
+0/0/2/4,n168,"text ""esc clear, then close""",none,,sure,no code layer renders this

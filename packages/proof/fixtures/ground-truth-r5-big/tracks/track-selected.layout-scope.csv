@@ -1,0 +1,5 @@
+id,in_layout_check,why
+TS-01,no,background dot pattern only; no element moves
+TS-02,yes,geometry: steps 42px lower below the fold
+TS-03,yes,geometry: card width below the fold
+TS-04,no,environment
