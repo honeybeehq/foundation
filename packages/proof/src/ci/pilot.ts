@@ -43,9 +43,13 @@ export async function pilotPolicy(
     captures: Record<string, string> = {},
     environments: NonNullable<VerifyPolicy["captureEnvironments"]> = {},
     links: Record<string, string> = {};
+  let designBinding: VerifyPolicy["designBinding"] | undefined;
   let tolerances: VerifyPolicy["tolerances"] | undefined;
   for (const c of cases) {
     const p = policyFromLinks(c.links);
+    if (designBinding && designBinding !== p.designBinding)
+      throw Error("Pilot links must use the same design binding mode");
+    designBinding = p.designBinding;
     tolerances ??= p.tolerances;
     links[c.file] = createHash("sha256")
       .update(await readFile(path.resolve(repo, c.file)))
@@ -60,7 +64,12 @@ export async function pilotPolicy(
         "design",
       );
       const d = await readCapture(path.resolve(repo, baseline, rel));
-      if (d.meta.designHead !== c.links.designHead)
+      if (
+        d.meta.designHead !== c.links.designHead ||
+        !c.links.designHtmlSha256 ||
+        d.meta.htmlSha256 !== c.links.designHtmlSha256 ||
+        (d.meta.binding ?? "chain-head") !== p.designBinding
+      )
         throw Error(`Baseline differs from linked design: ${key}`);
       required.push(scope);
       captures[key] = captureHash(d);
@@ -77,7 +86,7 @@ export async function pilotPolicy(
     links,
     tolerances: tolerances!,
     required,
-    designBinding: "chain-head",
+    designBinding: designBinding!,
     requireHtmlSha256: true,
     baseline: { bindings, captures },
     captureEnvironments: environments,

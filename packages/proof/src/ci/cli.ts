@@ -32,7 +32,9 @@ if (command === "capture-code") {
 } else if (command === "accept") {
   process.argv = [...process.argv.slice(0, 2), "accept", ...args];
   await import("../accept/cli.ts");
-} else if (["review", "review-start", "review-end"].includes(command!)) {
+} else if (
+  ["review", "review-start", "review-end", "review-abort"].includes(command!)
+) {
   process.argv = [...process.argv.slice(0, 2), command!, ...args];
   await import("../review/cli.ts");
 } else if (command === "pilot-policy") {
@@ -73,7 +75,12 @@ if (command === "capture-code") {
                 viewport: board.viewport,
               })
             ];
-          if (!binding || binding.head !== c.links.designHead)
+          if (
+            !binding ||
+            binding.head !== c.links.designHead ||
+            binding.htmlSha256 !== c.links.designHtmlSha256 ||
+            (c.links.binding ?? "chain-head") !== policy.designBinding
+          )
             throw Error("Pilot design binding differs from base policy");
         }
     }
@@ -102,7 +109,7 @@ if (command === "capture-code") {
       required.state,
       `${required.viewport.width}x${required.viewport.height}@${required.viewport.dpr}`,
     );
-    const destination = path.join(out, required.artboard, required.state),
+    const destination = path.join(out, rel),
       r = await compareDirectories(
         path.join(baseline, rel, "design"),
         path.join(opt("--captures", "captures")!, rel, "code"),
@@ -134,14 +141,19 @@ if (command === "capture-code") {
   );
   const runBody = {
     schema: "fdn-review-run/0" as const,
-    run: opt("--run", process.env.GITHUB_RUN_ID ?? "local")!,
+    run: opt(
+      "--run",
+      process.env.GITHUB_RUN_ID
+        ? `${process.env.GITHUB_RUN_ID}.${process.env.GITHUB_RUN_ATTEMPT ?? 1}`
+        : "local",
+    )!,
     createdAt: new Date().toISOString(),
     artifactUrl: opt("--artifact-url", ".")!,
     candidates: reports.flatMap((r: any, i: number) =>
       r.provable
-        ? r.defects.map((d: any) =>
-            candidateOf(r, d, path.relative(out, files[i]!)),
-          )
+        ? r.defects
+            .filter((d: any) => d.classification === "product")
+            .map((d: any) => candidateOf(r, d, path.relative(out, files[i]!)))
         : [],
     ),
   };
@@ -166,7 +178,13 @@ if (command === "capture-code") {
         reviewed: reviewItems.filter((i: any) => i.status !== "unreviewed")
           .length,
         items: reviewItems,
-        reviewTimes: reviewLog.sessions.filter((s) => s.endedAt),
+        counts: Object.fromEntries(
+          ["unreviewed", "real", "accept", "false"].map((status) => [
+            status,
+            reviewItems.filter((i: any) => i.status === status).length,
+          ]),
+        ),
+        reviewTimes: reviewLog.sessions.filter((s) => s.endedAt && !s.aborted),
       },
       null,
       2,

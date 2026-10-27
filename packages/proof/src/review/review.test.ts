@@ -173,3 +173,55 @@ test("tampered run index is refused", async () => {
     await rm(dir, { recursive: true, force: true });
   }
 });
+
+test("a valid pre-existing acceptance is already reviewed", () => {
+  const r = report(),
+    c = candidateOf(r, r.defects[0], "report.json");
+  expect(reviewState(c, emptyReview(), true).status).toBe("accept");
+});
+test("review and acceptance persist together, with rollback on log failure", async () => {
+  const { persistReview } = await import("./index.ts");
+  const dir = await mkdtemp(path.join(tmpdir(), "fdn-review-"));
+  try {
+    await mkdir(path.join(dir, ".foundation"));
+    const file = path.join(dir, ".foundation/accepted.json"),
+      before = '{"schema":"fdn-accepted/0","entries":[]}\n';
+    await writeFile(file, before);
+    await mkdir(path.join(dir, ".foundation/review-log.json"));
+    await expect(
+      persistReview(dir, emptyReview(), {
+        schema: "fdn-accepted/0",
+        entries: [{ id: "example" }],
+      }),
+    ).rejects.toThrow();
+    expect(await readFile(file, "utf8")).toBe(before);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+test("ended-session timing must be consistent and finite", async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), "fdn-review-"));
+  try {
+    const file = path.join(dir, "log.json");
+    await writeFile(
+      file,
+      JSON.stringify({
+        ...emptyReview(),
+        sessions: [
+          {
+            id: "s",
+            run: "r",
+            reviewer: "p",
+            startedAt: "2026-01-01T00:00:00Z",
+            lastAt: "2026-01-01T00:00:01Z",
+            endedAt: "2026-01-01T00:00:02Z",
+            durationMs: -1,
+          },
+        ],
+      }),
+    );
+    await expect(readReview(file)).rejects.toThrow("session");
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
