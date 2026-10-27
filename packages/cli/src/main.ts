@@ -1,6 +1,4 @@
 #!/usr/bin/env -S npx tsx
-import { runImages } from './commands/images.js'
-import { runDoctor } from './commands/doctor.js'
 /**
  * foundation-cli — entry point (API.md "CLI (packages/cli)"). Zero-dependency
  * argv parsing; bin name `foundation`; tsx is the runtime (this file is the
@@ -11,64 +9,44 @@ import { runDoctor } from './commands/doctor.js'
  * exit code — main.ts's only jobs are picking the command and calling
  * process.exit with what it returns.
  */
-import { runHelp, runSkill } from './commands/skill.js'
-import { runInstall } from './commands/install.js'
-import { runtimeVersion } from './runtime-version.js'
-import { runEdit } from './commands/edit.js'
 import { realpathSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { processIo } from './io.js'
-import { runNew } from './commands/new.js'
-import { runCopy } from './commands/copy.js'
-import { runInspect } from './commands/inspect.js'
-import { runValidate } from './commands/validate.js'
-import { runIngest } from './commands/ingest.js'
-import { runImport } from './commands/import.js'
-import { runBake } from './commands/bake.js'
-import { runRender } from './commands/render.js'
-import { runDiff } from './commands/diff.js'
-import { runServe } from './commands/serve.js'
-import { runChain } from './commands/chain.js'
-import { runAnnotate, runAnnotations } from './commands/annotate.js'
-import { runFreeze } from './commands/freeze.js'
-import { runMcp } from './commands/mcp.js'
-import { runGateway } from './commands/gateway.js'
-import { runGit } from './commands/git.js'
-import { runGitMergeDriver } from './commands/git-merge-driver.js'
-import { runProject } from './commands/project.js'
-import { runSession } from './commands/session.js'
 import type { CliIO } from './io.js'
+import { runCapabilities } from './commands/capabilities.js'
 
 const COMMANDS: Record<string, (args: string[], io: CliIO) => Promise<number>> = {
-  images: runImages,
-  'import-image': (args, io) => runImages(args, io, 'import-image'),
-  'localize-images': (args, io) => runImages(args, io, 'localize-images'),
-  doctor: runDoctor,
-  install: runInstall,
-  version: async (_args, io) => { io.stdout(JSON.stringify(runtimeVersion())); return 0 },
-  new: runNew,
-  copy: runCopy,
-  inspect: runInspect,
-  validate: runValidate,
-  ingest: runIngest,
-  import: runImport,
-  bake: runBake,
-  render: runRender,
-  diff: runDiff,
-  serve: runServe,
-  chain: runChain,
-  annotate: runAnnotate,
-  annotations: runAnnotations,
-  freeze: runFreeze,
-  mcp: runMcp,
-  gateway: runGateway,
-  git: runGit,
-  'git-merge-driver': runGitMergeDriver,
-  project: runProject,
-  session: runSession,
-  edit: runEdit,
-  help: runHelp,
-  skill: runSkill,
+  images: async (args, io) => (await import('./commands/images.js')).runImages(args, io),
+  'import-image': async (args, io) => (await import('./commands/images.js')).runImages(args, io, 'import-image'),
+  'localize-images': async (args, io) => (await import('./commands/images.js')).runImages(args, io, 'localize-images'),
+  doctor: async (args, io) => args.includes('--capabilities') ? runCapabilities(args, io) : (await import('./commands/doctor.js')).runDoctor(args, io),
+  install: async (args, io) => (await import('./commands/install.js')).runInstall(args, io),
+  version: async (_args, io) => { io.stdout(JSON.stringify((await import('./runtime-version.js')).runtimeVersion())); return 0 },
+  share: async (args, io) => (await import('./commands/share.js')).runShare(args, io),
+  sync: async (args, io) => (await import('./commands/sync.js')).runSync(args, io),
+  new: async (args, io) => (await import('./commands/new.js')).runNew(args, io),
+  copy: async (args, io) => (await import('./commands/copy.js')).runCopy(args, io),
+  inspect: async (args, io) => (await import('./commands/inspect.js')).runInspect(args, io),
+  validate: async (args, io) => (await import('./commands/validate.js')).runValidate(args, io),
+  ingest: async (args, io) => (await import('./commands/ingest.js')).runIngest(args, io),
+  import: async (args, io) => (await import('./commands/import.js')).runImport(args, io),
+  bake: async (args, io) => (await import('./commands/bake.js')).runBake(args, io),
+  render: async (args, io) => (await import('./commands/render.js')).runRender(args, io),
+  diff: async (args, io) => (await import('./commands/diff.js')).runDiff(args, io),
+  serve: async (args, io) => (await import('./commands/serve.js')).runServe(args, io),
+  chain: async (args, io) => (await import('./commands/chain.js')).runChain(args, io),
+  annotate: async (args, io) => (await import('./commands/annotate.js')).runAnnotate(args, io),
+  annotations: async (args, io) => (await import('./commands/annotate.js')).runAnnotations(args, io),
+  freeze: async (args, io) => (await import('./commands/freeze.js')).runFreeze(args, io),
+  mcp: async (args, io) => (await import('./commands/mcp.js')).runMcp(args, io),
+  gateway: async (args, io) => (await import('./commands/gateway.js')).runGateway(args, io),
+  git: async (args, io) => (await import('./commands/git.js')).runGit(args, io),
+  'git-merge-driver': async (args, io) => (await import('./commands/git-merge-driver.js')).runGitMergeDriver(args, io),
+  project: async (args, io) => (await import('./commands/project.js')).runProject(args, io),
+  session: async (args, io) => (await import('./commands/session.js')).runSession(args, io),
+  edit: async (args, io) => (await import('./commands/edit.js')).runEdit(args, io),
+  help: async (args, io) => (await import('./commands/skill.js')).runHelp(args, io),
+  skill: async (args, io) => (await import('./commands/skill.js')).runSkill(args, io),
 }
 
 const USAGE = `foundation — a design-document engine CLI
@@ -80,8 +58,14 @@ commands:
   import-image <file> <source> --node ID    store image and attach to node (one undo)
   localize-images <file> [--node ID]        store remote images explicitly (one undo)
   version [--json]                          report source revision and compatibility
-  install [--from CHECKOUT] [--sha SHA] [--force]  install a node-level committed copy
+  install [--from CHECKOUT] [--sha SHA] [--force] [--dry-run]  plan or install a node-level copy
+  install --rollback [--dry-run]            restore the previous activation
   doctor --inventory --json                  inventory executable copies without changing them
+  doctor --capabilities --json [--product-root ABS] [--design-path ABS] [--foundation-path ABS]
+                                              report installed runtime and selected checkout without writes
+  share init|login|status|grant|revoke-device|serve|backup     encrypted repo sharing
+  share github-app finish|check             register and verify a Metadata-only GitHub App
+  sync open|close|serve|status|materialize                    register live designs, sync through Comb, inspect local/upload state
   new <name> [--no-chain]                    write a minimal .fdn.html skeleton (chain-inits it too)
   copy <src> <dest> [--title T] [--json]      create an independent document with a fresh identity and chain
   inspect <file>                             summarize a document
@@ -129,11 +113,15 @@ commands:
                                               session protocol on stdin/stdout (packages/protocol)
   gateway install|uninstall|status           publish/withdraw the operator-gateway registry entry
   git setup                                 configure chain-aware Git merges
+  git pull [remote [branch]]                fast-forward while preserving live-synced design edits
+  git prepare-update <incoming> -- <command> [args...]
+                                              hold design locks around another fast-forward update
+  git recover-update <backup-directory>      restore edits after an interrupted update
   git-merge-driver <ancestor> <ours> <theirs> [repo-path]   git merge driver (see docs/GIT-INTEGRATION.md)
 `
 
 export async function runCli(argv: string[], io: CliIO = processIo): Promise<number> {
-  if (argv[0] === '--version') { io.stdout(JSON.stringify(runtimeVersion())); return 0 }
+  if (argv[0] === '--version') { io.stdout(JSON.stringify((await import('./runtime-version.js')).runtimeVersion())); return 0 }
   const [command, ...rest] = argv
   if (!command || command === '--help' || command === '-h') {
     io.stdout(USAGE)
@@ -145,7 +133,11 @@ export async function runCli(argv: string[], io: CliIO = processIo): Promise<num
     io.stdout(USAGE)
     return 2
   }
-  return handler(rest, io)
+  const code = await handler(rest, io)
+  // Commands with a document first argument include CLI and MCP-independent edits.
+  const editedFile = command === 'copy' ? rest[1] : ['new', 'edit', 'annotate', 'ingest'].includes(command) ? rest[0] : undefined
+  if (code === 0 && editedFile?.endsWith('.fdn.html')) (await import('./sync-store.js')).autoOpenDesign(editedFile, io.stderr)
+  return code
 }
 
 function isMainModule(): boolean {

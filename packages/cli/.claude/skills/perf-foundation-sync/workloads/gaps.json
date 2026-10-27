@@ -1,0 +1,420 @@
+{
+  "gaps": [
+    {
+      "key": "entry:packages/cli/src/session/bake-impact.ts:bakeImpact",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/bake-impact.ts:mergeBakeImpact",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/bin.ts:main",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/components.ts:expandComponentOp",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/free-geometry.ts:canonicalTransform",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/free-geometry.ts:constraintStyle",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/free-geometry.ts:constraintsOf",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/free-geometry.ts:effectiveStyle",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/free-geometry.ts:freeBounds",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/free-geometry.ts:freeTransform",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/free-geometry.ts:hasStateStyles",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/free-geometry.ts:isCanonicalTransform",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/free-geometry.ts:transformStyle",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/legacy.ts:legacyBoardRef",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/legacy.ts:legacyMessage",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/placement.ts:expandPlacement",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/token-modes.ts:expandSessionOps",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/token-modes.ts:isArtboardOperation",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/undo.ts:oppositeStep",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/undo.ts:placementHistory",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/undo.ts:undoOps",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/session/undo.ts:undoStep",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/sync/catalogue.ts:catalogueBytes",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/sync/catalogue.ts:catalogueHash",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/sync/catalogue.ts:catalogueLog",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/sync/catalogue.ts:catalogueRecord",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/sync/catalogue.ts:confinedRelativePath",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/sync/materialize.ts:materialize",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/sync/materialize.ts:materializePath",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "poll:packages/cli/src/sync/catalogue.ts#1",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "rpc:packages/cli/src/sync/catalogue.ts:append",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "rpc:packages/cli/src/sync/materialize.ts:head",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "rpc:packages/cli/src/sync/materialize.ts:read",
+      "reason": "Outside the measured sync critical path: catalogue/materialization or unrelated editing helpers"
+    },
+    {
+      "key": "entry:packages/cli/src/commands/share.ts:runShare",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/client.ts:createSpace",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/client.ts:ghToken",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/client.ts:initializeKeys",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/client.ts:login",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/client.ts:prepareDevice",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/client.ts:renew",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/client.ts:restoreRecovery",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/client.ts:rotateRecovery",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/client.ts:sharingStatus",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/config.ts:serviceUrl",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:authProof",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:certifyEpoch",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:deviceId",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:deviceStatement",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:generateDeviceKeys",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:newEpoch",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:recoverEpoch",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:recoveryKeypair",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:unwrapKey",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:validateEpoch",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:verifyEpochCertificate",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:wrapKey",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github.ts:githubIdentity",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github.ts:signDevice",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/service-store.ts:backupShareMetadata",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/service.ts:backupShareService",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "http:packages/cli/src/commands/share.ts#1",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "http:packages/cli/src/share/auth.ts#1",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "http:packages/cli/src/share/client.ts#1",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "http:packages/cli/src/share/github.ts#1",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "http:packages/cli/src/share/github.ts#2",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "poll:packages/cli/src/commands/share.ts#1",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "poll:packages/cli/src/share/auth.ts#1",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "spawn:packages/cli/src/share/auth.ts#1",
+      "reason": "Cold auth/enrollment/rotation/recovery or backup cost is outside warm held-store relay timing"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:appJwt",
+      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:checkContentsRefusal",
+      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:githubJson",
+      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:githubRepo",
+      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:githubRequest",
+      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:metadataToken",
+      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:mintMetadataToken",
+      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:parseGithubAppConfig",
+      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:readGithubAppConfig",
+      "reason": "GitHub App setup, token mint/refresh and permission preflight are cold authorization work, outside warm encrypted relay visibility; refresh latency remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/keychain.ts:readKeychain",
+      "reason": "macOS native Keychain process/cache/migration cost is not exercised by the Linux held-store recipe; native functional canaries are not a latency baseline, and cold compilation remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/keychain.ts:writeKeychain",
+      "reason": "macOS native Keychain process/cache/migration cost is not exercised by the Linux held-store recipe; native functional canaries are not a latency baseline, and cold compilation remains unmeasured"
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:checkSingleFileRead",
+      "reason": "App permission/path verification and preflight are cold work; current single-file real-App authorization latency is not measured by the pre-gate stub series. Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:requireDescriptorPath",
+      "reason": "App permission/path verification and preflight are cold work; current single-file real-App authorization latency is not measured by the pre-gate stub series. Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/share/github-app.ts:requireSharePermissions",
+      "reason": "App permission/path verification and preflight are cold work; current single-file real-App authorization latency is not measured by the pre-gate stub series. Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/share/crypto.ts:recoveryPublicKey",
+      "reason": "Two-step initialization derives the public recovery pin before live sharing; cold bootstrap cost is unmeasured. Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "poll:packages/cli/src/share/service.ts#2",
+      "reason": "Bearer-expiry relay lifecycle timer is outside the bounded warm edit series; descriptor recheck moved the existing timer ordinal. Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/share/share-path.ts:shareStateDir",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/catalogue-follower.ts:followLocalCatalogues",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/local-model.ts:catalogueCachePath",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/local-model.ts:catalogueContactPath",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/local-model.ts:catalogueSnapshot",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/local-model.ts:foldCatalogue",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/local-model.ts:modelRoot",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/local-model.ts:newCatalogueCache",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/local-model.ts:persistModel",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/local-model.ts:readCatalogueCache",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/local-model.ts:recordCatalogueContact",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/materialize-jobs.ts:acceptMaterialize",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/materialize-jobs.ts:materializeConfig",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/materialize-jobs.ts:materializeStatus",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "entry:packages/cli/src/sync/materialize-jobs.ts:processMaterializeJobs",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "poll:packages/cli/src/sync/catalogue-follower.ts#1",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "poll:packages/cli/src/sync/daemon.ts#6",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "poll:packages/cli/src/sync/materialize-jobs.ts#1",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "rpc:packages/cli/src/sync/catalogue-follower.ts:head",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    },
+    {
+      "key": "rpc:packages/cli/src/sync/catalogue-follower.ts:read",
+      "reason": "Not measured by the bounded local activity notice recipe; catalogue, setup and background costs remain explicit gaps."
+    }
+  ]
+}

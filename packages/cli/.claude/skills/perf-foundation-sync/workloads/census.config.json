@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "sourceRoots": [
+    "packages/cli/src/sync",
+    "packages/cli/src/session",
+    "packages/cli/src/disk.ts",
+    "packages/engine/src/chain/blob.ts",
+    "packages/cli/src/document-lock.ts",
+    "packages/cli/src/lock-owner.ts",
+    "packages/cli/src/sync-trace.ts",
+    "packages/engine/src/chain/chain.ts",
+    "packages/engine/src/chain/envelope.ts",
+    "packages/engine/src/chain/originals.ts",
+    "packages/cli/src/commands/capabilities.ts",
+    "packages/cli/src/capabilities-bin.ts",
+    "packages/cli/src/runtime-inventory.ts",
+    "packages/cli/src/commands/doctor.ts",
+    "packages/cli/src/main.ts",
+    "packages/cli/src/io.ts",
+    "packages/cli/src/argv.ts",
+    "packages/cli/src/commands/install.ts",
+    "scripts/foundation-shim.sh",
+    "packages/cli/src/share",
+    "packages/cli/src/commands/share.ts"
+  ],
+  "extensions": "\\.(ts|tsx|sh)$",
+  "exclude": "(\\.test\\.|/test/|/node_modules/)",
+  "registries": [],
+  "patterns": [
+    {
+      "inventory": "resource-owners",
+      "prefix": "spawn:",
+      "regex": "\\bspawn\\(",
+      "mode": "ordinal"
+    },
+    {
+      "inventory": "work-triggers",
+      "prefix": "poll:",
+      "regex": "\\b(?:setTimeout|setInterval|watch)\\(",
+      "mode": "ordinal"
+    },
+    {
+      "inventory": "boundaries",
+      "prefix": "rpc:",
+      "regex": "\\.request\\(\\s*'([^']+)'",
+      "mode": "capture",
+      "keyTemplate": "{path}:{1}",
+      "dedupe": true
+    },
+    {
+      "inventory": "entry-points",
+      "prefix": "entry:",
+      "regex": "export (?:async )?function ([A-Za-z]+)\\(",
+      "mode": "capture",
+      "keyTemplate": "{path}:{1}"
+    },
+    {
+      "inventory": "boundaries",
+      "prefix": "http:",
+      "regex": "\\b(?:fetch|createServer)\\(",
+      "mode": "ordinal"
+    },
+    {
+      "inventory": "resource-owners",
+      "prefix": "spawn:",
+      "regex": "\\bspawnSync\\(",
+      "mode": "ordinal",
+      "pathFilter": "/commands/capabilities.ts$"
+    }
+  ]
+}

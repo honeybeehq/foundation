@@ -1,0 +1,9 @@
+
+ RUN  v4.1.10 /home/trmd/.hive/v2/cells/fdnx-h2-share-service-490244f656d9/github-com-honeybeehq-foundation-ddad6d63099e-space-490244f656d9
+
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  12:58:10
+   Duration  1.02s (transform 580ms, setup 0ms, import 791ms, tests 90ms, environment 0ms)
+

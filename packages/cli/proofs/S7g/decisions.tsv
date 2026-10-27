@@ -1,0 +1,8 @@
+ts	phase	decision	why	evidence	result
+2026-10-26T11:25:00Z	contract	Preserve raw origin and add writer-stated/local/null assurance	Parent defined display provenance without authorization	packages/cli/SYNC-LOCAL.md	contract agreed with panel owner
+2026-10-26T11:30:00Z	local authorship	Observe actual engine commits and drain metadata after successful saves	Matching a claimed author or machine would mislabel imported edits	packages/cli/test/history-origin.test.ts	import remains unknown and local wins
+2026-10-26T11:33:00Z	verified history	Keep private append-only hash receipts and backfill retained verified journal rows	History must survive journal payload eviction and restart	packages/cli/src/history-origin.ts	no chain identity or format changes
+2026-10-26T11:35:00Z	test setup	Correct CLI argument order and hello/activity observer setup	The new test initially addressed the old CLI shape incorrectly and read a baseline as a delta	packages/cli/test/history-origin.test.ts	37 focused tests pass
+2026-10-26T11:38:00Z	verification	Replace unscoped test discovery with packages-only discovery	Fetched Comb source includes a node:test script unrelated to Foundation Vitest	packages/cli/proofs/S7g/tests.log	934 package tests pass
+2026-10-26T11:43:00Z	real run	Use distinct configured writer labels in the two-HOME outage drill	A shared hostname would obscure which replica made the edit	packages/cli/proofs/S7g/real-run.log	receiver writer-stated and author local
+2026-10-26T11:46:00Z	performance	Keep verified receipt writes in queued flush	Import and hint notice callbacks must stay cheap	packages/cli/proofs/S7g/journal.json	max callback below 0.36 ms

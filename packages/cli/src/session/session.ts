@@ -1,8 +1,13 @@
+import { historyOrigins } from '../history-origin.js'
 import { mintNodeId } from 'foundation-engine'
 import { hasImageOperations, prepareImageOperations } from './images.js'
 import { listDocumentImages } from 'foundation-engine'
 import type { ImageImportResult } from 'foundation-protocol'
+import { syncTrace } from '../sync-trace.js'
+import { selectedChainFormat } from '../chain-format.js'
 import { runtimeVersion } from '../runtime-version.js'
+import { loadChain } from '../chain-cache.js'
+import { autoOpenDesign } from '../sync-store.js'
 import { legacyMessage, legacyBoardRef, legacyArtboardReason, legacyArtboardOpReason } from './legacy.js'
 import { ARTBOARD_FRAME_VERSION, ARTBOARD_TAGS, ArtboardError, validateArtboards, explicitArtboards, artboardPages, boardViews, boardView, boardKey } from 'foundation-engine'
 import type { BoardRef } from 'foundation-engine'
@@ -21,7 +26,6 @@ import {
   diffPatch,
   emptyActivityPage,
   indexNodes,
-  loadChain,
   normalizeDocument,
   parseDocument,
   prepareChain,
@@ -88,6 +92,7 @@ class DesignSession implements Session {
   private author = ''
   private protocol: SessionProtocol = SESSION_PROTOCOL
   private artboardFrames = false
+  private clientChainFormats: Array<1 | 2> | undefined
   private actor = `session:${randomUUID()}`
   private chain: FdnChain | null = null
   private readonly activityIdentity = randomUUID()
@@ -198,8 +203,12 @@ class DesignSession implements Session {
 
   private emit(message: ServiceMessage): void {
     const wire = this.protocol === LEGACY_SESSION_PROTOCOL ? legacyMessage(message) : message
-    if (this.locked) this.outbox.push(() => this.options.send(wire))
-    else this.options.send(wire)
+    const send = () => {
+      if (message.t === 'doc') syncTrace('session.emit', () => ({ docId: this.docId, hash: message.head?.hash, rev: message.rev }))
+      this.options.send(wire)
+    }
+    if (this.locked) this.outbox.push(send)
+    else send()
   }
 
   private syncCurrent(): void {
@@ -208,8 +217,9 @@ class DesignSession implements Session {
     this.pendingSync = null
     const before = this.docText
     const sourcePending = this.sourcePending
+    const beforeFormat = this.chain?.storageFormat()
     const author = this.syncFromDisk()
-    if (this.docText !== before || this.sourcePending !== sourcePending) this.announce({ kind: 'external', author: author ?? null })
+    if (this.docText !== before || this.sourcePending !== sourcePending || this.chain?.storageFormat() !== beforeFormat) this.announce({ kind: 'external', author: author ?? null })
   }
 
   close(): void {
@@ -296,7 +306,8 @@ class DesignSession implements Session {
           }
           const baseline = this.emptyActivityFrontier
           const since = baseline && message.since === baseline.token && (baseline.docId === null || baseline.docId === this.chain.docId()) ? emptyActivityPage(this.chain.docId()).frontier : message.since
-          return this.emit({ t: 'activity', id: message.id, ...this.chain.activityPage({ ...message, since }) })
+          const page=this.chain.activityPage({ ...message, since })
+          return this.emit({ t: 'activity', id: message.id, ...page, entries:historyOrigins(this.docId,page.entries) })
         } catch (err) {
           return this.reject(message.id, { code: 'invalid-op', message: err instanceof Error ? err.message : String(err) })
         }
@@ -304,7 +315,7 @@ class DesignSession implements Session {
         this.syncAndAnnounce()
         try {
           const page = this.chain?.logPage(message) ?? { entries: [], nextCursor: null, latestCursor: null, hasMore: false }
-          return this.emit({ t: 'log', id: message.id, ...page })
+          return this.emit({ t: 'log', id: message.id, ...page, entries:historyOrigins(this.docId,page.entries) })
         } catch (err) {
           return this.reject(message.id, { code: 'invalid-op', message: err instanceof Error ? err.message : String(err) })
         }
@@ -318,12 +329,22 @@ class DesignSession implements Session {
     this.protocol = message.protocol
     this.author = message.author || this.options.author || defaultAuthor()
     this.artboardFrames = message.artboardFrames === true
+    this.clientChainFormats = message.chainFormats
     const created = this.open()
     if (created === null) return
     if (!this.readMode && !this.chain && !this.invalidExternalTokens && this.docId) {
       this.preparedChain = { text: this.docText, actor: this.actor, docId: this.docId, finish: prepareChain(this.doc, { actor: this.actor, docId: this.docId }) }
     }
     this.phase = 'open'
+    if (this.chain && !this.readMode) {
+      autoOpenDesign(this.path, message => this.log(message))
+      const bytes = readBytesIfPresent(this.chainPath)
+      if (bytes && !sameBytes(bytes, this.diskChain)) {
+        this.chain = loadChain(bytes, { actor: this.actor })
+        this.diskChain = bytes
+        this.setDoc(this.chain.doc())
+      }
+    }
     this.rev = 1
     this.emit({
       t: 'welcome',
@@ -637,6 +658,8 @@ class DesignSession implements Session {
 
   private commit(message: Extract<WireClientMessage, { t: 'commit' }>, images: ImageImportResult[] = [], allowEmpty = false): void {
     this.syncAndAnnounce()
+    const formatError = this.chainFormatError()
+    if (formatError) return this.reject(message.id, { code: 'invalid-op', message: formatError })
     if (this.protocol === LEGACY_SESSION_PROTOCOL && (explicitArtboards(this.doc) || message.ops.some(op => isArtboardOperation(op) || op.op === 'set-spec-version'))) return this.reject(message.id, { code: 'invalid-op', message: explicitArtboards(this.doc) ? legacyArtboardReason : legacyArtboardOpReason })
     if (this.readOnlyReason()) return this.reject(message.id, { code: 'invalid-op', message: this.readOnlyReason()! })
     if (this.invalidExternalTokens) return this.reject(message.id, { code: 'invalid-op', message: this.invalidExternalTokens })
@@ -697,6 +720,8 @@ class DesignSession implements Session {
 
   private step(id: string, direction: 'undo' | 'redo', durable = false): void {
     this.syncAndAnnounce()
+    const formatError = this.chainFormatError()
+    if (formatError) return this.reject(id, { code: 'invalid-op', message: formatError })
     if (this.protocol === LEGACY_SESSION_PROTOCOL && explicitArtboards(this.doc)) return this.reject(id, { code: 'invalid-op', message: legacyArtboardReason })
     if (this.readOnlyReason()) return this.reject(id, { code: 'invalid-op', message: this.readOnlyReason()! })
     if (this.invalidExternalTokens) return this.reject(id, { code: 'invalid-op', message: this.invalidExternalTokens })
@@ -741,6 +766,8 @@ class DesignSession implements Session {
   }
 
   private transact(mutate: (chain: FdnChain) => void, durable = false): Failure | null {
+    const formatError = this.chainFormatError()
+    if (formatError) return { code: 'invalid-op', message: formatError }
     if (this.invalidExternalTokens) return { code: 'invalid-op', message: this.invalidExternalTokens }
     const snapshot = this.chain?.save() ?? null
     const previous = { doc: this.doc, docId: this.docId }
@@ -780,8 +807,9 @@ class DesignSession implements Session {
   private syncAndAnnounce(): void {
     const before = this.docText
     const sourcePending = this.sourcePending
+    const beforeFormat = this.chain?.storageFormat()
     const author = this.syncFromDisk()
-    if (this.docText !== before || this.sourcePending !== sourcePending) this.announce({ kind: 'external', author: author ?? null })
+    if (this.docText !== before || this.sourcePending !== sourcePending || this.chain?.storageFormat() !== beforeFormat) this.announce({ kind: 'external', author: author ?? null })
   }
 
   private accept(id: string, cause: Cause, impact: BakeImpact, componentSwaps: InstanceSwapReport[] = [], componentDetaches: InstanceDetachReport[] = [], ops: PatchOp[] = [], before: FdnDocument = this.doc, images: ImageImportResult[] = []): void {
@@ -827,15 +855,29 @@ class DesignSession implements Session {
     return this.doc.specVersion === ARTBOARD_FRAME_VERSION && !this.artboardFrames ? 'This design uses artboard frame styles. Update this client to edit it.' : null
   }
 
+  private chainFormatError(): string | null {
+    const format = selectedChainFormat(this.path, this.chain?.storageFormat())
+    return this.clientChainFormats && !this.clientChainFormats.includes(format)
+      ? `This connection cannot write chain format ${format}. Reconnect with a client that supports it.` : null
+  }
+
   private documentView(head: EnvelopeRecord | null = this.head()): DocumentView {
     const top = (stack: UndoStep[]): string | null => stack.at(-1)?.label ?? null
+    const formatError = this.chainFormatError()
+    const readOnly = this.readOnlyReason() ?? formatError
     return {
+      chainFormat: this.chain?.storageFormat() ?? null,
+      writeChainFormat: selectedChainFormat(this.path, this.chain?.storageFormat()),
+      chainReadOnly: formatError !== null,
       rev: this.rev,
       doc: this.doc,
       head,
-      history: this.readOnlyReason() ? { canUndo: false, canRedo: false, undoLabel: null, redoLabel: null } : { canUndo: this.undoStack.length > 0, canRedo: this.redoStack.length > 0, undoLabel: top(this.undoStack), redoLabel: top(this.redoStack) },
-      ...(this.readOnlyReason() ? { readOnly: this.readOnlyReason()! } : {}),
-      issues: this.sourcePending ? [...this.issues, { code: 'read-only-source-pending', severity: 'info', message: 'The source is missing or differs from saved history. This read-only session shows the saved chain without ingesting source edits.' }] : this.issues,
+      history: readOnly ? { canUndo: false, canRedo: false, undoLabel: null, redoLabel: null } : { canUndo: this.undoStack.length > 0, canRedo: this.redoStack.length > 0, undoLabel: top(this.undoStack), redoLabel: top(this.redoStack) },
+      ...(readOnly ? { readOnly } : {}),
+      issues: [...this.issues,
+        ...(this.sourcePending ? [{ code: 'read-only-source-pending', severity: 'info' as const, message: 'The source is missing or differs from saved history. This read-only session shows the saved chain without ingesting source edits.' }] : []),
+        ...(formatError ? [{ code: 'chain-format-read-only', severity: 'warning' as const, message: formatError }] : []),
+      ],
       pages: artboardPages(this.doc),
       boards: boardViews(this.doc),
       unavailableBoards: this.unavailableBoards(),
@@ -925,7 +967,7 @@ class DesignSession implements Session {
   private startWatching(): void {
     const names = new Set([basename(this.path), basename(this.chainPath)])
     this.watcher = watch(dirname(this.path), (_event, filename) => {
-      if (filename === null || names.has(filename)) this.scheduleSync()
+      if (filename === null || names.has(filename)) { syncTrace('session.notice', () => ({ docId: this.docId, chain: filename === null || String(filename).endsWith('.chain') })); this.scheduleSync() }
     })
     this.watcher.on('error', (err) => this.log(`watch error: ${err.message}`))
     this.seenSignature = this.fileSignature()

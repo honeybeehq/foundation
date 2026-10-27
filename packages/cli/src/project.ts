@@ -1,3 +1,4 @@
+import { loadChain } from './chain-cache.js'
 /**
  * foundation-cli — project manifest: `foundation.json` (SPEC 13a-iii,
  * resolved 2026-07-31): "a `foundation.json` in the project directory —
@@ -22,7 +23,7 @@
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
-import { loadChain, parseDocument, validateDocument } from 'foundation-engine'
+import { parseDocument, validateDocument } from 'foundation-engine'
 import { readDocIdAttr } from './docid.js'
 
 export interface ProjectManifestDocument {

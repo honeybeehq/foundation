@@ -1,0 +1,259 @@
+{
+  "protocolVersion": 1,
+  "id": "share-held-store",
+  "title": "Encrypted relay while durable append is held",
+  "lane": "streaming",
+  "processes": [
+    "main",
+    "helper"
+  ],
+  "owners": [
+    "packages/cli/src/share/transport.ts@2d5a4407c87b4d95091cf7ea79154f3f37c94bc5",
+    "packages/cli/src/share/service.ts@ea25180270e891b89de13145d1f2466ebb310765",
+    "packages/cli/src/share/client.ts@9698b86e75063db70e629cec7ab3fc2cea0ab3b9",
+    "packages/cli/src/share/crypto.ts@af49d98d1743aefb04a65b26c1f1f3ce359abb12",
+    "packages/cli/src/share/vault.ts@f9c0892ea39d5669ce393405bebe2ce36f1c3bff",
+    "packages/cli/src/share/github.ts@2f79ebecb4c10d38c2dce202adb7b845795d68ff",
+    "packages/cli/src/share/config.ts@67d151b4857b7f0b23c83fa6cf7a43bda9c2ed3a",
+    "packages/cli/src/sync/daemon.ts@29ea84bca1a5fb7e8f0d1b6a1c35da2dd939127c"
+  ],
+  "effect": {
+    "user": "Later local saves reach the other local replica while an earlier Comb append is deliberately held.",
+    "assertions": [
+      "Every held-save plaintext identity arrives before release",
+      "Receive cursor and published acknowledgement do not advance from hints",
+      "Full durable convergence follows release"
+    ],
+    "exclusions": [
+      "Cross-machine S3c timing",
+      "Remote session paint",
+      "Cold GitHub login",
+      "Population p95 claims"
+    ]
+  },
+  "accounts": [
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/sync/daemon.ts:serveSync"
+    },
+    {
+      "inventory": "work-triggers",
+      "key": "poll:packages/cli/src/sync/daemon.ts#5"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/client.ts:authorizedSession"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/client.ts:maintainKeys"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/client.ts:stateFor"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/config.ts:findShareRoot"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/config.ts:readShareConfig"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/crypto.ts:decrypt"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/crypto.ts:encrypt"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/crypto.ts:keyId"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/crypto.ts:opaqueName"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/github.ts:github"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/github.ts:githubBase"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/github.ts:memberAccess"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/github.ts:verifyDevice"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/service.ts:startShareService"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/transport.ts:configForDesign"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/transport.ts:createBridge"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/transport.ts:maintainKnownRepos"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/transport.ts:prepareSharingRead"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/transport.ts:recordShareStatus"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/transport.ts:refreshKeys"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/transport.ts:shareRelay"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/vault.ts:readVault"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/vault.ts:saveSession"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/share/vault.ts:sessionFor"
+    },
+    {
+      "inventory": "boundaries",
+      "key": "http:packages/cli/src/share/service.ts#1"
+    },
+    {
+      "inventory": "boundaries",
+      "key": "http:packages/cli/src/share/transport.ts#1"
+    },
+    {
+      "inventory": "work-triggers",
+      "key": "poll:packages/cli/src/share/service.ts#1"
+    },
+    {
+      "inventory": "work-triggers",
+      "key": "poll:packages/cli/src/share/transport.ts#1"
+    },
+    {
+      "inventory": "boundaries",
+      "key": "rpc:packages/cli/src/share/service.ts:head"
+    },
+    {
+      "inventory": "boundaries",
+      "key": "rpc:packages/cli/src/share/service.ts:hello"
+    },
+    {
+      "inventory": "boundaries",
+      "key": "rpc:packages/cli/src/share/service.ts:read"
+    },
+    {
+      "inventory": "boundaries",
+      "key": "rpc:packages/cli/src/share/transport.ts:hint"
+    }
+  ],
+  "states": {
+    "idle": {
+      "matters": false,
+      "why": "Outside this bounded local recipe"
+    },
+    "first-use": {
+      "matters": false,
+      "why": "Outside this bounded local recipe"
+    },
+    "repeated": {
+      "matters": true,
+      "why": "Warm held-store relay regression"
+    },
+    "scale": {
+      "matters": false,
+      "why": "Outside this bounded local recipe"
+    },
+    "background": {
+      "matters": false,
+      "why": "Outside this bounded local recipe"
+    },
+    "release": {
+      "matters": true,
+      "why": "Warm held-store relay regression"
+    },
+    "recovery": {
+      "matters": true,
+      "why": "Warm held-store relay regression"
+    }
+  },
+  "fixture": {
+    "preset": "share-proof two isolated HOMEs, local GitHub stub, actual Comb bridge; document append held by wrapper",
+    "isolationPolicy": 1,
+    "scaleAxes": []
+  },
+  "recipe": {
+    "driver": "Existing share-proof.ts with --held-store",
+    "command": "pnpm exec tsx packages/cli/scripts/share-proof.ts /absolute/comb-bridge --held-store",
+    "readiness": "Warm keys and caught-up replicas; same machine, no other mutation driver",
+    "completion": "Five held saves each imported before backend release; full acknowledgement after release",
+    "reset": "Fresh isolated HOME/repo/store fixture each run",
+    "teardown": "Proof runner closes children and service; retain failed and successful receipts",
+    "serial": true,
+    "requires": [
+      "Actual Comb binary",
+      "Node/tsx",
+      "OpenSSH"
+    ]
+  },
+  "metrics": [
+    {
+      "id": "heldSaveVisibilityMax",
+      "unit": "ms",
+      "scope": "Local saved-chain mtime to other-replica chain import while append blocked; same host clock plus2ms guard",
+      "collector": "Existing real CLI proof driver polling validated chain; no profiling",
+      "aggregation": "max",
+      "kind": "upper-bound",
+      "status": "stale",
+      "states": [
+        "repeated"
+      ],
+      "betterWhen": "lower",
+      "budget": {
+        "value": 1000,
+        "unit": "ms",
+        "comparator": "<=",
+        "status": "proposed",
+        "source": "Local regression gate for taskH2 preserve S3c subsecond behavior; not a new population ruling",
+        "condition": "Five warm local held-store saves; does not establish cross-host p95"
+      },
+      "invariant": "Every held save is imported before release and neither feed cursor nor durable acknowledgement advances until Comb recovers.",
+      "noise": "Shared metal-3 host; recipe proof, no stable comparative baseline"
+    }
+  ],
+  "linked": [
+    {
+      "workload": "sync-save-to-session",
+      "why": "Two-host visibility and durable recovery remain separate acceptance populations"
+    }
+  ],
+  "gaps": [
+    "Current H2 two-host S3c series remains for H3; original direct timing is a different population",
+    "Idle/large-history/registration costs are not measured by this recipe"
+  ],
+  "updatedAt": "2026-10-25",
+  "updatedBy": "H3 deployment",
+  "readiness": "Retained H3 pre-gate local receipts are historical after the committed-descriptor gate changed service authorization. New gate functional drill passes; no current real-App latency claim."
+}

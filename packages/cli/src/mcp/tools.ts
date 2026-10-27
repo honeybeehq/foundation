@@ -1,3 +1,4 @@
+import { loadChain } from '../chain-cache.js'
 import { parseForWrite } from '../parse-write.js'
 import { editDocument } from '../edit.js'
 /**
@@ -30,12 +31,10 @@ import {
   bakeDocument,
   embedDocumentImages,
   createChain,
-  loadChain,
   mintAnnotationId,
   parseDocument,
   projectDocument,
-  validateDocument,
-} from 'foundation-engine'
+  validateDocument} from 'foundation-engine'
 import type { ConformanceReport, FdnAnnotation, FdnChain, FdnComponent, FdnDocument, FdnNode, FdnViewport, ReportLine } from 'foundation-engine'
 // Deep import, not re-exported from the package root (same as commands/freeze.ts) —
 // mirrored here rather than imported from commands/freeze.ts because that file

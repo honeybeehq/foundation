@@ -1,0 +1,237 @@
+{
+  "workload": "sync-save-to-session",
+  "seriesId": "studio-metal3-frontier61-proxy19344-v1",
+  "commit": "30bea85f5634b20d4e7bf552e40e4809eccac3a6",
+  "source": "packages/cli/performance/S3c-direct-samples.json",
+  "clockOffsetIntersectionMs": {
+    "lo": -6.287109375,
+    "hi": 53.43701171875
+  },
+  "observedClockOffsetEnvelopeMs": {
+    "lo": -9.728759765625,
+    "hi": 66.21484375
+  },
+  "clockAssumption": "offset stays inside union of retained before/after RTT brackets; unobserved interior clock steps are not bounded",
+  "timestampResolutionGuardMs": 2,
+  "results": [
+    {
+      "metric": "studioToMetalsaveToSessionP50",
+      "samples": [
+        375.157470703125,
+        408.92236328125,
+        593.2158203125,
+        534.42529296875,
+        528.1533203125,
+        460.432373046875,
+        369.544677734375,
+        492.33984375,
+        596.3125,
+        430.165283203125,
+        379.3125,
+        523.787353515625,
+        437.873291015625,
+        463.640869140625,
+        361.65625,
+        408.955810546875,
+        399.428466796875,
+        388.918701171875,
+        466.978759765625,
+        418.322509765625
+      ],
+      "invariantHolds": true,
+      "observations": 20,
+      "failed": 0
+    },
+    {
+      "metric": "studioToMetalsaveToSessionP95",
+      "samples": [
+        375.157470703125,
+        408.92236328125,
+        593.2158203125,
+        534.42529296875,
+        528.1533203125,
+        460.432373046875,
+        369.544677734375,
+        492.33984375,
+        596.3125,
+        430.165283203125,
+        379.3125,
+        523.787353515625,
+        437.873291015625,
+        463.640869140625,
+        361.65625,
+        408.955810546875,
+        399.428466796875,
+        388.918701171875,
+        466.978759765625,
+        418.322509765625
+      ],
+      "invariantHolds": true,
+      "observations": 20,
+      "failed": 0
+    },
+    {
+      "metric": "metalToStudiosaveToSessionP50",
+      "samples": [
+        537.41845703125,
+        644.340576171875,
+        918.24462890625,
+        505.135986328125,
+        648.05126953125,
+        658.959228515625,
+        617.876708984375,
+        714.78564453125,
+        276.68310546875,
+        506.614013671875,
+        675.536865234375,
+        431.44384765625,
+        461.3720703125,
+        457.296875,
+        392.224853515625,
+        442.150634765625,
+        598.073974609375,
+        1104.990966796875,
+        325.87548828125,
+        751.80126953125
+      ],
+      "invariantHolds": true,
+      "observations": 20,
+      "failed": 0
+    },
+    {
+      "metric": "metalToStudiosaveToSessionP95",
+      "samples": [
+        537.41845703125,
+        644.340576171875,
+        918.24462890625,
+        505.135986328125,
+        648.05126953125,
+        658.959228515625,
+        617.876708984375,
+        714.78564453125,
+        276.68310546875,
+        506.614013671875,
+        675.536865234375,
+        431.44384765625,
+        461.3720703125,
+        457.296875,
+        392.224853515625,
+        442.150634765625,
+        598.073974609375,
+        1104.990966796875,
+        325.87548828125,
+        751.80126953125
+      ],
+      "invariantHolds": true,
+      "observations": 20,
+      "failed": 0
+    }
+  ],
+  "warmups": [
+    {
+      "phase": "direct-steady",
+      "warmup": true,
+      "i": 0,
+      "writer": "a",
+      "id": "S3c-direct-steady-a-0-1792833239878046000",
+      "head": "6dde22a0149cd30e979be425b97cd54345f1bf764b5bed779d210cdebb9cbc1f",
+      "savedMtime": 1792833239957.9604,
+      "receivedAt": 1792833240612,
+      "rawMs": 654.03955078125,
+      "ok": true,
+      "latencyIntervalMs": [
+        600.6025390625,
+        660.32666015625
+      ]
+    },
+    {
+      "phase": "direct-steady",
+      "warmup": true,
+      "i": 0,
+      "writer": "b",
+      "id": "S3c-direct-steady-b-0-1792833240732541000",
+      "head": "9a3f47373ff59ebd843fc2a05ed60d2e23ddb1bb6f6aa615dbdb9a2cac3122cd",
+      "savedMtime": 1792833240949.5378,
+      "receivedAt": 1792833241633,
+      "rawMs": 683.462158203125,
+      "ok": true,
+      "latencyIntervalMs": [
+        677.175048828125,
+        736.899169921875
+      ]
+    },
+    {
+      "phase": "direct-steady",
+      "warmup": true,
+      "i": 1,
+      "writer": "a",
+      "id": "S3c-direct-steady-a-1-1792833241754242000",
+      "head": "473de9ad47c106cb9738b95ff5a7acb61a679e895f39fe956902d2849a0d741f",
+      "savedMtime": 1792833241821.0518,
+      "receivedAt": 1792833242337,
+      "rawMs": 515.9482421875,
+      "ok": true,
+      "latencyIntervalMs": [
+        462.51123046875,
+        522.2353515625
+      ]
+    },
+    {
+      "phase": "direct-steady",
+      "warmup": true,
+      "i": 1,
+      "writer": "b",
+      "id": "S3c-direct-steady-b-1-1792833242480247000",
+      "head": "2c5d39cd97391a0b1cceaa1af156795beea5176af62028512a58be47191e45de",
+      "savedMtime": 1792833242661.6338,
+      "receivedAt": 1792833243150,
+      "rawMs": 488.3662109375,
+      "ok": true,
+      "latencyIntervalMs": [
+        482.0791015625,
+        541.80322265625
+      ]
+    },
+    {
+      "phase": "direct-steady",
+      "warmup": true,
+      "i": 2,
+      "writer": "a",
+      "id": "S3c-direct-steady-a-2-1792833243264665000",
+      "head": "9a151ec2a58eb088b34dcbdbee6329159fa8ebf4b0c8544b55885dced2706d81",
+      "savedMtime": 1792833243299.946,
+      "receivedAt": 1792833243629,
+      "rawMs": 329.053955078125,
+      "ok": true,
+      "latencyIntervalMs": [
+        275.616943359375,
+        335.341064453125
+      ]
+    },
+    {
+      "phase": "direct-steady",
+      "warmup": true,
+      "i": 2,
+      "writer": "b",
+      "id": "S3c-direct-steady-b-2-1792833243768988000",
+      "head": "76b8b19e189498001ee1e494818ef3f5f45372e76b0caeebe99b6e5d70cbe19b",
+      "savedMtime": 1792833243965.707,
+      "receivedAt": 1792833244642,
+      "rawMs": 676.29296875,
+      "ok": true,
+      "latencyIntervalMs": [
+        670.005859375,
+        729.72998046875
+      ]
+    }
+  ],
+  "startupFailures": [],
+  "convergence": {
+    "historyCount": 107,
+    "chainBytes": 106433,
+    "hashes": [
+      "ef1bd01df8436bed772dd2f9fd0ed453d242310bbfbae8c372f7957244769633",
+      "fc35dd7620c23d9db0acc3b1a611f43fc7f344d0355bcf7f029fe2bd99214ca5"
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "workload": "local-activity-journal",
+  "seriesId": "metal3-journal-10k-v1",
+  "commit": "14173459e8c7fae444af8d8f1a62c6a128e55c2f",
+  "machine": "trmd-metal-3",
+  "runtime": "v24.18.0",
+  "buildMode": "source-tsx",
+  "loadavg": [
+    3.3,
+    5.43,
+    4.7
+  ],
+  "driverSha256": "604120b9ca83f67eeec28ab52b3533d8f8740dc02aee1fba0851f81e828e6782",
+  "fixture": "10000 synthetic cached fact bodies; real new engine envelopes; no network or credentials",
+  "cachedBytes": 11959020,
+  "queuedFlush": true,
+  "results": [
+    {
+      "metric": "journalNoticeMax",
+      "samples": [
+        100.34822699999995,
+        100.10016500000006,
+        100.17212399999994,
+        100.0916279999999,
+        100.11128600000006
+      ],
+      "invariantHolds": false
+    }
+  ],
+  "flushSamples": [
+    3.315119999999979,
+    3.0474099999999,
+    2.7724459999999453,
+    2.899552999999969,
+    2.841139999999996
+  ],
+  "control": "Deliberately worsened timing and false dedup invariant"
+}

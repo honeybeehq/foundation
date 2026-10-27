@@ -1,0 +1,176 @@
+{
+  "sha": "30bea85f5634b20d4e7bf552e40e4809eccac3a6",
+  "scope": "5 profiled samples/direction, one live copy/host; attribution only",
+  "clockOffsetIntersectionMs": {
+    "lo": -4.8779296875,
+    "hi": 56.0791015625
+  },
+  "rows": [
+    {
+      "writer": "a",
+      "hash": "2c1489150bf0fecbc5cd7a5efa7f4490f836f3becab42dd61c4938507719bf31",
+      "saveToDirectNoticeMs": 37.775146484375,
+      "noticeToReceiveIntervalMs": [
+        4.01611328125,
+        83.394287109375
+      ],
+      "strictLockedImportMs": 153.524764,
+      "importEndToSessionMs": 174,
+      "totalIntervalMs": [
+        386.696044921875,
+        447.653076171875
+      ],
+      "directFirst": true
+    },
+    {
+      "writer": "b",
+      "hash": "915eed4795fddddc84e61af94dd82aa7f383fb232b06145e9f43935df1415079",
+      "saveToDirectNoticeMs": 42.415283203125,
+      "noticeToReceiveIntervalMs": [
+        33.605712890625,
+        112.98388671875
+      ],
+      "strictLockedImportMs": 73.01025,
+      "importEndToSessionMs": 283,
+      "totalIntervalMs": [
+        441.537353515625,
+        502.494384765625
+      ],
+      "directFirst": true
+    },
+    {
+      "writer": "a",
+      "hash": "96016f37d6b1947ca44d302d78e453b4568333859bac4591e777c827577ac089",
+      "saveToDirectNoticeMs": 137.450927734375,
+      "noticeToReceiveIntervalMs": [
+        0,
+        42.394287109375
+      ],
+      "strictLockedImportMs": 141.039168,
+      "importEndToSessionMs": 155,
+      "totalIntervalMs": [
+        413.371826171875,
+        474.328857421875
+      ],
+      "directFirst": true
+    },
+    {
+      "writer": "b",
+      "hash": "826bf89de1fc4421c74c7da986aff1686106b7bb8cf5896ede4f29ca9925324a",
+      "saveToDirectNoticeMs": 58.333984375,
+      "noticeToReceiveIntervalMs": [
+        21.605712890625,
+        100.98388671875
+      ],
+      "strictLockedImportMs": 59.439166,
+      "importEndToSessionMs": 687,
+      "totalIntervalMs": [
+        835.4560546875,
+        896.4130859375
+      ],
+      "directFirst": true
+    },
+    {
+      "writer": "a",
+      "hash": "7c64185c52b4ca6f81e0e141a5ed06240b24e50405a312825f4ee2ccc552b457",
+      "saveToDirectNoticeMs": 76.171142578125,
+      "noticeToReceiveIntervalMs": [
+        0,
+        43.394287109375
+      ],
+      "strictLockedImportMs": 134.511877,
+      "importEndToSessionMs": 195,
+      "totalIntervalMs": [
+        388.092041015625,
+        449.049072265625
+      ],
+      "directFirst": true
+    },
+    {
+      "writer": "b",
+      "hash": "2ab11fe6535dbf4ca107ce9e313a6fcfe97ccec8a3fa21c280c8e33e08e348ab",
+      "saveToDirectNoticeMs": 68.234375,
+      "noticeToReceiveIntervalMs": [
+        5.605712890625,
+        84.98388671875
+      ],
+      "strictLockedImportMs": 73.410667,
+      "importEndToSessionMs": 200,
+      "totalIntervalMs": [
+        356.3564453125,
+        417.3134765625
+      ],
+      "directFirst": true
+    },
+    {
+      "writer": "a",
+      "hash": "7f4b6b9220861f0dc0b92cf8e657c52b6239a573e65d2d5e9baedd61da53228e",
+      "saveToDirectNoticeMs": 56.10888671875,
+      "noticeToReceiveIntervalMs": [
+        0,
+        48.394287109375
+      ],
+      "strictLockedImportMs": 125.874448,
+      "importEndToSessionMs": 148,
+      "totalIntervalMs": [
+        318.02978515625,
+        378.98681640625
+      ],
+      "directFirst": true
+    },
+    {
+      "writer": "b",
+      "hash": "3b64e9c052b3e40536451b2f29808d5190da3cfd8ba6aee77c79fffe11fe116e",
+      "saveToDirectNoticeMs": 58.165771484375,
+      "noticeToReceiveIntervalMs": [
+        8.605712890625,
+        87.98388671875
+      ],
+      "strictLockedImportMs": 77.071584,
+      "importEndToSessionMs": 61,
+      "totalIntervalMs": [
+        214.287841796875,
+        275.244873046875
+      ],
+      "directFirst": true
+    },
+    {
+      "writer": "a",
+      "hash": "341655e9178bdb6dce055d39ed8a648351cbd089a593793e8d701b94c207c827",
+      "saveToDirectNoticeMs": 42.59033203125,
+      "noticeToReceiveIntervalMs": [
+        0,
+        44.394287109375
+      ],
+      "strictLockedImportMs": 125.066096,
+      "importEndToSessionMs": 133,
+      "totalIntervalMs": [
+        284.51123046875,
+        345.46826171875
+      ],
+      "directFirst": true
+    },
+    {
+      "writer": "b",
+      "hash": "8e4150a93370ba00bcd83c8ee2714f1be41505cac54152870925e1a2db108275",
+      "saveToDirectNoticeMs": 58.106201171875,
+      "noticeToReceiveIntervalMs": [
+        11.605712890625,
+        90.98388671875
+      ],
+      "strictLockedImportMs": 79.201125,
+      "importEndToSessionMs": 169,
+      "totalIntervalMs": [
+        327.228271484375,
+        388.185302734375
+      ],
+      "directFirst": true
+    }
+  ],
+  "observedClockOffsetEnvelopeMs": {
+    "lo": -11.394287109375,
+    "hi": 63.98388671875
+  },
+  "clockAssumption": "offset remains inside union of observed before/after RTT brackets",
+  "timestampResolutionGuardMs": 2
+}

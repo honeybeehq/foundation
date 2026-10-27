@@ -1,0 +1,521 @@
+{
+  "protocolVersion": 1,
+  "id": "sync-save-to-session",
+  "title": "Shared-store save to remote session event",
+  "lane": "streaming",
+  "processes": [
+    "main",
+    "helper",
+    "node-remote"
+  ],
+  "owners": [
+    "packages/cli/src/sync/daemon.ts@c8f0697a54f59abca7e9bf1002a94a44b5b7710c",
+    "packages/cli/src/sync/bridge.ts@3596e7c7002abd338a9ea597d3162d1a4be45245",
+    "packages/cli/src/sync/direct.ts@2883981752375fa7a9b031eb20b42178ddf1e7da",
+    "packages/cli/src/session/session.ts@9e0d61ffea0058d1eef5e614f024d81dc0aecfe3",
+    "packages/cli/src/disk.ts@4b444b8d0069b1f283278858aa3538570f5d6113",
+    "packages/engine/src/chain/blob.ts@8fc718be5c55c7034189ab9279db02a853cecc94",
+    "packages/cli/src/document-lock.ts@c61caed89fc3f023a7ca2e1299a8ebae6400f5c3",
+    "packages/cli/src/lock-owner.ts@f1ba1ca809582660605f1d26abba4809fe5156f7",
+    "packages/cli/src/sync-trace.ts@0b844b089f594692d9c04a343b237a80baf391b5",
+    "packages/engine/src/chain/chain.ts@72b55be65e4088553eb852dfec8a3a4207fed6ca",
+    "packages/engine/src/chain/envelope.ts@63d6f5d6e79f712fdd048cf965425dff4f157515",
+    "packages/engine/src/chain/originals.ts@9318efeb25d69411e834d21b1c220c0e69c0dab8"
+  ],
+  "effect": {
+    "user": "A saved change is imported and announced by the other machine session.",
+    "assertions": [
+      "Same envelope hash reaches the target session",
+      "Both replicas converge to matching state",
+      "Losing every optional hint still converges through Comb"
+    ],
+    "exclusions": [
+      "renderer paint",
+      "metadata catalogue latency",
+      "CLI process startup",
+      "startup failure/retry latency (separately tested)"
+    ]
+  },
+  "accounts": [
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/disk.ts:canonicalText"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/disk.ts:commitDocument"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/disk.ts:documentText"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/disk.ts:materializeDocument"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/disk.ts:persistDocument"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/disk.ts:projectedText"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/disk.ts:projectionVersion"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/disk.ts:readBytesIfPresent"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/disk.ts:readTextIfPresent"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/disk.ts:recoverDocument"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/disk.ts:sameBytes"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/disk.ts:sourceBase"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/disk.ts:writeAtomic"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/disk.ts:writeUntrackedDocument"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/session/session.ts:createSession"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/sync/bridge.ts:validateAppendReceipt"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/sync/daemon.ts:combLog"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/sync/daemon.ts:copyKey"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/sync/daemon.ts:feedName"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/sync/daemon.ts:serveSync"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/engine/src/chain/blob.ts:decodeBlob"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/engine/src/chain/blob.ts:encodeBlob"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/engine/src/chain/blob.ts:importChangeBlobs"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/engine/src/chain/blob.ts:restoreChangeBlobs"
+    },
+    {
+      "inventory": "work-triggers",
+      "key": "poll:packages/cli/src/session/session.ts#1"
+    },
+    {
+      "inventory": "work-triggers",
+      "key": "poll:packages/cli/src/session/session.ts#2"
+    },
+    {
+      "inventory": "work-triggers",
+      "key": "poll:packages/cli/src/session/session.ts#3"
+    },
+    {
+      "inventory": "work-triggers",
+      "key": "poll:packages/cli/src/session/session.ts#4"
+    },
+    {
+      "inventory": "work-triggers",
+      "key": "poll:packages/cli/src/sync/bridge.ts#1"
+    },
+    {
+      "inventory": "work-triggers",
+      "key": "poll:packages/cli/src/sync/bridge.ts#2"
+    },
+    {
+      "inventory": "work-triggers",
+      "key": "poll:packages/cli/src/sync/daemon.ts#1"
+    },
+    {
+      "inventory": "work-triggers",
+      "key": "poll:packages/cli/src/sync/daemon.ts#2"
+    },
+    {
+      "inventory": "work-triggers",
+      "key": "poll:packages/cli/src/sync/daemon.ts#3"
+    },
+    {
+      "inventory": "boundaries",
+      "key": "rpc:packages/cli/src/sync/bridge.ts:hello"
+    },
+    {
+      "inventory": "boundaries",
+      "key": "rpc:packages/cli/src/sync/daemon.ts:append"
+    },
+    {
+      "inventory": "boundaries",
+      "key": "rpc:packages/cli/src/sync/daemon.ts:read"
+    },
+    {
+      "inventory": "resource-owners",
+      "key": "spawn:packages/cli/src/sync/bridge.ts#1"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/sync/direct.ts:readDirectStatus"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/sync/direct.ts:writeDirectStatus"
+    },
+    {
+      "inventory": "boundaries",
+      "key": "http:packages/cli/src/sync/direct.ts#1"
+    },
+    {
+      "inventory": "boundaries",
+      "key": "http:packages/cli/src/sync/direct.ts#2"
+    },
+    {
+      "inventory": "work-triggers",
+      "key": "poll:packages/cli/src/sync/direct.ts#1"
+    },
+    {
+      "inventory": "work-triggers",
+      "key": "poll:packages/cli/src/sync/direct.ts#2"
+    },
+    {
+      "inventory": "work-triggers",
+      "key": "poll:packages/cli/src/sync/daemon.ts#4"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/document-lock.ts:acquireDocumentLock"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/document-lock.ts:documentPath"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/document-lock.ts:isDocumentLocked"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/lock-owner.ts:currentLockOwner"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/lock-owner.ts:staleLockOwner"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/sync-trace.ts:syncTrace"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/cli/src/sync-trace.ts:syncTraceSpan"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/engine/src/chain/chain.ts:chainFromUpdates"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/engine/src/chain/chain.ts:createChain"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/engine/src/chain/chain.ts:loadChain"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/engine/src/chain/chain.ts:prepareChain"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/engine/src/chain/envelope.ts:computeEnvelopeHash"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/engine/src/chain/envelope.ts:decodeEnvelope"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/engine/src/chain/envelope.ts:encodeEnvelope"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/engine/src/chain/envelope.ts:parseWallTime"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/engine/src/chain/originals.ts:decodeOriginalUpdates"
+    },
+    {
+      "inventory": "entry-points",
+      "key": "entry:packages/engine/src/chain/originals.ts:encodeOriginalUpdates"
+    }
+  ],
+  "states": {
+    "idle": {
+      "matters": true,
+      "why": "Poll and bridge work affect resource cost"
+    },
+    "first-use": {
+      "matters": false,
+      "why": "Fresh materialization measured separately in S3b"
+    },
+    "repeated": {
+      "matters": true,
+      "why": "Twenty sequential edits per direction on warmed daemons"
+    },
+    "scale": {
+      "matters": true,
+      "why": "History growth and duplicate verification need separate controls"
+    },
+    "background": {
+      "matters": false,
+      "why": "Headless process has no visible/hidden state"
+    },
+    "release": {
+      "matters": true,
+      "why": "Hint listener and bridge processes must stop on abort"
+    },
+    "recovery": {
+      "matters": true,
+      "why": "All hints lost must retain Comb convergence"
+    }
+  },
+  "fixture": {
+    "preset": "S5 design clone, isolated prefix, same history/node count on Studio and metal-3",
+    "isolationPolicy": 1,
+    "scaleAxes": []
+  },
+  "recipe": {
+    "driver": "S5 real-session control harness plus opt-in Foundation stage trace",
+    "command": "See sync-save-to-session.md for coordinated two-machine recipe",
+    "readiness": "Quiet coordinated test window, same candidate on both hosts, clock bounds captured",
+    "completion": "At least twenty saved envelope hashes observed in remote session per direction",
+    "reset": "Fresh isolated feed/prefix and identical initial history",
+    "teardown": "Stop profiling daemons/listeners only; retain trace and receipts",
+    "serial": true,
+    "requires": [
+      "S5 shared-store test setup",
+      "both host controls",
+      "clock calibration"
+    ]
+  },
+  "metrics": [
+    {
+      "id": "studioToMetalsaveToSessionP50",
+      "unit": "ms",
+      "scope": "source saved chain -> target session doc event",
+      "collector": "Clock-bounded host event timestamps, unprofiled runs; local monotonic spans used only for attribution",
+      "aggregation": "median",
+      "kind": "upper-bound",
+      "status": "stale",
+      "states": [
+        "repeated"
+      ],
+      "betterWhen": "lower",
+      "budget": {
+        "value": 1000,
+        "unit": "ms",
+        "comparator": "<=",
+        "status": "ruled",
+        "source": "Orchestrator task S3c, 2026-10-24 07:58 UTC",
+        "ruledAt": "2026-10-24",
+        "condition": "Direct acceleration enabled on Studio\u2194metal-3; same shared S3-compatible backend and fixed61-change fixture; >=20samples/direction. Off mode requires convergence, not this fast-path budget."
+      },
+      "invariant": "Every measured save is observed by its unique envelope hash in the target session.",
+      "noise": "Host load, network RTT and clock-bound uncertainty retained per series",
+      "baseline": {
+        "seriesId": "studio-metal3-frontier61-proxy19344-v1",
+        "receipt": "packages/cli/performance/S3c-direct.json",
+        "commit": "30bea85f5634b20d4e7bf552e40e4809eccac3a6",
+        "samples": 20,
+        "machine": "Studio and metal-3, one live copy each, temporary SeaweedFS4.49 over tailnet",
+        "runtime": "Studio Node24.20.0; metal-3 Node24.18.0; exact per-host runtime unchanged between feature/control series",
+        "buildMode": "built",
+        "aggregation": "median",
+        "aggregate": 434.019287109375,
+        "median": 434.019287109375,
+        "p95": 593.2158203125,
+        "probes": [
+          "Foundation trace off",
+          "S3 proxy service spans on",
+          "Union of before/after RTT clock brackets",
+          "2ms quantization guard"
+        ],
+        "capturedAt": "2026-10-24"
+      }
+    },
+    {
+      "id": "studioToMetalsaveToSessionP95",
+      "unit": "ms",
+      "scope": "source saved chain -> target session doc event",
+      "collector": "Clock-bounded host event timestamps, unprofiled runs; local monotonic spans used only for attribution",
+      "aggregation": "p95",
+      "kind": "upper-bound",
+      "status": "stale",
+      "states": [
+        "repeated"
+      ],
+      "betterWhen": "lower",
+      "budget": {
+        "value": 1500,
+        "unit": "ms",
+        "comparator": "<=",
+        "status": "ruled",
+        "source": "Orchestrator task S3c, 2026-10-24 07:58 UTC",
+        "ruledAt": "2026-10-24",
+        "condition": "Direct acceleration enabled on Studio\u2194metal-3; same shared S3-compatible backend and fixed61-change fixture; >=20samples/direction. Off mode requires convergence, not this fast-path budget."
+      },
+      "invariant": "Every measured save is observed by its unique envelope hash in the target session.",
+      "noise": "Host load, network RTT and clock-bound uncertainty retained per series",
+      "baseline": {
+        "seriesId": "studio-metal3-frontier61-proxy19344-v1",
+        "receipt": "packages/cli/performance/S3c-direct.json",
+        "commit": "30bea85f5634b20d4e7bf552e40e4809eccac3a6",
+        "samples": 20,
+        "machine": "Studio and metal-3, one live copy each, temporary SeaweedFS4.49 over tailnet",
+        "runtime": "Studio Node24.20.0; metal-3 Node24.18.0; exact per-host runtime unchanged between feature/control series",
+        "buildMode": "built",
+        "aggregation": "p95",
+        "aggregate": 593.2158203125,
+        "median": 434.019287109375,
+        "p95": 593.2158203125,
+        "probes": [
+          "Foundation trace off",
+          "S3 proxy service spans on",
+          "Union of before/after RTT clock brackets",
+          "2ms quantization guard"
+        ],
+        "capturedAt": "2026-10-24"
+      }
+    },
+    {
+      "id": "metalToStudiosaveToSessionP50",
+      "unit": "ms",
+      "scope": "source saved chain -> target session doc event",
+      "collector": "Clock-bounded host event timestamps, unprofiled runs; local monotonic spans used only for attribution",
+      "aggregation": "median",
+      "kind": "upper-bound",
+      "status": "stale",
+      "states": [
+        "repeated"
+      ],
+      "betterWhen": "lower",
+      "budget": {
+        "value": 1000,
+        "unit": "ms",
+        "comparator": "<=",
+        "status": "ruled",
+        "source": "Orchestrator task S3c, 2026-10-24 07:58 UTC",
+        "ruledAt": "2026-10-24",
+        "condition": "Direct acceleration enabled on Studio\u2194metal-3; same shared S3-compatible backend and fixed61-change fixture; >=20samples/direction. Off mode requires convergence, not this fast-path budget."
+      },
+      "invariant": "Every measured save is observed by its unique envelope hash in the target session.",
+      "noise": "Host load, network RTT and clock-bound uncertainty retained per series",
+      "baseline": {
+        "seriesId": "studio-metal3-frontier61-proxy19344-v1",
+        "receipt": "packages/cli/performance/S3c-direct.json",
+        "commit": "30bea85f5634b20d4e7bf552e40e4809eccac3a6",
+        "samples": 20,
+        "machine": "Studio and metal-3, one live copy each, temporary SeaweedFS4.49 over tailnet",
+        "runtime": "Studio Node24.20.0; metal-3 Node24.18.0; exact per-host runtime unchanged between feature/control series",
+        "buildMode": "built",
+        "aggregation": "median",
+        "aggregate": 567.7462158203125,
+        "median": 567.7462158203125,
+        "p95": 918.24462890625,
+        "probes": [
+          "Foundation trace off",
+          "S3 proxy service spans on",
+          "Union of before/after RTT clock brackets",
+          "2ms quantization guard"
+        ],
+        "capturedAt": "2026-10-24"
+      }
+    },
+    {
+      "id": "metalToStudiosaveToSessionP95",
+      "unit": "ms",
+      "scope": "source saved chain -> target session doc event",
+      "collector": "Clock-bounded host event timestamps, unprofiled runs; local monotonic spans used only for attribution",
+      "aggregation": "p95",
+      "kind": "upper-bound",
+      "status": "stale",
+      "states": [
+        "repeated"
+      ],
+      "betterWhen": "lower",
+      "budget": {
+        "value": 1500,
+        "unit": "ms",
+        "comparator": "<=",
+        "status": "ruled",
+        "source": "Orchestrator task S3c, 2026-10-24 07:58 UTC",
+        "ruledAt": "2026-10-24",
+        "condition": "Direct acceleration enabled on Studio\u2194metal-3; same shared S3-compatible backend and fixed61-change fixture; >=20samples/direction. Off mode requires convergence, not this fast-path budget."
+      },
+      "invariant": "Every measured save is observed by its unique envelope hash in the target session.",
+      "noise": "Host load, network RTT and clock-bound uncertainty retained per series",
+      "baseline": {
+        "seriesId": "studio-metal3-frontier61-proxy19344-v1",
+        "receipt": "packages/cli/performance/S3c-direct.json",
+        "commit": "30bea85f5634b20d4e7bf552e40e4809eccac3a6",
+        "samples": 20,
+        "machine": "Studio and metal-3, one live copy each, temporary SeaweedFS4.49 over tailnet",
+        "runtime": "Studio Node24.20.0; metal-3 Node24.18.0; exact per-host runtime unchanged between feature/control series",
+        "buildMode": "built",
+        "aggregation": "p95",
+        "aggregate": 918.24462890625,
+        "median": 567.7462158203125,
+        "p95": 918.24462890625,
+        "probes": [
+          "Foundation trace off",
+          "S3 proxy service spans on",
+          "Union of before/after RTT clock brackets",
+          "2ms quantization guard"
+        ],
+        "capturedAt": "2026-10-24"
+      }
+    }
+  ],
+  "linked": [],
+  "gaps": [
+    "Catalogue retention/large-history scaling are separate costs",
+    "Synchronous inbound concurrency and diagnostic PID reuse remain unmeasured",
+    "Startup wrapper changed after timing; repeated worker source equivalence is recorded in packages/cli/performance/S3c-runtime-scope.json, with failure recovery tested separately"
+  ],
+  "updatedAt": "2026-10-24",
+  "updatedBy": "S3c worker",
+  "readiness": "Earlier receipts remain historical; current H2/main owners changed. H3 must rerun the two-host series; local held-store recipe is separate."
+}

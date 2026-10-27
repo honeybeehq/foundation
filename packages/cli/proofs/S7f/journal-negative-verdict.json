@@ -1,0 +1,29 @@
+{
+  "workload": "local-activity-journal",
+  "seriesId": "metal3-journal-10k-v1",
+  "verdict": "fail",
+  "results": [
+    {
+      "workload": "local-activity-journal",
+      "metric": "journalNoticeMax",
+      "unit": "ms",
+      "kind": "upper-bound",
+      "aggregation": "max",
+      "samples": 5,
+      "discardedSamples": 0,
+      "aggregate": 100.34822699999995,
+      "findings": [
+        "invariant violated: An evicted old hash emits neither duplicate live nor baseline facts and retained payload rows stay bounded.",
+        "proposed budget <= 10 ms exceeded: 100.34822699999995"
+      ],
+      "budget": {
+        "value": 10,
+        "unit": "ms",
+        "comparator": "<=",
+        "status": "proposed",
+        "ok": false
+      },
+      "verdict": "fail"
+    }
+  ]
+}

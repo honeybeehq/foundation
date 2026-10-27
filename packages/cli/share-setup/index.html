@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Foundation · GitHub setup</title>
+<style>
+:root{color-scheme:light;--ink:#242723;--muted:#62675e;--line:#d9ddd3;--green:#284d38}*{box-sizing:border-box}body{margin:0;background:#f4f5ef;color:var(--ink);font:16px/1.6 system-ui,-apple-system,sans-serif}main{max-width:720px;padding:64px 28px 72px;margin:auto}.brand{font-size:14px;font-weight:650;letter-spacing:.04em;display:flex;align-items:center;gap:10px}.mark{width:25px;height:25px;background:var(--green);border-radius:7px;color:white;display:grid;place-items:center}h1{font-size:clamp(32px,6vw,48px);font-weight:600;line-height:1.13;letter-spacing:-.035em;margin:45px 0 20px}p{margin:12px 0;color:var(--muted)}.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px;margin:28px 0}.eyebrow{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);font-weight:700}.permission{display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid #ebeee7;gap:14px}.permission:last-child{border:0}.permission span{color:var(--muted)}button,.button{font:inherit;font-weight:600;border:0;border-radius:10px;cursor:pointer;display:block;text-decoration:none;text-align:center;padding:15px 20px;background:var(--green);color:#fff;width:100%}button:hover,.button:hover{background:#193a27}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #b57925;outline-offset:4px}.secondary{background:transparent;color:var(--green);border:1px solid var(--line);padding:10px}.secondary:hover{background:#e8ece2}.small{font-size:13px}.foot{margin-top:26px;font-size:13px}a{color:var(--green)}details{margin-top:20px}summary{cursor:pointer;color:var(--muted);font-size:14px}input{font:inherit;width:100%;padding:10px;border:1px solid var(--line);border-radius:7px;margin:10px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f1f3ec;padding:16px;border-radius:8px;font:13px/1.6 ui-monospace,monospace;color:var(--ink)}.copy{width:auto;padding:7px 13px;font-size:13px;margin-top:8px}.step{margin:22px 0}.step>strong{display:block}.notice{border-left:3px solid #b57925;padding-left:14px}.hidden{display:none!important}#status{min-height:24px;font-size:13px;color:var(--green)}
+</style>
+</head>
+<body><main>
+<div class="brand"><span class="mark" aria-hidden="true">f</span> Foundation <span style="color:#8b9185;font-weight:400">/ GitHub setup</span></div>
+<section id="start">
+<h1>Share designs with<br>your GitHub team.</h1>
+<p>Create a private GitHub App for <strong>honeybeehq</strong>. Foundation uses it to check who can access a repository.</p>
+<div class="card"><div class="eyebrow">Small permission. Clear boundary.</div><div class="permission"><strong>Repository metadata</strong><span>Read only</span></div><div class="permission"><strong>Repository contents</strong><span>No access</span></div><div class="permission"><strong>Webhooks</strong><span>Off</span></div></div>
+<form method="post" action="https://github.com/organizations/honeybeehq/settings/apps/new" id="org-form"><input type="hidden" name="manifest"><input type="hidden" name="state"><button type="submit">Create App for honeybeehq →</button></form>
+<p class="small">GitHub will ask you to confirm. Then come back here to finish and select <strong>honeybeehq/foundation</strong>.</p>
+<details><summary>App name or personal account</summary><label for="name">App name</label><input id="name" maxlength="34" value="Foundation Share (honeybeehq)"><p class="small">If this name is taken, add a short suffix here or edit it on GitHub.</p><form method="post" action="https://github.com/settings/apps/new" id="personal-form"><input type="hidden" name="manifest"><input type="hidden" name="state"><button class="secondary" type="submit">Create for my personal account</button></form><p class="small notice">A private personal App only installs on your own account. Use the honeybeehq button to share honeybeehq/foundation.</p></details>
+</section>
+<section id="done" class="hidden">
+<h1>Your App is created.<br>Finish the connection.</h1><p>The code expires in one hour. Finish on the Studio, then install the App on the repository.</p>
+<div class="card"><div class="eyebrow">One-time setup code</div><pre id="code"></pre><button class="copy secondary" id="copy-code">Copy code</button></div>
+<div class="step"><strong>1. Save the private credentials on the Studio</strong><pre id="command"></pre><button class="copy secondary" id="copy-command">Copy command</button><p class="small">The command saves a private 0600 file at ~/.foundation/share-service/github-app.json, outside your repositories. It never prints the key. Treat the code as a private credential until finish runs. Share it only with your trusted setup agent.</p></div>
+<div class="step"><strong>2. Install on your repository</strong><p>Choose <strong>Only select repositories → honeybeehq/foundation</strong>.</p><a id="install" class="button" href="#">Install GitHub App →</a><p class="small" id="install-note">The finish command prints the exact install link. If you renamed the App on GitHub, use that link.</p><label for="slug">App slug (from the finish command, if renamed)</label><input id="slug" autocomplete="off" spellcheck="false"></div>
+<div class="step"><strong>3. Check the connection</strong><pre>foundation share github-app check --user trmdy</pre><p class="small">Checks repository permission metadata and confirms the App cannot receive Contents permission. Public repository contents remain public.</p></div>
+</section>
+<p id="status" role="status" aria-live="polite"></p><p class="foot">Private setup for Foundation. <a href="https://github.com/honeybeehq/foundation" rel="noreferrer">View the repository</a></p>
+</main>
+<script>
+const params=new URLSearchParams(location.search);
+const code=params.get('code');
+const base=location.origin+location.pathname;
+const name=document.getElementById('name');
+const defaultName='Foundation Share (honeybeehq)';
+const slugFor=name=>name.toLowerCase().replace(/[^a-z0-9 -]/g,'').replace(/ +/g,'-');
+function manifest(){return {name:name.value.trim()||defaultName,url:'https://github.com/honeybeehq/foundation',hook_attributes:{url:'https://github.com/honeybeehq/foundation',active:false},public:false,default_permissions:{metadata:'read'},redirect_url:base};}
+for(const form of document.querySelectorAll('form'))form.addEventListener('submit',event=>{
+ try{const state=crypto.randomUUID();sessionStorage.setItem('foundation-app-state',state);sessionStorage.setItem('foundation-app-slug',slugFor(manifest().name));form.elements.manifest.value=JSON.stringify(manifest());form.elements.state.value=state;}catch{event.preventDefault();document.getElementById('status').textContent='Allow browser storage to start the secure setup flow.';}
+});
+async function copy(text){try{await navigator.clipboard.writeText(text);document.getElementById('status').textContent='Copied.';}catch{document.getElementById('status').textContent='Select the text above and copy it.';}}
+if(code){
+ document.getElementById('start').classList.add('hidden');document.getElementById('done').classList.remove('hidden');
+ const expected=sessionStorage.getItem('foundation-app-state');
+ const valid=/^[a-zA-Z0-9_-]+$/.test(code)&&expected&&params.get('state')===expected;
+ if(!valid){document.getElementById('done').innerHTML='<h1>Return to the setup page.</h1><p>This return could not be matched to this browser’s setup. Start again from the same browser.</p><a class="button" href="'+base+'">Start setup again</a>';}
+ else{
+ history.replaceState(null,'',base+'?done=1');
+ const command='foundation share github-app finish --code '+code;
+ document.getElementById('code').textContent=code;document.getElementById('command').textContent=command;
+ document.getElementById('copy-code').onclick=()=>copy(code);document.getElementById('copy-command').onclick=()=>copy(command);
+ const slug=document.getElementById('slug');slug.value=sessionStorage.getItem('foundation-app-slug')||slugFor(defaultName);
+ function updateLink(){const valid=/^[a-z0-9-]+$/.test(slug.value);document.getElementById('install').href=valid?'https://github.com/apps/'+slug.value+'/installations/new':'#';document.getElementById('install').setAttribute('aria-disabled',String(!valid));}
+ slug.addEventListener('input',updateLink);updateLink();
+ }
+}else if(params.has('done')){document.getElementById('status').textContent='The one-time code is no longer in the address bar. Return to your open setup result or start again if it was not saved.';}
+</script></body></html>
