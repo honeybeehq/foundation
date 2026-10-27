@@ -20,9 +20,45 @@ it('retains inherited font and variable styles from real ancestors',async()=>{
  const result=await preserveDesignContext(page,'#selected',STYLE_PROPERTIES)
  expect(result.styleChanges).toEqual([])
  expect(result.geometryChanges).toEqual([])
- expect(await page.locator('#foundation-root').evaluate(el=>getComputedStyle(el).color)).toBe('rgb(12, 34, 56)')
+ expect(await page.locator('#foundation-root > #selected').evaluate(el=>getComputedStyle(el).color)).toBe('rgb(12, 34, 56)')
 })
 it('fails closed if assigning the capture id changes authored selectors',async()=>{
- await page.setContent('<style>#selected{color:red}</style><div><span id="selected">Native</span></div>')
+ await page.setContent('<style>.host > #selected{color:red}</style><div class="host"><span id="selected">Native</span></div>')
  await expect(preserveDesignContext(page,'#selected',STYLE_PROPERTIES)).rejects.toThrow('Design context changed')
+})
+it('ignores meaningless positions of empty display-contents rectangles',async()=>{
+ await page.setContent('<div style="display:flex;margin:25px"><div id="selected" style="display:flex"><span style="display:contents"><b>Content</b></span></div></div>')
+ const result=await preserveDesignContext(page,'#selected',STYLE_PROPERTIES)
+ expect(result.geometryChanges).toEqual([])
+ expect(await page.locator('#foundation-root > #selected').count()).toBe(1)
+})
+it('keeps diagnostic overflow paint at the isolated origin',async()=>{
+ const {captureFullExtent}=await import('./extent.ts')
+ const {mkdtemp,readFile,rm}=await import('node:fs/promises')
+ const {tmpdir}=await import('node:os')
+ const {join}=await import('node:path')
+ const {PNG}=await import('pngjs')
+ const directory=await mkdtemp(join(tmpdir(),'foundation-context-'))
+ try {
+  await page.setContent('<div style="display:flex;margin:28px"><span id="selected" style="width:6px;height:6px;background:rgb(0,128,0);flex:none"></span></div>')
+  await preserveDesignContext(page,'#selected',STYLE_PROPERTIES)
+  const path=join(directory,'extent.png')
+  await captureFullExtent(page,'#foundation-root',path)
+  const png=PNG.sync.read(await readFile(path))
+  expect([png.width,png.height]).toEqual([6,6])
+  const i=(2*png.width+2)*4
+  expect([...png.data.subarray(i,i+3)]).toEqual([0,128,0])
+ } finally {await rm(directory,{recursive:true,force:true})}
+})
+it('keeps the reference frame for overflow detection inside a larger rendering host',async()=>{
+ const {captureFrames}=await import('./frame.ts')
+ const {offscreenDefects}=await import('../compare/offscreen.ts')
+ const reference={width:20,height:20},viewport={width:100,height:100}
+ const {frame,hostFrame}=captureFrames(reference,viewport,true)
+ expect(frame).toEqual(reference)
+ expect(hostFrame).toEqual(viewport)
+ const node=(height:number)=>({path:'0/0',tag:'button',fdnId:'action',text:'Action',box:[0,0,20,height] as [number,number,number,number],style:{},visibility:{eligible:true,interactive:true,clips:[]}})
+ const design={nodes:[node(20)],meta:{frame,viewport},screenshot:Buffer.alloc(0)}
+ const code={nodes:[node(40)],meta:{frame,viewport},screenshot:Buffer.alloc(0)}
+ expect(offscreenDefects(design,code,[]).some(d=>d.cause==='offscreen')).toBe(true)
 })

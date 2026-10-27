@@ -1,3 +1,4 @@
+import {captureFrames} from './frame.ts'
 import { captureFullExtent } from "./extent.ts";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
@@ -101,7 +102,7 @@ try {
       throw Error(
         "Baseline design binding differs from links; regenerate baseline",
       );
-    const frame = design.meta.designIsolation?.mode === 'in-place' ? {width:board.viewport.width,height:board.viewport.height} : design.meta.frame;
+    const {frame,hostFrame}=captureFrames(design.meta.frame,board.viewport,design.meta.designIsolation?.mode === 'in-place');
     const folder = join(
       out,
       board.id,
@@ -221,7 +222,7 @@ try {
         await page.evaluate(() => document.fonts.ready);
         const fontSubstitutions = await pinFontStacks(page, links.fontPolicy);
         await page.addStyleTag({
-          content: `#foundation-root{width:${frame.width}px;height:${frame.height}px}`,
+          content: `#foundation-root{width:${hostFrame.width}px;height:${hostFrame.height}px}`,
         });
         await page.waitForFunction(
           () => (window as any).__foundationPendingTimers === 0,
