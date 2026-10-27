@@ -1,4 +1,4 @@
-import { readFile, writeFile, rename, mkdir } from "node:fs/promises";
+import { readFile, writeFile, rename, mkdir, rm } from "node:fs/promises";
 import path from "node:path";
 import { hash, canonical, checkHash } from "../compare/canonical.ts";
 import {
@@ -46,6 +46,8 @@ export interface ReviewSession {
   lastAt: string;
   endedAt?: string;
   durationMs?: number;
+  aborted?: boolean;
+  abortNote?: string;
 }
 export interface ReviewLog {
   schema: "fdn-review-log/0";
@@ -96,16 +98,27 @@ export async function readReview(file: string): Promise<ReviewLog> {
         (x) => typeof x === "string" && x.trim(),
       ) ||
       !Number.isFinite(Date.parse(s.startedAt)) ||
-      !Number.isFinite(Date.parse(s.lastAt))
+      !Number.isFinite(Date.parse(s.lastAt)) ||
+      Date.parse(s.lastAt) < Date.parse(s.startedAt) ||
+      (s.endedAt !== undefined &&
+        (!Number.isFinite(Date.parse(s.endedAt)) ||
+          Date.parse(s.endedAt) < Date.parse(s.lastAt) ||
+          !Number.isFinite(s.durationMs) ||
+          s.durationMs !== Date.parse(s.endedAt) - Date.parse(s.startedAt)))
     )
       throw Error("Invalid review session");
   return value;
 }
 export async function writeJson(file: string, value: unknown) {
   await mkdir(path.dirname(file), { recursive: true });
-  const temp = file + ".tmp";
-  await writeFile(temp, canonical(value) + "\n");
-  await rename(temp, file);
+  const temp = file + `.${process.pid}.tmp`;
+  try {
+    await writeFile(temp, canonical(value) + "\n");
+    await rename(temp, file);
+  } catch (e) {
+    await rm(temp, { force: true });
+    throw e;
+  }
 }
 export const candidateKey = (r: any, id: string) =>
   `${r.artboard}/${r.state}/${r.viewport.width}x${r.viewport.height}@${r.viewport.dpr}::${id}`;
@@ -136,17 +149,26 @@ export function reviewState(
   accepted: boolean = false,
 ) {
   const prior = [...log.entries].reverse().find((e) => e.key === candidate.key);
+  if (accepted)
+    return {
+      status: "accept" as const,
+      entry:
+        prior?.decision === "accept" &&
+        prior.fingerprint === candidate.fingerprint
+          ? prior
+          : null,
+    };
   if (!prior) return { status: "unreviewed" as const, entry: null };
   if (
     prior.fingerprint !== candidate.fingerprint ||
-    (prior.decision === "accept" && !accepted)
+    prior.decision === "accept"
   )
     return { status: "unreviewed" as const, entry: prior, stale: true };
   return { status: prior.decision, entry: prior };
 }
 export function runReviewMs(log: ReviewLog, run: string) {
   return log.sessions
-    .filter((s) => s.run === run && s.endedAt)
+    .filter((s) => s.run === run && s.endedAt && !s.aborted)
     .reduce((sum, s) => sum + (s.durationMs ?? 0), 0);
 }
 export async function loadRun(ref: string, repo: string) {
@@ -197,22 +219,24 @@ export async function recordReview(
       candidate.fingerprint
   )
     throw Error("Review index differs from measured report");
-  if (decision === "accept") {
-    const list = await readAccepted(
-        path.join(repo, ".foundation/accepted.json"),
+  if (defect.classification !== "product")
+    throw Error("Only product candidates enter manual verdict statistics");
+  const acceptedFile = path.join(repo, ".foundation/accepted.json"),
+    list = await readAccepted(acceptedFile);
+  const previousLength = list.entries.length;
+  list.entries = list.entries.filter(
+    (e) =>
+      !(
+        e.id === candidate.defectId &&
+        canonical(e.scope) === canonical(candidate.scope)
       ),
-      entry = makeAcceptance(
-        report,
-        candidate.defectId,
-        note,
-        session.reviewer,
-      );
-    list.entries = list.entries.filter(
-      (e) =>
-        !(e.id === entry.id && canonical(e.scope) === canonical(entry.scope)),
+  );
+  let acceptedList = previousLength !== list.entries.length ? list : undefined;
+  if (decision === "accept") {
+    list.entries.push(
+      makeAcceptance(report, candidate.defectId, note, session.reviewer),
     );
-    list.entries.push(entry);
-    await writeJson(path.join(repo, ".foundation/accepted.json"), list);
+    acceptedList = list;
   }
   const entry: ReviewEntry = {
     key: candidate.key,
@@ -228,5 +252,32 @@ export async function recordReview(
   };
   log.entries.push(entry);
   session.lastAt = entry.at;
-  return entry;
+  return { entry, acceptedList };
+}
+
+/** Roll back an intended acceptance if persisting its audit record fails. */
+export async function persistReview(
+  repo: string,
+  log: ReviewLog,
+  acceptedList?: unknown,
+) {
+  const acceptedFile = path.join(repo, ".foundation/accepted.json");
+  let original: Buffer | undefined;
+  if (acceptedList) {
+    try {
+      original = await readFile(acceptedFile);
+    } catch (e: any) {
+      if (e.code !== "ENOENT") throw e;
+    }
+    await writeJson(acceptedFile, acceptedList);
+  }
+  try {
+    await writeJson(path.join(repo, ".foundation/review-log.json"), log);
+  } catch (e) {
+    if (acceptedList) {
+      if (original) await writeFile(acceptedFile, original);
+      else await rm(acceptedFile, { force: true });
+    }
+    throw e;
+  }
 }

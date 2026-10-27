@@ -6,6 +6,7 @@ import {
   writeJson,
   recordReview,
   runReviewMs,
+  persistReview,
   type Decision,
 } from "./index.ts";
 const [command, ref, id, decision, ...rest] = process.argv.slice(2);
@@ -24,8 +25,10 @@ const { file: indexFile, run } = await loadRun(ref, repo),
 if (command === "review-start") {
   const reviewer = opt("--reviewer");
   if (!reviewer?.trim()) throw Error("--reviewer is required");
-  if (log.sessions.some((s) => s.run === run.run && !s.endedAt))
-    throw Error("Review already started; finish it with review-end RUN");
+  if (log.sessions.some((s) => !s.endedAt))
+    throw Error(
+      "Another review is active; finish it with review-end RUN or review-abort RUN --note REASON",
+    );
   log.sessions.push({
     id: hash({ run: run.run, now, reviewer }).slice(0, 20),
     run: run.run,
@@ -36,11 +39,17 @@ if (command === "review-start") {
   console.log(
     `Started measured review of ${run.run}; inspect candidates/images, then review each item.`,
   );
-} else if (command === "review-end") {
+} else if (["review-end", "review-abort"].includes(command!)) {
   const s = [...log.sessions]
     .reverse()
     .find((s) => s.run === run.run && !s.endedAt);
   if (!s) throw Error("No active review session");
+  if (command === "review-abort") {
+    const note = opt("--note");
+    if (!note?.trim()) throw Error("--note is required when aborting");
+    s.aborted = true;
+    s.abortNote = note;
+  }
   s.endedAt = now;
   s.durationMs = Date.parse(now) - Date.parse(s.startedAt);
   console.log(
@@ -56,7 +65,7 @@ if (command === "review-start") {
     throw Error(
       `Expected one candidate; found ${candidates.length}. Use the scoped id printed in the summary.`,
     );
-  const e = await recordReview(
+  const { entry: e, acceptedList } = await recordReview(
     run,
     candidates[0]!,
     decision as Decision,
@@ -65,8 +74,10 @@ if (command === "review-start") {
     indexFile,
     log,
   );
+  await persistReview(repo, log, acceptedList);
   console.log(
     `${e.key}: ${e.decision}; measured ${e.reviewMs} ms since prior review action.`,
   );
+  process.exit(0);
 } else throw Error("Unknown review command");
 await writeJson(file, log);
