@@ -13,7 +13,7 @@ const cell = (v: unknown) =>
     .replaceAll("\n", " ")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
-    .replaceAll("`", "\\`");
+    .replaceAll("`", "`");
 export function jobSummary(
   reports: any[],
   verification: any,
@@ -50,7 +50,7 @@ export function jobSummary(
       "## Manual review — advisory only",
       `${states.filter((s) => s.status === "unreviewed").length} unreviewed · ${states.filter((s) => s.status !== "unreviewed" && s.entry).length} pilot-reviewed · ${states.filter((s) => s.status === "accept" && !s.entry).length} existing accepted-list items. Only product groups enter these counts and verdict frequencies. Environment/uncertain groups are shown separately. Real / intended / false-alarm decisions are reviewer observations, not release gates.`,
       "",
-      "Scoped IDs below are stable across runs. Download the artifact and start a timed session with \`foundation-proof review-start RUN --reviewer NAME\`, then use \`review RUN SCOPED_ID real|accept|false --note NOTE\`, and finish with \`review-end RUN\`. Keep the downloaded review-index.json and its relative report files together.",
+      "Scoped IDs below are stable across runs. Download the artifact and start a timed session with `foundation-proof review-start RUN --reviewer NAME`, then use `review RUN SCOPED_ID real|accept|false --note NOTE`, and finish with `review-end RUN`. Keep the downloaded review-index.json and its relative report files together.",
       "",
       "| Reviewed run | Measured review wall time | Timed decisions | Untimed decisions |",
       "|---|---:|---:|---:|",
@@ -84,7 +84,7 @@ export function jobSummary(
     }
     lines.push(
       `Accepted pixel bounds exclude ${((r.acceptedPixels?.excludedRatio ?? 0) * 100).toFixed(3)}% of the image; residual difference outside them: ${((r.acceptedPixels?.residualRatio ?? r.pixels.diffRatio) * 100).toFixed(3)}%. Allowlisted environment groups: ${defectsOf(r).filter((d) => d.classification === "environment" && environmentCauses.includes(d.cause)).length}; unreviewed environment groups: ${defectsOf(r).filter((d) => d.classification === "environment" && !environmentCauses.includes(d.cause)).length}.`,
-      `Images: [Design](${artifactUrl}) (\`${cell(r.artboard)}/${cell(r.state)}/${r.viewport.width}x${r.viewport.height}@${r.viewport.dpr}/design.png\`), [Code](${artifactUrl}) (\`${cell(r.artboard)}/${cell(r.state)}/${r.viewport.width}x${r.viewport.height}@${r.viewport.dpr}/code.png\`), [Diff](${artifactUrl}) (\`${cell(r.artboard)}/${cell(r.state)}/${r.viewport.width}x${r.viewport.height}@${r.viewport.dpr}/diff.png\`). Links download the image artifact.`,
+      `Images: [Design](${artifactUrl}) (`${cell(r.artboard)}/${cell(r.state)}/${r.viewport.width}x${r.viewport.height}@${r.viewport.dpr}/design.png`), [Code](${artifactUrl}) (`${cell(r.artboard)}/${cell(r.state)}/${r.viewport.width}x${r.viewport.height}@${r.viewport.dpr}/code.png`), [Diff](${artifactUrl}) (`${cell(r.artboard)}/${cell(r.state)}/${r.viewport.width}x${r.viewport.height}@${r.viewport.dpr}/diff.png`). Links download the image artifact.`,
       "",
       `<details><summary>Candidate table (${defectsOf(r).length} groups, including uncertain/environment groups)</summary>`,
       "",
@@ -132,7 +132,7 @@ export function jobSummary(
     ...(verification.errors ?? []).map((e: string) => `- ${cell(e)}`),
     "",
     "## Timings",
-    `\`${cell(timings)}\``,
+    ``${cell(timings)}``,
   );
   return lines.join("\n") + "\n";
 }
