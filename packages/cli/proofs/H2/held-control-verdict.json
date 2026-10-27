@@ -1,0 +1,29 @@
+{
+  "workload": "share-held-store",
+  "seriesId": "metal3-local-held-v1",
+  "verdict": "fail",
+  "results": [
+    {
+      "workload": "share-held-store",
+      "metric": "heldSaveVisibilityMax",
+      "unit": "ms",
+      "kind": "upper-bound",
+      "aggregation": "max",
+      "samples": 1,
+      "discardedSamples": 0,
+      "aggregate": 54.522705078125,
+      "findings": [
+        "1 timing samples cannot support a verdict",
+        "invariant violated: Every held save is imported before release and neither feed cursor nor durable acknowledgement advances until Comb recovers."
+      ],
+      "budget": {
+        "value": 1000,
+        "unit": "ms",
+        "comparator": "<=",
+        "status": "proposed",
+        "ok": true
+      },
+      "verdict": "fail"
+    }
+  ]
+}

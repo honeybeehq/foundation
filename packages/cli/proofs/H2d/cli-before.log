@@ -1,0 +1,35 @@
+
+ RUN  v4.1.10 /home/trmd/.hive/v2/cells/fdnx-h2-share-service-490244f656d9/github-com-honeybeehq-foundation-ddad6d63099e-space-490244f656d9
+
+stdout | packages/cli/test/share-service.test.ts > CLI SIGTERM exits zero promptly with active SSE and restarts on the same port
+H2d CLI SIGTERM cycle 1: 85 ms, exit=0, SSE reconnected
+
+ ❯ packages/cli/test/share-service.test.ts (16 tests | 1 failed | 15 skipped) 697ms
+   × CLI SIGTERM exits zero promptly with active SSE and restarts on the same port 694ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/cli/test/share-service.test.ts > CLI SIGTERM exits zero promptly with active SSE and restarts on the same port
+AssertionError: expected '' to contain 'event: close'
+
+- Expected
++ Received
+
+- event: close
+
+ ❯ packages/cli/test/share-service.test.ts:319:20
+    317|     expect(performance.now()-started).toBeLessThan(2000)
+    318|     let ending='';for(;;){const row=await reader.read();if(row.done)br…
+    319|     expect(ending).toContain('event: close')
+       |                    ^
+    320|   }
+    321| },15000)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 15 skipped (16)
+   Start at  10:59:08
+   Duration  1.04s (transform 144ms, setup 0ms, import 199ms, tests 697ms, environment 0ms)
+

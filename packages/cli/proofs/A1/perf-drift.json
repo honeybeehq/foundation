@@ -1,0 +1,69 @@
+{
+  "unaccounted": [],
+  "dead": [],
+  "staleOwners": [
+    {
+      "workload": "doctor-capabilities",
+      "path": "packages/cli/src/main.ts",
+      "problem": "content changed (25d28fdd -> 9c44da9d)"
+    },
+    {
+      "workload": "share-held-store",
+      "path": "packages/cli/src/share/transport.ts",
+      "problem": "content changed (2d5a4407 -> 3f7b1c54)"
+    },
+    {
+      "workload": "share-held-store",
+      "path": "packages/cli/src/share/service.ts",
+      "problem": "content changed (ea251802 -> 8a641142)"
+    },
+    {
+      "workload": "share-held-store",
+      "path": "packages/cli/src/share/client.ts",
+      "problem": "content changed (9698b86e -> 81b6c6fa)"
+    },
+    {
+      "workload": "share-held-store",
+      "path": "packages/cli/src/share/crypto.ts",
+      "problem": "content changed (af49d98d -> d7207115)"
+    },
+    {
+      "workload": "share-held-store",
+      "path": "packages/cli/src/share/vault.ts",
+      "problem": "content changed (f9c0892e -> e7086a0a)"
+    },
+    {
+      "workload": "share-held-store",
+      "path": "packages/cli/src/share/github.ts",
+      "problem": "content changed (2f79ebec -> 4d557f1c)"
+    },
+    {
+      "workload": "share-held-store",
+      "path": "packages/cli/src/sync/daemon.ts",
+      "problem": "content changed (29ea84bc -> 8d816f70)"
+    },
+    {
+      "workload": "sync-save-to-session",
+      "path": "packages/cli/src/sync/daemon.ts",
+      "problem": "content changed (c8f0697a -> 8d816f70)"
+    },
+    {
+      "workload": "sync-save-to-session",
+      "path": "packages/cli/src/session/session.ts",
+      "problem": "content changed (9e0d61ff -> 65bb9a1f)"
+    },
+    {
+      "workload": "sync-save-to-session",
+      "path": "packages/engine/src/chain/chain.ts",
+      "problem": "content changed (72b55be6 -> 27f855fb)"
+    }
+  ],
+  "summary": {
+    "census": 224,
+    "accounted": 120,
+    "gaps": 104,
+    "unaccounted": 0,
+    "dead": 0,
+    "staleOwners": 11
+  }
+}

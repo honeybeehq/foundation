@@ -1,0 +1,109 @@
+2026-10-25T19:56:17.796Z LABELLED STUB: GitHub identities, repo membership and SSH public keys served by loopback fixture; actual CLI/crypto/HTTP/Comb/disk are real
+2026-10-25T19:56:18.108Z PREPARE: no server space or token before descriptor commit
+2026-10-25T19:56:18.584Z UNCOMMITTED DESCRIPTOR REFUSED: init cannot enable sharing
+2026-10-25T19:56:19.118Z COMMITTED DESCRIPTOR ACCEPTED: default branch stub reads actual git HEAD, not working tree
+2026-10-25T19:56:19.119Z init created secret-free share.json; recovery code withheld from transcript
+2026-10-25T19:56:19.578Z second member login: Live sharing: waiting for key — Waiting for a teammate's machine to share the key
+2026-10-25T19:56:19.993Z automatic signed-device key handover with no designs open: 406ms
+2026-10-25T19:56:21.841Z genesis durably acknowledged: 368ms
+2026-10-25T19:56:22.172Z activity baseline caught-up marker: 326ms
+2026-10-25T19:56:22.623Z alice edit visible on other member: 72ms
+2026-10-25T19:56:22.623Z save-to-remote visibility alice: 98.929931640625ms
+2026-10-25T19:56:23.071Z bob edit visible on other member: 73ms
+2026-10-25T19:56:23.072Z save-to-remote visibility bob: 95.904541015625ms
+2026-10-25T19:56:24.611Z text changes sync while image is pending: 678ms
+2026-10-25T19:56:34.431Z 5MB image fetched and verified in background: 9820ms
+2026-10-25T19:56:34.788Z IMAGE RENDER: second HOME actual browser img naturalWidth1280/naturalHeight1024; screenshot /home/trmd/.hive/v2/cells/fdnx-h2-share-service-490244f656d9/github-com-honeybeehq-foundation-ddad6d63099e-space-490244f656d9/.audit/share-run-oh5rY2/received-image.png
+2026-10-25T19:56:34.856Z ASSET: 5244767byte PNG transferred byte-exact; pending reference remains a consistent chain
+2026-10-25T19:56:35.308Z ordinary edit on image design still relays promptly: 67ms
+2026-10-25T19:56:35.443Z ASSET BOUNDS: 41 opaque chunk feeds; max durable events perfeed 1
+2026-10-25T19:56:36.231Z ASSET TAMPER REFUSED: real Comb read ciphertext bit-flip rejected; no installed file or partial temp
+2026-10-25T19:56:36.849Z missing image does not block forward text sync: 210ms
+2026-10-25T19:56:37.283Z missing image does not block reverse text sync: 48ms
+2026-10-25T19:56:37.652Z missing image status is visible: 368ms
+2026-10-25T19:56:37.652Z ASSET ISOLATION: missing image pending/error visible; both directions still sync; no invalid local file
+2026-10-25T19:56:38.215Z oversize image does not block forward text sync: 119ms
+2026-10-25T19:56:38.730Z oversize image does not block reverse text sync: 126ms
+2026-10-25T19:56:39.081Z oversize image status is visible: 351ms
+2026-10-25T19:56:39.081Z ASSET ISOLATION: oversize image pending/error visible; both directions still sync; no invalid local file
+2026-10-25T19:56:39.632Z hash-mismatch image does not block forward text sync: 144ms
+2026-10-25T19:56:40.145Z hash-mismatch image does not block reverse text sync: 124ms
+2026-10-25T19:56:40.505Z hash-mismatch image status is visible: 360ms
+2026-10-25T19:56:40.505Z ASSET ISOLATION: hash-mismatch image pending/error visible; both directions still sync; no invalid local file
+2026-10-25T19:56:41.024Z unsupported image does not block forward text sync: 113ms
+2026-10-25T19:56:41.575Z unsupported image does not block reverse text sync: 150ms
+2026-10-25T19:56:41.942Z unsupported image status is visible: 367ms
+2026-10-25T19:56:41.943Z ASSET ISOLATION: unsupported image pending/error visible; both directions still sync; no invalid local file
+2026-10-25T19:56:42.410Z asset-like prose does not block sync: 83ms
+2026-10-25T19:56:42.411Z ASSET PROSE: non-contract names in text ignored; original verified image restored
+2026-10-25T19:56:42.411Z signed ephemeral hint yields live imported activity: 0ms
+2026-10-25T19:56:42.414Z ACTIVITY: signed writer-stated trmd-metal-3 origin retained on bob-owned replica; touched n1; no owner substitution
+2026-10-25T19:56:42.748Z activity cursor resume caught-up marker: 322ms
+2026-10-25T19:56:43.083Z persistent activity observer ready for outage: 323ms
+2026-10-25T19:56:46.394Z remote-only catalogue persisted on second HOME: 1852ms
+2026-10-25T19:56:46.730Z CATALOGUE: cached remote-only row fee30096-965d-49e1-a343-3315f55dacd5; origin alice; revision e22c9bb131e640b8f7fa0e1805e67f3020a44e9857c0a3a7498dd548cf83fd83
+2026-10-25T19:56:57.891Z encrypted materialization accepted then ready: 10816ms
+2026-10-25T19:56:57.894Z ASSET MATERIALIZE: remote-only encrypted history plus missing5MB image ready in a new directory
+2026-10-25T19:56:57.896Z MATERIALIZE: asynchronous accepted/ready; actual encrypted network history (no local candidate); confined path; original document identity
+2026-10-25T19:56:59.954Z foreign target refusal settles: 316ms
+2026-10-25T19:56:59.954Z REFUSAL: wrong docId verification and foreign target refused; both foreign files remain exact
+2026-10-25T19:57:02.614Z idle catalogue data checkpoint stays unchanged across contact polls: 2659ms
+2026-10-25T19:57:02.615Z IDLE: follower contact remains fresh without rewriting the durable catalogue data checkpoint
+2026-10-25T19:57:03.053Z NO ACCESS REFUSED: Live sharing: no access
+2026-10-25T19:57:03.492Z removal causes epoch rotation: 0ms
+2026-10-25T19:57:03.493Z removed device token revoked and relay disconnected
+2026-10-25T19:57:04.255Z new epoch change durably acknowledged: 360ms
+2026-10-25T19:57:04.447Z RAW STORE CIPHERTEXT: removed member old keys and nonmember empty keys cannot decrypt latest event
+2026-10-25T19:57:04.449Z REMOVED TOKEN REFUSED: HTTP 403
+2026-10-25T19:57:04.475Z RAW-STORE GREP: exit 1, no plaintext matches in Comb objects or service metadata
+2026-10-25T19:57:04.520Z ASSET RAW-STORE GREP: zero matches for128 exact PNG bytes or plaintext content SHA in all Comb/service files
+2026-10-25T19:57:04.522Z TAMPER REFUSED: changed encrypted record fails authentication
+2026-10-25T19:57:04.870Z ROLLBACK REFUSED: {"state":"unavailable","reason":"service rolled back epoch 2 to 1"}
+2026-10-25T19:57:05.231Z RECOVERY SUBSTITUTION REFUSED: {"state":"unavailable","reason":"recovery key differs from committed share.json"}
+2026-10-25T19:57:05.391Z REFUSED ROTATION: requirement persisted across retries; old-key sending stays paused
+2026-10-25T19:57:05.422Z OUTAGE: service stopped
+2026-10-25T19:57:05.783Z catalogue marks service outage stale: 361ms
+2026-10-25T19:57:06.147Z OFFLINE CACHE: cached remote rows retained; read succeeds with service stopped, no scan/network wait
+2026-10-25T19:57:06.610Z OFFLINE MATERIALIZE: complete local history opens another confined replica with service stopped
+2026-10-25T19:57:07.035Z local edit saved during outage
+2026-10-25T19:57:07.846Z outbox recovered after service restart: 808ms
+2026-10-25T19:57:10.859Z re-attested replacement device receives current key: 2499ms
+2026-10-25T19:57:10.859Z RE-ATTEST: renewed SSH binding and replaced revoked device keys; current access checked again
+2026-10-25T19:57:14.686Z outage history arrives as baseline imported fact: 3826ms
+2026-10-25T19:57:14.687Z REPLAY: delayed outage edit is exactly one imported baseline fact, never a live lease
+2026-10-25T19:57:17.198Z RESTART: durable activity cursor and cross-copy hash dedup retained
+2026-10-25T19:57:17.243Z DESCRIPTOR REMOVED from default-branch git HEAD; waiting for bounded cache expiry
+node:internal/deps/undici/undici:13826
+            fetchParams.controller.controller.error(new TypeError("terminated", {
+                                                    ^
+
+TypeError: terminated
+    at Fetch.onAborted (node:internal/deps/undici/undici:13826:53)
+    at Fetch.emit (node:events:509:28)
+    at Fetch.terminate (node:internal/deps/undici/undici:12956:14)
+    at Object.onError (node:internal/deps/undici/undici:13960:38)
+    at Request.onError (node:internal/deps/undici/undici:3121:31)
+    at Object.errorRequest (node:internal/deps/undici/undici:1942:17)
+    at Socket.onHttpSocketClose (node:internal/deps/undici/undici:7852:14)
+    at Socket.emit (node:events:521:24)
+    at TCP.<anonymous> (node:net:351:12) {
+  [cause]: SocketError: other side closed
+      at Socket.onHttpSocketEnd (node:internal/deps/undici/undici:7825:26)
+      at Socket.emit (node:events:521:24)
+      at endReadableNT (node:internal/streams/readable:1729:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    code: 'UND_ERR_SOCKET',
+    socket: {
+      localAddress: '127.0.0.1',
+      localPort: 35028,
+      remoteAddress: '127.0.0.1',
+      remotePort: 43445,
+      remoteFamily: 'IPv4',
+      timeout: undefined,
+      bytesWritten: 287,
+      bytesRead: 184
+    }
+  }
+}
+
+Node.js v24.18.0

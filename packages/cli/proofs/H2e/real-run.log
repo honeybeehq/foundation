@@ -1,0 +1,4 @@
+PASS real session hello: registered without nested-lock warning; status=sharing pending
+PASS real daemon: busy startup retried without lock deletion; format2 and shared after release
+PASS session and daemon exit0; actual Comb durable publication complete
+PASS real CLI edit: saved and auto-registered after closing registration

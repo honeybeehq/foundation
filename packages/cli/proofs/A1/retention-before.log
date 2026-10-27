@@ -1,0 +1,28 @@
+
+ RUN  v4.1.10 /home/trmd/.hive/v2/cells/fdnx-h2-share-service-490244f656d9/github-com-honeybeehq-foundation-ddad6d63099e-space-490244f656d9
+
+ ❯ packages/cli/test/share-assets.test.ts (11 tests | 1 failed) 2063ms
+   × keeps retained images readable after more than64 historical chunk copies 11ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/cli/test/share-assets.test.ts > keeps retained images readable after more than64 historical chunk copies
+Error: asset chunk missing or history too large
+ ❯ download packages/cli/src/share/assets.ts:214:141
+    212|         await bridge.hello()
+    213|         const head=await bridge.request('head',{log})
+    214|         if(head.log!==log||typeof head.cursor!=='string'||!/^\d+$/.tes…
+       |                                                                                                                                             ^
+    215|         let item:ReturnType<typeof decode>|undefined,lastError:unknown
+    216|         const newest=BigInt(head.cursor)-1n
+ ❯ transfer packages/cli/src/share/assets.ts:188:14
+ ❯ packages/cli/src/share/assets.ts:168:131
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 passed (11)
+   Start at  21:39:32
+   Duration  2.96s (transform 549ms, setup 0ms, import 755ms, tests 2.06s, environment 0ms)
+

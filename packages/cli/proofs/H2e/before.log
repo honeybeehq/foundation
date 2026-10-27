@@ -1,0 +1,47 @@
+
+ RUN  v4.1.10 /home/trmd/.hive/v2/cells/fdnx-h2-share-service-490244f656d9/github-com-honeybeehq-foundation-ddad6d63099e-space-490244f656d9
+
+ ❯ packages/cli/test/sync-store.test.ts (4 tests | 2 failed) 136ms
+   × auto-registers without taking a busy document lock or mutating the chain 10ms
+   × session hello auto-registers while its own transaction holds the lock 27ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/cli/test/sync-store.test.ts > auto-registers without taking a busy document lock or mutating the chain
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "sync registration: Error: document is busy: /tmp/sync-registration-aP96xb/board.fdn.html; lock /tmp/sync-registration-aP96xb/board.fdn.html.lock; recorded owner: {\"pid\":471094,\"host\":\"trmd-metal-3\",\"machineId\":\"os:9e7926daceeb64582c57a504e4a44374e4c67250b3389df428cf31ca1922ee76\",\"bootId\":\"b009d0a6-6f91-4396-bbaa-7e330a015021\",\"pidNamespace\":\"pid:[4026531836]\",\"created\":\"2026-10-26T10:30:22.868Z\",\"token\":\"461c770e-ad03-4b38-9629-328af2032dd3\"}. Retry the edit. Only after confirming the owner is stopped, remove the stale lock: rm -- '/tmp/sync-registration-aP96xb/board.fdn.html.lock'",
++ ]
+
+ ❯ packages/cli/test/sync-store.test.ts:38:16
+     36|   try{autoOpenDesign(file,message=>logs.push(message))}finally{release…
+     37|   expect(performance.now()-started).toBeLessThan(200)
+     38|   expect(logs).toEqual([])
+       |                ^
+     39|   expect(liveDesigns()).toHaveLength(1)
+     40|   expect(readFileSync(file+'.chain')).toEqual(Buffer.from(bytes))
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  packages/cli/test/sync-store.test.ts > session hello auto-registers while its own transaction holds the lock
+AssertionError: expected 'sync registration: Error: document is…' not to contain 'document is busy'
+
+Expected: "document is busy"
+Received: "sync registration: Error: document is busy: /tmp/session-registration-ZsnUHk/board.fdn.html; lock /tmp/session-registration-ZsnUHk/board.fdn.html.lock; recorded owner: {"pid":471094,"host":"trmd-metal-3","machineId":"os:9e7926daceeb64582c57a504e4a44374e4c67250b3389df428cf31ca1922ee76","bootId":"b009d0a6-6f91-4396-bbaa-7e330a015021","pidNamespace":"pid:[4026531836]","created":"2026-10-26T10:30:22.879Z","token":"441dac10-6677-471d-8bb4-21abb039e605"}. Retry the edit. Only after confirming the owner is stopped, remove the stale lock: rm -- '/tmp/session-registration-ZsnUHk/board.fdn.html.lock'"
+
+ ❯ packages/cli/test/sync-store.test.ts:50:176
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 2 passed (4)
+   Start at  11:30:21
+   Duration  1.26s (transform 687ms, setup 0ms, import 992ms, tests 136ms, environment 0ms)
+

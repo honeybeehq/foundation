@@ -1,0 +1,30 @@
+{
+  "workload": "share-held-store",
+  "seriesId": "metal3-local-held-v1",
+  "commit": "3c49364d4c2d46f3ad1c0cf2dcaddf174fc1850d",
+  "machine": "trmd-metal-3",
+  "runtime": "v24.18.0",
+  "buildMode": "source-tsx",
+  "load": [
+    0.92,
+    0.78,
+    0.82
+  ],
+  "independentHints": true,
+  "relay": true,
+  "driverSha256": "df220883aa7ced8dfa8d4d87d432e372ad8d4b74df5f5a25640082086c89b07b",
+  "failure": null,
+  "results": [
+    {
+      "metric": "heldSaveVisibilityMax",
+      "samples": [
+        64.092529296875,
+        53.067138671875,
+        54.04443359375,
+        52.02197265625,
+        57.999267578125
+      ],
+      "invariantHolds": true
+    }
+  ]
+}

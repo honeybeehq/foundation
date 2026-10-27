@@ -1,0 +1,26 @@
+{
+  "workload": "share-held-store",
+  "seriesId": "metal3-local-held-v1",
+  "verdict": "pass",
+  "results": [
+    {
+      "workload": "share-held-store",
+      "metric": "heldSaveVisibilityMax",
+      "unit": "ms",
+      "kind": "upper-bound",
+      "aggregation": "max",
+      "samples": 5,
+      "discardedSamples": 0,
+      "aggregate": 64.092529296875,
+      "findings": [],
+      "budget": {
+        "value": 1000,
+        "unit": "ms",
+        "comparator": "<=",
+        "status": "proposed",
+        "ok": true
+      },
+      "verdict": "pass"
+    }
+  ]
+}

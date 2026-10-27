@@ -1,0 +1,81 @@
+2026-10-25T20:00:57.447Z LABELLED STUB: GitHub identities, repo membership and SSH public keys served by loopback fixture; actual CLI/crypto/HTTP/Comb/disk are real
+2026-10-25T20:00:57.749Z PREPARE: no server space or token before descriptor commit
+2026-10-25T20:00:58.210Z UNCOMMITTED DESCRIPTOR REFUSED: init cannot enable sharing
+2026-10-25T20:00:58.715Z COMMITTED DESCRIPTOR ACCEPTED: default branch stub reads actual git HEAD, not working tree
+2026-10-25T20:00:58.715Z init created secret-free share.json; recovery code withheld from transcript
+2026-10-25T20:00:59.193Z second member login: Live sharing: waiting for key — Waiting for a teammate's machine to share the key
+2026-10-25T20:00:59.593Z automatic signed-device key handover with no designs open: 392ms
+2026-10-25T20:01:01.443Z genesis durably acknowledged: 369ms
+2026-10-25T20:01:01.750Z activity baseline caught-up marker: 301ms
+2026-10-25T20:01:02.268Z alice edit visible on other member: 154ms
+2026-10-25T20:01:02.269Z save-to-remote visibility alice: 173.2001953125ms
+2026-10-25T20:01:02.689Z bob edit visible on other member: 46ms
+2026-10-25T20:01:02.690Z save-to-remote visibility bob: 66.17041015625ms
+2026-10-25T20:01:04.422Z text changes sync while image is pending: 884ms
+2026-10-25T20:01:13.783Z 5MB image fetched and verified in background: 9361ms
+2026-10-25T20:01:14.118Z IMAGE RENDER: second HOME actual browser img naturalWidth1280/naturalHeight1024; screenshot /home/trmd/.hive/v2/cells/fdnx-h2-share-service-490244f656d9/github-com-honeybeehq-foundation-ddad6d63099e-space-490244f656d9/.audit/share-run-5ZSmXB/received-image.png
+2026-10-25T20:01:14.165Z ASSET: 5244767byte PNG transferred byte-exact; pending reference remains a consistent chain
+2026-10-25T20:01:14.563Z ordinary edit on image design still relays promptly: 26ms
+2026-10-25T20:01:14.688Z ASSET BOUNDS: 41 opaque chunk feeds; max durable events perfeed 1
+2026-10-25T20:01:15.491Z ASSET TAMPER REFUSED: real Comb read ciphertext bit-flip rejected; no installed file or partial temp
+2026-10-25T20:01:16.122Z missing image does not block forward text sync: 214ms
+2026-10-25T20:01:16.626Z missing image does not block reverse text sync: 126ms
+2026-10-25T20:01:16.988Z missing image status is visible: 362ms
+2026-10-25T20:01:16.988Z ASSET ISOLATION: missing image pending/error visible; both directions still sync; no invalid local file
+2026-10-25T20:01:17.566Z oversize image does not block forward text sync: 119ms
+2026-10-25T20:01:18.101Z oversize image does not block reverse text sync: 141ms
+2026-10-25T20:01:18.459Z oversize image status is visible: 358ms
+2026-10-25T20:01:18.460Z ASSET ISOLATION: oversize image pending/error visible; both directions still sync; no invalid local file
+2026-10-25T20:01:18.996Z hash-mismatch image does not block forward text sync: 149ms
+2026-10-25T20:01:19.523Z hash-mismatch image does not block reverse text sync: 143ms
+2026-10-25T20:01:19.883Z hash-mismatch image status is visible: 360ms
+2026-10-25T20:01:19.883Z ASSET ISOLATION: hash-mismatch image pending/error visible; both directions still sync; no invalid local file
+2026-10-25T20:01:20.421Z unsupported image does not block forward text sync: 142ms
+2026-10-25T20:01:20.913Z unsupported image does not block reverse text sync: 103ms
+2026-10-25T20:01:21.273Z unsupported image status is visible: 360ms
+2026-10-25T20:01:21.274Z ASSET ISOLATION: unsupported image pending/error visible; both directions still sync; no invalid local file
+2026-10-25T20:01:21.736Z asset-like prose does not block sync: 76ms
+2026-10-25T20:01:21.736Z ASSET PROSE: non-contract names in text ignored; original verified image restored
+2026-10-25T20:01:21.737Z signed ephemeral hint yields live imported activity: 1ms
+2026-10-25T20:01:21.740Z ACTIVITY: signed writer-stated trmd-metal-3 origin retained on bob-owned replica; touched n1; no owner substitution
+2026-10-25T20:01:22.092Z activity cursor resume caught-up marker: 341ms
+2026-10-25T20:01:22.405Z persistent activity observer ready for outage: 303ms
+2026-10-25T20:01:24.596Z remote-only catalogue persisted on second HOME: 700ms
+2026-10-25T20:01:24.946Z CATALOGUE: cached remote-only row 06b89df9-5604-43b7-b484-35226d075d57; origin alice; revision 050a77285ca9fcf88a940edec56a5a017a553dd4b488808b47ca7f522dcf1f86
+2026-10-25T20:01:35.983Z encrypted materialization accepted then ready: 10690ms
+2026-10-25T20:01:35.988Z ASSET MATERIALIZE: remote-only encrypted history plus missing5MB image ready in a new directory
+2026-10-25T20:01:35.990Z MATERIALIZE: asynchronous accepted/ready; actual encrypted network history (no local candidate); confined path; original document identity
+2026-10-25T20:01:38.090Z foreign target refusal settles: 342ms
+2026-10-25T20:01:38.091Z REFUSAL: wrong docId verification and foreign target refused; both foreign files remain exact
+2026-10-25T20:01:40.298Z idle catalogue data checkpoint stays unchanged across contact polls: 2207ms
+2026-10-25T20:01:40.298Z IDLE: follower contact remains fresh without rewriting the durable catalogue data checkpoint
+2026-10-25T20:01:40.787Z NO ACCESS REFUSED: Live sharing: no access
+2026-10-25T20:01:41.208Z removal causes epoch rotation: 0ms
+2026-10-25T20:01:41.209Z removed device token revoked and relay disconnected
+2026-10-25T20:01:41.991Z new epoch change durably acknowledged: 373ms
+2026-10-25T20:01:42.163Z RAW STORE CIPHERTEXT: removed member old keys and nonmember empty keys cannot decrypt latest event
+2026-10-25T20:01:42.165Z REMOVED TOKEN REFUSED: HTTP 403
+2026-10-25T20:01:42.194Z RAW-STORE GREP: exit 1, no plaintext matches in Comb objects or service metadata
+2026-10-25T20:01:42.240Z ASSET RAW-STORE GREP: zero matches for128 exact PNG bytes or plaintext content SHA in all Comb/service files
+2026-10-25T20:01:42.243Z TAMPER REFUSED: changed encrypted record fails authentication
+2026-10-25T20:01:42.593Z ROLLBACK REFUSED: {"state":"unavailable","reason":"service rolled back epoch 2 to 1"}
+2026-10-25T20:01:42.940Z RECOVERY SUBSTITUTION REFUSED: {"state":"unavailable","reason":"recovery key differs from committed share.json"}
+2026-10-25T20:01:43.352Z REFUSED ROTATION: requirement persisted across retries; old-key sending stays paused
+2026-10-25T20:01:43.385Z OUTAGE: service stopped
+2026-10-25T20:01:43.736Z catalogue marks service outage stale: 351ms
+2026-10-25T20:01:44.085Z OFFLINE CACHE: cached remote rows retained; read succeeds with service stopped, no scan/network wait
+2026-10-25T20:01:44.571Z OFFLINE MATERIALIZE: complete local history opens another confined replica with service stopped
+2026-10-25T20:01:44.991Z local edit saved during outage
+2026-10-25T20:01:46.566Z outbox recovered after service restart: 1573ms
+2026-10-25T20:01:49.149Z re-attested replacement device receives current key: 2030ms
+2026-10-25T20:01:49.150Z RE-ATTEST: renewed SSH binding and replaced revoked device keys; current access checked again
+2026-10-25T20:01:50.923Z outage history arrives as baseline imported fact: 1773ms
+2026-10-25T20:01:50.924Z REPLAY: delayed outage edit is exactly one imported baseline fact, never a live lease
+2026-10-25T20:01:52.798Z RESTART: durable activity cursor and cross-copy hash dedup retained
+2026-10-25T20:01:52.831Z DESCRIPTOR REMOVED from default-branch git HEAD; waiting for bounded cache expiry
+2026-10-25T20:01:52.933Z quiet relay socket closed: TypeError: terminated
+2026-10-25T20:02:23.853Z REMOVED DESCRIPTOR REFUSED existing token: HTTP 412
+2026-10-25T20:02:23.853Z quiet relay closes after descriptor removal: 0ms
+2026-10-25T20:02:23.854Z DESCRIPTOR REMOVAL: existing token refused and quiet SSE disconnected
+2026-10-25T20:02:27.444Z complete stopped local-store backup includes metadata and Comb objects
+2026-10-25T20:02:27.445Z PASS real two-HOME CLI/daemon/Comb encrypted sharing, handover, subsecond bidirectional visibility, refusal, removal/rotation, raw-store grep, outage and backup
