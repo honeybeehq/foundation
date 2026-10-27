@@ -1,0 +1,19 @@
+{
+  "cases": 14,
+  "fields": [
+    "scenario",
+    "expected",
+    "found",
+    "tp",
+    "fp",
+    "fn",
+    "precision",
+    "recall",
+    "pixelRatio"
+  ],
+  "exact": true,
+  "differences": [],
+  "offscreenControl": 1,
+  "source": "frozen capture/compare source, rerun after9eb007b",
+  "measurement": "controls-frozen.log"
+}
