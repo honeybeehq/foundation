@@ -1,0 +1,32 @@
+name: landing-typecheck
+
+on:
+  pull_request:
+  push:
+    branches: ['review/landing-candidate/**']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: landing-typecheck-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  landing-typecheck:
+    name: landing-typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.18.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
