@@ -2,6 +2,7 @@ import {
   candidateOf,
   reviewState,
   runReviewMs,
+  reviewCounts,
   type ReviewLog,
   type ReviewRun,
 } from "../review/index.ts";
@@ -47,12 +48,12 @@ export function jobSummary(
     lines.push(
       "",
       "## Manual review — advisory only",
-      `${states.filter((s) => s.status === "unreviewed").length} unreviewed · ${states.filter((s) => s.status !== "unreviewed").length} carried forward. Only product groups enter these counts and verdict frequencies. Environment/uncertain groups are shown separately. Real / intended / false-alarm decisions are reviewer observations, not release gates.`,
+      `${states.filter((s) => s.status === "unreviewed").length} unreviewed · ${states.filter((s) => s.status !== "unreviewed" && s.entry).length} pilot-reviewed · ${states.filter((s) => s.status === "accept" && !s.entry).length} existing accepted-list items. Only product groups enter these counts and verdict frequencies. Environment/uncertain groups are shown separately. Real / intended / false-alarm decisions are reviewer observations, not release gates.`,
       "",
       "Scoped IDs below are stable across runs. Download the artifact and start a timed session with \`foundation-proof review-start RUN --reviewer NAME\`, then use \`review RUN SCOPED_ID real|accept|false --note NOTE\`, and finish with \`review-end RUN\`. Keep the downloaded review-index.json and its relative report files together.",
       "",
-      "| Reviewed run | Measured review wall time | Decisions |",
-      "|---|---:|---:|",
+      "| Reviewed run | Measured review wall time | Timed decisions | Untimed decisions |",
+      "|---|---:|---:|---:|",
     );
     for (const run of [
       ...new Set(
@@ -62,10 +63,10 @@ export function jobSummary(
       ),
     ])
       lines.push(
-        `| ${cell(run)} | ${(runReviewMs(review.log, run) / 1000).toFixed(1)} s | ${review.log.entries.filter((e) => e.run === run).length} |`,
+        `| ${cell(run)} | ${(runReviewMs(review.log, run) / 1000).toFixed(1)} s | ${reviewCounts(review.log, run).timed} | ${reviewCounts(review.log, run).untimed} |`,
       );
     if (!review.log.sessions.some((s) => s.endedAt && !s.aborted))
-      lines.push("| None yet | — | 0 |");
+      lines.push("| None yet | — | 0 | 0 |");
   }
   lines.push("", "## Accepted differences");
   for (const a of verification.accepted ?? [])

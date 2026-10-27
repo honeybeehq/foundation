@@ -11,6 +11,7 @@ import {
   candidateOf,
   reviewState,
   runReviewMs,
+  reviewCounts,
   type ReviewRun,
 } from "../review/index.ts";
 import { hash } from "../compare/canonical.ts";
@@ -181,9 +182,15 @@ if (command === "capture-code") {
         counts: Object.fromEntries(
           ["unreviewed", "real", "accept", "false"].map((status) => [
             status,
-            reviewItems.filter((i: any) => i.status === status).length,
+            reviewItems.filter(
+              (i: any) =>
+                i.status === status && (status !== "accept" || i.entry),
+            ).length,
           ]),
         ),
+        preAccepted: reviewItems.filter(
+          (i: any) => i.status === "accept" && !i.entry,
+        ).length,
         reviewTimes: reviewLog.sessions.filter((s) => s.endedAt && !s.aborted),
       },
       null,
