@@ -1,0 +1,36 @@
+{
+  "captureOnly": true,
+  "comparisonRun": false,
+  "freshContextReplay": [
+    {
+      "file": "status-dot/running/100x60@1/design/screenshot.png",
+      "equal": true,
+      "sha256": "2faa217e1ea01155ff887bcdf2eec3ccb31443894da3062f419add836fd934b3"
+    },
+    {
+      "file": "status-dot/running/100x60@1/design/dom.json",
+      "equal": true,
+      "sha256": "813728abd262e2c7589014b9a350ae5d725a310563f3edb5a33afc84d8bc91bb"
+    },
+    {
+      "file": "status-dot/running/100x60@1/design/full-extent.png",
+      "equal": true,
+      "sha256": "030f717899b0272b599e51b2c3fe049aaf662e201e51c63e3cecbc15eff778c0"
+    },
+    {
+      "file": "status-dot/running/100x60@1/code/screenshot.png",
+      "equal": true,
+      "sha256": "4ce9c83aa70d26bc4d32fcd5a32f4b3adef798702013551b315b4339798d49fd"
+    },
+    {
+      "file": "status-dot/running/100x60@1/code/dom.json",
+      "equal": true,
+      "sha256": "9a2dcba1e4e880b142bc71822e4988575c4552714b05d67cf3319bab255da621"
+    },
+    {
+      "file": "status-dot/running/100x60@1/code/full-extent.png",
+      "equal": true,
+      "sha256": "4ce9c83aa70d26bc4d32fcd5a32f4b3adef798702013551b315b4339798d49fd"
+    }
+  ]
+}

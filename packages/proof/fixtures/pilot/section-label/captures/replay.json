@@ -1,0 +1,36 @@
+{
+  "captureOnly": true,
+  "comparisonRun": false,
+  "freshContextReplay": [
+    {
+      "file": "section-label/default/240x60@1/design/screenshot.png",
+      "equal": true,
+      "sha256": "f492b7423a871c96fd604f151d269eb9b3a1124068969548f7df8b1b7405f527"
+    },
+    {
+      "file": "section-label/default/240x60@1/design/dom.json",
+      "equal": true,
+      "sha256": "375d261bc6233c45b368d091fecec7c1f87b0d9c7299d61b91afffc419696440"
+    },
+    {
+      "file": "section-label/default/240x60@1/design/full-extent.png",
+      "equal": true,
+      "sha256": "cb1810ebd39a7a97f9a57feb28a09d9b6a9ca90ded51ccdbf36b7c73c191898c"
+    },
+    {
+      "file": "section-label/default/240x60@1/code/screenshot.png",
+      "equal": true,
+      "sha256": "d8077fe35d840f79cc77d100592c6fb7c8856a97c66e160ec307488719e27416"
+    },
+    {
+      "file": "section-label/default/240x60@1/code/dom.json",
+      "equal": true,
+      "sha256": "2d4adef4ba144623427da5c81cb188765f0483f095812481dc9aec40ce082d7f"
+    },
+    {
+      "file": "section-label/default/240x60@1/code/full-extent.png",
+      "equal": true,
+      "sha256": "d8077fe35d840f79cc77d100592c6fb7c8856a97c66e160ec307488719e27416"
+    }
+  ]
+}
