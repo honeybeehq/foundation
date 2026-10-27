@@ -22,6 +22,7 @@ const report = () => ({
   },
   code: { root: "bits.tsx#Keycap", commit: "old" },
   provable: true,
+  acceptancePixelHashes: { "def-one": "f".repeat(64) },
   drifts: [
     {
       id: "d1",
@@ -151,6 +152,40 @@ test("actual CLI measures and persists a review session", async () => {
     expect(log.entries[0]!.decision).toBe("real");
     expect(log.sessions[0]!.durationMs).toBeGreaterThanOrEqual(0);
     expect(reviewState(body.candidates[0]!, log).status).toBe("real");
+    invoke("review-start", index, "--reviewer", "Pilot demo");
+    invoke(
+      "review",
+      index,
+      "def-one",
+      "accept",
+      "--note",
+      "Keep this intended color",
+    );
+    invoke("review-end", index);
+    const { readAccepted, evaluateAccepted } = await import(
+      "../accept/index.ts"
+    );
+    const list = await readAccepted(
+      path.join(dir, ".foundation/accepted.json"),
+    );
+    expect(evaluateAccepted(r, list).accepted).toEqual(["def-one"]);
+    expect(
+      reviewState(
+        body.candidates[0]!,
+        await readReview(path.join(dir, ".foundation/review-log.json")),
+        true,
+      ).status,
+    ).toBe("accept");
+    invoke("review-start", index, "--reviewer", "Pilot demo");
+    expect(() =>
+      invoke("review-start", index, "--reviewer", "Second session"),
+    ).toThrow("Another review is active");
+    invoke("review-abort", index, "--note", "Orphan recovery demo");
+    expect(
+      (
+        await readReview(path.join(dir, ".foundation/review-log.json"))
+      ).sessions.at(-1)!.aborted,
+    ).toBe(true);
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
