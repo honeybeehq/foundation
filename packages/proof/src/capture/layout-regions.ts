@@ -19,7 +19,7 @@ export async function captureLayoutRegions(page:Page,side:'design'|'code',region
     visit(boundary,'0');
     return regions.map(region=>{
       const selector=side==='design' ? `[data-fdn-id="${CSS.escape(region.designNode)}"]` : region.codeSelector;
-      const roots=Array.from(boundary.querySelectorAll(selector));
+      const roots=[...(boundary.matches(selector)?[boundary]:[]),...Array.from(boundary.querySelectorAll(selector))];
       if(roots.length>1) throw Error(`Layout-only region ${region.id} has ambiguous ${side} marker`);
       const root=roots[0];
       if(!root) return {id:region.id,root:null,...(region.repeat?{items:[]}: {})};
