@@ -1,3 +1,5 @@
+import {preserveCodeContext} from "./code-context.ts";
+import {captureLayoutRegions} from "./layout-regions.js";
 import {captureFrames} from './frame.ts'
 import {preserveDesignContext} from './design-context.ts'
 
@@ -24,7 +26,9 @@ const linksPath = resolve(repo, option('--links', '.foundation/links.json')!)
 const out = resolve(option('--out', 'captures')!)
 const designPath = resolve(option('--design', resolve(import.meta.dirname, '../../fixtures/design/tracks-pane.fdn.html'))!)
 const codeBoundary = option('--code-boundary')
+const codeContextBoundary = option('--code-context-boundary')
 const preserveContext = args.includes('--preserve-design-context')
+if(codeContextBoundary && (!preserveContext || codeBoundary)) throw Error('Code context boundary requires --preserve-design-context and cannot use legacy extraction')
 if (preserveContext && codeBoundary) throw Error('Choose design-context preservation or legacy card extraction, not both')
 const started = performance.now()
 const links = JSON.parse(await readFile(linksPath, 'utf8')) as Links
@@ -97,6 +101,7 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
       page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()) })
       let url = 'foundation:baked'
       let designIsolation: Awaited<ReturnType<typeof preserveDesignContext>> | undefined
+      let codeIsolation: Awaited<ReturnType<typeof preserveCodeContext>> | undefined
       let originalFontSubstitutions: Awaited<ReturnType<typeof pinFontStacks>> | undefined
       try {
         if (side === 'code') {
@@ -166,6 +171,7 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
         await page.waitForFunction(() => (window as any).__foundationPendingTimers === 0, undefined, {timeout:5000})
         await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
         await settleRoot(page)
+        if(side === "code" && codeContextBoundary) codeIsolation=await preserveCodeContext(page,codeContextBoundary,STYLE_PROPERTIES)
         const platformFonts = await usedFonts(page, links.fontPolicy?.requireCustomFonts ?? false, fontAssets.map(font => font.postScriptName).filter((name): name is string => Boolean(name)))
         const boundaryAudit = codeBoundary ? await page.evaluate(() => {
           const audit = (window as any).__foundationBoundaryAudit
@@ -173,12 +179,10 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
           return {...audit, finalScrolls:audit.scrolls.map((s:any) => ({...s,finalX:elements[s.node]!.scrollLeft,finalY:elements[s.node]!.scrollTop}))}
         }) : undefined
         const dom = await collectDom(page, '#foundation-root')
-<<<<<<< HEAD
+        if (designIsolation || codeIsolation) dom.extent.frame=[0,0,frame.width,frame.height]
         const regionLinks=state.layoutOnly?.regions ?? board.layoutOnly?.regions
         const layoutOnlyRegions=regionLinks ? await captureLayoutRegions(page,side,regionLinks) : undefined
-=======
-        if (designIsolation) dom.extent.frame=[0,0,frame.width,frame.height]
->>>>>>> origin/proto/dtc-r3-components
+
         if (errors.length || blocked.length) throw new Error(JSON.stringify({ errors, blocked }))
         const fonts = await page.evaluate(() => [...new Set(Array.from(document.querySelectorAll('#foundation-root *')).map(el => getComputedStyle(el).fontFamily))].sort())
         const tokens = await page.evaluate(() => { const css = getComputedStyle(document.documentElement); return Object.fromEntries(Array.from(css).filter(k => k.startsWith('--')).sort().map(k => [k, css.getPropertyValue(k).trim()])) })
@@ -187,12 +191,8 @@ if (links.platform && process.platform !== links.platform) throw new Error(`Plat
         await page.screenshot({ path: join(destination, 'screenshot.png'), animations: 'disabled' })
         const fullExtent = await captureFullExtent(page, '#foundation-root', join(destination, 'full-extent.png'))
         await writeFile(join(destination, 'dom.json'), JSON.stringify(dom, null, 2) + '\n')
-<<<<<<< HEAD
-        const meta = { schema: 'fdn-capture/0', ...(layoutOnlyRegions?{layoutOnlyRegions}:{}), ...provenance, rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, extent: dom.extent, fullExtent, frame, ...(designIsolation ? {designIsolation} : {}), ...(preserveContext && side === 'code' ? {componentFrame:'viewport'} : {}), ...(codeBoundary ? {boundary:{codeSelector:codeBoundary, originNormalized:true, bothRootsNormalized:true, sizePreserved:true,audit:boundaryAudit}} : {}), url, fonts, fontPolicy: links.fontPolicy, fontSubstitutions, platformFonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
+        const meta = { schema: 'fdn-capture/0', ...(layoutOnlyRegions?{layoutOnlyRegions}:{}), ...provenance, rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, extent: dom.extent, fullExtent, frame, ...(designIsolation ? {designIsolation} : {}), ...(codeIsolation?{codeIsolation}:{}), ...(preserveContext && side === 'code' ? {componentFrame:codeIsolation?'in-place-boundary':'unconstrained-host'} : {}), ...(codeBoundary ? {boundary:{codeSelector:codeBoundary, originNormalized:true, bothRootsNormalized:true, sizePreserved:true,audit:boundaryAudit}} : {}), url, fonts, fontPolicy: links.fontPolicy, fontSubstitutions, platformFonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
 
-=======
-        const meta = { schema: 'fdn-capture/0', ...provenance, rendererCommit, rendererDirty, provable: state.provable !== false, ...(state.reason ? {reason: state.reason} : {}), source: side, artboard: board.id, state: state.name, viewport: board.viewport, extent: dom.extent, fullExtent, frame, ...(designIsolation ? {designIsolation} : {}), ...(preserveContext && side === 'code' ? {componentFrame:'unconstrained-host'} : {}), ...(codeBoundary ? {boundary:{codeSelector:codeBoundary, originNormalized:true, bothRootsNormalized:true, sizePreserved:true,audit:boundaryAudit}} : {}), url, fonts, fontPolicy: links.fontPolicy, fontSubstitutions, platformFonts, fontAssets: fontAssets.map(({css, ...font}) => font), tokens, renderedAt: '2026-07-31T12:00:00.000Z', ...(side === 'code' ? { repo: 'honeybeehq/apiary', commit, dirty: Boolean(dirty), root: board.component } : { file: links.designFile, htmlSha256, designHead, binding: links.binding ?? 'chain-head' }), browserVersion: browser.version(), platform: process.platform, flags: DETERMINISM_FLAGS, styleProperties: STYLE_PROPERTIES, blocked, errors, timingsMs: { capture: Math.round(performance.now() - captureStart) } }
->>>>>>> origin/proto/dtc-r3-components
         await writeFile(join(destination, 'meta.json'), JSON.stringify(meta, null, 2) + '\n')
         console.log(`${board.id}/${state.name} ${side}: ${dom.nodes.length} nodes, ${meta.timingsMs.capture} ms`)
       } finally { await context.close() }

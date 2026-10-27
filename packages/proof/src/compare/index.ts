@@ -286,7 +286,7 @@ export function compare(
       containerText: "descendant-Dice",
       confidence: "1-cost; uncalibrated",
     },
-    offscreen: [design,code].every(c=>c.nodes.every(n=>n.visibility))
+    offscreen: layout ? {status:"declared-regions-only",reason:"Only declared geometry is checked; the independent off-screen eligibility scan is not run."} : [design,code].every(c=>c.nodes.every(n=>n.visibility))
       ? {status:'measured'}
       : {status:'unavailable',reason:'offscreen-unavailable: capture lacks per-node visibility facts; recapture both sides to check clipping and off-screen content'},
     tolerances: t,

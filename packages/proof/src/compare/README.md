@@ -13,3 +13,19 @@ Both captures must provide the same 54-property list; incomplete captures are no
 Output reports use canonical SHA256 hashes and bundle source DOM/meta/screenshots in `design-capture/` and `code-capture/` for verifier replay.
 
 Pinned captures validate the actual CDP glyph inventory against hashed declared assets and matching browser/platform/source fingerprints. Source authoredFontFamily is compared for font-family drift while rendered normalized stacks are retained separately; alias normalization does not erase authored stack changes. The environment regression test covers invalid capture metadata and hidden family drift. Final dataset provenance and the historical fallback-font incident are in RESULTS.md.
+
+Layout-only mode is opt-in: `cli.ts DESIGN CODE OUT --layout-only`, or
+`compare(design, code, tolerances, {mode:'layout-only'})`. Captures must carry
+`layoutOnlyRegions`, resolved from artboard/state `layoutOnly.regions` in
+links.json. Each declaration pairs `id`, `designNode` and `codeSelector`; an
+optional `repeat` contains `designSelector` and `codeSelector`. Excess repeated
+items are ignored; loss of all items is a presence finding. Shared stable ids
+preserve semantic order, with ordinal geometry for remaining common templates.
+
+Only declared markers and common template boxes are checked. Descendant marked
+regions use a declared parent as their coordinate frame to avoid repeating a
+parent displacement. This mode does not establish full-panel equality: text,
+styles, pixels, unmarked content and excess declared repetition do not set the
+verdict. The report records coverage and ignored item counts. Missing/ambiguous
+markers are not-provable. Pixel output remains diagnostic. Full mode is the
+unchanged default.

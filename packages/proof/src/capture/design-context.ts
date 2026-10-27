@@ -12,12 +12,17 @@ export async function preserveDesignContext(page: Page, selector: string, proper
     const styles = elements.map(el => properties.map(p => getComputedStyle(el).getPropertyValue(p)))
     if (document.getElementById('foundation-root')) throw Error('Capture root already exists')
     if (getComputedStyle(document.documentElement).transform !== 'none') throw Error('Authored html transforms need a dedicated capture adapter')
+    const focused=selected.contains(document.activeElement) ? document.activeElement as HTMLElement : null
+    const scrolls=elements.map(el=>({el,x:el.scrollLeft,y:el.scrollTop}))
     const originalId = selected.id
     const wrapper=document.createElement('div')
     wrapper.id='foundation-root'
     wrapper.style.display='contents'
     selected.before(wrapper)
     wrapper.append(selected)
+    focused?.focus({preventScroll:true})
+    for(const {el,x,y} of scrolls) {el.scrollLeft=x;el.scrollTop=y}
+    if(focused && document.activeElement!==focused) throw Error('Capture context lost focused element')
     const isolation = document.createElement('style')
     isolation.textContent = `html{transform:translate(${-original.x}px,${-original.y}px)!important;transform-origin:0 0!important}body *:not(#foundation-root):not(#foundation-root *){visibility:hidden!important}#foundation-root{visibility:visible!important}`
     document.head.append(isolation)
@@ -32,6 +37,6 @@ export async function preserveDesignContext(page: Page, selector: string, proper
       return actual===styles[i]![j]?[]:[{node:i,property,before:styles[i]![j],after:actual}]
     }))
     if (geometryChanges.length || styleChanges.length || Math.abs(after.x)>0.05 || Math.abs(after.y)>0.05) throw Error('Design context changed during isolation: '+JSON.stringify({geometryChanges,styleChanges,origin:[after.x,after.y]}))
-    return {mode:'in-place' as const, originalId, originalBox:[original.x,original.y,original.width,original.height], isolatedBox:[after.x,after.y,after.width,after.height], properties:properties.length, nodes:elements.length,geometryChanges,styleChanges,wrapper:'display:contents',ancestorContextPreserved:true,outsidePaint:'visibility:hidden',backgrounds:'authored html/body retained',ancestorClips:'retained'}
+    return {mode:'in-place' as const,focusRestored:Boolean(focused),scrollPositionsPreserved:scrolls.length, originalId, originalBox:[original.x,original.y,original.width,original.height], isolatedBox:[after.x,after.y,after.width,after.height], properties:properties.length, nodes:elements.length,geometryChanges,styleChanges,wrapper:'display:contents',ancestorContextPreserved:true,outsidePaint:'visibility:hidden',backgrounds:'authored html/body retained',ancestorClips:'retained'}
   },{selector,properties:[...properties]})
 }
