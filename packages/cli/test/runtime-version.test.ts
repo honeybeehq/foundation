@@ -30,3 +30,14 @@ describe('runtime attestation', () => {
     } finally { rmSync(root, { recursive: true, force: true }) }
   })
 })
+
+it('does not discover an ancestor repository from an archive stage', () => {
+  const root = mkdtempSync(join(tmpdir(), 'foundation-ancestor-'))
+  try {
+    const git = (...args: string[]) => execFileSync('git', ['-C', root, ...args], { encoding: 'utf8' }).trim()
+    git('init', '-q'); git('config', 'user.name', 'test'); git('config', 'user.email', 'test@example.com')
+    writeFileSync(join(root, 'tracked'), 'original'); git('add', '.'); git('commit', '-qm', 'fixture')
+    const stage = join(root, 'versions', 'stage'); mkdirSync(stage, { recursive: true })
+    expect(runtimeVersion(stage)).toMatchObject({ sourceSha: 'unknown', dirty: null })
+  } finally { rmSync(root, { recursive: true, force: true }) }
+})

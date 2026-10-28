@@ -110,3 +110,18 @@ it('refuses to overwrite a gateway edited after activation', async () => {
   expect(await runInstall(['--rollback'], captureIo())).toBe(1)
   expect(readFileSync(registry, 'utf8')).toBe('changed by owner')
 })
+
+it('reports install state outside the four restored paths in plans and activation output', async () => {
+  const io = captureIo()
+  expect(await runInstall(['--from', process.cwd(), '--dry-run'], io)).toBe(0)
+  const plan = JSON.parse(io.out[0]!)
+  const activated = captureIo()
+  activateInstall(release('a'.repeat(40)), home, undefined, activated)
+  expect(JSON.parse(activated.out[0]!).stateOutsideRollback).toEqual(plan.stateOutsideRollback)
+  expect(plan.stateOutsideRollback.map((entry: {path:string}) => entry.path)).toEqual([
+    '.local/share/foundation/versions/', '.local/share/foundation/rollbacks/',
+    '.local/share/foundation/rollback.json', '.local/share/foundation/rollback-restored.json',
+    '.local/share/foundation/rollback-active', '.local/bin/foundation.before-foundation-install',
+    '.local/share/foundation/install.lock', '.foundation/machine-id',
+  ].map(path => join(home, path)))
+})

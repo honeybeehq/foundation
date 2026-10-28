@@ -49,3 +49,21 @@ it('session hello auto-registers while its own transaction holds the lock', () =
   const session=createSession({path:file,watch:false,send:message=>messages.push(message),log:message=>logs.push(message)})
   try{session.receive(JSON.stringify({t:'hello',protocol:'0.2',client:'test',author:'test'}));expect(messages.some(m=>m.t==='welcome')).toBe(true);expect(logs.join('\n')).not.toContain('document is busy');expect(liveDesigns()).toHaveLength(1)}finally{session.close()}
 })
+
+it('session hello respects AUTO_OPEN=0 even beside a share config', () => {
+  dir = mkdtempSync(join(tmpdir(), 'session-share-optout-'))
+  vi.stubEnv('FOUNDATION_REPLICA_STORE', join(dir, 'store'))
+  vi.stubEnv('FOUNDATION_SYNC_AUTO_OPEN', '0')
+  mkdirSync(join(dir, '.foundation'))
+  writeFileSync(join(dir, '.foundation/share.json'), JSON.stringify({version:1,mode:'self-hosted',service:'https://share.example',space:'sp_test',repo:'github.com/team/repo',encryption:'e2e-v1'}))
+  const file = join(dir, 'board.fdn.html'), doc = skeletonDocument('Board')
+  writeFileSync(file, projectDocument(doc))
+  writeFileSync(file + '.chain', createChain(doc, {author:'test',message:'init'}, {docId:'board'}).save())
+  const messages: any[] = []
+  const session = createSession({path:file,watch:false,send:message=>messages.push(message)})
+  try {
+    session.receive(JSON.stringify({t:'hello',protocol:'0.2',client:'test',author:'test'}))
+    expect(messages.some(m=>m.t==='welcome')).toBe(true)
+    expect(liveDesigns()).toEqual([])
+  } finally { session.close() }
+})
