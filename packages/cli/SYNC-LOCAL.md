@@ -227,13 +227,14 @@ the private replica state in their normal local disk retention planning.
 A writable session hello or local editing hook can register a design for sharing
 when a nearby `.foundation/share.json` enables sharing. Set
 `FOUNDATION_SYNC_AUTO_OPEN=0` to disable automatic registration, including that
-share-config fallback. An unset value keeps share-config discovery; `1` opts in
+share-config fallback. An unset or other value keeps share-config discovery; `1` opts in
 without requiring a share config. Explicit `foundation sync open` remains an
 explicit registration request. This setting does not unregister existing copies;
 use `foundation sync close FILE` to close an already registered copy.
 
 Share-config discovery checks the starting directory, then walks upward until
-it finds a share config or Git root. It never walks above `HOME`, or enters an
+it finds a share config or Git root. `HOME` itself is checked (including a
+dotfiles Git root there), but its parents are never searched. It never enters an
 ancestor listed in `GIT_CEILING_DIRECTORIES` (using the platform path-list
 separator, `:` on Linux/macOS). Paths and ceilings are resolved through symlinks.
 An explicitly selected `--repo-root` does not perform this discovery walk.

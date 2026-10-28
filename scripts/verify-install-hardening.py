@@ -46,6 +46,11 @@ with tempfile.TemporaryDirectory(prefix='foundation-install-') as scratch:
     print(f'CHECK TMPDIR bytes={len(str(temp))}; source={sha}')
     installed = json.loads(run(cli + ['install', '--from', str(repo)]))
     assert installed['sourceSha'] == sha
+    assert len(installed['stateOutsideRollback']) == 8
+    base = home / '.local/share/foundation'
+    assert (base / 'rollback.json').is_file()
+    assert (base / 'rollback-active').is_file()
+    assert list((base / 'rollbacks').glob('*/restore.sh'))
     assert (index.read_bytes(), index.stat().st_mtime_ns) == before
     version = json.loads(run([str(bin), 'version', '--json']))
     assert version['sourceSha'] == sha and version['dirty'] is False
@@ -57,4 +62,9 @@ with tempfile.TemporaryDirectory(prefix='foundation-install-') as scratch:
     assert not (home / '.local/share/foundation/install.lock').exists()
     assert (home / '.local/share/foundation/versions' / sha).exists()
     assert Path(str(bin) + '.before-foundation-install').read_bytes() == original
+    assert not (base / 'rollback.json').exists()
+    assert (base / 'rollback-restored.json').is_file()
+    assert not (base / 'rollback-active').exists()
+    assert list((base / 'rollbacks').glob('*/restore.sh'))
+    assert not list((base / 'versions').glob('*.tmp'))
     print('PASS: archive install, untouched ancestor index, installed version, and rollback with 100-byte TMPDIR')

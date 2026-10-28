@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from 'vitest'
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { delimiter, join } from 'node:path'
 import { findShareRoot } from '../src/share/config.js'
@@ -31,5 +31,13 @@ it('does not walk beyond HOME into an ancestor repository', () => {
 })
 it('still discovers a config below the boundary', () => {
   const {home, child} = fixture(); share(join(home, 'work'))
-  expect(findShareRoot(child)).toBe(join(home, 'work'))
+  expect(findShareRoot(child)).toBe(realpathSync(join(home, 'work')))
+})
+
+it('applies ceilings through symlinked paths', () => {
+  const {home, child} = fixture(); share(home)
+  const alias = join(root, 'alias'); symlinkSync(home, alias)
+  vi.stubEnv('GIT_CEILING_DIRECTORIES', join(alias, 'work'))
+  expect(findShareRoot(child)).toBe(null)
+  expect(findShareRoot(join(alias, 'work', 'designs'))).toBe(null)
 })
