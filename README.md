@@ -68,7 +68,7 @@ Restart existing agent sessions to pick up a changed MCP registration. Install
 into a temporary `HOME` to test without changing the node's active Foundation.
 
 Rollback does not erase install state. Both install JSON and `--dry-run` JSON
-list it in `stateOutsideRollback`:
+describe the retained and transient Foundation state in `stateOutsideRollback`:
 
 - `~/.local/share/foundation/versions/` retains releases and their dependencies.
 - `~/.local/share/foundation/rollbacks/` retains private restore scripts and
@@ -85,6 +85,9 @@ list it in `stateOutsideRollback`:
   Confirm no install or rollback is running before removing a stale lock.
 - `~/.foundation/machine-id` may be created by document lock-owner identification
   if no OS machine identity is available. It is persistent and outside rollback.
+
+Parent directories created for the executable, gateway and state are not pruned
+by rollback. Dependency-manager caches follow pnpm's own configuration.
 
 The installer uses Node's in-process TypeScript loader for version queries and
 the launcher, so long `TMPDIR` paths do not require a tsx CLI IPC socket. Run

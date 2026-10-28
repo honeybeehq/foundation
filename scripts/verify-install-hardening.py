@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import select
 import subprocess
 import tempfile
 
@@ -55,6 +56,28 @@ with tempfile.TemporaryDirectory(prefix='foundation-install-') as scratch:
     version = json.loads(run([str(bin), 'version', '--json']))
     assert version['sourceSha'] == sha and version['dirty'] is False
     run([str(bin), '--version'])
+    failed = subprocess.run([str(bin), 'not-a-foundation-command'], env=env, text=True, capture_output=True)
+    assert failed.returncode != 0 and 'unknown command' in failed.stderr
+    print('PASS: installed launcher preserves failing exit code and stderr')
+    server = subprocess.Popen([str(bin), 'mcp'], env=env, text=True,
+                              stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    try:
+        server.stdin.write(json.dumps({'jsonrpc':'2.0','id':1,'method':'initialize',
+            'params':{'protocolVersion':'2024-11-05','capabilities':{},'clientInfo':{'name':'install-proof','version':'1'}}}) + '\n')
+        server.stdin.flush()
+        assert select.select([server.stdout], [], [], 15)[0], 'MCP initialize timed out'
+        response = json.loads(server.stdout.readline())
+        assert response['id'] == 1 and 'serverInfo' in response['result']
+        server.stdin.close()
+        assert server.wait(timeout=15) == 0
+        print('PASS: installed MCP starts, responds, and exits on stdin close with long TMPDIR')
+    finally:
+        if server.poll() is None:
+            server.kill()
+            server.wait()
+        server.stdout.close()
+        server.stderr.close()
+
     run([str(bin), 'install', '--rollback'])
     assert bin.read_bytes() == original and bin.stat().st_mode & 0o777 == 0o751
     assert not (home / '.local/share/foundation/current').exists()
