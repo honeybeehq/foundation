@@ -60,9 +60,34 @@ on the current node without running or changing discovered copies; unknown
 revision or format safety stays unknown.
 
 Reinstalling a commit reuses its release. A non-descendant revision requires
-`--force`. The installer prints the previous revision and rollback command;
-the original executable and gateway registration are retained with a
-`.before-foundation-install` suffix. To restore the pre-install setup, move those
-back to their original paths (remove the new executable symlink first). Restart
-existing agent sessions to pick up a changed MCP registration. Install into a
-temporary `HOME` to test without changing the node's active Foundation.
+`--force`. The installer prints the previous revision and a runtime-independent
+`/bin/sh` rollback command. That command (or `foundation install --rollback`)
+restores four activation paths: `current`, `previous`, `~/.local/bin/foundation`,
+and the gateway registration (including its original bytes and permissions).
+Restart existing agent sessions to pick up a changed MCP registration. Install
+into a temporary `HOME` to test without changing the node's active Foundation.
+
+Rollback does not erase install state. Both install JSON and `--dry-run` JSON
+list it in `stateOutsideRollback`:
+
+- `~/.local/share/foundation/versions/` retains releases and their dependencies.
+- `~/.local/share/foundation/rollbacks/` retains private restore scripts and
+  before/after file snapshots.
+- `~/.local/share/foundation/rollback.json` holds the latest activation snapshot;
+  successful rollback renames it to `rollback-restored.json`, which remains.
+- `~/.local/share/foundation/rollback-active` holds the active restore token and
+  is removed after successful rollback.
+- `~/.local/bin/foundation.before-foundation-install` retains the original
+  executable backup when one was needed, including after rollback. The gateway
+  is saved in the rollback snapshots, not in a separate suffixed backup.
+- `~/.local/share/foundation/install.lock` is a transient lock directory used by
+  install and rollback, removed on normal exit; interruption can leave it behind.
+  Confirm no install or rollback is running before removing a stale lock.
+- `~/.foundation/machine-id` may be created by document lock-owner identification
+  if no OS machine identity is available. It is persistent and outside rollback.
+
+The installer uses Node's in-process TypeScript loader for version queries and
+the launcher, so long `TMPDIR` paths do not require a tsx CLI IPC socket. Run
+`python3 scripts/verify-install-hardening.py` from a checkout to exercise a real
+temporary-HOME install, installed version query and rollback with a 100-byte
+`TMPDIR`, without changing the active node installation.

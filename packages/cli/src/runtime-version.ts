@@ -19,7 +19,8 @@ export function runtimeVersion(root = existsSync(resolve(sourceRoot, 'packages/c
   try { const runtime = JSON.parse(readFileSync(resolve(root, 'foundation-install.json'), 'utf8')).runtime; return { ...runtime, chainFormats: runtime.chainFormats ?? [1], defaultChainFormat: defaultChainFormat() } } catch {}
   let sourceSha = 'unknown'
   let dirty: boolean | null = null
-  try {
+  // Archive releases have no Git metadata; never discover a surrounding repo.
+  if (existsSync(resolve(root, '.git'))) try {
     sourceSha = execFileSync('git', ['-C', root, 'rev-parse', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
     dirty = !!execFileSync('git', ['-C', root, 'status', '--porcelain'], { encoding: 'utf8' }).trim()
   } catch {}

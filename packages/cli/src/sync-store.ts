@@ -73,6 +73,7 @@ export function closeDesign(file: string): void {
 }
 /** Opt-in node installation hook; sync registration must never prevent local editing. */
 export function autoOpenDesign(file: string, log: (message: string) => void): void {
+  if (process.env.FOUNDATION_SYNC_AUTO_OPEN === '0') return
   try {
     if (process.env.FOUNDATION_SYNC_AUTO_OPEN !== '1') {
       const root=findShareRoot(dirname(file));if(!root || !readShareConfig(root))return

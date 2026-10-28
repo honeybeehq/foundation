@@ -57,7 +57,7 @@ export async function runInstall(args: string[], io: CliIO): Promise<number> {
         execFileSync(process.execPath, ['--input-type=module', '-e', `import {build} from 'esbuild'; await build({entryPoints:['src/capabilities-bin.ts'],bundle:true,platform:'node',format:'esm',target:'node22',outfile:'dist/capabilities.mjs'})`], { cwd: join(stage, 'packages/cli') })
       }
       // Ask the target revision, never the installer's constants.
-      const runtime = JSON.parse(execFileSync(process.execPath, [join(stage, 'node_modules/tsx/dist/cli.mjs'), '-e', "import {runtimeVersion} from './packages/cli/src/runtime-version.ts'; console.log(JSON.stringify(runtimeVersion(process.cwd())))"], { cwd: stage, encoding: 'utf8' }))
+      const runtime = JSON.parse(execFileSync(process.execPath, ['--import', join(stage, 'node_modules/tsx/dist/loader.mjs'), '--input-type=module', '-e', "import {runtimeVersion} from './packages/cli/src/runtime-version.ts'; console.log(JSON.stringify(runtimeVersion(process.cwd())))"], { cwd: stage, encoding: 'utf8' }))
       runtime.sourceSha = sha
       runtime.dirty = false
       writeFileSync(join(stage, 'foundation-install.json'), JSON.stringify({ runtime, installedAt: new Date().toISOString() }, null, 2))
@@ -70,7 +70,7 @@ if [ "$1" = doctor ] && [ -f "$FDN_ROOT/packages/cli/dist/capabilities.mjs" ]; t
     if [ "$arg" = --capabilities ]; then shift; exec ${shellQuote(process.execPath)} "$FDN_ROOT/packages/cli/dist/capabilities.mjs" "$@"; fi
   done
 fi
-exec ${shellQuote(process.execPath)} "$FDN_ROOT/node_modules/tsx/dist/cli.mjs" "$FDN_ROOT/packages/cli/src/main.ts" "$@"
+exec ${shellQuote(process.execPath)} --import "$FDN_ROOT/node_modules/tsx/dist/loader.mjs" "$FDN_ROOT/packages/cli/src/main.ts" "$@"
 `, { mode: 0o755 })
       renameSync(stage, target)
     } catch (err) { rmSync(stage, { recursive: true, force: true }); throw err }
@@ -120,6 +120,7 @@ export function activateInstall(target: string, home: string, previous: string |
   }
   io.stdout(JSON.stringify({ installed: target, sourceSha: sha, previous: previous || null,
     rollback: snapshot?.shell ? `/bin/sh ${shellQuote(snapshot.shell)}` : null,
+    stateOutsideRollback: stateOutsideRollback(home),
     rollbackCommand: `${shellQuote(join(target, 'foundation'))} install --rollback` }))
   return 0
 }
@@ -155,11 +156,27 @@ function installPlan(target: string, home: string, sha: string, previous: string
     changes: paths.map((path, i) => ({ path, before: (() => { const state = capturePath(path); return state.kind === 'file' ? { kind: 'file', bytes: Buffer.from(state.data, 'base64').length, mode: state.mode } : state })(),
       after: i === 0 ? { kind: 'link', target } : i === 1 ? previous && previous !== sha ? { kind: 'link', target: join(home, '.local/share/foundation/versions', previous) } : 'unchanged'
         : i === 2 ? { kind: 'link', target: join(current, 'foundation') } : { command: paths[2], args: ['mcp'], env: 'preserved' } })),
+    stateOutsideRollback: stateOutsideRollback(home),
     rollbackSnapshot: join(home, '.local/share/foundation/rollback.json'),
     originalExecutableBackup: { path: `${paths[2]}.before-foundation-install`, action: pathExists(paths[2]!) && !pathExists(`${paths[2]}.before-foundation-install`) && !readLinkIsOurs(paths[2]!, join(current, 'foundation')) ? 'rename existing executable here' : 'unchanged' },
     rollback: 'A runtime-independent /bin/sh command is printed after activation; --rollback restores the same snapshot.',
     sessionPolicy: 'Drain writers before activation; running processes retain the previous runtime.',
   }
+}
+
+/** State retained or managed separately from the four activation paths. */
+function stateOutsideRollback(home: string) {
+  const base = join(home, '.local/share/foundation')
+  return [
+    { path: join(base, 'versions/'), lifetime: 'Retained release archives and dependencies; rollback does not remove releases.' },
+    { path: join(base, 'rollbacks/'), lifetime: 'Retained private restore scripts and before/after file snapshots.' },
+    { path: join(base, 'rollback.json'), lifetime: 'Latest activation snapshot; renamed to rollback-restored.json on successful rollback.' },
+    { path: join(base, 'rollback-restored.json'), lifetime: 'Retained snapshot after rollback.' },
+    { path: join(base, 'rollback-active'), lifetime: 'Active restore token; removed on successful rollback.' },
+    { path: join(home, '.local/bin/foundation.before-foundation-install'), lifetime: 'Original executable backup, if needed; retained after rollback.' },
+    { path: join(base, 'install.lock'), lifetime: 'Transient install/rollback lock directory; removed on normal exit, may remain after interruption.' },
+    { path: join(home, '.foundation/machine-id'), lifetime: 'Possible persistent fallback lock-owner identity when OS identity is unavailable; not restored or deleted by rollback.' },
+  ]
 }
 
 function rollbackInstall(home: string, dryRun: boolean, io: CliIO): number {

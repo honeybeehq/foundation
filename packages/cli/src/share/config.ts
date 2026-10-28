@@ -1,5 +1,6 @@
-import { readFileSync, existsSync } from 'node:fs'
-import { dirname, join, resolve } from 'node:path'
+import { readFileSync, existsSync, realpathSync } from 'node:fs'
+import { homedir } from 'node:os'
+import { delimiter, dirname, isAbsolute, join, resolve } from 'node:path'
 
 export interface ShareConfig {
   version: 1
@@ -48,12 +49,18 @@ export function readShareConfig(root: string): ShareConfig | null {
   }
 }
 export function findShareRoot(path: string): string | null {
-  let dir = resolve(path)
+  const canonical = (path: string) => {
+    try { return realpathSync(path) } catch { return resolve(path) }
+  }
+  const home = canonical(process.env.HOME || homedir())
+  const ceilings = new Set((process.env.GIT_CEILING_DIRECTORIES || '').split(delimiter)
+    .filter(path => isAbsolute(path)).map(canonical))
+  let dir = canonical(path)
   for (;;) {
     if (existsSync(join(dir, '.foundation/share.json'))) return dir
     if (existsSync(join(dir, '.git'))) return dir
     const parent = dirname(dir)
-    if (parent === dir) return null
+    if (parent === dir || dir === home || ceilings.has(parent)) return null
     dir = parent
   }
 }

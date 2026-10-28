@@ -221,3 +221,19 @@ History-origin receipts are append-only and currently never pruned (about66
 bytes per assurance record, before directory/filesystem overhead). This retains
 display provenance after activity payload eviction; operators should include
 the private replica state in their normal local disk retention planning.
+
+## Automatic registration and discovery boundaries
+
+A writable session hello or local editing hook can register a design for sharing
+when a nearby `.foundation/share.json` enables sharing. Set
+`FOUNDATION_SYNC_AUTO_OPEN=0` to disable automatic registration, including that
+share-config fallback. An unset value keeps share-config discovery; `1` opts in
+without requiring a share config. Explicit `foundation sync open` remains an
+explicit registration request. This setting does not unregister existing copies;
+use `foundation sync close FILE` to close an already registered copy.
+
+Share-config discovery checks the starting directory, then walks upward until
+it finds a share config or Git root. It never walks above `HOME`, or enters an
+ancestor listed in `GIT_CEILING_DIRECTORIES` (using the platform path-list
+separator, `:` on Linux/macOS). Paths and ceilings are resolved through symlinks.
+An explicitly selected `--repo-root` does not perform this discovery walk.
